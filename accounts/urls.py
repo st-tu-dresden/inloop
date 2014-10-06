@@ -1,12 +1,7 @@
-from django.conf.urls import patterns, url
-
-#from accounts import views
+from django.conf.urls import patterns, include, url
+from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'prktmt.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-    url(r'^$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^login/$', 'django.contrib.auth.views.logout', name='login'),
-    url(r'^logout/$', 'django.contrib.auth.views.login', name='logout'),
+    url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}, name='auth_login'),
+    url(r'^logout/$', auth_views.logout_then_login, name='auth_logout'),
 )
