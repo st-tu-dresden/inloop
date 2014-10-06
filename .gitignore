@@ -1,0 +1,13 @@
+*.swp
+*.swo
+*.pyc
+*.pyo
+*~
+*.backup
+.settings
+.tmp_*
+.project
+.pydevproject
+.DS_Store
+data
+venv
