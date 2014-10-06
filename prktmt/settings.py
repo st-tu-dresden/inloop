@@ -50,6 +50,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+LOGIN_REDIRECT_URL = '/tasks'
+
 ROOT_URLCONF = 'prktmt.urls'
 
 WSGI_APPLICATION = 'prktmt.wsgi.application'
