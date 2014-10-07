@@ -1,7 +1,7 @@
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/base.css" />
-
+  {% load staticfiles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
   <title>Prktmt</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
       <li><a href="#">About</a></li>
       {% else %}
       <li><a href="#">Home</a></li>
-      <li><a href="#">{{user}}</a></li>
+      <li><a href="#">{{ user.get_username }}</a></li>
       <li><a href="#">Settings</a></li>
       <li><a href="{% url 'accounts:auth_logout' %}">Logout</a></li>
       {% endif %}
