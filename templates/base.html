@@ -1,0 +1,29 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/base.css" />
+
+  <title>Prktmt</title>
+</head>
+<body>
+  <div id="navbar">
+    <ul id="menu">
+      {% if user.is_anonymous %}
+      <li><a href="{% url 'accounts:auth_login' %}">Login</a></li>
+      <li><a href="#">About</a></li>
+      {% else %}
+      <li><a href="#">Home</a></li>
+      <li><a href="#">{{user}}</a></li>
+      <li><a href="#">Settings</a></li>
+      <li><a href="{% url 'accounts:auth_logout' %}">Logout</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  <div id="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+  <div id="footer">
+
+  </div>
+</body>
+</html>
