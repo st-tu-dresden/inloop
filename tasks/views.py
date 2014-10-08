@@ -10,6 +10,7 @@ def index(request):
 	lesson_tasks = Task.objects.filter(category='L')
 	exam_tasks = Task.objects.filter(category='E')
 	return render_to_response('tasks/index.html', {
+			'user' : request.user,
 			'basic_tasks' : basic_tasks,
 			'advanced_tasks' : advanced_tasks,
 			'lesson_tasks' : lesson_tasks,
@@ -20,6 +21,7 @@ def index(request):
 def detail(request, slug):
 	task = get_object_or_404(Task, slug=slug)
 	return render_to_response('tasks/task-detail.html', {
+		'user' : request.user,
 		'title' : task.title,
 		'deadline_date' : task.deadline_date,
 		'description' : task.description,
