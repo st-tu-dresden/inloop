@@ -38,6 +38,13 @@
     position: relative;
 }
 
+#menu li:last-child {
+    float: right;
+    border-right: 1px solid #222;
+    box-shadow: 1px 0 0 #444;
+    position: relative;
+}
+
 #menu a {
     float: left;
     padding: 12px 30px;
