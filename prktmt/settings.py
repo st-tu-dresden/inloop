@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'tinymce',
     'accounts',
     'tasks',
 )
@@ -85,6 +86,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Environment variable for compatibility with django-tinymce
+
+STATIC_ROOT = '/static/'
+
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )

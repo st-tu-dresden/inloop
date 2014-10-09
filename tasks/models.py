@@ -1,6 +1,9 @@
 from django.db import models
 
 class Task(models.Model):
+	'''
+	Represents the tasks that are presented to the user to solve.
+	'''
 	title = models.CharField(max_length=100, help_text='Task name')
 	author = models.CharField(max_length=100, help_text='Creator of task')
 	description = models.TextField(help_text='Task description')
@@ -22,4 +25,16 @@ class Task(models.Model):
 		Returns True if the task is already visible to the users.
 		'''
 		pass
-		
+
+class TaskFile(models.Model):
+	'''
+	Represents the files the user has to edit for each task. As each task
+	has a different amount of connected files, they were implemented using
+	a ForeignKey relationship.
+
+	Access all files connected to a task:
+	task = Task.objects.get(pk=1)
+	task.task_files.all()
+	'''
+	filename = models.CharField(max_length=30, help_text='Name of the file including the ending')
+	task = models.ForeignKey(Task, related_name='task_files')

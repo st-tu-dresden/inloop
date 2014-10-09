@@ -2,6 +2,15 @@
 <head>
   {% load staticfiles %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.css' %}">
+  <script src="{% static 'framework/jquery-ui-1.11.1.custom/external/jquery/jquery.js' %}"></script>
+  <script src="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.js' %}"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  </script>
   <title>Prktmt</title>
 </head>
 <body>

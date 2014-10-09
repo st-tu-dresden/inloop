@@ -21,6 +21,7 @@ def index(request):
 def detail(request, slug):
 	task = get_object_or_404(Task, slug=slug)
 	return render_to_response('tasks/task-detail.html', {
+		'task_files' : task.task_files.all(),
 		'user' : request.user,
 		'title' : task.title,
 		'deadline_date' : task.deadline_date,

@@ -4,4 +4,18 @@
 <br />
 <p>Due to: {{deadline_date}}
 <p>{{description}}</p>
+<div id="tabs">
+  <ul>
+    {% for task_file in task_files %}
+    <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
+    {% empty %}
+    Error: No files connected to Task.
+    {% endfor %}
+  </ul>
+  {% for task_file in task_files %}
+  <div id="tabs-{{ forloop.counter }}">
+    Editor for {{ task_file.filename }}
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}
