@@ -9,5 +9,6 @@
 .project
 .pydevproject
 .DS_Store
-data
-venv
+data/
+venv/
+migrations/
