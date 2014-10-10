@@ -1,21 +1,38 @@
 {% extends 'base.html' %}
+
+{% block head %}
+  {# include jQueryUI tabs #}
+  <script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  </script>
+
+  {# include TinyMCE editor #}
+  {{ form.media }}
+{% endblock %}
+
 {% block content %}
 <h1>{{title}}</h1>
 <br />
 <p>Due to: {{deadline_date}}
-<p>{{description}}</p>
-<div id="tabs">
-  <ul>
+<p>{{description|safe}}</p>
+<form action="." method="post">
+  {% csrf_token %}
+  <div id="tabs">
+    <ul>
+      {% for task_file in task_files %}
+        <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
+      {% empty %}
+        Error: No files connected to Task.
+      {% endfor %}
+    </ul>
     {% for task_file in task_files %}
-    <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
-    {% empty %}
-    Error: No files connected to Task.
+      <div id="tabs-{{ forloop.counter }}">
+        {{ editor_form.as_p }}
+      </div>
     {% endfor %}
-  </ul>
-  {% for task_file in task_files %}
-  <div id="tabs-{{ forloop.counter }}">
-    Editor for {{ task_file.filename }}
   </div>
-  {% endfor %}
-</div>
+  <input type="submit" value="Submit" />
+</form>
 {% endblock %}

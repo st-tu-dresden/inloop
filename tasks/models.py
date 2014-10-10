@@ -1,4 +1,5 @@
 from django.db import models
+from tinymce import models as tinymce_models
 
 class Task(models.Model):
 	'''
@@ -6,7 +7,7 @@ class Task(models.Model):
 	'''
 	title = models.CharField(max_length=100, help_text='Task name')
 	author = models.CharField(max_length=100, help_text='Creator of task')
-	description = models.TextField(help_text='Task description')
+	description = tinymce_models.HTMLField(help_text='Task description')
 	publication_date = models.DateTimeField(help_text='When should the task be published?')
 	deadline_date = models.DateTimeField(help_text='Date the task is due to')
 	BASIC = 'B'
@@ -18,7 +19,7 @@ class Task(models.Model):
 											(ADVANCED, 'Advanced Exercise'),
 											(LESSON, 'Lesson Exercise'),
 											(EXAM, 'Exam Exercise')), help_text='Category of task')
-	slug = models.SlugField(max_length=50, help_text='URL name')
+	slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
 
 	def task_is_active(self):
 		'''
