@@ -4,6 +4,7 @@ from tasks.models import Task, TaskFile
 class TaskFileInline(admin.TabularInline):
 	model = TaskFile
 	extra = 1
+	#exclude = ('content',)
 
 class TaskAdmin(admin.ModelAdmin):
 	fieldsets = [	(None, {'fields' : ['title', 'author', 'category']}),

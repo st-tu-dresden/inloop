@@ -38,4 +38,5 @@ class TaskFile(models.Model):
 	task.task_files.all()
 	'''
 	filename = models.CharField(max_length=30, help_text='Name of the file including the ending')
+	content = tinymce_models.HTMLField()
 	task = models.ForeignKey(Task, related_name='task_files')

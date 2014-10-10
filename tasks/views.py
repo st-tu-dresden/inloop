@@ -21,21 +21,27 @@ def index(request):
 @login_required
 def detail(request, slug):
 	task = get_object_or_404(Task, slug=slug)
+	task_file_list = task.task_files.all()
 
 	if request.method == 'POST':
+		# save form data
 		form = forms.UserEditorForm(request.POST)
-		#make stuff. (pass on to compilation)
+		for task_file in task_file_list:
+			pass
+
 	else:
+		#prepopulate form with last saved data
 		form = forms.UserEditorForm()
 
 	return render(request, 'tasks/task-detail.html', {
 		'editor_form' : form,
-		'task_files' : task.task_files.all(),
+		'task_files' : task_file_list,
 		'user' : request.user,
 		'title' : task.title,
 		'deadline_date' : task.deadline_date,
 		'description' : task.description,
 		})
+
 @login_required
 def edit(request, slug):
 	pass
