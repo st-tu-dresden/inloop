@@ -1,10 +1,5 @@
-{{ user }}
-{% if user.is_anonymous %}
-<a href="{% url 'accounts:auth_login' %}">login</a>
-{% else %}
-<a href="{% url 'accounts:auth_logout' %}">logout</a>
-{% endif %}
-<br />
+{% extends 'base.html' %}
+{% block content %}
 <h1>Basic Tasks</h1>
 <table>
 {% for task in basic_tasks %}
@@ -96,3 +91,4 @@
 {% endfor %}
 </table>
 <br />
+{% endblock %}
