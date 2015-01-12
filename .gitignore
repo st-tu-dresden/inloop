@@ -13,3 +13,4 @@ data/
 venv/
 migrations/
 .idea/
+*.sqlite3
