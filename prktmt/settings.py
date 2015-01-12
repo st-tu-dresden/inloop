@@ -35,8 +35,9 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
-    'home',
+    'django.contrib.flatpages',
     'tinymce',
     'accounts',
     'tasks',
@@ -51,6 +52,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/tasks'
 

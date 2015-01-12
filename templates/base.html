@@ -13,8 +13,8 @@
   <div id="navbar">
     <ul id="menu">
       {% if user.is_anonymous %}
-      <li><a href="{% url 'home:index' %}">Home</a></li>
-      <li><a href="{% url 'home:about' %}">About</a></li>
+      <li><a href="{% url 'index' %}">Home</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
       <li><a href="{% url 'accounts:auth_login' %}">Login</a></li>
       {% else %}
       <li><a href="{% url 'tasks:index' %}">Home</a></li>
