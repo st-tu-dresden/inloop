@@ -11,6 +11,5 @@
 .DS_Store
 data/
 venv/
-migrations/
 .idea/
 *.sqlite3
