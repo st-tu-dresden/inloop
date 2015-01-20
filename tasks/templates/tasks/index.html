@@ -1,94 +1,94 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Basic Tasks</h1>
-<table>
-{% for task in basic_tasks %}
-	{% if forloop.first %}
-	<tr>
-		<th>Title</th>
-		<th>Published</th>
-		<th>Due to</th>
-		<th>Completed</th>
-	</tr>
-	{% endif %}
-	<tr>
-		<td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-		<td>{{ task.publication_date }}</td>
-		<td>{{ task.deadline_date }}</td>
-		<td>TODO</td>
-	</tr>
-{% empty %}
-	No Basic exercises to do.
-{% endfor %}
-</table>
-<br />
+    <h1>Basic Tasks</h1>
+    <table>
+        {% for task in basic_tasks %}
+            {% if forloop.first %}
+                <tr>
+                    <th>Title</th>
+                    <th>Published</th>
+                    <th>Due to</th>
+                    <th>Completed</th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+                <td>{{ task.publication_date }}</td>
+                <td>{{ task.deadline_date }}</td>
+                <td>TODO</td>
+            </tr>
+        {% empty %}
+            No Basic exercises to do.
+        {% endfor %}
+    </table>
+    <br/>
 
-<h1>Advanced Tasks</h1>
-<table>
-{% for task in advanced_tasks %}
-	{% if forloop.first %}
-	<tr>
-		<th>Title</th>
-		<th>Published</th>
-		<th>Due to</th>
-		<th>Completed</th>
-	</tr>
-	{% endif %}
-	<tr>
-		<td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-		<td>{{ task.publication_date }}</td>
-		<td>{{ task.deadline_date }}</td>
-		<td>TODO</td>
-	</tr>
-{% empty %}
-	No Advanced exercises to do.
-{% endfor %}
-</table>
-<br />
+    <h1>Advanced Tasks</h1>
+    <table>
+        {% for task in advanced_tasks %}
+            {% if forloop.first %}
+                <tr>
+                    <th>Title</th>
+                    <th>Published</th>
+                    <th>Due to</th>
+                    <th>Completed</th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+                <td>{{ task.publication_date }}</td>
+                <td>{{ task.deadline_date }}</td>
+                <td>TODO</td>
+            </tr>
+        {% empty %}
+            No Advanced exercises to do.
+        {% endfor %}
+    </table>
+    <br/>
 
-<h1>Lesson Tasks</h1>
-<table>
-{% for task in lesson_tasks %}
-	{% if forloop.first %}
-	<tr>
-		<th>Title</th>
-		<th>Published</th>
-		<th>Due to</th>
-		<th>Completed</th>
-	</tr>
-	{% endif %}
-	<tr>
-		<td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-		<td>{{ task.publication_date }}</td>
-		<td>{{ task.deadline_date }}</td>
-		<td>TODO</td>
-	</tr>
-{% empty %}
-	No Lesson exercises to do.
-{% endfor %}
-</table>
-<br />
+    <h1>Lesson Tasks</h1>
+    <table>
+        {% for task in lesson_tasks %}
+            {% if forloop.first %}
+                <tr>
+                    <th>Title</th>
+                    <th>Published</th>
+                    <th>Due to</th>
+                    <th>Completed</th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+                <td>{{ task.publication_date }}</td>
+                <td>{{ task.deadline_date }}</td>
+                <td>TODO</td>
+            </tr>
+        {% empty %}
+            No Lesson exercises to do.
+        {% endfor %}
+    </table>
+    <br/>
 
-<h1>Exam Tasks</h1>
-<table>
-{% for task in exam_tasks %}
-	{% if forloop.first %}
-	<tr>
-		<th>Title</th>
-		<th>Published</th>
-		<th>Due to</th>
-		<th>Completed</th>
-	</tr>
-	{% endif %}
-	<tr>
-		<td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-		<td>{{ task.publication_date }}</td>
-		<td>{{ task.deadline_date }}</td>
-		<td>TODO</td>
-	</tr>
-{% empty %}
-	No Exam exercises to do.
-{% endfor %}
-</table>
-<br />
+    <h1>Exam Tasks</h1>
+    <table>
+        {% for task in exam_tasks %}
+            {% if forloop.first %}
+                <tr>
+                    <th>Title</th>
+                    <th>Published</th>
+                    <th>Due to</th>
+                    <th>Completed</th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+                <td>{{ task.publication_date }}</td>
+                <td>{{ task.deadline_date }}</td>
+                <td>TODO</td>
+            </tr>
+        {% empty %}
+            No Exam exercises to do.
+        {% endfor %}
+    </table>
+    <br/>
 {% endblock %}

@@ -1,35 +1,37 @@
 <html>
 <head>
-  {% load staticfiles %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
-  <link rel="stylesheet" type="text/css" href="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.css' %}">
-  <script src="{% static 'framework/jquery-ui-1.11.1.custom/external/jquery/jquery.js' %}"></script>
-  <script src="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.js' %}"></script>
-  {% block head %}
-  {% endblock %}
-  <title>Prktmt</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.css' %}">
+    <script src="{% static 'framework/jquery-ui-1.11.1.custom/external/jquery/jquery.js' %}"></script>
+    <script src="{% static 'framework/jquery-ui-1.11.1.custom/jquery-ui.js' %}"></script>
+    {% block head %}
+    {% endblock %}
+    <title>Prktmt</title>
 </head>
 <body>
-  <div id="navbar">
+<div id="navbar">
     <ul id="menu">
-      {% if user.is_anonymous %}
-      <li><a href="{% url 'index' %}">Home</a></li>
-      <li><a href="{% url 'about' %}">About</a></li>
-      <li><a href="{% url 'accounts:auth_login' %}">Login</a></li>
-      {% else %}
-      <li><a href="{% url 'tasks:index' %}">Home</a></li>
-      <li><a href="#">{{ user.get_username }}</a></li>
-      <li><a href="#">Settings</a></li>
+        {% if user.is_anonymous %}
+            <li><a href="{% url 'index' %}">Home</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            <li><a href="{% url 'accounts:auth_login' %}">Login</a></li>
+        {% else %}
+            <li><a href="{% url 'tasks:index' %}">Home</a></li>
+            <li><a href="#">{{ user.get_username }}</a></li>
+            <li><a href="#">Settings</a></li>
+            {% comment %}
       <li><a href="{% url 'accounts:auth_logout' %}">Logout</a></li>
-      {% endif %}
+      {% endcomment %}
+        {% endif %}
     </ul>
-  </div>
-  <div id="content">
+</div>
+<div id="content">
     {% block content %}
     {% endblock %}
-  </div>
-  <div id="footer">
+</div>
+<div id="footer">
 
-  </div>
+</div>
 </body>
 </html>

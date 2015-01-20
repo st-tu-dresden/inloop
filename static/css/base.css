@@ -28,7 +28,7 @@
 }
 
 #menu {
-    zoom:1;
+    zoom: 1;
 }
 
 #menu li {
@@ -59,7 +59,8 @@
     color: #fafafa;
 }
 
-*html #menu li a:hover { /* IE6 only */
+* html #menu li a:hover {
+    /* IE6 only */
     color: #fafafa;
 }
 
@@ -74,7 +75,7 @@
     z-index: 1;
     background: #444;
     background: linear-gradient(#444, #111);
-    box-shadow: 0 -1px 0 rgba(255,255,255,.3);
+    box-shadow: 0 -1px 0 rgba(255, 255, 255, .3);
     border-radius: 3px;
     transition: all .2s ease-in-out;
 }
@@ -90,7 +91,7 @@
     left: 150px;
     margin: 0 0 0 20px;
     _margin: 0; /*IE6 only*/
-    box-shadow: -1px 0 0 rgba(255,255,255,.3);
+    box-shadow: -1px 0 0 rgba(255, 255, 255, .3);
 }
 
 #menu ul li {
