@@ -10,4 +10,4 @@ def about(request):
 
 
 def impressum(request):
-    return render(request, 'home/impressum.html')
+    return render(request, 'home/legal.html')

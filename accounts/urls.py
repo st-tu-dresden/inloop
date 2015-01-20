@@ -6,6 +6,5 @@ import accounts.views as account_views
 urlpatterns = patterns('',
                        url(r'^register/$', account_views.register, name='register'),
                        url(r'^login/$', account_views.user_login, name='user_login'),
-                       url(r'^logout/$', auth_views.logout_then_login,
-                           {'template_name': 'registration/logged_out.html'}, name='auth_logout'),
+                       url(r'^logout/$', account_views.user_logout, name='user_logout'),
 )

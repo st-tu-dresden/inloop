@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect, HttpResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from accounts.forms import UserForm
 
 
@@ -36,7 +37,7 @@ def user_login(request):
         user = authenticate(username=username, password=password)
 
         if user:
-            if user.is_active():
+            if user.is_active:
                 # everything alright
                 login(request, user)
                 return HttpResponseRedirect('/tasks/')
@@ -48,8 +49,9 @@ def user_login(request):
             print "Invalid login details: {0}, {1}".format(username, password)
             return HttpResponse("Invalid login details supplied.")
     else:
-        return render(request, 'accounts/login.html', {})
+        return render(request, 'registration/login.html', {})
 
-
+@login_required(login_url='accounts/login/')
 def user_logout(request):
-    pass
+    logout(request)
+    return HttpResponseRedirect('/accounts/login/')
