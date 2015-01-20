@@ -10,9 +10,9 @@ def register(request):
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
 
-        if user_form.is_valid():
+        if user_form.is_valid:
             user = user_form.save()
-            user.set_password()
+            user.set_password(user.password)
             user.save()
 
             registered = True
@@ -47,7 +47,7 @@ def user_login(request):
         else:
             # invalid credentials
             print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied.")
+            return HttpResponse("Invalid login details!")
     else:
         return render(request, 'registration/login.html', {})
 
