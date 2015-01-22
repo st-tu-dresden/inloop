@@ -6,6 +6,9 @@
 
     <form method="post" action="{% url 'accounts:user_login' %}">
         {% csrf_token %}
+        {% if login_failed %}
+            <p>Invalid username or password!</p>
+        {% endif %}
         Username: <input type="text" name="username" value="" size="50"/>
         <br/>
         Password: <input type="password" name="password" value="" size="50"/>

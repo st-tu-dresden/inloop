@@ -10,6 +10,24 @@
               enctype="multipart/form-data">
             {% csrf_token %}
 
+            {% comment %}
+            {% if user_form.mat_num.errors %}
+                <ul>
+                {% for error in user_form.errors %}
+                    {% if error == "mat_num" %}
+                        <li><strong>The matriculation number must have 7 digits!</strong></li>
+                    {% else %}
+                        {% if error == "password" %}
+                            <li><strong>The password field must not be empty!</strong></li>
+                        {% else %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endif%}
+            {% endcomment %}
+
             {{ user_form.as_p }}
 
             <input type="submit" name="submit" value="Register"/>

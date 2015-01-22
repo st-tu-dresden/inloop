@@ -10,7 +10,7 @@ def register(request):
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
 
-        if user_form.is_valid:
+        if user_form.is_valid():
             user = user_form.save()
             user.set_password(user.password)
             user.save()
@@ -43,15 +43,25 @@ def user_login(request):
                 return HttpResponseRedirect('/tasks/')
             else:
                 # account disabled
-                return HttpResponse('Your user account is currently disabled!!')
+                return render(request, 'registration/login.html', {
+                    'login_failed': True
+                })
         else:
             # invalid credentials
             print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details!")
+            return render(request, 'registration/login.html', {
+                'login_failed': True
+            })
     else:
-        return render(request, 'registration/login.html', {})
+        return render(request, 'registration/login.html', {
+            'login_failed': False
+        })
 
 @login_required(login_url='accounts/login/')
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/accounts/login/')
+
+@login_required(login_url='/accounts/login/')
+def user_profile(request):
+    pass
