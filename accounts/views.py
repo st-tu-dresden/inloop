@@ -44,23 +44,33 @@ def user_login(request):
             else:
                 # account disabled
                 return render(request, 'registration/login.html', {
-                    'login_failed': True
+                    'login_failed': False,
+                    'account_disabled': True,
+                    'successful_logout': False
                 })
         else:
             # invalid credentials
             print "Invalid login details: {0}, {1}".format(username, password)
             return render(request, 'registration/login.html', {
-                'login_failed': True
+                'login_failed': True,
+                'account_disabled': False,
+                'successful_logout': False
             })
     else:
         return render(request, 'registration/login.html', {
-            'login_failed': False
+            'login_failed': False,
+            'account_disabled': False,
+            'successful_logout': False
         })
 
 @login_required(login_url='accounts/login/')
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect('/accounts/login/')
+    return render(request, 'registration/login.html', {
+        'login_failed': False,
+        'account_disabled': False,
+        'successful_logout': True
+    })
 
 @login_required(login_url='/accounts/login/')
 def user_profile(request):
