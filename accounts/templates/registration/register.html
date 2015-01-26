@@ -4,15 +4,20 @@
         <strong>Thank you for registering!</strong>
         <a href="/tasks/">Return to the homepage.</a><br/>
     {% else %}
-        <strong>Register here!</strong><br/>
+        <div class="col-md-4 col-md-offset-4">
+            <form id="user_form" method="post" action="/accounts/register/"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
 
-        <form id="user_form" method="post" action="/accounts/register/"
-              enctype="multipart/form-data">
-            {% csrf_token %}
+                {% for field in user_form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
 
-            {{ user_form.as_p }}
-
-            <input type="submit" name="submit" value="Register"/>
-        </form>
+                <button type="submit" class="btn btn-default">Register</button>
+            </form>
+        </div>
     {% endif %}
 {% endblock %}
