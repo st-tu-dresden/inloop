@@ -29,7 +29,7 @@
                     <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'accounts:register' %}">Register</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li>
+                    <li><a href="{% url 'django.contrib.flatpages.views.flatpage' url="/about/" %}">About</a></li>
                 {% endif %}
             </ul>
         </div>
