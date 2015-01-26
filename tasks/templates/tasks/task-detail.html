@@ -13,26 +13,28 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{ title }}</h1>
-    <br/>
-    <p>Due to: {{ deadline_date }}
-    <p>{{ description|safe }}</p>
-    <form action="." method="post">
-        {% csrf_token %}
-        <div id="tabs">
-            <ul>
+    <div class="col-md-4 col-md-offset-4">
+        <h1>{{ title }}</h1>
+        <br/>
+        <p>Due to: {{ deadline_date }}
+        <p>{{ description|safe }}</p>
+        <form action="." method="post">
+            {% csrf_token %}
+            <div id="tabs">
+                <ul>
+                    {% for task_file in task_files %}
+                        <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
+                    {% empty %}
+                        Error: No files connected to Task.
+                    {% endfor %}
+                </ul>
                 {% for task_file in task_files %}
-                    <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
-                {% empty %}
-                    Error: No files connected to Task.
+                    <div id="tabs-{{ forloop.counter }}">
+                        {{ editor_form.as_p }}
+                    </div>
                 {% endfor %}
-            </ul>
-            {% for task_file in task_files %}
-                <div id="tabs-{{ forloop.counter }}">
-                    {{ editor_form.as_p }}
-                </div>
-            {% endfor %}
-        </div>
-        <input type="submit" value="Submit"/>
-    </form>
+            </div>
+            <input type="submit" value="Submit"/>
+        </form>
+    </div>
 {% endblock %}
