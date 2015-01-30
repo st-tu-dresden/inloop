@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if registered %}
-        <strong>Thank you for registering!</strong>
-        <a href="/tasks/">Return to the homepage.</a><br/>
+        <div class="col-md-4 col-md-offset-4">
+            <strong>Thank you for registering!</strong>
+            <a href="/tasks/">Return to the homepage.</a><br/>
+        </div>
     {% else %}
         <div class="col-md-4 col-md-offset-4">
             <form autocomplete="off" id="user_form" method="post" action="/accounts/register/"
