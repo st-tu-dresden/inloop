@@ -17,7 +17,7 @@ Note: This version has only been tested with Python 2.7.
 
 3. Set up the database and super user:
 	```
-	./manage.py syncdb
+	./manage.py migrate
 	./manage.py createsuperuser
 	```
 
