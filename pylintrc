@@ -1,0 +1,11 @@
+[MASTER]
+jobs = 1
+ignore = migrations
+
+[MESSAGES CONTROL]
+enable = all
+disable = missing-docstring
+
+[REPORTS]
+reports = no
+output-format = colorized
