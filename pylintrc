@@ -4,8 +4,11 @@ ignore = migrations
 
 [MESSAGES CONTROL]
 enable = all
-disable = missing-docstring
+disable = missing-docstring,invalid-name,too-few-public-methods
 
 [REPORTS]
 reports = no
 output-format = colorized
+
+[TYPECHECK]
+generated-members=objects
