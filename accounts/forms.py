@@ -17,6 +17,6 @@ class UserForm(forms.ModelForm):
         'class': 'form-control',
         'autocomplete': 'off'}), validators=[validate_mat_num])
 
-    class Meta:
+    class Meta(object):
         model = UserProfile
         fields = ('username', 'email', 'password', 'mat_num')
