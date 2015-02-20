@@ -17,7 +17,8 @@ def register(request):
 
             registered = True
         else:
-            print "The following form validation errors occurred: ", user_form.errors
+            error_msg = "The following form validation errors occurred: %s"
+            print error_msg % user_form.errors
 
     else:
         user_form = UserForm()
