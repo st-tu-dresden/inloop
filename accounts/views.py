@@ -63,6 +63,7 @@ def user_login(request):
             'successful_logout': False
         })
 
+
 @login_required(login_url='accounts/login/')
 def user_logout(request):
     logout(request)
@@ -71,6 +72,7 @@ def user_logout(request):
         'account_disabled': False,
         'successful_logout': True
     })
+
 
 @login_required(login_url='/accounts/login/')
 def user_profile(request):

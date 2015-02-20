@@ -11,7 +11,8 @@ class TaskFileInline(admin.TabularInline):
 
 class TaskAdmin(admin.ModelAdmin):
     fieldsets = [(None, {'fields': ['title', 'author', 'category']}),
-                 ('Date Information', {'fields': ['publication_date', 'deadline_date']}),
+                 ('Date Information', {
+                  'fields': ['publication_date', 'deadline_date']}),
                  ('Content', {'fields': ['description', 'slug']})]
     list_display = ('title', 'publication_date', 'deadline_date', 'author')
     list_filter = ['category', 'publication_date', 'deadline_date']

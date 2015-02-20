@@ -12,11 +12,11 @@ def index(request):
     lesson_tasks = Task.objects.filter(category='L')
     exam_tasks = Task.objects.filter(category='E')
     return render(request, 'tasks/index.html', {
-    'user': request.user,
-    'basic_tasks': basic_tasks,
-    'advanced_tasks': advanced_tasks,
-    'lesson_tasks': lesson_tasks,
-    'exam_tasks': exam_tasks,
+        'user': request.user,
+        'basic_tasks': basic_tasks,
+        'advanced_tasks': advanced_tasks,
+        'lesson_tasks': lesson_tasks,
+        'exam_tasks': exam_tasks,
     })
 
 
@@ -36,12 +36,12 @@ def detail(request, slug):
         form = forms.UserEditorForm()
 
     return render(request, 'tasks/task-detail.html', {
-    'editor_form': form,
-    'task_files': task_file_list,
-    'user': request.user,
-    'title': task.title,
-    'deadline_date': task.deadline_date,
-    'description': task.description,
+        'editor_form': form,
+        'task_files': task_file_list,
+        'user': request.user,
+        'title': task.title,
+        'deadline_date': task.deadline_date,
+        'description': task.description,
     })
 
 

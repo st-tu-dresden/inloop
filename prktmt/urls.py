@@ -5,16 +5,18 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
-urlpatterns = patterns('',
-                       url(r'^$', include('tasks.urls', namespace='tasks')),
-                       url(r'^tasks/', include('tasks.urls', namespace='tasks')),
-                       url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-                       url(r'^admin/', include(admin.site.urls)),
+urlpatterns = patterns(
+    '',
+    url(r'^$', include('tasks.urls', namespace='tasks')),
+    url(r'^tasks/', include('tasks.urls', namespace='tasks')),
+    url(r'^accounts/', include('accounts.urls', namespace='accounts')),
+    url(r'^admin/', include(admin.site.urls)),
 )
 # serve static content
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # flatpages catchall pattern
-urlpatterns += patterns('django.contrib.flatpages.views',
-                        (r'^(?P<url>.*/)$', 'flatpage'),
+urlpatterns += patterns(
+    'django.contrib.flatpages.views',
+    (r'^(?P<url>.*/)$', 'flatpage'),
 )
