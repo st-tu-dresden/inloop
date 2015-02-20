@@ -13,7 +13,7 @@
                     </tr>
                 {% endif %}
                 <tr>
-                    <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+                    <td><a href="{% comment %}{% url 'tasks:detail' task.slug %}{% endcomment %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date }}</td>
                     <td>{{ task.deadline_date }}</td>
                     <td>TODO</td>

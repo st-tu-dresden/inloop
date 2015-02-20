@@ -9,4 +9,9 @@ class UserProfile(auth_models.AbstractUser):
     Username, First Name, Last Name, E-Mail
     '''
 
-    mat_num = models.IntegerField(max_length=7, help_text='Matriculation Number', null=True, validators=[validate_mat_num])
+    mat_num = models.IntegerField(
+        max_length=7,
+        help_text='Matriculation Number',
+        null=True,
+        validators=[validate_mat_num]
+    )
