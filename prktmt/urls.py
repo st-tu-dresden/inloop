@@ -5,9 +5,11 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
+from tasks import views as task_views
+
 urlpatterns = patterns(
     '',
-    url(r'^$', include('tasks.urls', namespace='tasks')),
+    url(r'^$', task_views.index, name='index'),
     url(r'^tasks/', include('tasks.urls', namespace='tasks')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls)),
