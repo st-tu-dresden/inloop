@@ -25,3 +25,6 @@ Note: This version has only been tested with Python 2.7.
 	```
 	./manage.py runserver
 	```
+
+## Developers
+Also read the [HACKING](https://github.com/st-tu-dresden/tud_praktomat_neu/blob/master/HACKING.md) documentation for useful development tips and conventions.
