@@ -4,6 +4,9 @@ Django==1.7.2
 django-flatpages-tinymce==0.1.1
 django-tinymce==1.5.3
 logilab-common==0.63.2
-pep8==1.6.2
-pylint==1.4.1
+flake8==2.3.0
+mccabe==0.3
+ordereddict==1.1
+pep8==1.5.7
+pyflakes==0.8.1
 six==1.9.0
