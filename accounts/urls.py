@@ -1,6 +1,4 @@
-from django.conf.urls import patterns, include, url
-from django.views.generic import RedirectView
-from django.contrib.auth import views as auth_views
+from django.conf.urls import patterns, url
 import accounts.views as account_views
 
 urlpatterns = patterns(
