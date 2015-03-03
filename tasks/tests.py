@@ -1,9 +1,10 @@
 from django.test import TestCase
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from tasks.models import Task
 
 
-class TaskIntegrationTests(TestCase):
+class TaskModelests(TestCase):
 
     def setUp(self):
         Task.objects.create(
@@ -32,3 +33,10 @@ class TaskIntegrationTests(TestCase):
 
         self.assertTrue(active_task.is_active())
         self.assertFalse(disabled_task.is_active())
+
+    def test_invalid_inputs(self):
+        with self.assertRaises(ValidationError):
+            Task.objects.create(publication_date='abc')
+
+        with self.assertRaises(ValidationError):
+            Task.objects.create(deadline_date='abc')
