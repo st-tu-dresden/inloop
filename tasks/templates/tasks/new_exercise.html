@@ -1,0 +1,7 @@
+{% block content %}
+    <form action="{% url 'tasks:new_exercise' %}" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{ exercise_form }}
+        <input type="submit" value="submit">
+    </form>
+{% endblock %}

@@ -32,7 +32,7 @@ def detail(request, slug):
             pass
 
     else:
-        # prepopulate form with last saved data
+        # TODO: prepopulate form with last saved data
         form = forms.UserEditorForm()
 
     return render(request, 'tasks/task-detail.html', {
@@ -53,3 +53,18 @@ def edit(request, slug):
 @login_required
 def results(request, slug):
     pass
+
+
+def submit_new_exercise(request):
+    if request.method == 'POST':
+        # save form data
+        form = forms.ExerciseSubmissionForm(request.POST, request.FILES)
+        file_list = request.FILES.getlist('exercise_files')
+        for f in file_list:
+            print f
+    else:
+        form = forms.ExerciseSubmissionForm()
+
+    return render(request, 'tasks/new_exercise.html', {
+        'exercise_form': form
+    })
