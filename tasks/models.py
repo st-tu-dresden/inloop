@@ -34,7 +34,7 @@ class Task(models.Model):
         return timezone.now() > self.publication_date
 
 
-class TaskFile(models.Model):
+class TaskSolutionFile(models.Model):
     '''
     Represents the files the user has to edit for each task. As each task
     has a different amount of connected files, they were implemented using
@@ -47,5 +47,5 @@ class TaskFile(models.Model):
     filename = models.CharField(
         max_length=30, help_text='Name of the file including the ending'
     )
-    content = tinymce_models.HTMLField()
+    content = models.TextField()
     task = models.ForeignKey(Task, related_name='task_files')

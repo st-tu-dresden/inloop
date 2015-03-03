@@ -1,9 +1,9 @@
 from django.contrib import admin
-from tasks.models import Task, TaskFile
+from tasks.models import Task, TaskSolutionFile
 
 
 class TaskFileInline(admin.TabularInline):
-    model = TaskFile
+    model = TaskSolutionFile
     extra = 1
 
 
