@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from tinymce import models as tinymce_models
 
 
@@ -25,11 +26,12 @@ class Task(models.Model):
                                 help_text='Category of task')
     slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
 
-    def task_is_active(self):
+    def is_active(self):
         '''
         Returns True if the task is already visible to the users.
         '''
-        pass
+
+        return timezone.now() > self.publication_date
 
 
 class TaskFile(models.Model):
