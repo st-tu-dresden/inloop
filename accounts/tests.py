@@ -12,6 +12,10 @@ class LoginSystemTests(TestCase):
                                         password=self.password,
                                         mat_num='0000000')
 
+    def tearDown(self):
+        user = UserProfile.objects.get(username='test_user')
+        user.delete()
+
     def test_anonymous_redirect(self):
         # redirect to login page for anonymous users
         resp = self.client.get('/', follow=True)
