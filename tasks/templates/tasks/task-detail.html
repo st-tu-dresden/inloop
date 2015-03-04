@@ -16,8 +16,11 @@
     <div class="col-md-4 col-md-offset-4">
         <h1>{{ title }}</h1>
         <br/>
+
         <p>Due to: {{ deadline_date }}
+
         <p>{{ description|safe }}</p>
+
         <form action="." method="post">
             {% csrf_token %}
             <div id="tabs">

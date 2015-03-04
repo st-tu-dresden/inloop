@@ -7,8 +7,6 @@ class TaskFileInline(admin.TabularInline):
     extra = 1
 
 
-# exclude = ('content',)
-
 class TaskAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['title', 'author', 'category']}),

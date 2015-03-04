@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
 from tasks import forms
 from tasks.models import Task
+from . import upload_utils as ul
 
 
 @login_required
@@ -26,7 +26,7 @@ def detail(request, slug):
     task_file_list = task.task_files.all()
 
     if request.method == 'POST':
-        # save form data
+        # TODO: save form data
         form = forms.UserEditorForm(request.POST)
         for task_file in task_file_list:
             pass
@@ -55,13 +55,24 @@ def results(request, slug):
     pass
 
 
+@login_required
 def submit_new_exercise(request):
     if request.method == 'POST':
         # save form data
         form = forms.ExerciseSubmissionForm(request.POST, request.FILES)
-        file_list = request.FILES.getlist('exercise_files')
-        for f in file_list:
-            print f
+        if form.is_valid():
+            exercise_file_list = request.FILES.getlist('exercise_files')
+            unittest_file_list = request.FILES.getlist('unittest_files')
+            for exercise_file in exercise_file_list:
+                ul.handle_uploaded_exercise(
+                    exercise_file,
+                    form.cleaned_data['exercise_name'])
+
+            for unittest_file in unittest_file_list:
+                ul.handle_uploaded_unittest(
+                    unittest_file,
+                    form.cleaned_data['exercise_name'])
+
     else:
         form = forms.ExerciseSubmissionForm()
 

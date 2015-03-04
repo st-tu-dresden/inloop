@@ -5,7 +5,6 @@ from tasks.models import Task
 
 
 class TaskModelests(TestCase):
-
     def setUp(self):
         Task.objects.create(
             title='active_task',

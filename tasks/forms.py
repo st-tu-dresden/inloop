@@ -9,6 +9,7 @@ class UserEditorForm(forms.Form):
 
 
 class ExerciseSubmissionForm(forms.Form):
+    exercise_name = forms.CharField(max_length=100)
     unittest_files = forms.FileField(widget=forms.FileInput(attrs={
         'multiple': '1'
     }))
