@@ -3,6 +3,12 @@ from django.utils import timezone
 from tinymce import models as tinymce_models
 
 
+TASK_CATEGORIES = (('B', 'Basic Exercise'),
+                   ('A', 'Advanced Exercise'),
+                   ('L', 'Lesson Exercise'),
+                   ('E', 'Exam Exercise'))
+
+
 class Task(models.Model):
     '''
     Represents the tasks that are presented to the user to solve.
@@ -14,15 +20,8 @@ class Task(models.Model):
         help_text='When should the task be published?'
     )
     deadline_date = models.DateTimeField(help_text='Date the task is due to')
-    BASIC = 'B'
-    ADVANCED = 'A'
-    LESSON = 'L'
-    EXAM = 'E'
     category = models.CharField(max_length=1,
-                                choices=((BASIC, 'Basic Exercise'),
-                                         (ADVANCED, 'Advanced Exercise'),
-                                         (LESSON, 'Lesson Exercise'),
-                                         (EXAM, 'Exam Exercise')),
+                                choices=TASK_CATEGORIES,
                                 help_text='Category of task')
     slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
 

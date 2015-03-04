@@ -1,5 +1,3 @@
-__author__ = 'spoons'
-
 import os
 from prktmt.settings import BASE_DIR
 
