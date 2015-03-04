@@ -9,10 +9,16 @@ class UserEditorForm(forms.Form):
 
 
 class ExerciseSubmissionForm(forms.Form):
-    exercise_name = forms.CharField(max_length=100)
+    # TODO: Add validators for file size, ending and header
+    exercise_name = forms.CharField(max_length=100,
+                                    widget=forms.TextInput(attrs={
+                                        'class': 'form-control'
+                                    }))
     unittest_files = forms.FileField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
         'multiple': '1'
     }))
     exercise_files = forms.FileField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
         'multiple': '1'
     }))
