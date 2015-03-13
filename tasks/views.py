@@ -1,3 +1,4 @@
+from django.template.defaultfilters import slugify
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from tasks import forms
@@ -72,6 +73,16 @@ def submit_new_exercise(request):
                 ul.handle_uploaded_unittest(
                     unittest_file,
                     form.cleaned_data['exercise_name'])
+
+        # add Task object to system
+        t = Task.objects.create(title=form.data['e_title'],
+                                author=request.user,
+                                description=form.data['e_desc'],
+                                publication_date=form.data['e_pub_date'],
+                                deadline_date=form.data['e_dead_date'],
+                                category=form.data['e_cat'],
+                                slug=slugify(unicode(form.data['e_title'])))
+        t.save()
 
     else:
         form = forms.ExerciseSubmissionForm()

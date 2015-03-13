@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from tinymce import models as tinymce_models
+from accounts.models import UserProfile
 
 
 TASK_CATEGORIES = (('B', 'Basic Exercise'),
@@ -14,7 +15,7 @@ class Task(models.Model):
     Represents the tasks that are presented to the user to solve.
     '''
     title = models.CharField(max_length=100, help_text='Task name')
-    author = models.CharField(max_length=100, help_text='Creator of task')
+    author = models.ForeignKey(UserProfile)
     description = tinymce_models.HTMLField(help_text='Task description')
     publication_date = models.DateTimeField(
         help_text='When should the task be published?'
