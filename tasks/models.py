@@ -33,18 +33,19 @@ class Task(models.Model):
         return timezone.now() > self.publication_date
 
 
-class TaskSolutionFile(models.Model):
-    '''
-    Represents the files the user has to edit for each task. As each task
-    has a different amount of connected files, they were implemented using
-    a ForeignKey relationship.
-
-    Access all files connected to a task:
-    task = Task.objects.get(pk=1)
-    task.task_files.all()
-    '''
-    filename = models.CharField(
-        max_length=30, help_text='Name of the file including the ending'
-    )
-    content = models.TextField()
-    task = models.ForeignKey(Task, related_name='task_files')
+# class TaskSolutionFile(models.Model):
+#     '''
+#     Represents the files the user has to edit for each task. As each task
+#     has a different amount of connected files, they were implemented using
+#     a ForeignKey relationship.
+#
+#     Access all files connected to a task:
+#     task = Task.objects.get(pk=1)
+#     task.task_files.all()
+#     '''
+#     filename = models.CharField(
+#         max_length=30, help_text='Name of the file including the ending'
+#     )
+#     unittest = models.BooleanField()
+#     content = models.TextField()
+#     task = models.ForeignKey(Task, related_name='task_files')

@@ -1,6 +1,7 @@
 from django import forms
 from tinymce.widgets import TinyMCE
 from tasks.models import TASK_CATEGORIES
+import datetime
 
 
 class UserEditorForm(forms.Form):
@@ -24,10 +25,9 @@ class ExerciseSubmissionForm(forms.Form):
             'cols': 100,
             'rows': 20
         }))
-    exercise_pub_date = forms.DateTimeField(auto_now=True)
-    exercise_dead_date = forms.DateTimeField(auto_now=True)
-    exercise_category = forms.CharField(
-        max_length=1,
+    exercise_pub_date = forms.DateTimeField(initial=datetime.datetime.now())
+    exercise_dead_date = forms.DateTimeField()
+    exercise_category = forms.ChoiceField(
         choices=TASK_CATEGORIES
     )
     unittest_files = forms.FileField(widget=forms.FileInput(attrs={
