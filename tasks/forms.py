@@ -44,18 +44,16 @@ class ExerciseSubmissionForm(forms.Form):
                                       widget=forms.DateTimeInput(attrs={
                                           'class': 'form-control'
                                       }))
-    e_cat = forms.ChoiceField(
-        choices=TASK_CATEGORIES,
-        label='Exercise Category',
-        widget=forms.Select(attrs={
-            'class': 'form-control'
-        })
-    )
+    e_cat = forms.ChoiceField(choices=TASK_CATEGORIES,
+                              label='Exercise Category',
+                              widget=forms.Select(attrs={
+                                  'class': 'form-control'
+                              }))
     ut_files = forms.FileField(label='Unittest Files',
-                                     widget=forms.FileInput(attrs={
-                                         'class': 'form-control',
-                                         'multiple': '1'
-                                     }))
+                               widget=forms.FileInput(attrs={
+                                   'class': 'form-control',
+                                   'multiple': '1'
+                               }))
     e_files = forms.FileField(label='Exercise Templates',
                               widget=forms.FileInput(attrs={
                                   'class': 'form-control',
