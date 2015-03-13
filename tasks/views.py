@@ -62,17 +62,17 @@ def submit_new_exercise(request):
         # save form data
         form = forms.ExerciseSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
-            exercise_file_list = request.FILES.getlist('exercise_files')
-            unittest_file_list = request.FILES.getlist('unittest_files')
+            exercise_file_list = request.FILES.getlist('e_files')
+            unittest_file_list = request.FILES.getlist('ut_files')
             for exercise_file in exercise_file_list:
                 ul.handle_uploaded_exercise(
                     exercise_file,
-                    form.cleaned_data['exercise_name'])
+                    form.cleaned_data['e_title'])
 
             for unittest_file in unittest_file_list:
                 ul.handle_uploaded_unittest(
                     unittest_file,
-                    form.cleaned_data['exercise_name'])
+                    form.cleaned_data['e_title'])
 
         # add Task object to system
         t = Task.objects.create(title=form.data['e_title'],
