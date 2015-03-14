@@ -5,11 +5,12 @@
     {% load staticfiles %}
     {% load flatpages %}
     {% get_flatpages as fpages %}
-    <!-- Bootstrap and jQuery -->
+    <!-- Bootstrap, jQuery, Ace -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js" type="text/javascript" charset="utf-8"></script>
     <!-- custom CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
     {% block head %}

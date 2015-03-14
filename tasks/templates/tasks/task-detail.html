@@ -1,12 +1,6 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    {# include jQueryUI tabs #}
-    <script>
-        $(function () {
-            $("#tabs").tabs();
-        });
-    </script>
 
     {# include TinyMCE editor #}
     {{ form.media }}
@@ -23,19 +17,41 @@
 
         <form action="." method="post">
             {% csrf_token %}
-            <div id="tabs">
-                <ul>
-                    {% for fname, content in file_dict %}
-                        <li><a href="#tabs-{{ forloop.counter }}">{{ fname }}</a></li>
-                    {% empty %}
-                        Error: No files connected to Task.
+            <div role="tabpanel">
+                <!-- nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for fname in file_dict.keys %}
+                        {% if forloop.first %}
+                        <li role="presentation" class="active">
+                            <a href="#{{ forloop.counter }}"
+                               role="tab"
+                               data-toggle="tab">{{ fname }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li role="presentation">
+                            <a href="#{{ forloop.counter }}"
+                               role="tab"
+                               data-toggle="tab">{{ fname }}
+                            </a>
+                        </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
-                {% for fname, content in file_dict %}
-                    <div id="tabs-{{ forloop.counter }}">
-                        {{ editor_form.as_p }}
-                    </div>
-                {% endfor %}
+
+                <!-- tab panes -->
+                <div class="tab-content">
+                    {% for fname, content in file_dict.items %}
+                        {% if forloop.first %}
+                            <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
+                                {{ content }}
+                            </div>
+                        {% else %}
+                            <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
+                                {{ content }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
             </div>
             <input type="submit" value="Submit"/>
         </form>
