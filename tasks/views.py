@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from tasks import forms
 from tasks.models import Task
-from . import upload_utils as ul
+from . import filesystem_utils as fsu
 
 
 @login_required
@@ -65,12 +65,12 @@ def submit_new_exercise(request):
             exercise_file_list = request.FILES.getlist('e_files')
             unittest_file_list = request.FILES.getlist('ut_files')
             for exercise_file in exercise_file_list:
-                ul.handle_uploaded_exercise(
+                fsu.handle_uploaded_exercise(
                     exercise_file,
                     form.cleaned_data['e_title'])
 
             for unittest_file in unittest_file_list:
-                ul.handle_uploaded_unittest(
+                fsu.handle_uploaded_unittest(
                     unittest_file,
                     form.cleaned_data['e_title'])
 
