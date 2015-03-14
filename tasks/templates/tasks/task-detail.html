@@ -25,13 +25,13 @@
             {% csrf_token %}
             <div id="tabs">
                 <ul>
-                    {% for task_file in task_files %}
-                        <li><a href="#tabs-{{ forloop.counter }}">{{ task_file.filename }}</a></li>
+                    {% for fname, content in file_dict %}
+                        <li><a href="#tabs-{{ forloop.counter }}">{{ fname }}</a></li>
                     {% empty %}
                         Error: No files connected to Task.
                     {% endfor %}
                 </ul>
-                {% for task_file in task_files %}
+                {% for fname, content in file_dict %}
                     <div id="tabs-{{ forloop.counter }}">
                         {{ editor_form.as_p }}
                     </div>
