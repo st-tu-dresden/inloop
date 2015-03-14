@@ -1,59 +1,70 @@
 {% extends 'base.html' %}
 
 {% block head %}
-
     {# include TinyMCE editor #}
     {{ form.media }}
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-4 col-md-offset-4">
-        <h1>{{ title }}</h1>
-        <br/>
+<div class="col-md-4 col-md-offset-4">
+    <h1>{{ title }}</h1>
+    <br/>
 
-        <p>Due to: {{ deadline_date }}
+    <p>Due to: {{ deadline_date }}
 
-        <p>{{ description|safe }}</p>
+    <p>{{ description|safe }}</p>
 
-        <form action="." method="post">
-            {% csrf_token %}
-            <div role="tabpanel">
-                <!-- nav tabs -->
-                <ul class="nav nav-tabs" role="tablist">
-                    {% for fname in file_dict.keys %}
-                        {% if forloop.first %}
-                        <li role="presentation" class="active">
-                            <a href="#{{ forloop.counter }}"
-                               role="tab"
-                               data-toggle="tab">{{ fname }}
-                            </a>
-                        </li>
-                        {% else %}
-                        <li role="presentation">
-                            <a href="#{{ forloop.counter }}"
-                               role="tab"
-                               data-toggle="tab">{{ fname }}
-                            </a>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+    <form action="." method="post">
+        {% csrf_token %}
+        <div role="tabpanel">
+            <!-- nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                {% for fname in file_dict.keys %}
+                    {% if forloop.first %}
+                    <li role="presentation" class="active">
+                        <a href="#{{ forloop.counter }}"
+                           role="tab"
+                           data-toggle="tab">{{ fname }}
+                        </a>
+                    </li>
+                    {% else %}
+                    <li role="presentation">
+                        <a href="#{{ forloop.counter }}"
+                           role="tab"
+                           data-toggle="tab">{{ fname }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
 
-                <!-- tab panes -->
-                <div class="tab-content">
-                    {% for fname, content in file_dict.items %}
-                        {% if forloop.first %}
-                            <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                                {{ content }}
+            <!-- tab panes -->
+            <div class="tab-content">
+                {% for fname, content in file_dict.items %}
+                    {% if forloop.first %}
+                        <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
+                            <div id="editor{{ forloop.counter }}">{{ content }}
                             </div>
-                        {% else %}
-                            <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                                {{ content }}
+                        </div>
+                    {% else %}
+                        <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
+                            <div id="editor{{ forloop.counter }}">{{ content }}
                             </div>
-                        {% endif %}
-                    {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-            <input type="submit" value="Submit"/>
-        </form>
-    </div>
+        </div>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+{% endblock %}
+
+{% block subbody_content %}
+<script>
+    {% for fname in file_dict.keys %}
+        var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
+        editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
+    {% endfor %}
+</script>
 {% endblock %}
