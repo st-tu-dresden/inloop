@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-md-4 col-md-offset-4">
+<div class="col-md-6 col-md-offset-3">
     <h1>{{ title }}</h1>
     <br/>
 
@@ -43,13 +43,11 @@
                 {% for fname, content in file_dict.items %}
                     {% if forloop.first %}
                         <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content }}
-                            </div>
+                            <div id="editor{{ forloop.counter }}">{{ content }}</div>
                         </div>
                     {% else %}
                         <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content }}
-                            </div>
+                            <div id="editor{{ forloop.counter }}">{{ content }}</div>
                         </div>
                     {% endif %}
                 {% endfor %}
