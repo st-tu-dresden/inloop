@@ -45,10 +45,12 @@
                         <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
                             <div id="editor{{ forloop.counter }}">{{ content }}</div>
                         </div>
+                        <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% else %}
                         <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
                             <div id="editor{{ forloop.counter }}">{{ content }}</div>
                         </div>
+                        <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% endif %}
                 {% endfor %}
             </div>
@@ -63,6 +65,10 @@
     {% for fname in file_dict.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
+        editor{{ forloop.counter }}.getSession().on('change', function () {
+            $('#content{{ forloop.counter }}').val(editor.getSession().getValue());
+       });
+       $('#content{{ forloop.counter }}').val(editor{{ forloop.counter }}.getSession().getValue());
     {% endfor %}
 </script>
 {% endblock %}

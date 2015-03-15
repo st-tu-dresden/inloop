@@ -6,3 +6,7 @@ div[id^="editor"] {
     min-height:500px;
     height:100%;
 }
+
+textarea[id^="content"] {
+    display: none;
+}
