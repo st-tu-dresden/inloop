@@ -1,4 +1,5 @@
 from django.template.defaultfilters import slugify
+from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from tasks import forms
@@ -85,13 +86,13 @@ def delete(request, slug):
         if form.is_valid():
             if form.cleaned_data['are_you_sure']:
                 task.delete()
+                return redirect('tasks:index')
     else:
         form = forms.ExerciseDeletionForm()
-
-    return render(request, 'tasks/delete_exercise.html', {
-        'deletion_form': form,
-        'task': task
-    })
+        return render(request, 'tasks/delete_exercise.html', {
+            'deletion_form': form,
+            'task': task
+        })
 
 
 @login_required

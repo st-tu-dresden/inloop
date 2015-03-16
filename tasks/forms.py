@@ -28,7 +28,7 @@ class UserEditorForm(forms.Form):
 class ExerciseDeletionForm(forms.Form):
     are_you_sure = forms.ChoiceField(choices=YESNO_CHOICES,
                                      widget=forms.RadioSelect(attrs={
-                                        'class': 'form-control'
+                                         'class': 'form-control'
                                      }))
 
 
