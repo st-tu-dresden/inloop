@@ -53,7 +53,7 @@ def edit(request, slug):
         if form.is_valid():
             # populate direct task data
             task.title = form.data['e_title']
-            # task.author = request.user,
+            # TODO: task.author = request.user,
             task.description = form.data['e_desc']
             task.publication_date = form.data['e_pub_date']
             task.deadline_date = form.data['e_dead_date']
@@ -78,7 +78,20 @@ def edit(request, slug):
 
 @login_required
 def delete(request, slug):
-    pass
+    task = get_object_or_404(Task, slug=slug)
+
+    if request.method == 'POST':
+        form = forms.ExerciseDeletionForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['are_you_sure']:
+                task.delete()
+    else:
+        form = forms.ExerciseDeletionForm()
+
+    return render(request, 'tasks/delete_exercise.html', {
+        'deletion_form': form,
+        'task': task
+    })
 
 
 @login_required

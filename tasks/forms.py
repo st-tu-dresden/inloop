@@ -4,6 +4,10 @@ from tasks.models import TASK_CATEGORIES
 import datetime
 
 
+YESNO_CHOICES = [('Y', 'Yes'),
+                 ('N', 'No')]
+
+
 def tomorrow():
     return datetime.datetime.now() + datetime.timedelta(1)
 
@@ -19,6 +23,13 @@ class UserEditorForm(forms.Form):
             'cols': 100,
             'rows': 20
         }))
+
+
+class ExerciseDeletionForm(forms.Form):
+    are_you_sure = forms.ChoiceField(choices=YESNO_CHOICES,
+                                     widget=forms.RadioSelect(attrs={
+                                        'class': 'form-control'
+                                     }))
 
 
 class ExerciseEditForm(forms.Form):
