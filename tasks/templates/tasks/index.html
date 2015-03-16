@@ -37,14 +37,19 @@
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date }}</td>
                     <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>
+                        <ul>
+                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
+                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
+                        </ul>
+                    </td>
                 </tr>
             {% empty %}
                 No Advanced exercises to do.
@@ -60,14 +65,19 @@
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date }}</td>
                     <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>
+                        <ul>
+                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
+                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
+                        </ul>
+                    </td>
                 </tr>
             {% empty %}
                 No Lesson exercises to do.
@@ -83,14 +93,19 @@
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date }}</td>
                     <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>
+                        <ul>
+                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
+                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
+                        </ul>
+                    </td>
                 </tr>
             {% empty %}
                 No Exam exercises to do.
