@@ -61,6 +61,7 @@ def edit(request, slug):
             task.category = form.data['e_cat']
             task.slug = slugify(unicode(form.data['e_title']))
             task.save()
+            return redirect('tasks:detail', slug=task.slug)
     else:
         # construct data dict for pre populating form
         data_dict = {
@@ -127,10 +128,10 @@ def submit_new_exercise(request):
                                 category=form.data['e_cat'],
                                 slug=slugify(unicode(form.data['e_title'])))
         t.save()
+        return redirect('tasks:index')
 
     else:
         form = forms.ExerciseSubmissionForm()
-
-    return render(request, 'tasks/new_exercise.html', {
-        'exercise_form': form
-    })
+        return render(request, 'tasks/new_exercise.html', {
+            'exercise_form': form
+        })
