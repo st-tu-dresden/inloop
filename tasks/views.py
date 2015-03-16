@@ -72,10 +72,9 @@ def edit(request, slug):
             'e_cat': task.category
         }
         form = forms.ExerciseEditForm(initial=data_dict)
-
-    return render(request, 'tasks/update_exercise.html', {
-        'update_form': form
-    })
+        return render(request, 'tasks/update_exercise.html', {
+            'update_form': form
+        })
 
 
 @login_required
