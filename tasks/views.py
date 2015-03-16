@@ -48,6 +48,10 @@ def edit(request, slug):
     pass
 
 
+def delete(request, slug):
+    pass
+
+
 @login_required
 def results(request, slug):
     pass

@@ -32,6 +32,7 @@
                         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
                     {% endfor %}
                     {% if user.is_superuser %}
+                        <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
                         <li><a href="{% url 'admin:index' %}">System</a></li>
                     {% endif %}
                     <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
