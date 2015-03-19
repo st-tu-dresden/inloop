@@ -65,9 +65,6 @@
     {% for fname in file_dict.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
-        editor{{ forloop.counter }}.getSession().on('change', function () {
-            $('#content{{ forloop.counter }}').val(editor.getSession().getValue());
-        });
     {% endfor %}
     $('#submit').on('click', function() {
         {% for fname in file_dict.keys %}
