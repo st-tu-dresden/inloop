@@ -3,6 +3,16 @@ import glob
 from prktmt.settings import BASE_DIR
 
 
+def delete_template_file(f, task_name):
+    path = os.path.join(BASE_DIR, 'media', 'exercises', task_name)
+    os.remove(os.path.join(path, f.name))
+
+
+def delete_unittest_file(f, task_name):
+    path = os.path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
+    os.remove(os.path.join(path, f.name))
+
+
 def handle_uploaded_unittest(f, task_name):
     path = os.path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
     if not os.path.exists(path):
