@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from tasks.models import Task
 
 
-class TaskModelests(TestCase):
+class TaskModelTests(TestCase):
     def setUp(self):
         Task.objects.create(
             title='active_task',
