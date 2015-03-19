@@ -55,7 +55,7 @@
                 {% endfor %}
             </div>
         </div>
-        <input type="submit" value="Submit"/>
+        <input id="submit" type="submit" value="Submit"/>
     </form>
 </div>
 {% endblock %}
@@ -67,8 +67,12 @@
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
         editor{{ forloop.counter }}.getSession().on('change', function () {
             $('#content{{ forloop.counter }}').val(editor.getSession().getValue());
-       });
-       $('#content{{ forloop.counter }}').val(editor{{ forloop.counter }}.getSession().getValue());
+        });
     {% endfor %}
+    $('#submit').on('click', function() {
+        {% for fname in file_dict.keys %}
+            $('#content{{ forloop.counter }}').val(editor{{ forloop.counter }}.getSession().getValue());
+        {% endfor %}
+    });
 </script>
 {% endblock %}
