@@ -12,7 +12,7 @@
 
     <p>Due to: {{ deadline_date }}
 
-    <p>{{ description|safe }}</p>
+    <p>{{ description|escape }}</p>
 
     <form action="." method="post">
         {% csrf_token %}
@@ -24,14 +24,14 @@
                     <li role="presentation" class="active">
                         <a href="#{{ forloop.counter }}"
                            role="tab"
-                           data-toggle="tab">{{ fname }}
+                           data-toggle="tab">{{ fname|escape }}
                         </a>
                     </li>
                     {% else %}
                     <li role="presentation">
                         <a href="#{{ forloop.counter }}"
                            role="tab"
-                           data-toggle="tab">{{ fname }}
+                           data-toggle="tab">{{ fname|escape }}
                         </a>
                     </li>
                     {% endif %}
@@ -43,12 +43,12 @@
                 {% for fname, content in file_dict.items %}
                     {% if forloop.first %}
                         <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content }}</div>
+                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% else %}
                         <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content }}</div>
+                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% endif %}
