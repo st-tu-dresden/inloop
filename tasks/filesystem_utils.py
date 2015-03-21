@@ -15,14 +15,14 @@ def get_unittest_names(task_name):
     return map(os.path.basename, glob.glob(path + os.path.sep + '*.java'))
 
 
-def delete_template_file(f, task_name):
+def del_template(f_name, task_name):
     path = os.path.join(BASE_DIR, 'media', 'exercises', task_name)
-    os.remove(os.path.join(path, f.name))
+    os.remove(os.path.join(path, f_name))
 
 
-def delete_unittest_file(f, task_name):
+def del_unittest(f_name, task_name):
     path = os.path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
-    os.remove(os.path.join(path, f.name))
+    os.remove(os.path.join(path, f_name))
 
 
 def handle_uploaded_unittest(f, task_name):

@@ -56,7 +56,14 @@ def edit(request, slug):
                                       extra_templates=template_names,
                                       extra_unittests=unittest_names)
         if form.is_valid():
-            # TODO: HANDLE FILE DELETION
+            for name, label, value in form.extra_templates():
+                if form.cleaned_data[name]:
+                    fsu.del_template(label, task.title)
+
+            for name, label, value in form.extra_unittests():
+                if form.cleaned_data[name]:
+                    fsu.del_unittest(label, task.title)
+
             # populate direct task data
             task.title = form.data['e_title']
             # TODO: task.author = request.user,

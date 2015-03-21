@@ -41,19 +41,19 @@ class ExerciseEditForm(forms.Form):
         # save templates as BooleanField
         for i, templ in enumerate(extra_templates):
             name = 'template_%s' % i
-            self.fields[name] = forms.BooleanField(label='Delete ' + templ,
+            self.fields[name] = forms.BooleanField(label=templ,
                                                    required=False)
 
         # save unittests as BooleanField
         for i, unitt in enumerate(extra_unittests):
             name = 'unittest_%s' % i
-            self.fields[name] = forms.BooleanField(label='Delete ' + unitt,
+            self.fields[name] = forms.BooleanField(label=unitt,
                                                    required=False)
 
     def extra_templates(self):
         for key, value in self.cleaned_data.items():
             if key.startswith('template'):
-                yield (self.fields[key].label, value)
+                yield (key, self.fields[key].label, value)
 
     def extra_unittests(self):
         for key, value in self.cleaned_data.items():
