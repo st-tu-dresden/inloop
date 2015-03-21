@@ -53,9 +53,22 @@ def edit(request, slug):
 
     if request.method == 'POST':
         form = forms.ExerciseEditForm(request.POST,
+                                      request.FILES,
                                       extra_templates=template_names,
                                       extra_unittests=unittest_names)
         if form.is_valid():
+            exercise_file_list = request.FILES.getlist('e_files')
+            unittest_file_list = request.FILES.getlist('ut_files')
+            for exercise_file in exercise_file_list:
+                fsu.handle_uploaded_exercise(
+                    exercise_file,
+                    form.cleaned_data['e_title'])
+
+            for unittest_file in unittest_file_list:
+                fsu.handle_uploaded_unittest(
+                    unittest_file,
+                    form.cleaned_data['e_title'])
+
             for name, label, value in form.extra_templates():
                 if form.cleaned_data[name]:
                     fsu.del_template(label, task.title)
