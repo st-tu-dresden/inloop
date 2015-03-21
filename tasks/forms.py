@@ -86,6 +86,18 @@ class ExerciseEditForm(forms.Form):
                               widget=forms.Select(attrs={
                                   'class': 'form-control'
                               }))
+    ut_files = forms.FileField(label='Unittest Files',
+                               required=False,
+                               widget=forms.FileInput(attrs={
+                                   'class': 'form-control',
+                                   'multiple': '1'
+                               }))
+    e_files = forms.FileField(label='Exercise Templates',
+                              required=False,
+                              widget=forms.FileInput(attrs={
+                                  'class': 'form-control',
+                                  'multiple': '1'
+                              }))
 
 
 class ExerciseSubmissionForm(forms.Form):
