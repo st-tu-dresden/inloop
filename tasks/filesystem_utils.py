@@ -3,6 +3,18 @@ import glob
 from prktmt.settings import BASE_DIR
 
 
+def get_template_names(task_name):
+    path = os.path.join(BASE_DIR, 'media', 'exercises', task_name)
+    # get all java template files for task, e.g. 'template.java'
+    return map(os.path.basename, glob.glob(path + os.path.sep + '*.java'))
+
+
+def get_unittest_names(task_name):
+    path = os.path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
+    # get all java template files for task, e.g. 'unittest.java'
+    return map(os.path.basename, glob.glob(path + os.path.sep + '*.java'))
+
+
 def delete_template_file(f, task_name):
     path = os.path.join(BASE_DIR, 'media', 'exercises', task_name)
     os.remove(os.path.join(path, f.name))

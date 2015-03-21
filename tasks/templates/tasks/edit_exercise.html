@@ -4,11 +4,12 @@
         <form action="." enctype="multipart/form-data" method="post">
             {% csrf_token %}
             {% for field in update_form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                {% endfor %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            
             <button type="submit" class="btn btn-default" value="submit">Update</button>
         </form>
     </div>

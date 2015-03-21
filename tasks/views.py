@@ -48,10 +48,15 @@ def detail(request, slug):
 def edit(request, slug):
     # TODO: Separate options to add/ delete files
     task = get_object_or_404(Task, slug=slug)
+    template_names = fsu.get_template_names(task.title)
+    unittest_names = fsu.get_unittest_names(task.title)
 
     if request.method == 'POST':
-        form = forms.ExerciseEditForm(request.POST, request.FILES)
+        form = forms.ExerciseEditForm(request.POST,
+                                      extra_templates=template_names,
+                                      extra_unittests=unittest_names)
         if form.is_valid():
+            # TODO: HANDLE FILE DELETION
             # populate direct task data
             task.title = form.data['e_title']
             # TODO: task.author = request.user,
@@ -62,6 +67,8 @@ def edit(request, slug):
             task.slug = slugify(unicode(form.data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
+        else:
+            print form.errors
     else:
         # construct data dict for pre populating form
         data_dict = {
@@ -71,7 +78,9 @@ def edit(request, slug):
             'e_dead_date': task.deadline_date,
             'e_cat': task.category
         }
-        form = forms.ExerciseEditForm(initial=data_dict)
+        form = forms.ExerciseEditForm(initial=data_dict,
+                                      extra_templates=template_names,
+                                      extra_unittests=unittest_names)
         return render(request, 'tasks/edit_exercise.html', {
             'update_form': form
         })

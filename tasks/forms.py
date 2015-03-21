@@ -33,6 +33,33 @@ class ExerciseDeletionForm(forms.Form):
 
 
 class ExerciseEditForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        extra_templates = kwargs.pop('extra_templates')
+        extra_unittests = kwargs.pop('extra_unittests')
+        super(ExerciseEditForm, self).__init__(*args, **kwargs)
+
+        # save templates as BooleanField
+        for i, templ in enumerate(extra_templates):
+            name = 'template_%s' % i
+            self.fields[name] = forms.BooleanField(label='Delete ' + templ,
+                                                   required=False)
+
+        # save unittests as BooleanField
+        for i, unitt in enumerate(extra_unittests):
+            name = 'unittest_%s' % i
+            self.fields[name] = forms.BooleanField(label='Delete ' + unitt,
+                                                   required=False)
+
+    def extra_templates(self):
+        for key, value in self.cleaned_data.items():
+            if key.startswith('template'):
+                yield (self.fields[key].label, value)
+
+    def extra_unittests(self):
+        for key, value in self.cleaned_data.items():
+            if key. startswith('unittest'):
+                yield (self.fields[key].label, value)
+
     e_title = forms.CharField(max_length=100,
                               label='Exercise Title',
                               widget=forms.TextInput(attrs={
