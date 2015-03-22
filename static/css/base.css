@@ -19,6 +19,7 @@ textarea[id^="content"] {
     text-align: center;
     width: 20%;
     padding-top: 5px;
+    font-size: 16px;
 }
 
 .task-listing td {
