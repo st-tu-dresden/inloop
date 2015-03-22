@@ -58,7 +58,7 @@ class ExerciseEditForm(forms.Form):
     def extra_unittests(self):
         for key, value in self.cleaned_data.items():
             if key. startswith('unittest'):
-                yield (self.fields[key].label, value)
+                yield (key, self.fields[key].label, value)
 
     e_title = forms.CharField(max_length=100,
                               label='Exercise Title',

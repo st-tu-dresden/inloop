@@ -2,7 +2,7 @@
 {% block content %}
     <div class="col-md-5 col-md-offset-3">
         <h1 class="task-heading">Basic Tasks</h1>
-        <table class="task-listing">
+        <table class="task-listing table">
             {% for task in basic_tasks %}
                 {% if forloop.first and user.is_staff%}
                     <tr>
@@ -28,7 +28,7 @@
         <br/>
 
         <h1 class="task-heading">Advanced Tasks</h1>
-        <table class="task-listing">
+        <table class="task-listing table">
             {% for task in advanced_tasks %}
                 {% if forloop.first %}
                     <tr>
@@ -54,7 +54,7 @@
         <br/>
 
         <h1 class="task-heading">Lesson Tasks</h1>
-        <table class="task-listing">
+        <table class="task-listing table">
             {% for task in lesson_tasks %}
                 {% if forloop.first %}
                     <tr>
@@ -80,7 +80,7 @@
         <br/>
 
         <h1 class="task-heading">Exam Tasks</h1>
-        <table class="task-listing">
+        <table class="task-listing table">
             {% for task in exam_tasks %}
                 {% if forloop.first %}
                     <tr>
