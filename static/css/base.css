@@ -1,12 +1,35 @@
 /* style editors */
 
 div[id^="editor"] {
-    margin-top:0px;
-    position:relative;
-    min-height:500px;
-    height:100%;
+    margin-top: 0px;
+    position: relative;
+    min-height: 500px;
+    height: 100%;
 }
 
 textarea[id^="content"] {
     display: none;
+}
+
+.task-listing {
+    width: 100%;
+}
+
+.task-listing th {
+    text-align: center;
+    width: 20%;
+    padding-top: 5px;
+}
+
+.task-listing td {
+    text-align: center;
+}
+
+.task-heading {
+    padding-left: 20px;
+}
+
+.no-tasks {
+    padding-top: 5px;
+    padding-left: 40px;
 }

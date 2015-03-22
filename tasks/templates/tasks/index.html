@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="col-md-4 col-md-offset-4">
-        <h1>Basic Tasks</h1>
+        <h1 class="task-heading">Basic Tasks</h1>
         <table class="task-listing">
             {% for task in basic_tasks %}
                 {% if forloop.first and user.is_staff%}
@@ -17,19 +17,17 @@
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <ul>
-                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
-                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
-                        </ul>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
                     </td>
                 </tr>
             {% empty %}
-                No Basic exercises to do.
+                <p class="no-tasks">No Basic exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Advanced Tasks</h1>
+        <h1 class="task-heading">Advanced Tasks</h1>
         <table class="task-listing">
             {% for task in advanced_tasks %}
                 {% if forloop.first %}
@@ -45,19 +43,17 @@
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <ul>
-                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
-                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
-                        </ul>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
                     </td>
                 </tr>
             {% empty %}
-                No Advanced exercises to do.
+                <p class="no-tasks">No Advanced exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Lesson Tasks</h1>
+        <h1 class="task-heading">Lesson Tasks</h1>
         <table class="task-listing">
             {% for task in lesson_tasks %}
                 {% if forloop.first %}
@@ -73,19 +69,17 @@
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <ul>
-                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
-                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
-                        </ul>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
                     </td>
                 </tr>
             {% empty %}
-                No Lesson exercises to do.
+                <p class="no-tasks">No Lesson exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Exam Tasks</h1>
+        <h1 class="task-heading">Exam Tasks</h1>
         <table class="task-listing">
             {% for task in exam_tasks %}
                 {% if forloop.first %}
@@ -101,14 +95,12 @@
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <ul>
-                            <li><a href="{% url 'tasks:edit' task.slug %}">Edit</a></li>
-                            <li><a href="{% url 'tasks:delete' task.slug %}">Delete</a></li>
-                        </ul>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
                     </td>
                 </tr>
             {% empty %}
-                No Exam exercises to do.
+                <p class="no-tasks">No Exam exercises to do.</p>
             {% endfor %}
         </table>
     </div>
