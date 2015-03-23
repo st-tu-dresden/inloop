@@ -19,7 +19,7 @@
     </h1>
     <br/>
 
-    <p><strong>Due to:</strong> {{ deadline_date|date:"l, d. F Y P" }}
+    <p><strong>Due to:</strong> {{ deadline_date|date:"l, d. F Y P" }}</p>
 
     <p>{{ description|escape }}</p>
 
@@ -27,6 +27,7 @@
         {% csrf_token %}
         <div role="tabpanel">
             <!-- nav tabs -->
+            {% if file_dict %}
             <ul class="nav nav-tabs" role="tablist">
                 {% for fname in file_dict.keys %}
                     {% if forloop.first %}
@@ -46,6 +47,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            {% endif %}
 
             <!-- tab panes -->
             <div class="tab-content">
@@ -61,10 +63,16 @@
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% endif %}
+                {% empty %}
+                    <p>But chief! There are no files in here!</p>
                 {% endfor %}
             </div>
         </div>
-        <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
+        {% if file_dict %}
+            <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'tasks:index' %}">Go back</a>
+        {% endif %}
     </form>
 </div>
 {% endblock %}
