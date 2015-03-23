@@ -1,13 +1,11 @@
 from django.contrib import admin
-from tasks.models import Task, TaskFile
+from tasks.models import Task
 
 
-class TaskFileInline(admin.TabularInline):
-    model = TaskFile
-    extra = 1
+# class TaskFileInline(admin.TabularInline):
+#     model = TaskSolutionFile
+#     extra = 1
 
-
-# exclude = ('content',)
 
 class TaskAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -20,7 +18,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ['category', 'publication_date', 'deadline_date']
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [TaskFileInline]
+#    inlines = [TaskFileInline]
 
 
 admin.site.register(Task, TaskAdmin)

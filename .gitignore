@@ -11,5 +11,7 @@
 .DS_Store
 data/
 venv/
+media/exercises/
+media/solutions/
 .idea/
 *.sqlite3

@@ -95,6 +95,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Storage location for uploaded files
+
+MEDIA_ROOT = '/media/'
+
 # Environment variable for compatibility with django-tinymce
 
 STATIC_ROOT = '/static/'

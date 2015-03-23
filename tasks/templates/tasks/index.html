@@ -1,94 +1,106 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="col-md-4 col-md-offset-4">
-        <h1>Basic Tasks</h1>
-        <table>
+    <div class="col-md-5 col-md-offset-3">
+        <h1 class="task-heading">Basic Tasks</h1>
+        <table class="task-listing table">
             {% for task in basic_tasks %}
-                {% if forloop.first %}
+                {% if forloop.first and user.is_staff%}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date }}</td>
-                    <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
+                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
+                    <td>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                    </td>
                 </tr>
             {% empty %}
-                No Basic exercises to do.
+                <p class="no-tasks">No Basic exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Advanced Tasks</h1>
-        <table>
+        <h1 class="task-heading">Advanced Tasks</h1>
+        <table class="task-listing table">
             {% for task in advanced_tasks %}
                 {% if forloop.first %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date }}</td>
-                    <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
+                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
+                    <td>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                    </td>
                 </tr>
             {% empty %}
-                No Advanced exercises to do.
+                <p class="no-tasks">No Advanced exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Lesson Tasks</h1>
-        <table>
+        <h1 class="task-heading">Lesson Tasks</h1>
+        <table class="task-listing table">
             {% for task in lesson_tasks %}
                 {% if forloop.first %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date }}</td>
-                    <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
+                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
+                    <td>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                    </td>
                 </tr>
             {% empty %}
-                No Lesson exercises to do.
+                <p class="no-tasks">No Lesson exercises to do.</p>
             {% endfor %}
         </table>
         <br/>
 
-        <h1>Exam Tasks</h1>
-        <table>
+        <h1 class="task-heading">Exam Tasks</h1>
+        <table class="task-listing table">
             {% for task in exam_tasks %}
                 {% if forloop.first %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
-                        <th>Completed</th>
+                        <th>Staff Options</th>
                     </tr>
                 {% endif %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date }}</td>
-                    <td>{{ task.deadline_date }}</td>
-                    <td>TODO</td>
+                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
+                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
+                    <td>
+                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                    </td>
                 </tr>
             {% empty %}
-                No Exam exercises to do.
+                <p class="no-tasks">No Exam exercises to do.</p>
             {% endfor %}
         </table>
     </div>

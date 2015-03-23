@@ -1,1 +1,40 @@
+/* style editors */
 
+div[id^="editor"] {
+    margin-top: 0px;
+    position: relative;
+    min-height: 500px;
+    height: 100%;
+}
+
+textarea[id^="content"] {
+    display: none;
+}
+
+.task-listing {
+    width: 100%;
+}
+
+.task-listing th {
+    text-align: center;
+    width: 20%;
+    padding-top: 5px;
+    font-size: 16px;
+}
+
+.task-listing td {
+    text-align: center;
+}
+
+.task-heading {
+    padding-left: 20px;
+}
+
+.no-tasks {
+    padding-top: 5px;
+    padding-left: 40px;
+}
+
+.detail-btn {
+    margin-top: 10px;
+}

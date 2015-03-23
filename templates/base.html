@@ -5,7 +5,7 @@
     {% load staticfiles %}
     {% load flatpages %}
     {% get_flatpages as fpages %}
-    <!-- Bootstrap and jQuery -->
+    <!-- Bootstrap, jQuery, Ace -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
     <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -32,6 +32,7 @@
                         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
                     {% endfor %}
                     {% if user.is_superuser %}
+                        <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
                         <li><a href="{% url 'admin:index' %}">System</a></li>
                     {% endif %}
                     <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
@@ -50,5 +51,8 @@
     {% block content %}
     {% endblock %}
 </div>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js" type="text/javascript" charset="utf-8"></script>
+{% block subbody_content %}
+{% endblock %}
 </body>
 </html>
