@@ -1,14 +1,29 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from accounts.models import UserProfile
 from tasks.models import Task
+
+import datetime
 
 
 class TaskModelTests(TestCase):
     def setUp(self):
+        author = UserProfile.objects.create(
+            username='unittest',
+            first_name='unit',
+            last_name='test',
+            email='unittest@example.com',
+            mat_num='12345678',
+            is_staff=True,
+            is_active=True,
+            date_joined=datetime.datetime.now()
+
+        )
+
         Task.objects.create(
             title='active_task',
-            author='unittest',
+            author=author,
             description='',
             publication_date=timezone.now() - timezone.timedelta(days=2),
             deadline_date=timezone.now() + timezone.timedelta(days=2),
@@ -18,7 +33,7 @@ class TaskModelTests(TestCase):
 
         Task.objects.create(
             title='disabled_task',
-            author='unittest',
+            author=author,
             description='',
             publication_date=timezone.now() + timezone.timedelta(days=1),
             deadline_date=timezone.now() + timezone.timedelta(days=5),
