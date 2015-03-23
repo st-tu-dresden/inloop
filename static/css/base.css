@@ -34,3 +34,7 @@ textarea[id^="content"] {
     padding-top: 5px;
     padding-left: 40px;
 }
+
+.detail-btn {
+    margin-top: 10px;
+}

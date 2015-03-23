@@ -41,6 +41,7 @@ def detail(request, slug):
         'title': task.title,
         'deadline_date': task.deadline_date,
         'description': task.description,
+        'slug': task.slug
     })
 
 

@@ -7,10 +7,19 @@
 
 {% block content %}
 <div class="col-md-6 col-md-offset-3">
-    <h1>{{ title }}</h1>
+    <h1>
+        {{ title }}
+        <small>
+            {% if user.is_staff %}
+                <a href="{% url 'tasks:edit' slug %}">
+                    <span title="Edit" class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a>
+            {% endif %}
+        </small>
+    </h1>
     <br/>
 
-    <p><strong>Due to:</strong> {{ deadline_date|date:"l, d. F Y P" }}</p>
+    <p><strong>Due to:</strong> {{ deadline_date|date:"l, d. F Y P" }}
 
     <p>{{ description|escape }}</p>
 
@@ -18,7 +27,6 @@
         {% csrf_token %}
         <div role="tabpanel">
             <!-- nav tabs -->
-            {% if file_dict %}
             <ul class="nav nav-tabs" role="tablist">
                 {% for fname in file_dict.keys %}
                     {% if forloop.first %}
@@ -38,7 +46,6 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            {% endif %}
 
             <!-- tab panes -->
             <div class="tab-content">
@@ -54,16 +61,10 @@
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
                     {% endif %}
-                {% empty %}
-                    <p>But chief! There are no files in here!</p>
                 {% endfor %}
             </div>
         </div>
-        {% if file_dict %}
-            <input id="submit" type="submit" value="Submit" class="btn btn-default"/>
-        {% else %}
-            <a class="btn btn-default" href="{% url 'tasks:index' %}">Go back</a>
-        {% endif %}
+        <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
     </form>
 </div>
 {% endblock %}
