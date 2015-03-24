@@ -3,22 +3,35 @@
     <div class="col-md-5 col-md-offset-3">
         <h1 class="task-heading">Basic Tasks</h1>
         <table class="task-listing table">
-            {% for task in basic_tasks %}
-                {% if forloop.first and user.is_staff%}
+            {% if basic_tasks %}
+                {% if user.is_staff %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
                         <th>Staff Options</th>
                     </tr>
+                {% else %}
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>Due to</th>
+                        <th>Completed</th>
+                    </tr>
                 {% endif %}
+            {% endif %}
+            {% for task in basic_tasks %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% else %}
+                            <p><strong>ICON</strong></p>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
@@ -29,22 +42,35 @@
 
         <h1 class="task-heading">Advanced Tasks</h1>
         <table class="task-listing table">
-            {% for task in advanced_tasks %}
-                {% if forloop.first %}
+            {% if advanced_tasks %}
+                {% if user.is_staff %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
                         <th>Staff Options</th>
                     </tr>
+                {% else %}
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>Due to</th>
+                        <th>Completed</th>
+                    </tr>
                 {% endif %}
+            {% endif %}
+            {% for task in advanced_tasks %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% else %}
+                            <p><strong>ICON</strong></p>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
@@ -55,22 +81,35 @@
 
         <h1 class="task-heading">Lesson Tasks</h1>
         <table class="task-listing table">
-            {% for task in lesson_tasks %}
-                {% if forloop.first %}
+            {% if lesson_tasks %}
+                {% if user.is_staff %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
                         <th>Staff Options</th>
                     </tr>
+                {% else %}
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>Due to</th>
+                        <th>Completed</th>
+                    </tr>
                 {% endif %}
+            {% endif %}
+            {% for task in lesson_tasks %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% else %}
+                            <p><strong>ICON</strong></p>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
@@ -81,22 +120,35 @@
 
         <h1 class="task-heading">Exam Tasks</h1>
         <table class="task-listing table">
-            {% for task in exam_tasks %}
-                {% if forloop.first %}
+            {% if exam_tasks %}
+                {% if user.is_staff %}
                     <tr>
                         <th>Title</th>
                         <th>Published</th>
                         <th>Due to</th>
                         <th>Staff Options</th>
                     </tr>
+                {% else %}
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>Due to</th>
+                        <th>Completed</th>
+                    </tr>
                 {% endif %}
+            {% endif %}
+            {% for task in exam_tasks %}
                 <tr>
                     <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
                     <td>{{ task.publication_date|date:"d/m/y" }}</td>
                     <td>{{ task.deadline_date|date:"d/m/y" }}</td>
                     <td>
-                        <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                        <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
+                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
+                        {% else %}
+                            <p><strong>ICON</strong></p>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
