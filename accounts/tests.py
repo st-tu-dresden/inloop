@@ -5,12 +5,13 @@ from accounts.models import UserProfile
 class LoginSystemTests(TestCase):
     def setUp(self):
         self.password = '123456'
-        UserProfile.objects.create_user(username='test_user',
-                                        first_name='first_name',
-                                        last_name='last_name',
-                                        email='test@example.com',
-                                        password=self.password,
-                                        mat_num='0000000')
+        UserProfile.objects.create_user(
+            username='test_user',
+            first_name='first_name',
+            last_name='last_name',
+            email='test@example.com',
+            password=self.password,
+            mat_num='0000000')
 
     def tearDown(self):
         user = UserProfile.objects.get(username='test_user')
