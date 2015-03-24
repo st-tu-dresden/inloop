@@ -7,6 +7,7 @@ from tasks.models import Task
 
 class TaskModelTests(TestCase):
     def setUp(self):
+        self.password = '123456'
         author = UserProfile.objects.create_user(
             username='test_user',
             first_name='first_name',
