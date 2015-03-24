@@ -4,8 +4,6 @@ from django.core.exceptions import ValidationError
 from accounts.models import UserProfile
 from tasks.models import Task
 
-import datetime
-
 
 class TaskModelTests(TestCase):
     def setUp(self):
@@ -17,7 +15,7 @@ class TaskModelTests(TestCase):
             mat_num='12345678',
             is_staff=True,
             is_active=True,
-            date_joined=datetime.datetime.now()
+            date_joined=timezone.now() - timezone.timedelta(days=1)
 
         )
 
