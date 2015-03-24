@@ -2,6 +2,7 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from tasks import forms
 from tasks.models import Task
 from . import filesystem_utils as fsu
@@ -9,10 +10,18 @@ from . import filesystem_utils as fsu
 
 @login_required
 def index(request):
-    basic_tasks = Task.objects.filter(category='B')
-    advanced_tasks = Task.objects.filter(category='A')
-    lesson_tasks = Task.objects.filter(category='L')
-    exam_tasks = Task.objects.filter(category='E')
+    basic_tasks = Task.objects.filter(
+        category='B',
+        publication_date__lte=timezone.now())
+    advanced_tasks = Task.objects.filter(
+        category='A',
+        publication_date__lte=timezone.now())
+    lesson_tasks = Task.objects.filter(
+        category='L',
+        publication_date__lte=timezone.now())
+    exam_tasks = Task.objects.filter(
+        category='E',
+        publication_date__lte=timezone.now())
     return render(request, 'tasks/index.html', {
         'user': request.user,
         'basic_tasks': basic_tasks,

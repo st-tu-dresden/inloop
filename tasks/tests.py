@@ -42,7 +42,12 @@ class TaskModelTests(TestCase):
         self.assertFalse(disabled_task.is_active())
 
     def test_disabled_task_not_displayed_in_index(self):
-        pass
+        user = UserProfile.objects.get(username='test_user')
+        disabled_task = Task.objects.get(title='disabled_task')
+        self.client.login(username=user.username, password=self.password)
+        resp = self.client.get('/', follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(disabled_task.title in resp.content)
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
