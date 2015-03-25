@@ -73,11 +73,13 @@ class ExerciseEditForm(forms.Form):
                              }))
     e_pub_date = forms.DateTimeField(initial=datetime_now,
                                      label='Publication Date',
+                                     input_formats=['%m/%d/%Y %H:%M'],
                                      widget=forms.DateTimeInput(attrs={
                                          'class': 'form-control'
                                      }))
     e_dead_date = forms.DateTimeField(initial=tomorrow,
                                       label='Deadline Date',
+                                      input_formats=['%m/%d/%Y %H:%M'],
                                       widget=forms.DateTimeInput(attrs={
                                           'class': 'form-control'
                                       }))
@@ -115,14 +117,20 @@ class ExerciseSubmissionForm(forms.Form):
                              }))
     e_pub_date = forms.DateTimeField(initial=datetime_now,
                                      label='Publication Date',
-                                     widget=forms.DateTimeInput(attrs={
-                                         'class': 'form-control'
-                                     }))
+                                     input_formats=['%m/%d/%Y %H:%M'],
+                                     widget=forms.DateTimeInput(
+                                         format='%m/%d/%Y %H:%M',
+                                         attrs={
+                                             'class': 'form-control'}
+                                     ))
     e_dead_date = forms.DateTimeField(initial=tomorrow,
                                       label='Deadline Date',
-                                      widget=forms.DateTimeInput(attrs={
-                                          'class': 'form-control'
-                                      }))
+                                      input_formats=['%m/%d/%Y %H:%M'],
+                                      widget=forms.DateTimeInput(
+                                          format='%m/%d/%Y %H:%M',
+                                          attrs={
+                                              'class': 'form-control'}
+                                      ))
     e_cat = forms.ChoiceField(choices=TASK_CATEGORIES,
                               label='Exercise Category',
                               widget=forms.Select(attrs={

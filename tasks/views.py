@@ -88,13 +88,12 @@ def edit(request, slug):
                     fsu.del_unittest(label, task.title)
 
             # populate direct task data
-            task.title = form.data['e_title']
-            # TODO: task.author = request.user,
-            task.description = form.data['e_desc']
-            task.publication_date = form.data['e_pub_date']
-            task.deadline_date = form.data['e_dead_date']
-            task.category = form.data['e_cat']
-            task.slug = slugify(unicode(form.data['e_title']))
+            task.title = form.cleaned_data['e_title']
+            task.description = form.cleaned_data['e_desc']
+            task.publication_date = form.cleaned_data['e_pub_date']
+            task.deadline_date = form.cleaned_data['e_dead_date']
+            task.category = form.cleaned_data['e_cat']
+            task.slug = slugify(unicode(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
         else:
@@ -104,8 +103,8 @@ def edit(request, slug):
         data_dict = {
             'e_title': task.title,
             'e_desc': task.description,
-            'e_pub_date': task.publication_date,
-            'e_dead_date': task.deadline_date,
+            'e_pub_date': task.publication_date.strftime('%m/%d/%Y %H:%M'),
+            'e_dead_date': task.deadline_date.strftime('%m/%d/%Y %H:%M'),
             'e_cat': task.category
         }
         form = forms.ExerciseEditForm(initial=data_dict,

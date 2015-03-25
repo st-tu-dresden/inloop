@@ -16,6 +16,14 @@ class TaskModelTests(TestCase):
             password=self.password,
             mat_num='0000000')
 
+        UserProfile.objects.create_superuser(
+            username='superuser',
+            email='staff@example.com',
+            password=self.password,
+            first_name='first_name',
+            last_name='last_name',
+            mat_num='1234567')
+
         Task.objects.create(
             title='active_task',
             author=author,
@@ -55,3 +63,36 @@ class TaskModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             Task.objects.create(deadline_date='abc')
+
+    def test_superuser_can_edit_task(self):
+        task = Task.objects.get(title='active_task')
+        superuser = UserProfile.objects.get(username='superuser')
+        url = '/tasks/' + task.slug + '/edit/'
+        new_title = 'New title'
+        new_desc = 'New description'
+        new_pub = timezone.now() - timezone.timedelta(days=1)
+        new_dead = timezone.now() + timezone.timedelta(days=7)
+        new_cat = 'L'
+
+        self.client.login(username=superuser.username, password=self.password)
+        # edit form accessible
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        # post new content
+        data_dict = {
+            'e_title': new_title,
+            'e_desc': new_desc,
+            'e_pub_date': new_pub.strftime('%m/%d/%Y %H:%M'),
+            'e_dead_date': new_dead.strftime('%m/%d/%Y %H:%M'),
+            'e_cat': new_cat
+        }
+        resp = self.client.post(url, data_dict, follow=True)
+        task = Task.objects.get(title=new_title)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(task.title, new_title)
+        self.assertEqual(task.description, new_desc)
+        self.assertEqual(task.publication_date.strftime('%m/%d/%Y %H:%M'),
+                         new_pub.strftime('%m/%d/%Y %H:%M'))
+        self.assertEqual(task.deadline_date.strftime('%m/%d/%Y %H:%M'),
+                         new_dead.strftime('%m/%d/%Y %H:%M'))
+        self.assertEqual(task.category, new_cat)
