@@ -17,8 +17,8 @@ def register(request):
 
             registered = True
         else:
-            error_msg = "The following form validation errors occurred: %s"
-            print error_msg % user_form.errors
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(user_form.errors))
 
     else:
         user_form = UserForm()
@@ -51,7 +51,7 @@ def user_login(request):
                 })
         else:
             # invalid credentials
-            print "Invalid login details: {0}, {1}".format(username, password)
+            print("Invalid login details: {0}, {1}".format(username, password))
             return render(request, 'registration/login.html', {
                 'login_failed': True,
                 'account_disabled': False,

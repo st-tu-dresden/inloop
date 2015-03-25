@@ -98,7 +98,7 @@ def edit(request, slug):
             task.save()
             return redirect('tasks:detail', slug=task.slug)
         else:
-            print form.errors
+            print(form.errors)
     else:
         # construct data dict for pre populating form
         data_dict = {
