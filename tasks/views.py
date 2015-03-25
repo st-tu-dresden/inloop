@@ -62,10 +62,11 @@ def edit(request, slug):
     unittest_names = fsu.get_unittest_names(task.title)
 
     if request.method == 'POST':
-        form = forms.ExerciseEditForm(request.POST,
-                                      request.FILES,
-                                      extra_templates=template_names,
-                                      extra_unittests=unittest_names)
+        form = forms.ExerciseEditForm(
+            request.POST,
+            request.FILES,
+            extra_templates=template_names,
+            extra_unittests=unittest_names)
         if form.is_valid():
             exercise_file_list = request.FILES.getlist('e_files')
             unittest_file_list = request.FILES.getlist('ut_files')
@@ -107,9 +108,10 @@ def edit(request, slug):
             'e_dead_date': task.deadline_date.strftime('%m/%d/%Y %H:%M'),
             'e_cat': task.category
         }
-        form = forms.ExerciseEditForm(initial=data_dict,
-                                      extra_templates=template_names,
-                                      extra_unittests=unittest_names)
+        form = forms.ExerciseEditForm(
+            initial=data_dict,
+            extra_templates=template_names,
+            extra_unittests=unittest_names)
         return render(request, 'tasks/edit_exercise.html', {
             'update_form': form
         })
@@ -157,13 +159,14 @@ def submit_new_exercise(request):
                     form.cleaned_data['e_title'])
 
         # add Task object to system
-        t = Task.objects.create(title=form.data['e_title'],
-                                author=request.user,
-                                description=form.data['e_desc'],
-                                publication_date=form.data['e_pub_date'],
-                                deadline_date=form.data['e_dead_date'],
-                                category=form.data['e_cat'],
-                                slug=slugify(unicode(form.data['e_title'])))
+        t = Task.objects.create(
+            title=form.cleaned_data['e_title'],
+            author=request.user,
+            description=form.cleaned_data['e_desc'],
+            publication_date=form.cleaned_data['e_pub_date'],
+            deadline_date=form.cleaned_data['e_dead_date'],
+            category=form.cleaned_data['e_cat'],
+            slug=slugify(unicode(form.data['e_title'])))
         t.save()
         return redirect('tasks:index')
 
