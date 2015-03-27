@@ -35,6 +35,10 @@ textarea[id^="content"] {
     padding-left: 40px;
 }
 
+.no-resize {
+    resize: none;
+}
+
 .detail-btn {
     margin-top: 10px;
 }

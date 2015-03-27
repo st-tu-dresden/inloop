@@ -66,10 +66,8 @@ class ExerciseEditForm(forms.Form):
                                   'class': 'form-control'
                               }))
     e_desc = forms.CharField(label='Description',
-                             widget=TinyMCE(attrs={
-                                 'cols': 100,
-                                 'rows': 20,
-                                 'class': 'form-control'
+                             widget=forms.Textarea(attrs={
+                                 'class': 'form-control no-resize'
                              }))
     e_pub_date = forms.DateTimeField(initial=datetime_now,
                                      label='Publication Date',
@@ -110,10 +108,8 @@ class ExerciseSubmissionForm(forms.Form):
                                   'class': 'form-control'
                               }))
     e_desc = forms.CharField(label='Description',
-                             widget=TinyMCE(attrs={
-                                 'cols': 100,
-                                 'rows': 20,
-                                 'class': 'form-control'
+                             widget=forms.Textarea(attrs={
+                                 'class': 'form-control no-resize'
                              }))
     e_pub_date = forms.DateTimeField(initial=datetime_now,
                                      label='Publication Date',
