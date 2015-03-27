@@ -3,6 +3,7 @@ import accounts.views as account_views
 
 urlpatterns = patterns(
     '',
+    url(r'^new_course/$', account_views.new_course, name='new_course'),
     url(r'^register/$', account_views.register, name='register'),
     url(r'^login/$', account_views.user_login, name='user_login'),
     url(r'^logout/$', account_views.user_logout, name='user_logout'),

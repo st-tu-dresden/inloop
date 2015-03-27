@@ -1,7 +1,23 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from accounts.forms import UserForm
+from accounts.forms import UserForm, NewCourseForm
+
+
+def new_course(request):
+    if request.method == 'POST':
+        course_form = NewCourseForm(data=request.POST)
+        if course_form.is_valid():
+            course_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(course_form.errors))
+    else:
+        course_form = NewCourseForm()
+
+    return render(request, 'accounts/new_course.html', {
+        'course_form': course_form
+    })
 
 
 def register(request):
