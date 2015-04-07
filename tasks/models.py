@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from tinymce import models as tinymce_models
 from accounts.models import UserProfile
 
 
@@ -16,7 +15,7 @@ class Task(models.Model):
     '''
     title = models.CharField(max_length=100, help_text='Task name')
     author = models.ForeignKey(UserProfile)
-    description = tinymce_models.HTMLField(help_text='Task description')
+    description = models.TextField(help_text='Task description')
     publication_date = models.DateTimeField(
         help_text='When should the task be published?'
     )

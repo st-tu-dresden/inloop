@@ -1,7 +1,23 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from accounts.forms import UserForm
+from accounts.forms import UserForm, NewCourseForm
+
+
+def new_course(request):
+    if request.method == 'POST':
+        course_form = NewCourseForm(data=request.POST)
+        if course_form.is_valid():
+            course_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(course_form.errors))
+    else:
+        course_form = NewCourseForm()
+
+    return render(request, 'accounts/new_course.html', {
+        'course_form': course_form
+    })
 
 
 def register(request):
@@ -17,8 +33,8 @@ def register(request):
 
             registered = True
         else:
-            error_msg = "The following form validation errors occurred: %s"
-            print error_msg % user_form.errors
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(user_form.errors))
 
     else:
         user_form = UserForm()
@@ -51,7 +67,7 @@ def user_login(request):
                 })
         else:
             # invalid credentials
-            print "Invalid login details: {0}, {1}".format(username, password)
+            print("Invalid login details: {0}, {1}".format(username, password))
             return render(request, 'registration/login.html', {
                 'login_failed': True,
                 'account_disabled': False,

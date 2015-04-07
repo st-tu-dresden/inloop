@@ -2,6 +2,7 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from tasks import forms
 from tasks.models import Task
 from . import filesystem_utils as fsu
@@ -9,10 +10,18 @@ from . import filesystem_utils as fsu
 
 @login_required
 def index(request):
-    basic_tasks = Task.objects.filter(category='B')
-    advanced_tasks = Task.objects.filter(category='A')
-    lesson_tasks = Task.objects.filter(category='L')
-    exam_tasks = Task.objects.filter(category='E')
+    basic_tasks = Task.objects.filter(
+        category='B',
+        publication_date__lte=timezone.now())
+    advanced_tasks = Task.objects.filter(
+        category='A',
+        publication_date__lte=timezone.now())
+    lesson_tasks = Task.objects.filter(
+        category='L',
+        publication_date__lte=timezone.now())
+    exam_tasks = Task.objects.filter(
+        category='E',
+        publication_date__lte=timezone.now())
     return render(request, 'tasks/index.html', {
         'user': request.user,
         'basic_tasks': basic_tasks,
@@ -53,10 +62,11 @@ def edit(request, slug):
     unittest_names = fsu.get_unittest_names(task.title)
 
     if request.method == 'POST':
-        form = forms.ExerciseEditForm(request.POST,
-                                      request.FILES,
-                                      extra_templates=template_names,
-                                      extra_unittests=unittest_names)
+        form = forms.ExerciseEditForm(
+            request.POST,
+            request.FILES,
+            extra_templates=template_names,
+            extra_unittests=unittest_names)
         if form.is_valid():
             exercise_file_list = request.FILES.getlist('e_files')
             unittest_file_list = request.FILES.getlist('ut_files')
@@ -79,29 +89,29 @@ def edit(request, slug):
                     fsu.del_unittest(label, task.title)
 
             # populate direct task data
-            task.title = form.data['e_title']
-            # TODO: task.author = request.user,
-            task.description = form.data['e_desc']
-            task.publication_date = form.data['e_pub_date']
-            task.deadline_date = form.data['e_dead_date']
-            task.category = form.data['e_cat']
-            task.slug = slugify(unicode(form.data['e_title']))
+            task.title = form.cleaned_data['e_title']
+            task.description = form.cleaned_data['e_desc']
+            task.publication_date = form.cleaned_data['e_pub_date']
+            task.deadline_date = form.cleaned_data['e_dead_date']
+            task.category = form.cleaned_data['e_cat']
+            task.slug = slugify(unicode(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
         else:
-            print form.errors
+            print(form.errors)
     else:
         # construct data dict for pre populating form
         data_dict = {
             'e_title': task.title,
             'e_desc': task.description,
-            'e_pub_date': task.publication_date,
-            'e_dead_date': task.deadline_date,
+            'e_pub_date': task.publication_date.strftime('%m/%d/%Y %H:%M'),
+            'e_dead_date': task.deadline_date.strftime('%m/%d/%Y %H:%M'),
             'e_cat': task.category
         }
-        form = forms.ExerciseEditForm(initial=data_dict,
-                                      extra_templates=template_names,
-                                      extra_unittests=unittest_names)
+        form = forms.ExerciseEditForm(
+            initial=data_dict,
+            extra_templates=template_names,
+            extra_unittests=unittest_names)
         return render(request, 'tasks/edit_exercise.html', {
             'update_form': form
         })
@@ -149,13 +159,14 @@ def submit_new_exercise(request):
                     form.cleaned_data['e_title'])
 
         # add Task object to system
-        t = Task.objects.create(title=form.data['e_title'],
-                                author=request.user,
-                                description=form.data['e_desc'],
-                                publication_date=form.data['e_pub_date'],
-                                deadline_date=form.data['e_dead_date'],
-                                category=form.data['e_cat'],
-                                slug=slugify(unicode(form.data['e_title'])))
+        t = Task.objects.create(
+            title=form.cleaned_data['e_title'],
+            author=request.user,
+            description=form.cleaned_data['e_desc'],
+            publication_date=form.cleaned_data['e_pub_date'],
+            deadline_date=form.cleaned_data['e_dead_date'],
+            category=form.cleaned_data['e_cat'],
+            slug=slugify(unicode(form.data['e_title'])))
         t.save()
         return redirect('tasks:index')
 
