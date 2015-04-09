@@ -1,8 +1,15 @@
 from django import forms
 from tinymce.widgets import TinyMCE
 from tasks.models import TaskCategory
-from tasks.models import TASK_CATEGORIES
 import datetime
+
+
+def get_task_categories():
+    # TODO: CHECK LOGIC
+    res = []
+    for c in TaskCategory.objects.all():
+        res.append(c.get_tuple())
+    return res
 
 
 YESNO_CHOICES = [('Y', 'Yes'),
@@ -104,7 +111,7 @@ class ExerciseEditForm(forms.Form):
                                       widget=forms.DateTimeInput(attrs={
                                           'class': 'form-control'
                                       }))
-    e_cat = forms.ChoiceField(choices=TASK_CATEGORIES,
+    e_cat = forms.ChoiceField(choices=get_task_categories(),
                               label='Exercise Category',
                               widget=forms.Select(attrs={
                                   'class': 'form-control'
@@ -150,7 +157,7 @@ class ExerciseSubmissionForm(forms.Form):
                                           attrs={
                                               'class': 'form-control'}
                                       ))
-    e_cat = forms.ChoiceField(choices=TASK_CATEGORIES,
+    e_cat = forms.ChoiceField(choices=get_task_categories(),
                               label='Exercise Category',
                               widget=forms.Select(attrs={
                                   'class': 'form-control'

@@ -103,11 +103,14 @@ def edit(request, slug):
                     fsu.del_unittest(label, task.title)
 
             # populate direct task data
+            cat = TaskCategory.objects.filter(
+                short_id=form.cleaned_data['e_cat']
+            )[0]
             task.title = form.cleaned_data['e_title']
             task.description = form.cleaned_data['e_desc']
             task.publication_date = form.cleaned_data['e_pub_date']
             task.deadline_date = form.cleaned_data['e_dead_date']
-            task.category = form.cleaned_data['e_cat']
+            task.category = cat
             task.slug = slugify(unicode(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
@@ -120,7 +123,7 @@ def edit(request, slug):
             'e_desc': task.description,
             'e_pub_date': task.publication_date.strftime('%m/%d/%Y %H:%M'),
             'e_dead_date': task.deadline_date.strftime('%m/%d/%Y %H:%M'),
-            'e_cat': task.category
+            'e_cat': str(task.category)
         }
         form = forms.ExerciseEditForm(
             initial=data_dict,
@@ -173,13 +176,16 @@ def submit_new_exercise(request):
                     form.cleaned_data['e_title'])
 
         # add Task object to system
+        cat = TaskCategory.objects.filter(
+            short_id=form.cleaned_data['e_cat']
+        )[0]
         t = Task.objects.create(
             title=form.cleaned_data['e_title'],
             author=request.user,
             description=form.cleaned_data['e_desc'],
             publication_date=form.cleaned_data['e_pub_date'],
             deadline_date=form.cleaned_data['e_dead_date'],
-            category=form.cleaned_data['e_cat'],
+            category=cat,
             slug=slugify(unicode(form.data['e_title'])))
         t.save()
         return redirect('tasks:index')
