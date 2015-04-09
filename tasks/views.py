@@ -2,10 +2,10 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
 from tasks import forms
 from tasks.models import Task, TaskCategory
 from . import filesystem_utils as fsu
+
 
 @login_required
 def new_category(request):
@@ -15,7 +15,7 @@ def new_category(request):
             cat_form.save()
         else:
             error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(course_form.errors))
+            print(error_msg.format(cat_form.errors))
     else:
         cat_form = forms.NewTaskCategoryForm()
 
@@ -25,28 +25,19 @@ def new_category(request):
 
 
 @login_required
-def index(request):
-    '''
-    basic_tasks = Task.objects.filter(
-        category='B',
-        publication_date__lte=timezone.now())
-    advanced_tasks = Task.objects.filter(
-        category='A',
-        publication_date__lte=timezone.now())
-    lesson_tasks = Task.objects.filter(
-        category='L',
-        publication_date__lte=timezone.now())
-    exam_tasks = Task.objects.filter(
-        category='E',
-        publication_date__lte=timezone.now())
-    return render(request, 'tasks/index.html', {
+def category(request, short_id):
+    cat = get_object_or_404(TaskCategory, short_id=short_id)
+    task_list = Task.objects.filter(category=cat)
+
+    return render(request, 'tasks/category.html', {
         'user': request.user,
-        'basic_tasks': basic_tasks,
-        'advanced_tasks': advanced_tasks,
-        'lesson_tasks': lesson_tasks,
-        'exam_tasks': exam_tasks,
+        'name': cat.name,
+        'task_list': task_list
     })
-    '''
+
+
+@login_required
+def index(request):
     categories = TaskCategory.objects.all()
     return render(request, 'tasks/index2.html', {
         'user': request.user,

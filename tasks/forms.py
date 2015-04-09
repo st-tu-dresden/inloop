@@ -18,6 +18,14 @@ def datetime_now():
 
 
 class NewTaskCategoryForm(forms.ModelForm):
+    short_id = forms.CharField(
+        max_length=2,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'off'
+        })
+    )
+
     name = forms.CharField(
         max_length=50,
         widget=forms.TextInput(attrs={
@@ -28,7 +36,7 @@ class NewTaskCategoryForm(forms.ModelForm):
 
     class Meta(object):
         model = TaskCategory
-        fields = ('name',)
+        fields = ('short_id', 'name')
 
 
 class UserEditorForm(forms.Form):
