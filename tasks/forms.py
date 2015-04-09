@@ -1,5 +1,4 @@
 from django import forms
-from tinymce.widgets import TinyMCE
 from tasks.models import TaskCategory
 import datetime
 
@@ -44,15 +43,6 @@ class NewTaskCategoryForm(forms.ModelForm):
     class Meta(object):
         model = TaskCategory
         fields = ('short_id', 'name')
-
-
-class UserEditorForm(forms.Form):
-    content = forms.CharField(
-        label='',
-        widget=TinyMCE(attrs={
-            'cols': 100,
-            'rows': 20
-        }))
 
 
 class ExerciseDeletionForm(forms.Form):
