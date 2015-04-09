@@ -1,5 +1,6 @@
 from django import forms
 from tinymce.widgets import TinyMCE
+from tasks.models import TaskCategory
 from tasks.models import TASK_CATEGORIES
 import datetime
 
@@ -14,6 +15,20 @@ def tomorrow():
 
 def datetime_now():
     return datetime.datetime.now()
+
+
+class NewTaskCategoryForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'off'
+        })
+    )
+
+    class Meta(object):
+        model = TaskCategory
+        fields = ('name',)
 
 
 class UserEditorForm(forms.Form):

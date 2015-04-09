@@ -6,6 +6,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', views.index, name='index'),
     url(r'^new_exercise/$', views.submit_new_exercise, name='new_exercise'),
+    url(r'^new_category/$', views.new_category, name='new_category'),
     url(r'^(?P<slug>[-\w]+)/$', views.detail, name='detail'),
     url(r'^(?P<slug>[-\w]+)/edit/$', views.edit, name='edit'),
     url(r'^(?P<slug>[-\w]+)/results/$', views.results, name='results'),

@@ -35,3 +35,4 @@ class NewCourseForm(forms.ModelForm):
 
     class Meta(object):
         model = COS
+        fields = ('name',)

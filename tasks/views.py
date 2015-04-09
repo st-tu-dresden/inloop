@@ -4,12 +4,29 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from tasks import forms
-from tasks.models import Task
+from tasks.models import Task, TaskCategory
 from . import filesystem_utils as fsu
+
+@login_required
+def new_category(request):
+    if request.method == 'POST':
+        cat_form = forms.NewTaskCategoryForm(data=request.POST)
+        if cat_form.is_valid():
+            cat_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(course_form.errors))
+    else:
+        cat_form = forms.NewTaskCategoryForm()
+
+    return render(request, 'tasks/new_category.html', {
+        'cat_form': cat_form
+    })
 
 
 @login_required
 def index(request):
+    '''
     basic_tasks = Task.objects.filter(
         category='B',
         publication_date__lte=timezone.now())
@@ -28,6 +45,12 @@ def index(request):
         'advanced_tasks': advanced_tasks,
         'lesson_tasks': lesson_tasks,
         'exam_tasks': exam_tasks,
+    })
+    '''
+    categories = TaskCategory.objects.all()
+    return render(request, 'tasks/index2.html', {
+        'user': request.user,
+        'categories': categories
     })
 
 

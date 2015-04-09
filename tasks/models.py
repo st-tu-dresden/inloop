@@ -19,9 +19,11 @@ def get_task_categories():
 
 class TaskCategory(models.Model):
     short_id = models.CharField(
+        unique=True,
         max_length=2,
         help_text='Short ID for the database')
     name = models.CharField(
+        unique=True,
         max_length=50,
         help_text='Category Name')
 
@@ -51,7 +53,7 @@ class Task(models.Model):
     # category = models.CharField(max_length=1,
     #                            choices=TASK_CATEGORIES,
     #                            help_text='Category of task')
-    category = models.OneToOneField(TaskCategory)
+    category = models.ForeignKey(TaskCategory)
     slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
 
     def is_active(self):
