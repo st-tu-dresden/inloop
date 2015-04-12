@@ -24,6 +24,7 @@ def datetime_now():
 
 class ManageCategoriesForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
         super(ManageCategoriesForm, self).__init__(*args, **kwargs)
 
         for i, tk in enumerate(TaskCategory.objects.all()):
@@ -70,6 +71,7 @@ class ExerciseEditForm(forms.Form):
     def __init__(self, *args, **kwargs):
         extra_templates = kwargs.pop('extra_templates')
         extra_unittests = kwargs.pop('extra_unittests')
+        kwargs.setdefault('label_suffix', '')
         super(ExerciseEditForm, self).__init__(*args, **kwargs)
         self.fields['e_cat'] = forms.ChoiceField(
             choices=get_task_categories(),
@@ -145,6 +147,7 @@ class ExerciseEditForm(forms.Form):
 
 class ExerciseSubmissionForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
         super(ExerciseSubmissionForm, self).__init__(*args, **kwargs)
         self.fields['e_cat'] = forms.ChoiceField(
             choices=get_task_categories(),
