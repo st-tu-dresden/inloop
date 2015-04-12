@@ -22,6 +22,21 @@ def datetime_now():
     return datetime.datetime.now()
 
 
+class ManageCategoriesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ManageCategoriesForm, self).__init__(*args, **kwargs)
+
+        for i, tk in enumerate(TaskCategory.objects.all()):
+            name = 'category_%s' % i
+            self.fields[name] = forms.BooleanField(label=tk.name,
+                                                   required=False)
+
+    def get_categories(self):
+        for key, value in self.cleaned_data.items():
+            if key.startswith('category'):
+                yield (key, self.fields[key].label, value)
+
+
 class NewTaskCategoryForm(forms.ModelForm):
     short_id = forms.CharField(
         max_length=2,

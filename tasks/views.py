@@ -8,6 +8,25 @@ from . import filesystem_utils as fsu
 
 
 @login_required
+def manage_categories(request):
+    if request.method == 'POST':
+        man_cat_form = forms.ManageCategoriesForm(data=request.POST)
+        if man_cat_form.is_valid():
+            for name, label, value in man_cat_form.get_categories():
+                if man_cat_form.cleaned_data[name]:
+                    TaskCategory.objects.get(name=label).delete()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(man_cat_form.errors))
+    else:
+        man_cat_form = forms.ManageCategoriesForm()
+
+    return render(request, 'tasks/manage_categories.html', {
+        'man_cat_form': man_cat_form
+    })
+
+
+@login_required
 def new_category(request):
     if request.method == 'POST':
         cat_form = forms.NewTaskCategoryForm(data=request.POST)
@@ -69,7 +88,6 @@ def detail(request, slug):
 
 @login_required
 def edit(request, slug):
-    # TODO: Separate options to add/ delete files
     task = get_object_or_404(Task, slug=slug)
     template_names = fsu.get_template_names(task.title)
     unittest_names = fsu.get_unittest_names(task.title)

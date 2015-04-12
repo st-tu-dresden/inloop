@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="col-md-4 col-md-offset-4">
+        <form action="{% url 'tasks:manage_categories' %}" method="post">
+            {% csrf_token %}
+            {% for field in man_cat_form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+            <button type="submit" class="btn btn-default" value="submit">Create</button>
+        </form>
+    </div>
+{% endblock %}
