@@ -4,7 +4,6 @@ import datetime
 
 
 def get_task_categories():
-    # TODO: CHECK LOGIC
     res = []
     for c in TaskCategory.objects.all():
         res.append(c.get_tuple())
@@ -29,16 +28,14 @@ class NewTaskCategoryForm(forms.ModelForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
-        })
-    )
+        }))
 
     name = forms.CharField(
         max_length=50,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
-        })
-    )
+        }))
 
     class Meta(object):
         model = TaskCategory

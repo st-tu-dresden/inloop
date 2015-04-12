@@ -51,14 +51,13 @@ def detail(request, slug):
 
     if request.method == 'POST':
         # TODO: save form data
-        form = forms.UserEditorForm(request.POST)
+        pass
 
     else:
         # TODO: prepopulate form with last saved data
-        form = forms.UserEditorForm()
+        pass
 
     return render(request, 'tasks/task-detail.html', {
-        'editor_form': form,
         'file_dict': fsu.get_task_templates(task.title),
         'user': request.user,
         'title': task.title,
