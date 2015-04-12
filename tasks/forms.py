@@ -69,6 +69,12 @@ class ExerciseEditForm(forms.Form):
         extra_templates = kwargs.pop('extra_templates')
         extra_unittests = kwargs.pop('extra_unittests')
         super(ExerciseEditForm, self).__init__(*args, **kwargs)
+        self.fields['e_cat'] = forms.ChoiceField(
+            choices=get_task_categories(),
+            label='Exercise Category',
+            widget=forms.Select(attrs={
+                'class': 'form-control'
+            }))
 
         # save templates as BooleanField
         for i, templ in enumerate(extra_templates):
@@ -113,11 +119,6 @@ class ExerciseEditForm(forms.Form):
                                       widget=forms.DateTimeInput(attrs={
                                           'class': 'form-control'
                                       }))
-    e_cat = forms.ChoiceField(choices=get_task_categories(),
-                              label='Exercise Category',
-                              widget=forms.Select(attrs={
-                                  'class': 'form-control'
-                              }))
     ut_files = forms.FileField(label='Unittest Files',
                                required=False,
                                widget=forms.FileInput(attrs={
@@ -133,6 +134,15 @@ class ExerciseEditForm(forms.Form):
 
 
 class ExerciseSubmissionForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ExerciseSubmissionForm, self).__init__(*args, **kwargs)
+        self.fields['e_cat'] = forms.ChoiceField(
+            choices=get_task_categories(),
+            label='Exercise Category',
+            widget=forms.Select(attrs={
+                'class': 'form-control'
+            }))
+
     # TODO: Add validators for file size, ending and header
     e_title = forms.CharField(max_length=100,
                               label='Exercise Title',
@@ -159,11 +169,6 @@ class ExerciseSubmissionForm(forms.Form):
                                           attrs={
                                               'class': 'form-control'}
                                       ))
-    e_cat = forms.ChoiceField(choices=get_task_categories(),
-                              label='Exercise Category',
-                              widget=forms.Select(attrs={
-                                  'class': 'form-control'
-                              }))
     ut_files = forms.FileField(label='Unittest Files',
                                widget=forms.FileInput(attrs={
                                    'class': 'form-control',

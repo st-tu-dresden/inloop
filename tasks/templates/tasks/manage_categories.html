@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="row">
     <div class="col-md-4 col-md-offset-4">
-        <form action="{% url 'tasks:manage_categories' %}" method="post">
+        <a href="{% url 'tasks:new_category' %}"><h4>New Category</h4></a>
+        <hr>
+        <h3>Delete Categories</h3>
+        <form action="{% url 'tasks:man_cat' %}" method="post">
             {% csrf_token %}
             {% for field in man_cat_form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                {% endfor %}
-            <button type="submit" class="btn btn-default" value="submit">Create</button>
+                <div class="form-group">
+                    {{ field }}
+                    {{ field.label_tag }}
+                </div>
+            {% empty %}
+                <p class="no-categories">There are currently no categories in the system.</p>
+            {% endfor %}
+            <button type="submit" class="btn btn-default" value="submit">Delete</button>
         </form>
     </div>
+</div>
 {% endblock %}

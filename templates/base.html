@@ -33,7 +33,7 @@
                     {% endfor %}
                     {% if user.is_superuser %}
                         <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
-                        <li><a href="{% url 'tasks:new_category' %}">New Category</a></li>
+                        <li><a href="{% url 'tasks:man_cat' %}">Manage Categories</a></li>
                         <li><a href="{% url 'accounts:new_course' %}">New Course</a></li>
                         <li><a href="{% url 'admin:index' %}">System</a></li>
                     {% endif %}
