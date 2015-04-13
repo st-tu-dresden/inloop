@@ -30,7 +30,7 @@ class ManageCategoriesForm(forms.Form):
         for i, tk in enumerate(TaskCategory.objects.all()):
             name = 'category_%s' % i
             self.fields[name] = forms.BooleanField(
-                label=tk.name,
+                label=tk.short_id,
                 required=False)
 
     def get_categories(self):

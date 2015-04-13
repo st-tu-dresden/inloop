@@ -14,7 +14,7 @@ def manage_categories(request):
         if man_cat_form.is_valid():
             for name, label, value in man_cat_form.get_categories():
                 if man_cat_form.cleaned_data[name]:
-                    TaskCategory.objects.get(name=label).delete()
+                    TaskCategory.objects.get(short_id=label).delete()
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(man_cat_form.errors))
@@ -22,7 +22,32 @@ def manage_categories(request):
         man_cat_form = forms.ManageCategoriesForm()
 
     return render(request, 'tasks/manage_categories.html', {
-        'man_cat_form': man_cat_form
+        'man_cat_form': man_cat_form,
+    })
+
+
+@login_required
+def edit_category(request, short_id):
+    cat = get_object_or_404(TaskCategory, short_id=short_id)
+    if request.method == 'POST':
+        cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
+        if cat_form.is_valid():
+            cat_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(cat_form.errors))
+    else:
+        cat_form = forms.NewTaskCategoryForm(
+            instance=cat,
+            initial={
+                'short_id': cat.short_id,
+                'name': cat.name
+            }
+        )
+
+    return render(request, 'tasks/edit_category.html', {
+        'cat_form': cat_form,
+        'short_id': short_id
     })
 
 

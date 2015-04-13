@@ -11,6 +11,7 @@
                 <div class="form-group">
                     {{ field }}
                     {{ field.label_tag }}
+                    <a href="{% url 'tasks:edit_category' field.label %}"> - Edit</a>
                 </div>
             {% empty %}
                 <p class="no-categories">There are currently no categories in the system.</p>
