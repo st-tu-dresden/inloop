@@ -1,4 +1,5 @@
 import os
+import shutil
 import glob
 from prktmt.settings import BASE_DIR
 
@@ -23,6 +24,11 @@ def del_template(f_name, task_name):
 def del_unittest(f_name, task_name):
     path = os.path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
     os.remove(os.path.join(path, f_name))
+
+
+def del_task_files(task_name):
+    path = os.path.join(BASE_DIR, 'media', 'exercises', task_name)
+    shutil.rmtree(path)
 
 
 def handle_uploaded_unittest(f, task_name):

@@ -2,32 +2,90 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
 from tasks import forms
-from tasks.models import Task
+from tasks.models import Task, TaskCategory
 from . import filesystem_utils as fsu
 
 
 @login_required
-def index(request):
-    basic_tasks = Task.objects.filter(
-        category='B',
-        publication_date__lte=timezone.now())
-    advanced_tasks = Task.objects.filter(
-        category='A',
-        publication_date__lte=timezone.now())
-    lesson_tasks = Task.objects.filter(
-        category='L',
-        publication_date__lte=timezone.now())
-    exam_tasks = Task.objects.filter(
-        category='E',
-        publication_date__lte=timezone.now())
-    return render(request, 'tasks/index.html', {
+def manage_categories(request):
+    if request.method == 'POST':
+        man_cat_form = forms.ManageCategoriesForm(data=request.POST)
+        if man_cat_form.is_valid():
+            for name, label, value in man_cat_form.get_categories():
+                if man_cat_form.cleaned_data[name]:
+                    TaskCategory.objects.get(short_id=label).delete()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(man_cat_form.errors))
+    else:
+        man_cat_form = forms.ManageCategoriesForm()
+
+    return render(request, 'tasks/manage_categories.html', {
+        'man_cat_form': man_cat_form,
+    })
+
+
+@login_required
+def edit_category(request, short_id):
+    cat = get_object_or_404(TaskCategory, short_id=short_id)
+    if request.method == 'POST':
+        cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
+        if cat_form.is_valid():
+            cat_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(cat_form.errors))
+    else:
+        cat_form = forms.NewTaskCategoryForm(
+            instance=cat,
+            initial={
+                'short_id': cat.short_id,
+                'name': cat.name
+            }
+        )
+
+    return render(request, 'tasks/edit_category.html', {
+        'cat_form': cat_form,
+        'short_id': short_id
+    })
+
+
+@login_required
+def new_category(request):
+    if request.method == 'POST':
+        cat_form = forms.NewTaskCategoryForm(data=request.POST)
+        if cat_form.is_valid():
+            cat_form.save()
+        else:
+            error_msg = "The following form validation errors occurred: {0}"
+            print(error_msg.format(cat_form.errors))
+    else:
+        cat_form = forms.NewTaskCategoryForm()
+
+    return render(request, 'tasks/new_category.html', {
+        'cat_form': cat_form
+    })
+
+
+@login_required
+def category(request, short_id):
+    cat = get_object_or_404(TaskCategory, short_id=short_id)
+    task_list = Task.objects.filter(category=cat)
+
+    return render(request, 'tasks/category.html', {
         'user': request.user,
-        'basic_tasks': basic_tasks,
-        'advanced_tasks': advanced_tasks,
-        'lesson_tasks': lesson_tasks,
-        'exam_tasks': exam_tasks,
+        'name': cat.name,
+        'task_list': task_list
+    })
+
+
+@login_required
+def index(request):
+    categories = TaskCategory.objects.all()
+    return render(request, 'tasks/index2.html', {
+        'user': request.user,
+        'categories': categories
     })
 
 
@@ -37,14 +95,13 @@ def detail(request, slug):
 
     if request.method == 'POST':
         # TODO: save form data
-        form = forms.UserEditorForm(request.POST)
+        pass
 
     else:
         # TODO: prepopulate form with last saved data
-        form = forms.UserEditorForm()
+        pass
 
     return render(request, 'tasks/task-detail.html', {
-        'editor_form': form,
         'file_dict': fsu.get_task_templates(task.title),
         'user': request.user,
         'title': task.title,
@@ -56,7 +113,6 @@ def detail(request, slug):
 
 @login_required
 def edit(request, slug):
-    # TODO: Separate options to add/ delete files
     task = get_object_or_404(Task, slug=slug)
     template_names = fsu.get_template_names(task.title)
     unittest_names = fsu.get_unittest_names(task.title)
@@ -89,11 +145,14 @@ def edit(request, slug):
                     fsu.del_unittest(label, task.title)
 
             # populate direct task data
+            cat = TaskCategory.objects.filter(
+                short_id=form.cleaned_data['e_cat']
+            )[0]
             task.title = form.cleaned_data['e_title']
             task.description = form.cleaned_data['e_desc']
             task.publication_date = form.cleaned_data['e_pub_date']
             task.deadline_date = form.cleaned_data['e_dead_date']
-            task.category = form.cleaned_data['e_cat']
+            task.category = cat
             task.slug = slugify(unicode(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
@@ -106,7 +165,7 @@ def edit(request, slug):
             'e_desc': task.description,
             'e_pub_date': task.publication_date.strftime('%m/%d/%Y %H:%M'),
             'e_dead_date': task.deadline_date.strftime('%m/%d/%Y %H:%M'),
-            'e_cat': task.category
+            'e_cat': str(task.category)
         }
         form = forms.ExerciseEditForm(
             initial=data_dict,
@@ -159,13 +218,16 @@ def submit_new_exercise(request):
                     form.cleaned_data['e_title'])
 
         # add Task object to system
+        cat = TaskCategory.objects.filter(
+            short_id=form.cleaned_data['e_cat']
+        )[0]
         t = Task.objects.create(
             title=form.cleaned_data['e_title'],
             author=request.user,
             description=form.cleaned_data['e_desc'],
             publication_date=form.cleaned_data['e_pub_date'],
             deadline_date=form.cleaned_data['e_dead_date'],
-            category=form.cleaned_data['e_cat'],
+            category=cat,
             slug=slugify(unicode(form.data['e_title'])))
         t.save()
         return redirect('tasks:index')
