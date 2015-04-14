@@ -1,6 +1,7 @@
 from django import forms
 from tasks.models import TaskCategory
 import datetime
+from validators import validate_short_id
 
 
 def get_task_categories():
@@ -42,6 +43,7 @@ class ManageCategoriesForm(forms.Form):
 class NewTaskCategoryForm(forms.ModelForm):
     short_id = forms.CharField(
         max_length=2,
+        validators=[validate_short_id],
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'

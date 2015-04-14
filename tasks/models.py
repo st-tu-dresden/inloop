@@ -4,6 +4,11 @@ from accounts.models import UserProfile
 
 
 class TaskCategory(models.Model):
+    def save(self, *args, **kwargs):
+        sid = getattr(self, 'short_id', False)
+        setattr(self, 'short_id', sid.upper())
+        super(TaskCategory, self).save(*args, **kwargs)
+
     short_id = models.CharField(
         unique=True,
         max_length=2,
