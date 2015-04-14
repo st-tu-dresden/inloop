@@ -25,15 +25,22 @@ class Task(models.Model):
     Represents the tasks that are presented to the user to solve.
     '''
 
-    title = models.CharField(max_length=100, help_text='Task name')
-    author = models.ForeignKey(UserProfile)
-    description = models.TextField(help_text='Task description')
+    title = models.CharField(
+        max_length=100,
+        help_text='Task name')
+    author = models.ForeignKey(
+        UserProfile)
+    description = models.TextField(
+        help_text='Task description')
     publication_date = models.DateTimeField(
-        help_text='When should the task be published?'
-    )
-    deadline_date = models.DateTimeField(help_text='Date the task is due to')
+        help_text='When should the task be published?')
+    deadline_date = models.DateTimeField(
+        help_text='Date the task is due to')
     category = models.ForeignKey(TaskCategory)
-    slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        help_text='URL name')
 
     def is_active(self):
         '''

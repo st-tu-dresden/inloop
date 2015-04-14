@@ -29,4 +29,6 @@ class UserProfile(auth_models.AbstractUser):
         null=True,
         validators=[validate_mat_num]
     )
-    course = models.ForeignKey(CourseOfStudy, null=True)
+    course = models.ForeignKey(
+        CourseOfStudy,
+        null=True)
