@@ -11,6 +11,10 @@ textarea[id^="content"] {
     display: none;
 }
 
+.topbot {
+    margin-top: 15px;
+}
+
 .task-listing {
     width: 100%;
 }
@@ -46,4 +50,9 @@ textarea[id^="content"] {
 
 .detail-btn {
     margin-top: 10px;
+}
+
+.bigger {
+    margin-right: 10px;
+    font-size: 18px;
 }
