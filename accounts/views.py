@@ -33,8 +33,9 @@ def register(request):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
-
-            registered = True
+            return render(request, 'accounts/success.html', {
+                'message': 'You have successfully been registered!'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(user_form.errors))
@@ -87,10 +88,8 @@ def user_login(request):
 @login_required(login_url='accounts/login/')
 def user_logout(request):
     logout(request)
-    return render(request, 'registration/login.html', {
-        'login_failed': False,
-        'account_disabled': False,
-        'successful_logout': True
+    return render(request, 'accounts/success.html', {
+        'message': 'You have been logged out!'
     })
 
 
