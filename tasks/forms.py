@@ -40,6 +40,10 @@ class ManageCategoriesForm(forms.Form):
 
 
 class NewTaskCategoryForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(NewTaskCategoryForm, self).__init__(*args, **kwargs)
+
     name = forms.CharField(
         max_length=50,
         widget=forms.TextInput(attrs={
