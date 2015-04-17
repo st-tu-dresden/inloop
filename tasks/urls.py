@@ -15,22 +15,22 @@ urlpatterns = patterns(
         name='new_exercise'
     ),
     url(
-        r'^new_category/$',
+        r'^category/admin/new_category/$',
         views.new_category,
         name='new_category'
     ),
     url(
-        r'^(?P<short_id>[\w]+)/edit_category/$',
+        r'^category/admin/(?P<short_id>[\w]+)/edit_category/$',
         views.edit_category,
         name='edit_category'
     ),
     url(
-        r'^(?P<short_id>[\w]+)/delete/$',
+        r'^category/admin/(?P<short_id>[\w]+)/delete/$',
         views.delete_category,
         name='delete_category'
     ),
     url(
-        r'^manage_categories/$',
+        r'^category/admin/manage/$',
         views.manage_categories,
         name='man_cat'
     ),
