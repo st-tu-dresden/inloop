@@ -25,6 +25,11 @@ urlpatterns = patterns(
         name='edit_category'
     ),
     url(
+        r'^(?P<short_id>[\w]+)/delete/$',
+        views.delete_category,
+        name='delete_category'
+    ),
+    url(
         r'^manage_categories/$',
         views.manage_categories,
         name='man_cat'

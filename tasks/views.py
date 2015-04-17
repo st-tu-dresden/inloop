@@ -9,21 +9,18 @@ from . import filesystem_utils as fsu
 
 @login_required
 def manage_categories(request):
-    if request.method == 'POST':
-        man_cat_form = forms.ManageCategoriesForm(data=request.POST)
-        if man_cat_form.is_valid():
-            for name, label, value in man_cat_form.get_categories():
-                if man_cat_form.cleaned_data[name]:
-                    TaskCategory.objects.get(short_id=label).delete()
-        else:
-            error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(man_cat_form.errors))
-    else:
-        man_cat_form = forms.ManageCategoriesForm()
+    categories = TaskCategory.objects.all()
 
     return render(request, 'tasks/manage_categories.html', {
-        'man_cat_form': man_cat_form,
+        'categories': categories
     })
+
+
+@login_required
+def delete_category(request, short_id):
+    cat = get_object_or_404(TaskCategory, short_id=short_id)
+    cat.delete()
+    return redirect('tasks:man_cat')
 
 
 @login_required
