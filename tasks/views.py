@@ -171,9 +171,9 @@ def edit(request, slug):
             initial=data_dict,
             extra_templates=template_names,
             extra_unittests=unittest_names)
-        return render(request, 'tasks/edit_exercise.html', {
-            'update_form': form
-        })
+    return render(request, 'tasks/edit_exercise.html', {
+        'update_form': form
+    })
 
 
 @login_required
