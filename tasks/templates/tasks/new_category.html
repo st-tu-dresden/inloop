@@ -1,15 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="col-md-4 col-md-offset-4">
-        <form action="{% url 'tasks:new_category' %}" method="post">
+        <form action="{% url 'tasks:new_category' %}" class="form-horizontal" method="post">
             {% csrf_token %}
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10"><h3>Create a New Category</h3></div>
+            </div>
             {% for field in cat_form %}
+                {% if field.errors %}
+                    <div class="form-group has-error">
+                {% else %}
                     <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
+                {% endif %}
+                    <label for="{{ field.auto_id }}" class="col-md-2 control-label">{{ field.label }}</label>
+                    <div class="col-md-10">
+                        {% if field.errors %}
+                            <div class="panel panel-danger">
+                                {% with field.errors|first as error %}
+                                    <div class="panel-heading">{{ error }}</div>
+                                    <div class="panel-body">{{ field }}</div>
+                                {% endwith %}
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
                     </div>
-                {% endfor %}
-            <button type="submit" class="btn btn-default" value="submit">Create</button>
+                </div>
+            {% endfor %}
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-default" value="submit">Create</button>
+                </div>
+            </div>
         </form>
     </div>
 {% endblock %}
