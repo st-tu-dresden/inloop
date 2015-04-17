@@ -3,16 +3,21 @@ from django.utils import timezone
 from accounts.models import UserProfile
 
 
+def generate_short_id(s):
+    s = ''.join(e for e in s if e.isalnum())
+    return s.lower()
+
+
 class TaskCategory(models.Model):
     def save(self, *args, **kwargs):
-        sid = getattr(self, 'short_id', False)
-        setattr(self, 'short_id', sid.upper())
+        s = getattr(self, 'name')
+        setattr(self, 'short_id', generate_short_id(s))
         super(TaskCategory, self).save(*args, **kwargs)
 
     short_id = models.CharField(
         unique=True,
-        max_length=2,
-        help_text='Short ID for the database')
+        max_length=50,
+        help_text='Short ID for URLs')
     name = models.CharField(
         unique=True,
         max_length=50,

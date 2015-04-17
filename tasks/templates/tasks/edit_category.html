@@ -3,6 +3,7 @@
     <div class="col-md-4 col-md-offset-4">
         <form action="{% url 'tasks:edit_category' short_id %}" method="post">
             {% csrf_token %}
+            <p>Short id: {{ short_id }}</p>
             {% for field in cat_form %}
                     <div class="form-group">
                         {{ field.label_tag }}
