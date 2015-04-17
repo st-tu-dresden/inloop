@@ -25,8 +25,6 @@ def new_course(request):
 
 
 def register(request):
-    registered = False
-
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
 
@@ -46,8 +44,7 @@ def register(request):
         user_form = UserForm()
 
     return render(request, 'registration/register.html', {
-        'user_form': user_form,
-        'registered': registered
+        'user_form': user_form
     })
 
 
@@ -66,25 +63,18 @@ def user_login(request):
                 return redirect('tasks:index')
             else:
                 # account disabled
-                return render(request, 'registration/login.html', {
-                    'login_failed': False,
-                    'account_disabled': True,
-                    'successful_logout': False
+                return render(request, 'accounts/message.html', {
+                    'type': 'danger',
+                    'message': 'Your account has been disabled!'
                 })
         else:
             # invalid credentials
-            print("Invalid login details: {0}, {1}".format(username, password))
+            print('Invalid login details: {0}, {1}'.format(username, password))
             return render(request, 'registration/login.html', {
-                'login_failed': True,
-                'account_disabled': False,
-                'successful_logout': False
+                'login_failed': True
             })
     else:
-        return render(request, 'registration/login.html', {
-            'login_failed': False,
-            'account_disabled': False,
-            'successful_logout': False
-        })
+        return render(request, 'registration/login.html')
 
 
 @login_required(login_url='accounts/login/')
