@@ -15,6 +15,11 @@
             </div>
         </div>
         {% endfor %}
+        <div class="row topbot">
+            <div class="col-md-offset-2 col-md-8">
+                <a class="bigger" href="{% url 'tasks:new_category' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create a New Category</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
