@@ -9,7 +9,8 @@ def new_course(request):
         course_form = NewCourseForm(data=request.POST)
         if course_form.is_valid():
             course_form.save()
-            return render(request, 'accounts/success.html', {
+            return render(request, 'accounts/message.html', {
+                'type': 'success',
                 'message': 'The course has successfully been added!'
             })
         else:
@@ -33,7 +34,8 @@ def register(request):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
-            return render(request, 'accounts/success.html', {
+            return render(request, 'accounts/message.html', {
+                'type': 'success',
                 'message': 'You have successfully been registered!'
             })
         else:
@@ -88,7 +90,8 @@ def user_login(request):
 @login_required(login_url='accounts/login/')
 def user_logout(request):
     logout(request)
-    return render(request, 'accounts/success.html', {
+    return render(request, 'accounts/message.html', {
+        'type': 'success',
         'message': 'You have been logged out!'
     })
 
