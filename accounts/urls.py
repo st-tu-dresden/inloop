@@ -4,6 +4,11 @@ import accounts.views as account_views
 urlpatterns = patterns(
     '',
     url(
+        r'^success/$',
+        account_views.success,
+        name='success'
+    ),
+    url(
         r'^new_course/$',
         account_views.new_course,
         name='new_course'

@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from accounts.forms import UserForm, NewCourseForm
@@ -9,6 +9,9 @@ def new_course(request):
         course_form = NewCourseForm(data=request.POST)
         if course_form.is_valid():
             course_form.save()
+            return render(request, 'accounts/success.html', {
+                'message': 'The course has successfully been added!'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(course_form.errors))
@@ -57,7 +60,7 @@ def user_login(request):
             if user.is_active:
                 # everything alright
                 login(request, user)
-                return HttpResponseRedirect('/tasks/')
+                return redirect('tasks:index')
             else:
                 # account disabled
                 return render(request, 'registration/login.html', {
