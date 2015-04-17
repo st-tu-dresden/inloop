@@ -10,7 +10,6 @@ from . import filesystem_utils as fsu
 @login_required
 def manage_categories(request):
     categories = TaskCategory.objects.all()
-
     return render(request, 'tasks/manage_categories.html', {
         'categories': categories
     })
@@ -30,6 +29,10 @@ def edit_category(request, short_id):
         cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
         if cat_form.is_valid():
             cat_form.save()
+            return render(request, 'tasks/message.html', {
+                'type': 'success',
+                'message': 'The category has successfully been edited.'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(cat_form.errors))
@@ -54,6 +57,10 @@ def new_category(request):
         cat_form = forms.NewTaskCategoryForm(data=request.POST)
         if cat_form.is_valid():
             cat_form.save()
+            return render(request, 'tasks/message.html', {
+                'type': 'success',
+                'message': 'The new category has been added to the system.'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(cat_form.errors))
@@ -182,7 +189,10 @@ def delete(request, slug):
         if form.is_valid():
             if form.cleaned_data['are_you_sure']:
                 task.delete()
-                return redirect('tasks:index')
+                return render(request, 'tasks/message.html', {
+                    'type': 'success',
+                    'message': 'The task has been deleted.'
+                })
     else:
         form = forms.ExerciseDeletionForm()
         return render(request, 'tasks/delete_exercise.html', {
