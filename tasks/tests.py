@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from accounts.models import UserProfile
-from tasks.models import Task
+from tasks.models import Task, TaskCategory
 
 
 class TaskModelTests(TestCase):
@@ -24,13 +24,18 @@ class TaskModelTests(TestCase):
             last_name='last_name',
             mat_num='1234567')
 
+        basic = TaskCategory.objects.create(
+            short_id='BA',
+            name='Basic'
+        )
+
         Task.objects.create(
             title='active_task',
             author=author,
             description='',
             publication_date=timezone.now() - timezone.timedelta(days=2),
             deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category='B',
+            category=basic,
             slug='active-task')
 
         Task.objects.create(
@@ -39,7 +44,7 @@ class TaskModelTests(TestCase):
             description='',
             publication_date=timezone.now() + timezone.timedelta(days=1),
             deadline_date=timezone.now() + timezone.timedelta(days=5),
-            category='B',
+            category=basic,
             slug='disabled-task')
 
     def test_task_is_active(self):
@@ -72,7 +77,10 @@ class TaskModelTests(TestCase):
         new_desc = 'New description'
         new_pub = timezone.now() - timezone.timedelta(days=1)
         new_dead = timezone.now() + timezone.timedelta(days=7)
-        new_cat = 'L'
+        new_cat = TaskCategory.objects.create(
+            short_id='LE',
+            name='Lesson'
+        )
 
         self.client.login(username=superuser.username, password=self.password)
         # edit form accessible

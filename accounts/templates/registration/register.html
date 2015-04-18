@@ -1,28 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% if registered %}
-        <div class="col-md-4 col-md-offset-4">
-            <strong>Thank you for registering!</strong>
-            <a href="/tasks/">Return to the homepage.</a><br/>
-        </div>
-    {% else %}
-        <div class="col-md-4 col-md-offset-4">
-            <form autocomplete="off" id="user_form" method="post" action="/accounts/register/"
-                  enctype="multipart/form-data">
-                {% csrf_token %}
-                <!-- Get rid of Chrome autocomplete -->
-                <input style="display:none">
-                <input type="password" style="display:none">
+<div class="col-md-4 col-md-offset-4">
+    <form autocomplete="off" id="user_form" method="post" action="/accounts/register/"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Get rid of Chrome autocomplete -->
+        <input style="display:none">
+        <input type="password" style="display:none">
 
-                {% for field in user_form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                {% endfor %}
+        {% for field in user_form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+        {% endfor %}
 
-                <button type="submit" class="btn btn-default">Register</button>
-            </form>
-        </div>
-    {% endif %}
+        <button type="submit" class="btn btn-default">Register</button>
+    </form>
+</div>
 {% endblock %}

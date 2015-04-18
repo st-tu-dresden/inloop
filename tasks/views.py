@@ -10,7 +10,6 @@ from . import filesystem_utils as fsu
 @login_required
 def manage_categories(request):
     categories = TaskCategory.objects.all()
-
     return render(request, 'tasks/manage_categories.html', {
         'categories': categories
     })
@@ -30,6 +29,10 @@ def edit_category(request, short_id):
         cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
         if cat_form.is_valid():
             cat_form.save()
+            return render(request, 'tasks/message.html', {
+                'type': 'success',
+                'message': 'The category has successfully been edited.'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(cat_form.errors))
@@ -54,6 +57,10 @@ def new_category(request):
         cat_form = forms.NewTaskCategoryForm(data=request.POST)
         if cat_form.is_valid():
             cat_form.save()
+            return render(request, 'tasks/message.html', {
+                'type': 'success',
+                'message': 'The new category has been added to the system.'
+            })
         else:
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(cat_form.errors))
@@ -176,19 +183,11 @@ def edit(request, slug):
 @login_required
 def delete(request, slug):
     task = get_object_or_404(Task, slug=slug)
-
-    if request.method == 'POST':
-        form = forms.ExerciseDeletionForm(request.POST)
-        if form.is_valid():
-            if form.cleaned_data['are_you_sure']:
-                task.delete()
-                return redirect('tasks:index')
-    else:
-        form = forms.ExerciseDeletionForm()
-        return render(request, 'tasks/delete_exercise.html', {
-            'deletion_form': form,
-            'task': task
-        })
+    task.delete()
+    return render(request, 'tasks/message.html', {
+        'type': 'success',
+        'message': 'The task has been deleted.'
+    })
 
 
 @login_required
@@ -214,23 +213,27 @@ def submit_new_exercise(request):
                     unittest_file,
                     form.cleaned_data['e_title'])
 
-        # add Task object to system
-        cat = TaskCategory.objects.filter(
-            short_id=form.cleaned_data['e_cat']
-        )[0]
-        t = Task.objects.create(
-            title=form.cleaned_data['e_title'],
-            author=request.user,
-            description=form.cleaned_data['e_desc'],
-            publication_date=form.cleaned_data['e_pub_date'],
-            deadline_date=form.cleaned_data['e_dead_date'],
-            category=cat,
-            slug=slugify(unicode(form.data['e_title'])))
-        t.save()
-        return redirect('tasks:index')
+            # add Task object to system
+            cat = TaskCategory.objects.filter(
+                short_id=form.cleaned_data['e_cat']
+            )[0]
+            t = Task.objects.create(
+                title=form.cleaned_data['e_title'],
+                author=request.user,
+                description=form.cleaned_data['e_desc'],
+                publication_date=form.cleaned_data['e_pub_date'],
+                deadline_date=form.cleaned_data['e_dead_date'],
+                category=cat,
+                slug=slugify(unicode(form.data['e_title'])))
+            t.save()
+            return render(request, 'tasks/message.html', {
+                'type': 'success',
+                'message': 'The task has successfully been created!'
+            })
 
     else:
         form = forms.ExerciseSubmissionForm()
-        return render(request, 'tasks/new_exercise.html', {
-            'exercise_form': form
-        })
+
+    return render(request, 'tasks/new_exercise.html', {
+        'exercise_form': form
+    })
