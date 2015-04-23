@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {% load staticfiles %}
+    {% load flatpages %}
+    {% get_flatpages as fpages %}
+    <!-- Bootstrap, jQuery, Ace -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    {% block head %}
+    {% endblock %}
+    <title>Prktmt</title>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'tasks:index' %}">Praktomat TU Dresden</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'tasks:index' %}">Go Back</a></li>
+                {% for page in fpages %}
+                    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+<div id="content">
+    {% block content %}
+    {% endblock %}
+</div>
+{% block subbody_content %}
+{% endblock %}
+</body>
+</html>
