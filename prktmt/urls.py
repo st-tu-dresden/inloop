@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from tasks import views as task_views
+from . import views as sys_views
 
 urlpatterns = patterns(
     '',
@@ -16,6 +17,14 @@ urlpatterns = patterns(
 )
 # serve static content
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# add error pages for testing
+if settings.DEBUG:
+    urlpatterns += patterns(
+        '',
+        url(r'^404$', sys_views.handler404),
+        url(r'^500$', sys_views.handler500),
+    )
 
 # flatpages catchall pattern
 urlpatterns += patterns(
