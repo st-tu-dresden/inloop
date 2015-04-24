@@ -30,9 +30,13 @@ class UserProfile(auth_models.AbstractUser):
     '''
 
     def __init__(self, *args, **kwargs):
-        self.activation_key = self.generate_activation_key()
-        self.is_active = False
+        setattr(self, 'activation_key', self.generate_activation_key())
+        setattr(self, 'is_active', False)
         super(UserProfile, self).__init__(*args, **kwargs)
+
+    activation_key = models.CharField(
+        max_length=40
+    )
 
     mat_num = models.IntegerField(
         max_length=7,
@@ -46,7 +50,7 @@ class UserProfile(auth_models.AbstractUser):
 
     def generate_activation_key(self):
         sha = hashlib.sha1()
-        seed = str(random.random()) + self.username
+        seed = str(random.random()) + getattr(self, 'username')
         sha.update(seed.encode())
         self.activation_key = sha.hexdigest()
         self.save()
@@ -61,7 +65,7 @@ class UserProfile(auth_models.AbstractUser):
                    'We\'re looking forward to seeing you on the site!'
                    '\n\nCheers,'
                    '\nYour INLOOP Team'
-                   ).format(username=self.username, link=link)
+                   ).format(username=getattr(self, 'username'), link=link)
 
         try:
             send_mail(
