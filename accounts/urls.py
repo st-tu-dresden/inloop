@@ -23,4 +23,9 @@ urlpatterns = patterns(
         account_views.user_logout,
         name='user_logout'
     ),
+    url(
+        r'^activate/(?P<key>[0-9a-f]{5,40})$',
+        account_views.activate_user,
+        name='user_activation'
+    )
 )
