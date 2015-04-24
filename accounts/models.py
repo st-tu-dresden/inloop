@@ -31,7 +31,7 @@ class UserProfile(auth_models.AbstractUser):
 
     def __init__(self, *args, **kwargs):
         super(UserProfile, self).__init__(*args, **kwargs)
-        setattr(self, 'is_active', False)
+        # setattr(self, 'is_active', False)
 
     activation_key = models.CharField(
         max_length=40
