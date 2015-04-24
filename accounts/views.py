@@ -33,9 +33,10 @@ def register(request):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
+            user.send_activation_mail()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'You have successfully been registered!'
+                'message': 'Your activation mail has been sent!'
             })
         else:
             error_msg = "The following form validation errors occurred: {0}"
