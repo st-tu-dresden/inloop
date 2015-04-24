@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from accounts.forms import UserForm, NewCourseForm
+from .forms import UserForm, NewCourseForm
+from .models import UserProfile
 
 
 def new_course(request):
@@ -48,6 +49,16 @@ def register(request):
     })
 
 
+def activate_user(request, key):
+    user = get_object_or_404(UserProfile, activation_key=key)
+    user.is_active = True
+
+    return render(request, 'accounts/message.html', {
+        'type': 'success',
+        'message': 'Your account has been activated! You can now login.'
+    })
+
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -65,7 +76,7 @@ def user_login(request):
                 # account disabled
                 return render(request, 'accounts/message.html', {
                     'type': 'danger',
-                    'message': 'Your account has been disabled!'
+                    'message': 'Your account is disabled!'
                 })
         else:
             # invalid credentials
