@@ -33,6 +33,7 @@ def register(request):
             user = user_form.save(commit=False)
             user.set_password(user.password)
             user.generate_activation_key()
+            user.is_active = False
             user.save()
             user.send_activation_mail()
             return render(request, 'accounts/message.html', {
