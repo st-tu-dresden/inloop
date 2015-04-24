@@ -30,8 +30,9 @@ def register(request):
         user_form = UserForm(data=request.POST)
 
         if user_form.is_valid():
-            user = user_form.save()
+            user = user_form.save(commit=False)
             user.set_password(user.password)
+            user.generate_activation_key()
             user.save()
             user.send_activation_mail()
             return render(request, 'accounts/message.html', {
@@ -52,7 +53,8 @@ def register(request):
 
 def activate_user(request, key):
     user = get_object_or_404(UserProfile, activation_key=key)
-    user.is_active = True
+    user.activate()
+    user.save()
 
     return render(request, 'accounts/message.html', {
         'type': 'success',
