@@ -31,6 +31,7 @@ AUTH_USER_MODEL = 'accounts.UserProfile'
 
 # Debugging SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DOMAIN = 'http://localhost:8000/'
 
 # Application definition
 
