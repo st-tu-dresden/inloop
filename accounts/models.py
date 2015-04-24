@@ -51,7 +51,8 @@ class UserProfile(auth_models.AbstractUser):
         self.save()
 
     def send_activation_mail(self):
-        link = 
+        link = 'TODO'
+        s_addr = 'inloop@example.com'
         subject = 'INLOOP Activation'
         message = ('Howdy {username},\n\nClick the following link to '
                    'activate your INLOOP account and receive awesomeness:'
@@ -63,11 +64,11 @@ class UserProfile(auth_models.AbstractUser):
 
         try:
             send_mail(
-                'Subject here',
-                'Here is the message.',
-                'from@example.com',
-                ['to@example.com'],
-                fail_silently=False)
+                subject,
+                message,
+                s_addr,
+                [self.email],
+                fail_silently=False)  # To provoke SMTPException
             return True
         except smtplib.SMTPException:
             return False
