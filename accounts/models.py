@@ -31,7 +31,6 @@ class UserProfile(auth_models.AbstractUser):
 
     def __init__(self, *args, **kwargs):
         super(UserProfile, self).__init__(*args, **kwargs)
-        # setattr(self, 'is_active', False)
 
     activation_key = models.CharField(
         max_length=40
@@ -49,15 +48,15 @@ class UserProfile(auth_models.AbstractUser):
 
     def generate_activation_key(self):
         sha = hashlib.sha1()
-        seed = str(random.random()) + getattr(self, 'username')
+        seed = str(random.random()) + self.username
         sha.update(seed.encode())
-        setattr(self, 'activation_key', sha.hexdigest())
+        self.activation_key = sha.hexdigest()
 
     def activate(self):
-        setattr(self, 'is_active', True)
+        self.is_active = True
 
     def send_activation_mail(self):
-        link = DOMAIN + 'accounts/activate/' + getattr(self, 'activation_key')
+        link = DOMAIN + 'accounts/activate/' + self.activation_key
         s_addr = 'inloop@example.com'
         subject = 'INLOOP Activation'
         message = ('Howdy {username},\n\nClick the following link to '
@@ -66,14 +65,14 @@ class UserProfile(auth_models.AbstractUser):
                    'We\'re looking forward to seeing you on the site!'
                    '\n\nCheers,'
                    '\nYour INLOOP Team'
-                   ).format(username=getattr(self, 'username'), link=link)
+                   ).format(username=self.username, link=link)
 
         try:
             send_mail(
                 subject,
                 message,
                 s_addr,
-                [getattr(self, 'email')],
+                [self.email],
                 fail_silently=False)  # To provoke SMTPException
             return True
         except smtplib.SMTPException:
