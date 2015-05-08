@@ -6,7 +6,7 @@ from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth import models as auth_models
 from accounts.validators import validate_mat_num
-from prktmt.settings import DOMAIN
+from inloop.settings import DOMAIN
 
 
 class CourseOfStudy(models.Model):

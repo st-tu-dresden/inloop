@@ -1,7 +1,7 @@
 import os
 import shutil
 import glob
-from prktmt.settings import BASE_DIR
+from inloop.settings import BASE_DIR
 
 
 def get_template_names(task_name):
