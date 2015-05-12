@@ -58,15 +58,6 @@ class Task(models.Model):
 class TaskSolution(models.Model):
     '''Represents the user uploaded files'''
 
-    def __init__(self, *args, **kwargs):
-        extra_filepaths = kwargs.pop('extra_filepaths')
-        super(TaskSolution, self).__init__(*args, **kwargs)
-        for i, fp in enumerate(extra_filepaths):
-            name = 'filepath_%s' % i
-            self.fields[name] = models.FilePathField(
-                path=fp,
-                match='*.java$')
-
     submission_date = models.DateTimeField(
         help_text='When was the solution submitted?')
     author = models.ForeignKey(UserProfile)
@@ -74,3 +65,8 @@ class TaskSolution(models.Model):
     is_correct = models.BooleanField(
         help_text='Did the checker accept the solution?',
         default=False)
+    file_paths = models.TextField()
+
+    def get_file_paths(self):
+        for path in self.file_paths.split(':'):
+            yield path
