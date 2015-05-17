@@ -13,8 +13,13 @@ def generate_short_id(s):
     return s.lower()
 
 
-def get_storage_system(task_name, username, solution_id):
-    path = join(MEDIA_ROOT, 'solutions', username, task_name)
+def get_storage_system(instance, filename):
+    path = join(
+        MEDIA_ROOT,
+        'solutions',
+        instance.solution.author.username,
+        instance.solution.task.name,
+        timezone.now().strftime('%Y/%m/%d') + instance.solution.id)
     return FileSystemStorage(location=path)
 
 
@@ -81,8 +86,4 @@ class TaskSolutionFile(models.Model):
     '''Represents a single file as part of a solution'''
 
     solution = models.ForeignKey(TaskSolution)
-    file = models.FileField(storage=get_storage_system(
-        task_name=solution.task.name,
-        username=solution.author.username,
-        solution_id=solution.id
-    ))
+    file = models.FileField(storage=get_storage_system)
