@@ -1,11 +1,21 @@
+from os.path import join
+
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
+
 from accounts.models import UserProfile
+from inloop.settings import MEDIA_ROOT
 
 
 def generate_short_id(s):
     s = ''.join(e for e in s if e.isalnum())
     return s.lower()
+
+
+def get_storage_system(task_name, username, solution_id):
+    path = join(MEDIA_ROOT, 'solutions', username, task_name)
+    return FileSystemStorage(location=path)
 
 
 class TaskCategory(models.Model):
@@ -65,8 +75,14 @@ class TaskSolution(models.Model):
     is_correct = models.BooleanField(
         help_text='Did the checker accept the solution?',
         default=False)
-    file_paths = models.TextField()
 
-    def get_file_paths(self):
-        for path in self.file_paths.split(':'):
-            yield path
+
+class TaskSolutionFile(models.Model):
+    '''Represents a single file as part of a solution'''
+
+    solution = models.ForeignKey(TaskSolution)
+    file = models.FileField(storage=get_storage_system(
+        task_name=solution.task.name,
+        username=solution.author.username,
+        solution_id=solution.id
+    ))
