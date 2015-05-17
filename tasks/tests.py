@@ -152,3 +152,4 @@ class TaskSolutionTests(TestCase):
     def test_default_value(self):
         sol = TaskSolution.objects.get(pk=1)
         self.assertFalse(sol.is_correct)
+        self.assertNotEqual(sol.file_paths, "")
