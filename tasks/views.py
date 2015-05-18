@@ -2,8 +2,10 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.utils import timezone
 from tasks import forms
-from tasks.models import Task, TaskCategory
+from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 from . import filesystem_utils as fsu
 
 
@@ -99,7 +101,19 @@ def detail(request, slug):
 
     if request.method == 'POST':
         # TODO: save form data
-        pass
+        solution = TaskSolution(
+            submission_date=timezone.now(),
+            author=request.user,
+            task=task
+        )
+
+        solution.save()
+
+        for param in request.POST:
+            if param.startswith('content'):
+                TaskSolutionFile(
+                    file=ContentFile(request.POST[param]),
+                    solution=solution).save()
 
     else:
         # TODO: prepopulate form with last saved data
