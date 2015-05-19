@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='TaskSolutionFile',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('file', models.FileField(storage=tasks.models.get_storage_system, upload_to=b'')),
+                ('file', models.FileField(upload_to=tasks.models.get_upload_path)),
                 ('solution', models.ForeignKey(to='tasks.TaskSolution')),
             ],
             options={
