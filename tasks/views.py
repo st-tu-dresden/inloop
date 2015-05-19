@@ -107,14 +107,11 @@ def detail(request, slug):
         )
 
         solution.save()
-        print (request.POST.get('manual-upload') or 'empty. meh.')
-        if request.POST.get('manual-upload'):
-            # print (request.POST.get('manual-upload'))
-            # print ('-' * 20)
-            # print (request.FILES.getlist('manual-upload'))
-            pass
+
+        if request.FILES.getlist('manual-upload'):
+            print ('I\'m a manual upload!')
         else:
-            print ('I think this is an online edit.')
+            print ('I\'m an online edit.')
             for param in request.POST:
                 if param.startswith('content') \
                    and not param.endswith('-filename'):
