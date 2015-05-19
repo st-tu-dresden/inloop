@@ -107,15 +107,20 @@ def detail(request, slug):
         )
 
         solution.save()
+        if request.POST['manual-upload']:
+            pass
+        else:
+            for param in request.POST:
+                if param.startswith('content') \
+                   and not param.endswith('-filename'):
+                    tsf = TaskSolutionFile(
+                        filename=request.POST[param + '-filename'],
+                        solution=solution)
 
-        for param in request.POST:
-            if param.startswith('content') and not param.endswith('-filename'):
-                tsf = TaskSolutionFile(
-                    filename=request.POST[param + '-filename'],
-                    solution=solution)
-
-                tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
-                tsf.save()
+                    tsf.file.save(
+                        tsf.filename,
+                        ContentFile(request.POST[param]))
+                    tsf.save()
 
     else:
         # TODO: prepopulate form with last saved data
