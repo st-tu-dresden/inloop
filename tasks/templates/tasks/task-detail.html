@@ -12,60 +12,66 @@
         </small>
     </h1>
     <br/>
-
-    <p><strong>Due to:</strong> {{ deadline_date|date:"l, d. F Y P" }}</p>
-
+    <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
     <p>{{ description|escape }}</p>
 
-    <form action="." method="post">
+    <form class="form-inline" action="." method="post">
         {% csrf_token %}
-        <div role="tabpanel">
-            <!-- nav tabs -->
-            {% if file_dict %}
-            <ul class="nav nav-tabs" role="tablist">
-                {% for fname in file_dict.keys %}
-                    {% if forloop.first %}
-                    <li role="presentation" class="active">
-                        <a href="#{{ forloop.counter }}"
-                           role="tab"
-                           data-toggle="tab">{{ fname|escape }}
-                        </a>
-                    </li>
-                    {% else %}
-                    <li role="presentation">
-                        <a href="#{{ forloop.counter }}"
-                           role="tab"
-                           data-toggle="tab">{{ fname|escape }}
-                        </a>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            {% endif %}
+        <div class="form-group col-md-12">
+            <div role="tabpanel">
+                <!-- nav tabs -->
+                {% if file_dict %}
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for fname in file_dict.keys %}
+                        {% if forloop.first %}
+                        <li role="presentation" class="active">
+                            <a href="#{{ forloop.counter }}"
+                               role="tab"
+                               data-toggle="tab">{{ fname|escape }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li role="presentation">
+                            <a href="#{{ forloop.counter }}"
+                               role="tab"
+                               data-toggle="tab">{{ fname|escape }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
 
-            <!-- tab panes -->
-            <div class="tab-content">
-                {% for fname, content in file_dict.items %}
-                    {% if forloop.first %}
-                        <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                        </div>
-                        <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                        <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                    {% else %}
-                        <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                        </div>
-                        <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                        <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                    {% endif %}
-                {% empty %}
-                    <p>But chief! There are no files in here!</p>
-                {% endfor %}
+                <!-- tab panes -->
+                <div class="tab-content">
+                    {% for fname, content in file_dict.items %}
+                        {% if forloop.first %}
+                            <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
+                                <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                            </div>
+                            <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                            <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
+                        {% else %}
+                            <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
+                                <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                            </div>
+                            <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                            <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
+                        {% endif %}
+                    {% empty %}
+                        <p>But chief! There are no files in here!</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         {% if file_dict %}
-            <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
+            <div class="form-group col-md-12">
+                <label for="manual-upload">Manual upload:</label>
+                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple="1">
+            </div>
+            <div class="form-group col-md-12">
+                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
+            </div>
         {% else %}
             <a class="btn btn-default" href="{% url 'tasks:index' %}">Go back</a>
         {% endif %}

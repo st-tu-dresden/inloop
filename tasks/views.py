@@ -100,7 +100,6 @@ def detail(request, slug):
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
-        # TODO: save form data
         solution = TaskSolution(
             submission_date=timezone.now(),
             author=request.user,
@@ -112,7 +111,6 @@ def detail(request, slug):
         for param in request.POST:
             if param.startswith('content') and not param.endswith('-filename'):
                 tsf = TaskSolutionFile(
-                    # file=ContentFile(request.POST[param]),
                     filename=request.POST[param + '-filename'],
                     solution=solution)
 
