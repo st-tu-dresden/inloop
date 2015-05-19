@@ -18,7 +18,6 @@ def get_upload_path(instance, filename):
         instance.solution.task.title,
         timezone.now().strftime('%Y/%m/%d/%H:%M_') + str(instance.solution.id),
         filename)
-    print (path)
     return path
 
 

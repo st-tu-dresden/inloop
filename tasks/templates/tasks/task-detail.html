@@ -15,7 +15,7 @@
     <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
     <p>{{ description|escape }}</p>
 
-    <form class="form-inline" action="." method="post">
+    <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group col-md-12">
             <div role="tabpanel">
@@ -85,10 +85,12 @@
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
     {% endfor %}
-    $('#submit').on('click', function() {
-        {% for fname in file_dict.keys %}
-            $('#content{{ forloop.counter }}').val(editor{{ forloop.counter }}.getSession().getValue());
-        {% endfor %}
+    $("#submit").on("click", function() {
+        if (document.getElementById("manual-upload").files.length == 0) {
+            {% for fname in file_dict.keys %}
+                $("#content{{ forloop.counter }}").val(editor{{ forloop.counter }}.getSession().getValue());
+            {% endfor %}
+        };
     });
 </script>
 {% endblock %}
