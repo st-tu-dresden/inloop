@@ -25,8 +25,7 @@ def get_storage_system(instance, filename):
 
 class TaskCategory(models.Model):
     def save(self, *args, **kwargs):
-        s = getattr(self, 'name')
-        setattr(self, 'short_id', generate_short_id(s))
+        self.short_id = generate_short_id(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
 
     short_id = models.CharField(
