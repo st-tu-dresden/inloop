@@ -110,10 +110,14 @@ def detail(request, slug):
         solution.save()
 
         for param in request.POST:
-            if param.startswith('content'):
-                TaskSolutionFile(
-                    file=ContentFile(request.POST[param]),
-                    solution=solution).save()
+            if param.startswith('content') and not param.endswith('-filename'):
+                tsf = TaskSolutionFile(
+                    # file=ContentFile(request.POST[param]),
+                    filename=request.POST[param + '-filename'],
+                    solution=solution)
+
+                tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
+                tsf.save()
 
     else:
         # TODO: prepopulate form with last saved data

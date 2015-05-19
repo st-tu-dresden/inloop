@@ -18,8 +18,8 @@ def get_storage_system(instance, filename):
         MEDIA_ROOT,
         'solutions',
         instance.solution.author.username,
-        instance.solution.task.name,
-        timezone.now().strftime('%Y/%m/%d') + instance.solution.id)
+        instance.solution.task.title,
+        timezone.now().strftime('%Y/%m/%d %H:%M - ') + instance.solution.id)
     return FileSystemStorage(location=path)
 
 
@@ -86,4 +86,5 @@ class TaskSolutionFile(models.Model):
     '''Represents a single file as part of a solution'''
 
     solution = models.ForeignKey(TaskSolution)
+    filename = models.CharField(max_length=50)
     file = models.FileField(storage=get_storage_system)

@@ -51,11 +51,13 @@
                             <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                        <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
                     {% else %}
                         <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
                             <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                         <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                        <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
                     {% endif %}
                 {% empty %}
                     <p>But chief! There are no files in here!</p>
