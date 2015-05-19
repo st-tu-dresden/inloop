@@ -1,11 +1,9 @@
 from os.path import join
 
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
 
 from accounts.models import UserProfile
-from inloop.settings import MEDIA_ROOT
 
 
 def generate_short_id(s):
@@ -13,14 +11,15 @@ def generate_short_id(s):
     return s.lower()
 
 
-def get_storage_system(instance, filename):
+def get_upload_path(instance, filename):
     path = join(
-        MEDIA_ROOT,
         'solutions',
         instance.solution.author.username,
         instance.solution.task.title,
-        timezone.now().strftime('%Y/%m/%d %H:%M - ') + instance.solution.id)
-    return FileSystemStorage(location=path)
+        timezone.now().strftime('%Y/%m/%d/%H:%M_') + str(instance.solution.id),
+        filename)
+    print (path)
+    return path
 
 
 class TaskCategory(models.Model):
@@ -86,4 +85,4 @@ class TaskSolutionFile(models.Model):
 
     solution = models.ForeignKey(TaskSolution)
     filename = models.CharField(max_length=50)
-    file = models.FileField(storage=get_storage_system)
+    file = models.FileField(upload_to=get_upload_path)
