@@ -1,9 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+
 from accounts.models import UserProfile
-from tasks.models import Task, TaskCategory, TaskSolution
-from inloop.settings import BASE_DIR
+from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 
 
 class TaskModelTests(TestCase):
@@ -141,15 +141,31 @@ class TaskSolutionTests(TestCase):
             category=basic,
             slug='active-task')
 
-        TaskSolution.objects.create(
+        ts1 = TaskSolution.objects.create(
             submission_date=timezone.now() - timezone.timedelta(days=1),
             author=author,
-            task=t1,
-            file_paths=':'.join(
-                [BASE_DIR + '/media/bla.java', BASE_DIR + '/media/meh.java'])
+            task=t1
+            # omit is_correct as default = False
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='foo.java',
+            file=None
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='bar.java',
+            file=None
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='baz.java',
+            file=None
         )
 
     def test_default_value(self):
         sol = TaskSolution.objects.get(pk=1)
         self.assertFalse(sol.is_correct)
-        self.assertNotEqual(sol.file_paths, "")
