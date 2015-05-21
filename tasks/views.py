@@ -1,9 +1,17 @@
+from cStringIO import StringIO
+import zipfile
+from os import path
+import os
+
+from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.utils import timezone
+
+from inloop.settings import MEDIA_ROOT
 from tasks import forms
 from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 from . import filesystem_utils as fsu
@@ -134,17 +142,45 @@ def detail(request, slug):
                         ContentFile(request.POST[param]))
                     tsf.save()
 
-    else:
-        pass
+    latest_solutions = TaskSolution.objects.order_by('-submission_date')[:5]
+    get_solution_as_zip(request, task.slug, latest_solutions[0].id)
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),
+        'solutions': latest_solutions,
         'user': request.user,
         'title': task.title,
         'deadline_date': task.deadline_date,
         'description': task.description,
         'slug': task.slug
     })
+
+
+@login_required
+def get_solution_as_zip(request, slug, solution_id):
+    ts = get_object_or_404(TaskSolution, id=solution_id, author=request.user)
+    solution_files = TaskSolutionFile.objects.filter(solution=ts)
+
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = 'filename=test.zip'
+
+    buffer = StringIO()
+    zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
+
+    print (os.getcwd())
+
+    for tsf in solution_files:
+        zf.write(path.join(MEDIA_ROOT, tsf.file.name))
+
+    zf.close()
+    buffer.flush()
+
+    final_zip = buffer.getvalue()
+    buffer.close()
+
+    response.write(final_zip)
+
+    return response
 
 
 @login_required
