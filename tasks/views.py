@@ -2,8 +2,10 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.utils import timezone
 from tasks import forms
-from tasks.models import Task, TaskCategory
+from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 from . import filesystem_utils as fsu
 
 
@@ -98,15 +100,45 @@ def detail(request, slug):
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
-        # TODO: save form data
-        pass
+        solution = TaskSolution(
+            submission_date=timezone.now(),
+            author=request.user,
+            task=task
+        )
+
+        solution.save()
+
+        if request.FILES.getlist('manual-upload'):
+            for file in request.FILES.getlist('manual-upload'):
+                # only allow .java files
+                if file.content_type == 'text/x-java':
+                    tsf = TaskSolutionFile(
+                        filename=file.name,
+                        solution=solution,
+                    )
+
+                    tsf.file.save(
+                        file.name,
+                        ContentFile(''.join([s for s in file.chunks()]))
+                    )
+        else:
+            for param in request.POST:
+                if param.startswith('content') \
+                   and not param.endswith('-filename'):
+                    tsf = TaskSolutionFile(
+                        filename=request.POST[param + '-filename'],
+                        solution=solution)
+
+                    tsf.file.save(
+                        tsf.filename,
+                        ContentFile(request.POST[param]))
+                    tsf.save()
 
     else:
-        # TODO: prepopulate form with last saved data
         pass
 
     return render(request, 'tasks/task-detail.html', {
-        'file_dict': fsu.get_task_templates(task.title),
+        'file_dict': fsu.latest_solution_files(task, request.user.username),
         'user': request.user,
         'title': task.title,
         'deadline_date': task.deadline_date,

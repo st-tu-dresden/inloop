@@ -1,5 +1,8 @@
+from os.path import join
+
 from django.db import models
 from django.utils import timezone
+
 from accounts.models import UserProfile
 
 
@@ -8,10 +11,19 @@ def generate_short_id(s):
     return s.lower()
 
 
+def get_upload_path(instance, filename):
+    path = join(
+        'solutions',
+        instance.solution.author.username,
+        instance.solution.task.title,
+        timezone.now().strftime('%Y/%m/%d/%H:%M_') + str(instance.solution.id),
+        filename)
+    return path
+
+
 class TaskCategory(models.Model):
     def save(self, *args, **kwargs):
-        s = getattr(self, 'name')
-        setattr(self, 'short_id', generate_short_id(s))
+        self.short_id = generate_short_id(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
 
     short_id = models.CharField(
@@ -31,21 +43,16 @@ class TaskCategory(models.Model):
 
 
 class Task(models.Model):
-    '''
-    Represents the tasks that are presented to the user to solve.
-    '''
+    '''Represents the tasks that are presented to the user to solve.'''
 
     title = models.CharField(
         max_length=100,
         help_text='Task name')
-    author = models.ForeignKey(
-        UserProfile)
-    description = models.TextField(
-        help_text='Task description')
+    author = models.ForeignKey(UserProfile)
+    description = models.TextField(help_text='Task description')
     publication_date = models.DateTimeField(
         help_text='When should the task be published?')
-    deadline_date = models.DateTimeField(
-        help_text='Date the task is due to')
+    deadline_date = models.DateTimeField(help_text='Date the task is due to')
     category = models.ForeignKey(TaskCategory)
     slug = models.SlugField(
         max_length=50,
@@ -58,3 +65,23 @@ class Task(models.Model):
         '''
 
         return timezone.now() > self.publication_date
+
+
+class TaskSolution(models.Model):
+    '''Represents the user uploaded files'''
+
+    submission_date = models.DateTimeField(
+        help_text='When was the solution submitted?')
+    author = models.ForeignKey(UserProfile)
+    task = models.ForeignKey(Task)
+    is_correct = models.BooleanField(
+        help_text='Did the checker accept the solution?',
+        default=False)
+
+
+class TaskSolutionFile(models.Model):
+    '''Represents a single file as part of a solution'''
+
+    solution = models.ForeignKey(TaskSolution)
+    filename = models.CharField(max_length=50)
+    file = models.FileField(upload_to=get_upload_path)

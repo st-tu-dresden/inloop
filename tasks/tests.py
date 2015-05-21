@@ -1,8 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+
 from accounts.models import UserProfile
-from tasks.models import Task, TaskCategory
+from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 
 
 class TaskModelTests(TestCase):
@@ -104,3 +105,67 @@ class TaskModelTests(TestCase):
         self.assertEqual(task.deadline_date.strftime('%m/%d/%Y %H:%M'),
                          new_dead.strftime('%m/%d/%Y %H:%M'))
         self.assertEqual(task.category, new_cat)
+
+
+class TaskSolutionTests(TestCase):
+    def setUp(self):
+        self.password = '123456'
+
+        author = UserProfile.objects.create_user(
+            username='test_user',
+            first_name='first_name',
+            last_name='last_name',
+            email='test@example.com',
+            password=self.password,
+            mat_num='0000000')
+
+        UserProfile.objects.create_superuser(
+            username='superuser',
+            email='staff@example.com',
+            password=self.password,
+            first_name='first_name',
+            last_name='last_name',
+            mat_num='1234567')
+
+        basic = TaskCategory.objects.create(
+            short_id='BA',
+            name='Basic'
+        )
+
+        t1 = Task.objects.create(
+            title='active_task',
+            author=author,
+            description='',
+            publication_date=timezone.now() - timezone.timedelta(days=2),
+            deadline_date=timezone.now() + timezone.timedelta(days=2),
+            category=basic,
+            slug='active-task')
+
+        ts1 = TaskSolution.objects.create(
+            submission_date=timezone.now() - timezone.timedelta(days=1),
+            author=author,
+            task=t1
+            # omit is_correct as default = False
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='foo.java',
+            file=None
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='bar.java',
+            file=None
+        )
+
+        TaskSolutionFile.objects.create(
+            solution=ts1,
+            filename='baz.java',
+            file=None
+        )
+
+    def test_default_value(self):
+        sol = TaskSolution.objects.get(pk=1)
+        self.assertFalse(sol.is_correct)
