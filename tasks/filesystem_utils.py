@@ -2,8 +2,6 @@ import shutil
 import glob
 import os
 from os import path
-from time import strptime as strpt
-from time import strftime as strft
 
 from inloop.settings import BASE_DIR
 
@@ -70,7 +68,8 @@ def get_task_templates(task_name):
 def get_latest_solution_files(task, username):
     leading_zero = lambda n: str(n) if len(n) > 1 else '0' + str(n)
     max_int_in_dir = lambda p: str(max([int(d) for d in os.listdir(p)]))
-    max_t_in_dir = lambda p: max(strpt(d[:5], '%H:%M') for d in os.listdir(p))
+    max_id_in_dir = lambda p: str(max([int(d[6:]) for d in os.listdir(p)]))
+
     overview = {}
     p = path.join(
         BASE_DIR,
@@ -85,13 +84,12 @@ def get_latest_solution_files(task, username):
     p = path.join(p, month)
     day = leading_zero(max_int_in_dir(p))
     p = path.join(p, day)
-    time = strft('%H:%M', max_t_in_dir(p))
-    p = path.join(p, time + '_' + str(task.id))
+    time = filter(lambda x: str(x).endswith(max_id_in_dir(p)), os.listdir(p))
+    p = path.join(p, time[0])  # filter delivers one element list
 
     filenames = map(path.basename, glob.glob(p + path.sep + '*.java'))
     for fname in filenames:
         with open(path.join(p, fname)) as f:
             overview[fname] = f.read()
-
-    print (p)
+    print (overview)
     return overview

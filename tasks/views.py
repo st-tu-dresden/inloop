@@ -136,7 +136,7 @@ def detail(request, slug):
 
     else:
         # TODO: prepopulate form with last saved data
-        fsu.get_latest_solution_files(task.title, request.user.username)
+        fsu.get_latest_solution_files(task, request.user.username)
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.get_task_templates(task.title),
