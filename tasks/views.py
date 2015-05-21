@@ -1,7 +1,6 @@
 from cStringIO import StringIO
 import zipfile
 from os import path
-import os
 
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
@@ -146,7 +145,7 @@ def detail(request, slug):
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),
-        'solutions': latest_solutions,
+        'latest_solutions': latest_solutions,
         'user': request.user,
         'title': task.title,
         'deadline_date': task.deadline_date,
@@ -166,10 +165,9 @@ def get_solution_as_zip(request, slug, solution_id):
     buffer = StringIO()
     zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
 
-    print (os.getcwd())
-
     for tsf in solution_files:
-        zf.write(path.join(MEDIA_ROOT, tsf.file.name))
+        tsf_dir, tsf_name = path.split(path.join(MEDIA_ROOT, tsf.file.name))
+        zf.writestr(tsf_name, tsf.file.read())
 
     zf.close()
     buffer.flush()
