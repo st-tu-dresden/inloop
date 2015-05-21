@@ -66,8 +66,11 @@ def get_task_templates(task_name):
 
 
 def latest_solution_files(task, username):
+    # add a zero to one digit numbers
     leading_zero = lambda n: str(n) if len(n) > 1 else '0' + str(n)
+    # find the max integer in a directory
     max_int_in_dir = lambda p: str(max([int(d) for d in listdir(p)]))
+    # find the max id after the time part (e.g. 13:04_103)
     max_id_in_dir = lambda p: str(max([int(d[6:]) for d in listdir(p)]))
 
     overview = {}
