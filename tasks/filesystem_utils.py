@@ -1,7 +1,7 @@
 import shutil
 import glob
 import os
-from os import path
+from os import path, listdir
 
 from inloop.settings import BASE_DIR
 
@@ -67,8 +67,8 @@ def get_task_templates(task_name):
 
 def latest_solution_files(task, username):
     leading_zero = lambda n: str(n) if len(n) > 1 else '0' + str(n)
-    max_int_in_dir = lambda p: str(max([int(d) for d in os.listdir(p)]))
-    max_id_in_dir = lambda p: str(max([int(d[6:]) for d in os.listdir(p)]))
+    max_int_in_dir = lambda p: str(max([int(d) for d in listdir(p)]))
+    max_id_in_dir = lambda p: str(max([int(d[6:]) for d in listdir(p)]))
 
     overview = {}
     p = path.join(
@@ -78,18 +78,21 @@ def latest_solution_files(task, username):
         username,
         task.title)
 
-    year = max_int_in_dir(p)
-    p = path.join(p, year)
-    month = leading_zero(max_int_in_dir(p))
-    p = path.join(p, month)
-    day = leading_zero(max_int_in_dir(p))
-    p = path.join(p, day)
-    time = filter(lambda x: str(x).endswith(max_id_in_dir(p)), os.listdir(p))
-    p = path.join(p, time[0])  # filter delivers one element list
+    if path.exists(p):
+        year = max_int_in_dir(p)
+        p = path.join(p, year)
+        month = leading_zero(max_int_in_dir(p))
+        p = path.join(p, month)
+        day = leading_zero(max_int_in_dir(p))
+        p = path.join(p, day)
+        time = filter(lambda x: str(x).endswith(max_id_in_dir(p)), listdir(p))
+        p = path.join(p, time[0])  # filter delivers one element list
 
-    filenames = map(path.basename, glob.glob(p + path.sep + '*.java'))
-    for fname in filenames:
-        with open(path.join(p, fname)) as f:
-            overview[fname] = f.read()
-    print (overview)
+        filenames = map(path.basename, glob.glob(p + path.sep + '*.java'))
+        for fname in filenames:
+            with open(path.join(p, fname)) as f:
+                overview[fname] = f.read()
+    else:
+        # display templates
+        overview = get_task_templates(task.title)
     return overview
