@@ -109,9 +109,19 @@ def detail(request, slug):
         solution.save()
 
         if request.FILES.getlist('manual-upload'):
-            print ('I\'m a manual upload!')
+            for file in request.FILES.getlist('manual-upload'):
+                # only allow .java files
+                if file.content_type == 'text/x-java':
+                    tsf = TaskSolutionFile(
+                        filename=file.name,
+                        solution=solution,
+                    )
+
+                    tsf.file.save(
+                        file.name,
+                        ContentFile(''.join([s for s in file.chunks()]))
+                    )
         else:
-            print ('I\'m an online edit.')
             for param in request.POST:
                 if param.startswith('content') \
                    and not param.endswith('-filename'):
