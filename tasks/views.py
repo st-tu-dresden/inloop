@@ -135,11 +135,10 @@ def detail(request, slug):
                     tsf.save()
 
     else:
-        # TODO: prepopulate form with last saved data
-        fsu.get_latest_solution_files(task, request.user.username)
+        pass
 
     return render(request, 'tasks/task-detail.html', {
-        'file_dict': fsu.get_task_templates(task.title),
+        'file_dict': fsu.latest_solution_files(task, request.user.username),
         'user': request.user,
         'title': task.title,
         'deadline_date': task.deadline_date,

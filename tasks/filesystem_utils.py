@@ -65,7 +65,7 @@ def get_task_templates(task_name):
     return overview
 
 
-def get_latest_solution_files(task, username):
+def latest_solution_files(task, username):
     leading_zero = lambda n: str(n) if len(n) > 1 else '0' + str(n)
     max_int_in_dir = lambda p: str(max([int(d) for d in os.listdir(p)]))
     max_id_in_dir = lambda p: str(max([int(d[6:]) for d in os.listdir(p)]))
