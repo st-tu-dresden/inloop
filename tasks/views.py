@@ -143,7 +143,6 @@ def detail(request, slug):
                     tsf.save()
 
     latest_solutions = TaskSolution.objects.order_by('-submission_date')[:5]
-    get_solution_as_zip(request, task.slug, latest_solutions[0].id)
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),

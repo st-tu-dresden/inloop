@@ -59,4 +59,9 @@ urlpatterns = patterns(
         views.delete,
         name='delete'
     ),
+    url(
+        r'^(?P<slug>[-\w]+)/download_solution/(?P<solution_id>[\d]+)/$',
+        views.get_solution_as_zip,
+        name='solution_as_zip'
+    ),
 )
