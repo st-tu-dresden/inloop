@@ -159,8 +159,14 @@ def get_solution_as_zip(request, slug, solution_id):
     ts = get_object_or_404(TaskSolution, id=solution_id, author=request.user)
     solution_files = TaskSolutionFile.objects.filter(solution=ts)
 
+    filename = '{username}_{slug}_solution_{sid}.zip'.format(
+        username=request.user.username,
+        slug=slug,
+        sid=solution_id
+    )
+
     response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = 'filename=test.zip'
+    response['Content-Disposition'] = 'filename={}'.format(filename)
 
     buffer = StringIO()
     zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
