@@ -1,9 +1,16 @@
+from cStringIO import StringIO
+import zipfile
+from os import path
+
+from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.utils import timezone
+
+from inloop.settings import MEDIA_ROOT
 from tasks import forms
 from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 from . import filesystem_utils as fsu
@@ -110,8 +117,9 @@ def detail(request, slug):
 
         if request.FILES.getlist('manual-upload'):
             for file in request.FILES.getlist('manual-upload'):
-                # only allow .java files
-                if file.content_type == 'text/x-java':
+                # only allow .java files < 1Mb
+                if file.content_type == 'text/x-java'\
+                   and file.size < 1048576:
                     tsf = TaskSolutionFile(
                         filename=file.name,
                         solution=solution,
@@ -134,17 +142,49 @@ def detail(request, slug):
                         ContentFile(request.POST[param]))
                     tsf.save()
 
-    else:
-        pass
+    latest_solutions = TaskSolution.objects.order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),
+        'latest_solutions': latest_solutions,
         'user': request.user,
         'title': task.title,
         'deadline_date': task.deadline_date,
         'description': task.description,
         'slug': task.slug
     })
+
+
+@login_required
+def get_solution_as_zip(request, slug, solution_id):
+    ts = get_object_or_404(TaskSolution, id=solution_id, author=request.user)
+    solution_files = TaskSolutionFile.objects.filter(solution=ts)
+
+    filename = '{username}_{slug}_solution_{sid}.zip'.format(
+        username=request.user.username,
+        slug=slug,
+        sid=solution_id
+    )
+
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = 'filename={}'.format(filename)
+
+    buffer = StringIO()
+    zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
+
+    for tsf in solution_files:
+        tsf_dir, tsf_name = path.split(path.join(MEDIA_ROOT, tsf.file.name))
+        zf.writestr(tsf_name, tsf.file.read())
+
+    zf.close()
+    buffer.flush()
+
+    final_zip = buffer.getvalue()
+    buffer.close()
+
+    response.write(final_zip)
+
+    return response
 
 
 @login_required

@@ -1,81 +1,97 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="col-md-6 col-md-offset-3">
-    <h1>
-        {{ title }}
-        <small>
-            {% if user.is_staff %}
-                <a href="{% url 'tasks:edit' slug %}">
-                    <span title="Edit" class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                </a>
-            {% endif %}
-        </small>
-    </h1>
-    <br/>
-    <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-    <p>{{ description|escape }}</p>
-
-    <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group col-md-12">
-            <div role="tabpanel">
-                <!-- nav tabs -->
-                {% if file_dict %}
-                <ul class="nav nav-tabs" role="tablist">
-                    {% for fname in file_dict.keys %}
-                        {% if forloop.first %}
-                        <li role="presentation" class="active">
-                            <a href="#{{ forloop.counter }}"
-                               role="tab"
-                               data-toggle="tab">{{ fname|escape }}
-                            </a>
-                        </li>
-                        {% else %}
-                        <li role="presentation">
-                            <a href="#{{ forloop.counter }}"
-                               role="tab"
-                               data-toggle="tab">{{ fname|escape }}
-                            </a>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+<div class="container">
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h1>
+            {{ title }}
+            <small>
+                {% if user.is_staff %}
+                    <a href="{% url 'tasks:edit' slug %}">
+                        <span title="Edit" class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    </a>
                 {% endif %}
+            </small>
+        </h1>
+        <br/>
+        <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
+        <p>{{ description|escape }}</p>
 
-                <!-- tab panes -->
-                <div class="tab-content">
-                    {% for fname, content in file_dict.items %}
-                        {% if forloop.first %}
-                            <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                                <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                            </div>
-                            <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                            <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                        {% else %}
-                            <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                                <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                            </div>
-                            <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                            <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                        {% endif %}
-                    {% empty %}
-                        <p>But chief! There are no files in here!</p>
-                    {% endfor %}
+        <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group col-md-12">
+                <div role="tabpanel">
+                    <!-- nav tabs -->
+                    {% if file_dict %}
+                    <ul class="nav nav-tabs" role="tablist">
+                        {% for fname in file_dict.keys %}
+                            {% if forloop.first %}
+                            <li role="presentation" class="active">
+                                <a href="#{{ forloop.counter }}"
+                                   role="tab"
+                                   data-toggle="tab">{{ fname|escape }}
+                                </a>
+                            </li>
+                            {% else %}
+                            <li role="presentation">
+                                <a href="#{{ forloop.counter }}"
+                                   role="tab"
+                                   data-toggle="tab">{{ fname|escape }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    <!-- tab panes -->
+                    <div class="tab-content">
+                        {% for fname, content in file_dict.items %}
+                            {% if forloop.first %}
+                                <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
+                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                                </div>
+                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                                <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
+                            {% else %}
+                                <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
+                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                                </div>
+                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
+                                <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
+                            {% endif %}
+                        {% empty %}
+                            <p>But chief! There are no files in here!</p>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% if file_dict %}
+                <div class="form-group col-md-12">
+                    <label for="manual-upload">Manual upload:</label>
+                    <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple="1">
+                </div>
+                <div class="form-group col-md-12">
+                    <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
+                </div>
+            {% else %}
+                <a class="btn btn-default" href="{% url 'tasks:index' %}">Go back</a>
+            {% endif %}
+        </form>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <br />
+            <hr />
+            <h4>Download your latest solutions</h4>
+            <ul>
+            {% for sol in latest_solutions %}
+                <li><a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Solution from {{ sol.submission_date }}</a></li>
+            {% endfor %}
+            </ul>
         </div>
-        {% if file_dict %}
-            <div class="form-group col-md-12">
-                <label for="manual-upload">Manual upload:</label>
-                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple="1">
-            </div>
-            <div class="form-group col-md-12">
-                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
-            </div>
-        {% else %}
-            <a class="btn btn-default" href="{% url 'tasks:index' %}">Go back</a>
-        {% endif %}
-    </form>
+    </div>
 </div>
 {% endblock %}
 
