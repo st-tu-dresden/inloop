@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="row">
     <div class="col-md-4 col-md-offset-4">
         <form action="{% url 'tasks:new_category' %}" class="form-horizontal" method="post">
             {% csrf_token %}
@@ -34,4 +35,5 @@
             </div>
         </form>
     </div>
+</div>
 {% endblock %}
