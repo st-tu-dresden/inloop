@@ -38,6 +38,13 @@ class TaskCategory(models.Model):
     def get_tuple(self):
         return (self.short_id, self.name)
 
+    def completed_tasks_for_user(self, user):
+        '''Returns the tasks a user has already solved.'''
+        return [t for t in Task.objects.all() if t.solved_by(user)]
+
+    def get_tasks(self):
+        return Task.objects.filter(category=self)
+
     def __str__(self):
         return self.short_id
 
@@ -59,10 +66,12 @@ class Task(models.Model):
         unique=True,
         help_text='URL name')
 
+    def solved_by(self, user):
+        queryset = TaskSolution.objects.filter(author=user, is_correct=True)
+        return True if queryset else False
+
     def is_active(self):
-        '''
-        Returns True if the task is already visible to the users.
-        '''
+        '''Returns True if the task is already visible to the users.'''
 
         return timezone.now() > self.publication_date
 
