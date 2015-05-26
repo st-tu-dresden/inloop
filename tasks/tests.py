@@ -111,6 +111,16 @@ class TaskModelTests(TestCase):
         self.assertEqual(task.category, new_cat)
 
 
+class TaskCategoryTests(TestCase):
+    def test_image_path(self):
+        cat = TaskCategory(name='Unittest')
+        cat.image = File(open(os.path.join(BASE_DIR, 'tests', 'test.jpg')))
+        cat.save()
+
+        p = TaskCategory.objects.get(pk=1).image.path
+        self.failUnless(open(p), 'Image file not found')
+
+
 class TaskSolutionTests(TestCase):
     def setUp(self):
         self.password = '123456'
