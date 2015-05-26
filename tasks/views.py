@@ -96,7 +96,7 @@ def category(request, short_id):
 @login_required
 def index(request):
     categories = TaskCategory.objects.all()
-    return render(request, 'tasks/index2.html', {
+    return render(request, 'tasks/index.html', {
         'user': request.user,
         'categories': categories
     })
