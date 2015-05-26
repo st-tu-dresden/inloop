@@ -100,7 +100,8 @@ STATIC_URL = '/static/'
 
 # Storage location for uploaded files
 
-MEDIA_ROOT = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Environment variable for compatibility with django-tinymce
 

@@ -1,160 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="col-md-5 col-md-offset-3">
-        <h1 class="task-heading">Basic Tasks</h1>
-        <table class="task-listing table">
-            {% if basic_tasks %}
-                {% if user.is_staff %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Staff Options</th>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Completed</th>
-                    </tr>
-                {% endif %}
-            {% endif %}
-            {% for task in basic_tasks %}
-                <tr>
-                    <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
-                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
-                    <td>
-                        {% if user.is_staff %}
-                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
-                        {% else %}
-                            <p><strong>ICON</strong></p>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <p class="no-tasks">No Basic exercises to do.</p>
-            {% endfor %}
-        </table>
-        <br/>
-
-        <h1 class="task-heading">Advanced Tasks</h1>
-        <table class="task-listing table">
-            {% if advanced_tasks %}
-                {% if user.is_staff %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Staff Options</th>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Completed</th>
-                    </tr>
-                {% endif %}
-            {% endif %}
-            {% for task in advanced_tasks %}
-                <tr>
-                    <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
-                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
-                    <td>
-                        {% if user.is_staff %}
-                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
-                        {% else %}
-                            <p><strong>ICON</strong></p>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <p class="no-tasks">No Advanced exercises to do.</p>
-            {% endfor %}
-        </table>
-        <br/>
-
-        <h1 class="task-heading">Lesson Tasks</h1>
-        <table class="task-listing table">
-            {% if lesson_tasks %}
-                {% if user.is_staff %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Staff Options</th>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Completed</th>
-                    </tr>
-                {% endif %}
-            {% endif %}
-            {% for task in lesson_tasks %}
-                <tr>
-                    <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
-                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
-                    <td>
-                        {% if user.is_staff %}
-                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
-                        {% else %}
-                            <p><strong>ICON</strong></p>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <p class="no-tasks">No Lesson exercises to do.</p>
-            {% endfor %}
-        </table>
-        <br/>
-
-        <h1 class="task-heading">Exam Tasks</h1>
-        <table class="task-listing table">
-            {% if exam_tasks %}
-                {% if user.is_staff %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Staff Options</th>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <th>Title</th>
-                        <th>Published</th>
-                        <th>Due to</th>
-                        <th>Completed</th>
-                    </tr>
-                {% endif %}
-            {% endif %}
-            {% for task in exam_tasks %}
-                <tr>
-                    <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-                    <td>{{ task.publication_date|date:"d/m/y" }}</td>
-                    <td>{{ task.deadline_date|date:"d/m/y" }}</td>
-                    <td>
-                        {% if user.is_staff %}
-                            <a href="{% url 'tasks:edit' task.slug %}">Edit</a><br />
-                            <a href="{% url 'tasks:delete' task.slug %}">Delete</a>
-                        {% else %}
-                            <p><strong>ICON</strong></p>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <p class="no-tasks">No Exam exercises to do.</p>
-            {% endfor %}
-        </table>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+    <div class="row">
+    {% for cat, data in categories %}
+        {% if forloop.counter|divisibleby:"3" %}
+        </div>
+        <div class="row">
+        {% endif %}
+        <div class="col-md-6">
+            <div class="thumbnail">
+                <img src="{{ cat.image.url }}">
+                <div class="caption">
+                    <a href="{% url 'tasks:category' cat.short_id %}"><h3>{{ cat.name }}</h3>
+                    <hr />
+                    <p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.1 }}" aria-valuemin="0" aria-valuemax="{{ data.0 }}" style="width: {{ data.2 }}%;">
+                                {% if data.1 > 0 %}
+                                    {{ data.1 }} / {{ data.0 }}
+                                {% else %}
+                                    <span class="sr-only">No completed tasks</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>There are currently no tasks in the system.</p>
+    {% endfor %}
     </div>
-    <br/>
+    </div>
+</div>
 {% endblock %}

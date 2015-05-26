@@ -35,7 +35,10 @@ def delete_category(request, short_id):
 def edit_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
+        cat_form = forms.NewTaskCategoryForm(
+            request.POST,
+            request.FILES,
+            instance=cat)
         if cat_form.is_valid():
             cat_form.save()
             return render(request, 'tasks/message.html', {
@@ -63,7 +66,7 @@ def edit_category(request, short_id):
 @login_required
 def new_category(request):
     if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(data=request.POST)
+        cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
         if cat_form.is_valid():
             cat_form.save()
             return render(request, 'tasks/message.html', {
@@ -95,8 +98,16 @@ def category(request, short_id):
 
 @login_required
 def index(request):
-    categories = TaskCategory.objects.all()
-    return render(request, 'tasks/index2.html', {
+    progress = lambda a, b: u_amt / t_amt if t_amt != 0 else 0
+    queryset = TaskCategory.objects.all()
+    categories = []
+    for o in queryset:
+        t_amt = len(o.get_tasks())
+        u_amt = len(o.completed_tasks_for_user(request.user))
+        if t_amt > 0:
+            categories.append((o, (t_amt, u_amt, progress(u_amt, t_amt))))
+
+    return render(request, 'tasks/index.html', {
         'user': request.user,
         'categories': categories
     })
