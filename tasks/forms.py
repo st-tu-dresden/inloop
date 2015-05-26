@@ -34,6 +34,11 @@ class NewTaskCategoryForm(forms.ModelForm):
             'autocomplete': 'off'
         }))
 
+    image = forms.ImageField(
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control'
+        }))
+
     class Meta(object):
         model = TaskCategory
         exclude = ('short_id',)

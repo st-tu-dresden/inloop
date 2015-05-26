@@ -34,6 +34,8 @@ class TaskCategory(models.Model):
         unique=True,
         max_length=50,
         help_text='Category Name')
+    image = models.ImageField(
+        upload_to='images/category_thumbs/')
 
     def get_tuple(self):
         return (self.short_id, self.name)

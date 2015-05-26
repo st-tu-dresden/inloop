@@ -35,7 +35,10 @@ def delete_category(request, short_id):
 def edit_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(request.POST, instance=cat)
+        cat_form = forms.NewTaskCategoryForm(
+            request.POST,
+            request.FILES,
+            instance=cat)
         if cat_form.is_valid():
             cat_form.save()
             return render(request, 'tasks/message.html', {
@@ -63,7 +66,7 @@ def edit_category(request, short_id):
 @login_required
 def new_category(request):
     if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(data=request.POST)
+        cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
         if cat_form.is_valid():
             cat_form.save()
             return render(request, 'tasks/message.html', {

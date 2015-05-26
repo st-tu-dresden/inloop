@@ -10,7 +10,7 @@
         {% endif %}
         <div class="col-md-6">
             <div class="thumbnail">
-                <img src="http://lorempixel.com/g/500/500/">
+                <img src="{{ cat.image.url }}">
                 <div class="caption">
                     <a href="{% url 'tasks:category' cat.short_id %}"><h3>{{ cat.name }}</h3>
                     <hr />
