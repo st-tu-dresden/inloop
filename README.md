@@ -1,10 +1,10 @@
 ## Getting started
-Note: This version has only been tested with Python 2.7.
+Note: This version has been tested with Python 2.7 and Python 3.4
 
 1. Clone the repository:
 
 	```
-	git clone https://github.com/st-tu-dresden/tud_praktomat_neu.git
+	git clone https://github.com/st-tu-dresden/INLOOP.git
 	cd tud_praktomat_neu
 	```
 
