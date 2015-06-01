@@ -87,7 +87,9 @@ def new_category(request):
 @login_required
 def category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
-    task_list = Task.objects.filter(category=cat)
+    task_list = Task.objects.filter(
+        category=cat,
+        publication_date__lt=timezone.now())
 
     return render(request, 'tasks/category.html', {
         'user': request.user,
@@ -118,6 +120,12 @@ def detail(request, slug):
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
+        if timezone.now() > task.deadline_date:
+            return render(request, 'tasks/message.html', {
+                'type': 'danger',
+                'message': 'This task has already expired!'
+            })
+
         solution = TaskSolution(
             submission_date=timezone.now(),
             author=request.user,
@@ -152,8 +160,10 @@ def detail(request, slug):
                         tsf.filename,
                         ContentFile(request.POST[param]))
                     tsf.save()
-
-    latest_solutions = TaskSolution.objects.order_by('-submission_date')[:5]
+    latest_solutions = TaskSolution.objects.filter(
+        task=task,
+        author=request.user)
+    latest_solutions.order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),

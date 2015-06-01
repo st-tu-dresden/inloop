@@ -45,7 +45,11 @@ class TaskCategory(models.Model):
         return [t for t in Task.objects.all() if t.solved_by(user)]
 
     def get_tasks(self):
-        return Task.objects.filter(category=self)
+        '''Returns a queryset of this category's task that have already been
+        published'''
+        return Task.objects.filter(
+            category=self,
+            publication_date__lt=timezone.now())
 
     def __str__(self):
         return self.short_id
