@@ -123,7 +123,7 @@ def detail(request, slug):
         if timezone.now() > task.deadline_date:
             return render(request, 'tasks/message.html', {
                 'type': 'danger',
-                'message': 'This task is already expired!'
+                'message': 'This task has already expired!'
             })
 
         solution = TaskSolution(
