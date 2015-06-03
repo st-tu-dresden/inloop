@@ -22,10 +22,13 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='task',
+            name='category',
+        ),
+        migrations.AddField(
             model_name='task',
             name='category',
             field=models.OneToOneField(to='tasks.TaskCategory'),
-            preserve_default=True,
         ),
     ]
