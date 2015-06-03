@@ -8,10 +8,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+from os.path import dirname, join
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = dirname(dirname(dirname(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -75,7 +74,7 @@ WSGI_APPLICATION = 'inloop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -100,7 +99,7 @@ STATIC_URL = '/static/'
 
 # Storage location for uploaded files
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Environment variable for compatibility with django-tinymce
@@ -108,10 +107,10 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    join(BASE_DIR, 'static'),
 )
 
 # Template search paths
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
+    join(BASE_DIR, 'templates'),
 )
