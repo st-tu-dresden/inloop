@@ -29,6 +29,9 @@ DATABASES = {
 # Path where `manage.py collectstatic` collects files
 STATIC_ROOT = '/srv/inloop.inf.tu-dresden.de/static'
 
+# Path to media files
+MEDIA_ROOT = '/srv/inloop.inf.tu-dresden.de/media'
+
 # Security related settings
 ALLOWED_HOSTS = ['inloop.inf.tu-dresden.de']
 SESSION_COOKIE_SECURE = True
