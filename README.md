@@ -4,8 +4,8 @@ This version is designed to run with Python 3.
 1. Clone the repository:
 
 	```
-	git clone https://github.com/st-tu-dresden/INLOOP.git
-	cd tud_praktomat_neu
+	git clone https://github.com/st-tu-dresden/inloop.git
+	cd inloop
 	```
 
 2. PIL requires the following dependencies *on your system*:
@@ -16,9 +16,9 @@ This version is designed to run with Python 3.
 
 3. Set up a new virtualenv and install the required packages:
 	```
-	virtualenv venv
+	virtualenv --python=python3 venv
 	source venv/bin/activate
-	pip install -r dev-requirements.txt
+	pip install -r requirements.txt
 	```
 
 4. Set up the database and super user:
@@ -33,4 +33,4 @@ This version is designed to run with Python 3.
 	```
 
 ## Developers
-Also read the [HACKING](https://github.com/st-tu-dresden/tud_praktomat_neu/blob/master/HACKING.md) documentation for useful development tips and conventions.
+Also read the [HACKING](HACKING.md) documentation for useful development tips and conventions.
