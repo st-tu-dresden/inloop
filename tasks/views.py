@@ -9,8 +9,8 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.conf import settings
 
-from inloop.settings import MEDIA_ROOT
 from tasks import forms
 from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 from . import filesystem_utils as fsu
@@ -194,7 +194,7 @@ def get_solution_as_zip(request, slug, solution_id):
     zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
 
     for tsf in solution_files:
-        tsf_dir, tsf_name = path.split(path.join(MEDIA_ROOT, tsf.file.name))
+        tsf_dir, tsf_name = path.split(path.join(settings.MEDIA_ROOT, tsf.file.name))
         zf.writestr(tsf_name, tsf.file.read())
 
     zf.close()

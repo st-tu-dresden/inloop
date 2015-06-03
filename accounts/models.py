@@ -5,8 +5,9 @@ import smtplib
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth import models as auth_models
+from django.conf import settings
+
 from accounts.validators import validate_mat_num
-from inloop.settings import DOMAIN
 
 
 class CourseOfStudy(models.Model):
@@ -56,7 +57,7 @@ class UserProfile(auth_models.AbstractUser):
         self.is_active = True
 
     def send_activation_mail(self):
-        link = DOMAIN + 'accounts/activate/' + self.activation_key
+        link = settings.DOMAIN + 'accounts/activate/' + self.activation_key
         s_addr = 'inloop@example.com'
         subject = 'INLOOP Activation'
         message = ('Howdy {username},\n\nClick the following link to '

@@ -3,38 +3,38 @@ import glob
 import os
 from os import path, listdir
 
-from inloop.settings import BASE_DIR
+from django.conf import settings
 
 
 def get_template_names(task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name)
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name)
     # get all java template files for task, e.g. 'template.java'
     return map(path.basename, glob.glob(p + path.sep + '*.java'))
 
 
 def get_unittest_names(task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name, 'unittests')
     # get all java template files for task, e.g. 'unittest.java'
     return map(path.basename, glob.glob(p + path.sep + '*.java'))
 
 
 def del_template(f_name, task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name)
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name)
     os.remove(path.join(p, f_name))
 
 
 def del_unittest(f_name, task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name, 'unittests')
     os.remove(path.join(p, f_name))
 
 
 def del_task_files(task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name)
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name)
     shutil.rmtree(p)
 
 
 def handle_uploaded_unittest(f, task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name, 'unittests')
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name, 'unittests')
     if not path.exists(p):
         os.makedirs(p)
 
@@ -44,7 +44,7 @@ def handle_uploaded_unittest(f, task_name):
 
 
 def handle_uploaded_exercise(f, task_name):
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name)
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name)
     if not path.exists(p):
         os.makedirs(p)
 
@@ -55,7 +55,7 @@ def handle_uploaded_exercise(f, task_name):
 
 def get_task_templates(task_name):
     overview = {}
-    p = path.join(BASE_DIR, 'media', 'exercises', task_name)
+    p = path.join(settings.BASE_DIR, 'media', 'exercises', task_name)
     # get all java template files for task
     filenames = map(path.basename, glob.glob(p + path.sep + '*.java'))
     # build dict overview
@@ -75,7 +75,7 @@ def latest_solution_files(task, username):
 
     overview = {}
     p = path.join(
-        BASE_DIR,
+        settings.BASE_DIR,
         'media',
         'solutions',
         username,
