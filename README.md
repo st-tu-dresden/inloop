@@ -1,5 +1,5 @@
 ## Getting started
-Note: This version has been tested with Python 2.7 and Python 3.4.
+This version is designed to run with Python 3.
 
 1. Clone the repository:
 
@@ -7,7 +7,7 @@ Note: This version has been tested with Python 2.7 and Python 3.4.
 	git clone https://github.com/st-tu-dresden/INLOOP.git
 	cd tud_praktomat_neu
 	```
-	
+
 2. PIL requires the following dependencies *on your system*:
 	```
 	sudo apt-get install python-dev
