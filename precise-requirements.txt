@@ -1,0 +1,4 @@
+# We use psycopg2 from the APT repository
+-r requirements.txt
+psycopg2==2.4.5
+gunicorn==19.3.0
