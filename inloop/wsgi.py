@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "inloop.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "inloop.settings.production")
 
 from django.core.wsgi import get_wsgi_application
 

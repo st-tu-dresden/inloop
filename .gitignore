@@ -14,3 +14,4 @@ venv/
 media/
 .idea/
 *.sqlite3
+*.sublime-workspace

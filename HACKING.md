@@ -5,7 +5,8 @@ It is recommended for all developers to implement this pre-commit hook mechanism
 
 The project comes with its own pre-commit hook labeled *pre-commit.sh* in the root directory. To install it, simply clone the repository, navigate to the project root directory and issue the following commands:
 ```bash
-ln -s -f ../../pre-commit.sh .git/hooks/pre-commit
+cd .git/hooks
+ln -sf ../../support/pre-commit.sh pre-commit
 ```
 This will create a symlink to the hooks in your .git directory which are called once the commit is issued.
 

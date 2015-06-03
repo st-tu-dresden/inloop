@@ -1,0 +1,45 @@
+import os
+
+from .base import *
+
+# XXX: Check file permissions of __file__
+# XXX: Warn when PYTHONHASHSEED envvar is != random
+
+# Keep this secret and unique for every site
+SECRET_KEY = ''
+SITE_ID = 1
+
+# No debug pages!
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+
+# Postgres connection parameters
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'inloop',
+        'USER': 'inloop',
+        'PASSWORD': 'passw0rd',
+        # delete the following two entries when using unix sockets:
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+
+# Path where `manage.py collectstatic` collects files
+STATIC_ROOT = '/srv/inloop.inf.tu-dresden.de/static'
+
+# Security related settings
+ALLOWED_HOSTS = ['inloop.inf.tu-dresden.de']
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# SMTP server settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+
+# Use this if you are sure that your proxy (e.g., nginx) is always
+# terminating SSL.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
