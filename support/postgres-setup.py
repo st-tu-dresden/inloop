@@ -34,8 +34,8 @@ GRANT CREATE, USAGE ON SCHEMA "$SCHEMA" TO "$DB_USER";
 ''')
 
 if len(sys.argv) != 5:
-    print "Usage: %s dbuser pwfile dbname schema" % sys.argv[0]
-    print "  if pwfile is -, read password from stdin"
+    print("Usage: %s dbuser pwfile dbname schema" % sys.argv[0])
+    print("  if pwfile is -, read password from stdin")
     sys.exit(1)
 
 if sys.argv[2] == '-':
@@ -50,4 +50,4 @@ mapping = {
     'SCHEMA': sys.argv[4]
 }
 
-print t.substitute(mapping)
+print(t.substitute(mapping))
