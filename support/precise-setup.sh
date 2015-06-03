@@ -14,12 +14,12 @@ if [[ $DISTRIB_CODENAME != "precise" ]]; then
     exit 1
 fi
 
-# Installs Ubuntu-packaged version of psycopg2, which avoids the
-# many dependencies needed for installation and compilation via pip
-# (e.g., gcc, make, several *-dev packages).
-sudo aptitude -R install python3-psycopg2
+# o Installs Ubuntu-packaged version of psycopg2, which avoids the
+#   many quirks needed to build it from source on this distro.
+# o Installs build deps for Pillow (which builds fine w/o h4cks)
+sudo aptitude -R install build-essential python3-psycopg2 python3-dev libjpeg-dev zlib1g-dev
 
-# Import the above packages into our virtualenv.
+# Import postgres packages into our virtualenv.
 cd venv/lib/python3.2/site-packages && \
     ln -s /usr/lib/python3/dist-packages/psycopg2* .
 

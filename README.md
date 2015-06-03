@@ -10,8 +10,7 @@ This version is designed to run with Python 3.
 
 2. PIL requires the following dependencies *on your system*:
 	```
-	sudo apt-get install python-dev
-	sudo apt-get install python3.4-dev
+	sudo apt-get install build-essential python3-dev libjpeg-dev zlib1g-dev
 	```
 
 3. Set up a new virtualenv and install the required packages:
