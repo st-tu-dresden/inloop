@@ -1,5 +1,5 @@
-from io import StringIO
 import zipfile
+from io import StringIO
 from os import path
 
 from django.http import HttpResponse
@@ -250,7 +250,7 @@ def edit(request, slug):
             task.publication_date = form.cleaned_data['e_pub_date']
             task.deadline_date = form.cleaned_data['e_dead_date']
             task.category = cat
-            task.slug = slugify(unicode(form.cleaned_data['e_title']))
+            task.slug = slugify(str(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
         else:
@@ -317,7 +317,7 @@ def submit_new_exercise(request):
                 publication_date=form.cleaned_data['e_pub_date'],
                 deadline_date=form.cleaned_data['e_dead_date'],
                 category=cat,
-                slug=slugify(unicode(form.data['e_title'])))
+                slug=slugify(str(form.data['e_title'])))
             t.save()
             return render(request, 'tasks/message.html', {
                 'type': 'success',
