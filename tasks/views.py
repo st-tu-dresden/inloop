@@ -45,9 +45,7 @@ def edit_category(request, short_id):
                 'type': 'success',
                 'message': 'The category has successfully been edited.'
             })
-        else:
-            error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(cat_form.errors))
+        # XXX: else?
     else:
         cat_form = forms.NewTaskCategoryForm(
             instance=cat,
@@ -73,9 +71,7 @@ def new_category(request):
                 'type': 'success',
                 'message': 'The new category has been added to the system.'
             })
-        else:
-            error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(cat_form.errors))
+        # XXX: else?
     else:
         cat_form = forms.NewTaskCategoryForm()
 
@@ -253,8 +249,7 @@ def edit(request, slug):
             task.slug = slugify(str(form.cleaned_data['e_title']))
             task.save()
             return redirect('tasks:detail', slug=task.slug)
-        else:
-            print(form.errors)
+        # XXX: else?
     else:
         # construct data dict for pre populating form
         data_dict = {

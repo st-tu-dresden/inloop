@@ -14,9 +14,7 @@ def new_course(request):
                 'type': 'success',
                 'message': 'The course has successfully been added!'
             })
-        else:
-            error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(course_form.errors))
+        # XXX: else?
     else:
         course_form = NewCourseForm()
 
@@ -40,9 +38,7 @@ def register(request):
                 'type': 'success',
                 'message': 'Your activation mail has been sent!'
             })
-        else:
-            error_msg = "The following form validation errors occurred: {0}"
-            print(error_msg.format(user_form.errors))
+        # XXX: else?
 
     else:
         user_form = UserForm()
@@ -84,7 +80,6 @@ def user_login(request):
                 })
         else:
             # invalid credentials
-            print('Invalid login details: {0}, {1}'.format(username, password))
             return render(request, 'registration/login.html', {
                 'login_failed': True
             })
