@@ -34,7 +34,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
-    'tinymce',
     'accounts',
     'tasks',
 )
@@ -66,9 +65,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = ''
-
-# TinyMCE legacy stuff (XXX: WTF?)
-TINYMCE_JS_ROOT = STATIC_URL + 'js/tiny_mce'
 
 # Storage location for uploaded files
 MEDIA_ROOT = join(BASE_DIR, 'media')
