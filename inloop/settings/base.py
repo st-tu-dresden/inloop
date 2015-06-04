@@ -9,6 +9,10 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 from os.path import dirname, join
+from sys import version_info
+
+if version_info[0] < 3:
+    raise RuntimeError("INLOOP must be run with Python 3.x")
 
 BASE_DIR = dirname(dirname(dirname(__file__)))
 
