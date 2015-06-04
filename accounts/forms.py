@@ -23,8 +23,10 @@ class UserForm(forms.ModelForm):
     course = forms.ModelChoiceField(
         queryset=COS.objects.all())
     mat_num = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
+            'pattern': '[0-9]{7}',
+            'maxlength': '7',
             'autocomplete': 'off'
         }),
         validators=[validate_mat_num])
