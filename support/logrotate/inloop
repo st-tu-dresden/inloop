@@ -1,0 +1,12 @@
+/var/log/inloop/error.log {
+    daily
+    rotate 7
+    missingok
+    ifempty
+    create
+    nodateext
+    nocompress
+    postrotate
+        [ -f /var/run/inloop/master.pid ] && kill -USR1 `cat /var/run/inloop/master.pid`
+    endscript
+}
