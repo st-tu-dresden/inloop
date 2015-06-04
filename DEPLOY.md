@@ -42,14 +42,11 @@ virtualenv --python=python3 venv
 # Execute setup steps specific to Ubuntu 12.04 (will invoke sudo)
 ./support/precise-setup.sh
 
-# Install requirements (be sure your virtualenv is activated before)
-source venv/bin/activate
-pip install -r precise-requirements.txt
+# Install inloop_env wrapper
+sudo ln -s $PWD/support/inloop_env /usr/local/bin
 
-# Install the upstart and logrotate files
-# WARNING: Don't attempt to symlink these files!
-sudo cp support/upstart/inloop.conf /etc/init
-sudo cp support/logrotate/inloop /etc/logrotate.d
+# Install requirements (inloop_env takes care of the virtualenv)
+inloop_env pip install -r precise-requirements.txt
 
 # Create a unprivileged user id which will run gunicorn
 sudo adduser --system --group --home / inloop
@@ -58,6 +55,10 @@ sudo adduser --system --group --home / inloop
 sudo mkdir /var/run/inloop /var/log/inloop
 sudo chown inloop:inloop /var/run/inloop /var/log/inloop
 
+# Install the upstart and logrotate files
+# WARNING: Don't attempt to symlink these files!
+sudo cp support/upstart/inloop.conf /etc/init
+sudo cp support/logrotate/inloop /etc/logrotate.d
 ```
 
 ### Configuration steps
@@ -108,36 +109,33 @@ Create `/etc/default/inloop`, so it exports the following environment variables:
 configure the database settings matching the last paragraph:
 
 ```bash
+conf=/etc/default/inloop
 {
   echo export PG_NAME=inloop
   echo export PG_USER=inloop
   echo export PG_PASSWORD=`cat /tmp/password`
   echo export SITE_ID=1
   echo export SECRET_KEY=`pwgen -s 60 1`
-} | sudo tee /etc/default/inloop
+} | sudo tee $conf
 
 # The environment file must only be readable by you and inloop,
 # it contains very sensitive data!
-sudo chown $USER:inloop /etc/default/inloop
-sudo chmod 640 /etc/default/inloop
+sudo chown $USER:inloop $conf
+sudo chmod 640 $conf
 ```
 
 Using these settings, execute the final configuration steps:
 
 ```bash
-# Prepare the environment
-export DJANGO_SETTINGS_MODULE=inloop.settings.production
-source /etc/default/inloop
-
 # Load Django and INLOOP tables
 cd $basedir/inloop
-python manage.py migrate
+inloop_env ./manage.py migrate
 
 # Create a superuser account
-python manage.py createsuperuser
+inloop_env ./manage.py createsuperuser
 
 # Collect static files
-python manage.py collectstatic
+inloop_env ./manage.py collectstatic
 ```
 
 ### Starting INLOOP

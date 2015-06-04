@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Convenient wrapper which runs commands inside the INLOOP
+# production environment, for example:
+#
+#   inloop_env ./manage.py createsuperuser
+#
+# The outside environment is not affected.
+set -e
+
+if [[ $# == 0 ]]; then
+    echo >&2 "Usage: $0 command [args...]"
+    exit 1
+fi
+
+export DJANGO_SETTINGS_MODULE=inloop.settings.production
+source venv/bin/activate
+source /etc/default/inloop || true
+exec $@
