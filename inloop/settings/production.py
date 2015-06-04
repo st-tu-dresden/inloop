@@ -1,13 +1,9 @@
-import os
+from os import environ as env
 
 from .base import *
 
-# XXX: Check file permissions of __file__
-# XXX: Warn when PYTHONHASHSEED envvar is != random
-
-# Keep this secret and unique for every site
-SECRET_KEY = ''
-SITE_ID = 1
+SECRET_KEY = env['SECRET_KEY']
+SITE_ID = env['SITE_ID']
 
 # No debug pages!
 DEBUG = False
@@ -17,12 +13,10 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'inloop',
-        'USER': 'inloop',
-        'PASSWORD': 'passw0rd',
-        # delete the following two entries when using unix sockets:
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': env['PG_NAME'],
+        'USER': env['PG_USER'],
+        'PASSWORD': env['PG_PASSWORD'],
+        # HOST and PORT are omitted, defaults to using unix sockets
     }
 }
 
