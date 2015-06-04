@@ -8,7 +8,7 @@
 set -e
 
 if [[ $# == 0 ]]; then
-    echo >&2 "Usage: $0 command [args...]"
+    echo >&2 "Usage: $(basename $0) command [args...]"
     exit 1
 fi
 
