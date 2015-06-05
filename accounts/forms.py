@@ -29,12 +29,6 @@ class UserForm(forms.ModelForm):
             'class': 'form-control',
             'autocomplete': 'off'
         }))
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        })
-    )
     course = forms.ModelChoiceField(
         queryset=COS.objects.all())
     mat_num = forms.IntegerField(
