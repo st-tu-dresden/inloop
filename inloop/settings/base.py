@@ -7,9 +7,11 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
-
 from os.path import dirname, join
 from sys import version_info
+
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+
 
 if version_info[0] < 3:
     raise RuntimeError("INLOOP must be run with Python 3.x")
@@ -47,6 +49,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS += (
+    'inloop.context_processors.version',
 )
 
 LOGIN_REDIRECT_URL = '/tasks'
