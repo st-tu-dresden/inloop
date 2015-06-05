@@ -1,7 +1,7 @@
 from django import forms
 from accounts.models import UserProfile
 from accounts.models import CourseOfStudy as COS
-from accounts.validators import validate_mat_num
+from accounts import validators as v
 
 
 class UserForm(forms.ModelForm):
@@ -19,6 +19,7 @@ class UserForm(forms.ModelForm):
             'autocomplete': 'off'
         }))
     password1 = forms.CharField(
+        validators=[v.validate_password],
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
@@ -27,8 +28,7 @@ class UserForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
-        })
-    )
+        }))
     course = forms.ModelChoiceField(
         queryset=COS.objects.all())
     mat_num = forms.IntegerField(
@@ -38,7 +38,7 @@ class UserForm(forms.ModelForm):
             'maxlength': '7',
             'autocomplete': 'off'
         }),
-        validators=[validate_mat_num])
+        validators=[v.validate_mat_num])
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
