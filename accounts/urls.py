@@ -42,5 +42,10 @@ urlpatterns = patterns(
         r'^activate/(?P<key>[0-9a-f]{5,40})$',
         account_views.activate_user,
         name='user_activation'
+    ),
+    url(
+        r'activate_mail/(?P<key>[0-9a-f]{5,40})$',
+        account_views.activate_email,
+        name='activate_email'
     )
 )
