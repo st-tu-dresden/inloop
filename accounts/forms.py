@@ -75,7 +75,7 @@ class UserProfileForm(UserForm):
 
 class EmailForm(UserForm):
     def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
+        super(EmailForm, self).__init__(*args, **kwargs)
         # remove unwanted fields
         for field in self.Meta.exclude:
             self.fields.pop(field)
@@ -88,7 +88,7 @@ class EmailForm(UserForm):
 
 class PasswordForm(UserForm):
     def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
+        super(PasswordForm, self).__init__(*args, **kwargs)
         # remove unwanted fields
         for field in self.Meta.exclude:
             self.fields.pop(field)
