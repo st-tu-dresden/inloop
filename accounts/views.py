@@ -161,6 +161,6 @@ def change_password(request):
     else:
         password_form = forms.PasswordForm(instance=request.user)
 
-    return render(request, 'accounts/change_email.html', {
+    return render(request, 'accounts/change_password.html', {
         'password_form': password_form
     })
