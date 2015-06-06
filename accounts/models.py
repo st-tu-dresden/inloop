@@ -62,6 +62,12 @@ class UserProfile(auth_models.AbstractUser):
     def activate(self):
         self.is_active = True
         self.activation_key = ''
+        self.save()
+
+    def activate_mail(self):
+        self.email = self.new_email
+        self.new_email = ''
+        self.save()
 
     def send_activation_mail(self):
         link = settings.DOMAIN + 'accounts/activate/' + self.activation_key
