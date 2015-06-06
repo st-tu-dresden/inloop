@@ -142,3 +142,25 @@ def change_email(request):
     return render(request, 'accounts/change_email.html', {
         'email_form': email_form
     })
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        password_form = forms.PasswordForm(
+            data=request.POST,
+            instance=request.user)
+
+        if password_form.is_valid():
+            # TODO: Send mail
+            return render(request, 'accounts/message.html', {
+                'type': 'success',
+                'message': 'A validation mail has been sent \
+                to your email address!'
+            })
+    else:
+        password_form = forms.PasswordForm(instance=request.user)
+
+    return render(request, 'accounts/change_email.html', {
+        'password_form': password_form
+    })
