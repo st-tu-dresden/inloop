@@ -125,19 +125,21 @@ def user_profile(request):
 @login_required
 def change_email(request):
     if request.method == 'POST':
+        user = UserProfile.objects.get(username=request.user.username)
         email_form = forms.EmailForm(
             data=request.POST,
-            instance=request.user)
-
-        if email_form.is_valid():
-            # TODO: Send mail
+            instance=user)
+        if request.POST['email'] != user.email and email_form.is_valid():
+            user.generate_activation_key()
+            user.send_mail_change_mail(request.POST['email'])
+            user.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
                 'message': 'A validation mail has been sent \
                 to the new address!'
             })
-    else:
-        email_form = forms.EmailForm(instance=request.user)
+
+    email_form = forms.EmailForm(instance=request.user)
 
     return render(request, 'accounts/change_email.html', {
         'email_form': email_form
@@ -152,7 +154,6 @@ def change_password(request):
             instance=request.user)
 
         if password_form.is_valid():
-            # TODO: Send mail
             return render(request, 'accounts/message.html', {
                 'type': 'success',
                 'message': 'A validation mail has been sent \

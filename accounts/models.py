@@ -1,6 +1,5 @@
 import hashlib
 import random
-import smtplib
 
 from django.db import models
 from django.core.mail import send_mail
@@ -33,8 +32,15 @@ class UserProfile(auth_models.AbstractUser):
     def __init__(self, *args, **kwargs):
         super(UserProfile, self).__init__(*args, **kwargs)
 
+    new_email = models.EmailField(
+        default='',
+        blank=True,
+        help_text='The user\'s temporary email address waiting to be validated'
+    )
+
     activation_key = models.CharField(
-        max_length=40
+        max_length=40,
+        help_text='SHA1 key used to verify the user\'s email'
     )
 
     mat_num = models.IntegerField(
@@ -55,6 +61,7 @@ class UserProfile(auth_models.AbstractUser):
 
     def activate(self):
         self.is_active = True
+        self.activation_key = ''
 
     def send_activation_mail(self):
         link = settings.DOMAIN + 'accounts/activate/' + self.activation_key
@@ -67,14 +74,28 @@ class UserProfile(auth_models.AbstractUser):
                    '\n\nCheers,'
                    '\nYour INLOOP Team'
                    ).format(username=self.username, link=link)
+        send_mail(
+            subject,
+            message,
+            s_addr,
+            [self.email],
+            fail_silently=True)
 
-        try:
-            send_mail(
-                subject,
-                message,
-                s_addr,
-                [self.email],
-                fail_silently=False)  # To provoke SMTPException
-            return True
-        except smtplib.SMTPException:
-            return False
+    def send_mail_change_mail(self, new_address):
+        self.new_email = new_address
+        link = settings.DOMAIN + 'accounts/activate_mail/' + self.activation_key
+        s_addr = 'inloop@example.com'
+        subject = 'Your new INLOOP mail'
+        message = ('Howdy {username},\n\nClick the following link to '
+                   'change your INLOOP email address:'
+                   '\n\n{link}\n\n'
+                   'We\'re looking forward to seeing you on the site!'
+                   '\n\nCheers,'
+                   '\nYour INLOOP Team'
+                   ).format(username=self.username, link=link)
+        send_mail(
+            subject,
+            message,
+            s_addr,
+            [new_address],
+            fail_silently=True)
