@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserForm, NewCourseForm
+from . import forms
 from .models import UserProfile
 
 
 def new_course(request):
     if request.method == 'POST':
-        course_form = NewCourseForm(data=request.POST)
+        course_form = forms.NewCourseForm(data=request.POST)
         if course_form.is_valid():
             course_form.save()
             return render(request, 'accounts/message.html', {
@@ -18,7 +18,7 @@ def new_course(request):
             error_msg = "The following form validation errors occurred: {0}"
             print(error_msg.format(course_form.errors))
     else:
-        course_form = NewCourseForm()
+        course_form = forms.NewCourseForm()
 
     return render(request, 'accounts/new_course.html', {
         'course_form': course_form
@@ -27,7 +27,7 @@ def new_course(request):
 
 def register(request):
     if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
+        user_form = forms.UserForm(data=request.POST)
 
         if user_form.is_valid():
             user = user_form.save(commit=False)
@@ -45,7 +45,7 @@ def register(request):
             print(error_msg.format(user_form.errors))
 
     else:
-        user_form = UserForm()
+        user_form = forms.UserForm()
 
     return render(request, 'registration/register.html', {
         'user_form': user_form
@@ -103,4 +103,25 @@ def user_logout(request):
 
 @login_required(login_url='/accounts/login/')
 def user_profile(request):
-    pass
+    if request.method == 'POST':
+        user_profile = forms.UserProfileForm(
+            data=request.POST,
+            instance=request.user)
+        if user_profile.is_valid():
+            user_profile.save()
+            return render(request, 'accounts/message.html', {
+                'type': 'success',
+                'message': 'Your profile information has successfully \
+                been changed!'
+            })
+    else:
+        user_profile = forms.UserProfileForm(
+            instance=request.user,
+            initial={
+                'course': request.user.course,
+                'mat_num': request.user.mat_num
+            })
+
+    return render(request, 'accounts/profile.html', {
+        'user_profile': user_profile
+    })
