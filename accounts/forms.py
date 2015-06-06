@@ -60,6 +60,51 @@ class UserForm(forms.ModelForm):
                   'mat_num')
 
 
+class UserProfileForm(UserForm):
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        # remove unwanted fields
+        for field in self.Meta.exclude:
+            self.fields.pop(field)
+
+    class Meta(UserForm.Meta):
+        model = UserProfile
+        exclude = ('username', 'email', 'password1', 'password2')
+        fields = ('mat_num', 'course')
+
+
+class EmailForm(UserForm):
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        # remove unwanted fields
+        for field in self.Meta.exclude:
+            self.fields.pop(field)
+
+    class Meta(UserForm.Meta):
+        model = UserProfile
+        exclude = ('username', 'password1', 'password2', 'mat_num', 'course')
+        fields = ('email', )
+
+
+class PasswordForm(UserForm):
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        # remove unwanted fields
+        for field in self.Meta.exclude:
+            self.fields.pop(field)
+
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'off'
+        }))
+
+    class Meta(UserForm.Meta):
+        model = UserProfile
+        exclude = ('username', 'email', 'mat_num', 'course')
+        fields = ('old_password', 'password1', 'password2')
+
+
 class NewCourseForm(forms.ModelForm):
     name = forms.CharField(
         max_length=50,
