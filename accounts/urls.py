@@ -9,6 +9,11 @@ urlpatterns = patterns(
         name='new_course'
     ),
     url(
+        r'^profile/$',
+        account_views.user_profile,
+        name='user_profile'
+    ),
+    url(
         r'^register/$',
         account_views.register,
         name='register'

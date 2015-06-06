@@ -26,7 +26,7 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'tasks:index' %}">Home</a></li>
-                    <li><a href="#">{{ user.get_username }}</a></li>
+                    <li><a href="{% url 'accounts:user_profile' %}">{{ user.get_username }}</a></li>
                     <li><a href="#">Settings</a></li>
                     {% for page in fpages %}
                         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
