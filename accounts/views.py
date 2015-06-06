@@ -132,7 +132,6 @@ def change_email(request):
         if request.POST['email'] != user.email and email_form.is_valid():
             user.generate_activation_key()
             user.send_mail_change_mail(request.POST['email'])
-            user.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
                 'message': 'A validation mail has been sent \
