@@ -14,6 +14,16 @@ urlpatterns = patterns(
         name='user_profile'
     ),
     url(
+        r'^change_email/$',
+        account_views.change_email,
+        name='change_email'
+    ),
+    url(
+        r'^change_password/$',
+        account_views.change_password,
+        name='change_password'
+    ),
+    url(
         r'^register/$',
         account_views.register,
         name='register'
