@@ -120,3 +120,25 @@ def user_profile(request):
     return render(request, 'accounts/profile.html', {
         'user_profile': user_profile
     })
+
+
+@login_required
+def change_email(request):
+    if request.method == 'POST':
+        email_form = forms.EmailForm(
+            data=request.POST,
+            instance=request.user)
+
+        if email_form.is_valid():
+            # TODO: Send mail
+            return render(request, 'accounts/message.html', {
+                'type': 'success',
+                'message': 'A validation mail has been sent \
+                to the new address!'
+            })
+    else:
+        email_form = forms.EmailForm(instance=request.user)
+
+    return render(request, 'accounts/change_email.html', {
+        'email_form': email_form
+    })
