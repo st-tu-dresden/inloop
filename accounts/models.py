@@ -67,6 +67,7 @@ class UserProfile(auth_models.AbstractUser):
     def activate_mail(self):
         self.email = self.new_email
         self.new_email = ''
+        self.activation_key = ''
         self.save()
 
     def send_activation_mail(self):
@@ -89,6 +90,7 @@ class UserProfile(auth_models.AbstractUser):
 
     def send_mail_change_mail(self, new_address):
         self.new_email = new_address
+        self.save()
         link = settings.DOMAIN + 'accounts/activate_mail/' + self.activation_key
         s_addr = 'inloop@example.com'
         subject = 'Your new INLOOP mail'
