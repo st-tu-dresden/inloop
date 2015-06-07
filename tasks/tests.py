@@ -32,7 +32,7 @@ class TaskModelTests(TestCase):
         basic = TaskCategory.objects.create(
             short_id='BA',
             name='Basic',
-            image=File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg'))))
+            image=File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg'), 'rb')))
 
         Task.objects.create(
             title='active_task',
@@ -114,7 +114,7 @@ class TaskModelTests(TestCase):
 class TaskCategoryTests(TestCase):
     def test_image_path(self):
         cat = TaskCategory(name='Unittest')
-        cat.image = File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg')))
+        cat.image = File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg'), 'rb'))
         cat.save()
 
         p = TaskCategory.objects.get(pk=1).image.path
@@ -144,7 +144,7 @@ class TaskSolutionTests(TestCase):
         basic = TaskCategory.objects.create(
             short_id='BA',
             name='Basic',
-            image=File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg'))))
+            image=File(open(os.path.join(settings.BASE_DIR, 'tests', 'test.jpg'), 'rb')))
 
         t1 = Task.objects.create(
             title='active_task',
