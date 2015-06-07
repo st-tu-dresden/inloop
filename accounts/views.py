@@ -50,13 +50,17 @@ def register(request):
 
 def activate_user(request, key):
     user = get_object_or_404(UserProfile, activation_key=key)
-    user.activate()
-    user.save()
-
-    return render(request, 'accounts/message.html', {
-        'type': 'success',
-        'message': 'Your account has been activated! You can now login.'
-    })
+    if user.activate():
+        return render(request, 'accounts/message.html', {
+            'type': 'success',
+            'message': 'Your account has been activated! You can now login.'
+        })
+    else:
+        return render(request, 'accounts/message.html', {
+            'type': 'danger',
+            'message': 'Your activation key has expired. \
+            Please register again!'
+        })
 
 
 def user_login(request):
@@ -106,8 +110,8 @@ def user_profile(request):
             user_profile.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'Your profile information has successfully \
-                been changed!'
+                'message': 'Your profile information has \
+                successfully been changed!'
             })
     else:
         user_profile = forms.UserProfileForm(
@@ -147,13 +151,17 @@ def change_email(request):
 
 def activate_email(request, key):
     user = get_object_or_404(UserProfile, activation_key=key)
-    user.activate_mail()
-    user.save()
-
-    return render(request, 'accounts/message.html', {
-        'type': 'success',
-        'message': 'Your email has successfully been changed!'
-    })
+    if user.activate_mail():
+        return render(request, 'accounts/message.html', {
+            'type': 'success',
+            'message': 'Your email has successfully been changed!'
+        })
+    else:
+        return render(request, 'accounts/message.html', {
+            'type': 'danger',
+            'message': 'Your key has expired. \
+            Please try changing your email again!'
+        })
 
 
 @login_required

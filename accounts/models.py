@@ -5,6 +5,7 @@ from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth import models as auth_models
 from django.conf import settings
+from django.utils import timezone as tmz
 
 from accounts.validators import validate_mat_num
 
@@ -43,6 +44,11 @@ class UserProfile(auth_models.AbstractUser):
         help_text='SHA1 key used to verify the user\'s email'
     )
 
+    key_expires = models.DateTimeField(
+        default=tmz.now() + tmz.timedelta(weeks=1),
+        blank=True,
+        help_text='The key\'s deprecation time')
+
     mat_num = models.IntegerField(
         max_length=7,
         help_text='Matriculation Number',
@@ -60,23 +66,33 @@ class UserProfile(auth_models.AbstractUser):
         self.activation_key = sha.hexdigest()
 
     def activate(self):
-        self.is_active = True
+        success = False
+        if self.key_expires > tmz.now():
+            self.is_active = True
+            success = True
+
         self.activation_key = ''
         self.save()
+        return success
 
     def activate_mail(self):
-        self.email = self.new_email
+        success = False
+        if self.key_expires > tmz.now():
+            self.email = self.new_email
+            success = True
+
         self.new_email = ''
         self.activation_key = ''
         self.save()
+        return success
 
     def send_activation_mail(self):
         link = settings.DOMAIN + 'accounts/activate/' + self.activation_key
         s_addr = 'inloop@example.com'
         subject = 'INLOOP Activation'
-        message = ('Howdy {username},\n\nClick the following link to '
-                   'activate your INLOOP account and receive awesomeness:'
-                   '\n\n{link}\n\n'
+        message = ('Howdy {username},\n\nClick the following link within '
+                   'the next week to activate your INLOOP account '
+                   'and receive awesomeness:\n\n{link}\n\n'
                    'We\'re looking forward to seeing you on the site!'
                    '\n\nCheers,'
                    '\nYour INLOOP Team'
