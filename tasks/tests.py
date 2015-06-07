@@ -65,7 +65,7 @@ class TaskModelTests(TestCase):
         self.client.login(username=user.username, password=self.password)
         resp = self.client.get('/', follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse(disabled_task.title in resp.content)
+        self.assertFalse(disabled_task.title in resp.content.decode())
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
@@ -118,7 +118,7 @@ class TaskCategoryTests(TestCase):
         cat.save()
 
         p = TaskCategory.objects.get(pk=1).image.path
-        self.failUnless(open(p), 'Image file not found')
+        self.failUnless(open(p, 'rb'), 'Image file not found')
 
 
 class TaskSolutionTests(TestCase):
