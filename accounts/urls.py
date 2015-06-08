@@ -47,5 +47,24 @@ urlpatterns = patterns(
         r'activate_mail/(?P<key>[0-9a-f]{5,40})$',
         account_views.activate_email,
         name='activate_email'
-    )
+    ),
+    url(
+        r'^user/password/reset/$',
+        'django.contrib.auth.views.password_reset',
+        {'post_reset_redirect': '/user/password/reset/done/'},
+        name="password_reset"
+    ),
+    url(
+        r'^user/password/reset/done/$',
+        'django.contrib.auth.views.password_reset_done'
+    ),
+    url(
+        r'^user/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        {'post_reset_redirect': '/user/password/done/'}
+    ),
+    url(
+        r'^user/password/done/$',
+        'django.contrib.auth.views.password_reset_complete'
+    ),
 )
