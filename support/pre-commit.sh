@@ -1,2 +1,2 @@
 #!/bin/sh
-flake8 .
+exec "$PWD/venv/bin/flake8" .
