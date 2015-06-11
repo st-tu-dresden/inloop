@@ -78,4 +78,6 @@ STATICFILES_DIRS = (
 # Template search paths
 TEMPLATE_DIRS = (
     join(BASE_DIR, 'templates'),
+    # otherwise django.contrib.auth won't find the custom templates
+    join(BASE_DIR, 'accounts', 'templates')
 )
