@@ -57,7 +57,7 @@ sudo chown inloop:inloop /var/run/inloop /var/log/inloop
 
 # Install the upstart and logrotate files
 # WARNING: Don't attempt to symlink these files!
-sudo cp support/upstart/inloop.conf /etc/init
+sudo cp support/upstart/*.conf /etc/init
 sudo cp support/logrotate/inloop /etc/logrotate.d
 ```
 
