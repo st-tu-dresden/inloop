@@ -39,7 +39,9 @@
                     {% endif %}
                     <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
                 {% else %}
-                    <li><a href="{% url 'accounts:user_login' %}">Login</a></li>
+                    {% if not show_login %}
+                    <li><a href="{% url 'index' %}">Login</a></li>
+                    {% endif %}
                     <li><a href="{% url 'accounts:register' %}">Register</a></li>
                     {% for page in fpages %}
                         <li><a href="{{ page.url }}">{{ page.title }}</a></li>

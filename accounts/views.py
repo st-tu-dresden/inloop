@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.conf import settings
+
 from . import forms
 from .models import UserProfile
 
@@ -75,7 +77,7 @@ def user_login(request):
             if user.is_active:
                 # everything alright
                 login(request, user)
-                return redirect('tasks:index')
+                return redirect(settings.LOGIN_REDIRECT_URL)
             else:
                 # account disabled
                 return render(request, 'accounts/message.html', {
@@ -91,7 +93,7 @@ def user_login(request):
         return render(request, 'registration/login.html')
 
 
-@login_required(login_url='accounts/login/')
+@login_required
 def user_logout(request):
     logout(request)
     return render(request, 'accounts/message.html', {
@@ -100,7 +102,7 @@ def user_logout(request):
     })
 
 
-@login_required(login_url='/accounts/login/')
+@login_required
 def user_profile(request):
     if request.method == 'POST':
         user_profile = forms.UserProfileForm(
