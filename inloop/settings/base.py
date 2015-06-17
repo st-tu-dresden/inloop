@@ -21,9 +21,6 @@ TEMPLATE_DEBUG = DEBUG
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
-# Debugging SMTP
-DOMAIN = 'http://localhost:8000/'
-
 # Application definition
 INSTALLED_APPS = (
     'django.contrib.admin',

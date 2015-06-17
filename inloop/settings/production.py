@@ -9,6 +9,9 @@ SITE_ID = env['SITE_ID']
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+# XXX: use contrib.sites for this, because contrib.auth does it too
+DOMAIN = 'https://inloop.inf.tu-dresden.de/'
+
 # Postgres connection parameters
 DATABASES = {
     'default': {
