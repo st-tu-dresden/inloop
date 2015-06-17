@@ -9,6 +9,9 @@ SITE_ID = env['SITE_ID']
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+# XXX: use contrib.sites for this, because contrib.auth does it too
+DOMAIN = 'https://inloop.inf.tu-dresden.de/'
+
 # Postgres connection parameters
 DATABASES = {
     'default': {
@@ -30,6 +33,14 @@ MEDIA_ROOT = '/srv/inloop.inf.tu-dresden.de/media'
 ALLOWED_HOSTS = ['inloop.inf.tu-dresden.de']
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# Email From: addresses
+DEFAULT_FROM_EMAIL = 'no-reply@inloop.inf.tu-dresden.de'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Send error reports to root (which is normally forwarded to
+# a real address)
+ADMINS = (('root', 'root@localhost'),)
 
 # SMTP server settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

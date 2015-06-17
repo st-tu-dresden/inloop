@@ -1,0 +1,10 @@
+[
+  {
+    "fields": {
+      "domain": "inloop.inf.tu-dresden.de",
+      "name": "inloop.inf.tu-dresden.de"
+    },
+    "model": "sites.site",
+    "pk": 1
+  }
+]
