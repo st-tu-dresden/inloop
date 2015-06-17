@@ -134,6 +134,9 @@ inloop_env ./manage.py migrate
 # Create a superuser account
 inloop_env ./manage.py createsuperuser
 
+# Initialize django.contrib.sites from sites.json
+inloop_env ./manage.py loaddata sites
+
 # Collect static files
 inloop_env ./manage.py collectstatic
 ```
