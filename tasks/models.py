@@ -42,7 +42,7 @@ class TaskCategory(models.Model):
 
     def completed_tasks_for_user(self, user):
         '''Returns the tasks a user has already solved.'''
-        return [t for t in Task.objects.all() if t.solved_by(user)]
+        return Task.objects.filter(tasksolution__author=user, tasksolution__is_correct=True)
 
     def get_tasks(self):
         '''Returns a queryset of this category's task that have already been
@@ -71,10 +71,6 @@ class Task(models.Model):
         max_length=50,
         unique=True,
         help_text='URL name')
-
-    def solved_by(self, user):
-        queryset = TaskSolution.objects.filter(author=user, is_correct=True)
-        return True if queryset else False
 
     def is_active(self):
         '''Returns True if the task is already visible to the users.'''

@@ -19,12 +19,14 @@ class UserForm(forms.ModelForm):
             'autocomplete': 'off'
         }))
     password1 = forms.CharField(
+        label='Password',
         validators=[v.validate_password],
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
         }))
     password2 = forms.CharField(
+        label='Confirm password',
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
@@ -32,6 +34,7 @@ class UserForm(forms.ModelForm):
     course = forms.ModelChoiceField(
         queryset=COS.objects.all())
     mat_num = forms.IntegerField(
+        label='Matriculation number',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'pattern': '[0-9]{7}',

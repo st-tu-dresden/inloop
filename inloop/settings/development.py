@@ -7,6 +7,9 @@ from .base import *
 SECRET_KEY = '8b)5ax&m^6ce8-id_0n%*5=rjsb-#(it91y9e0i_$p8o&2a#9a'
 SITE_ID = 1
 
+# XXX: Use contrib.sites for this
+DOMAIN = 'http://localhost:8000/'
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

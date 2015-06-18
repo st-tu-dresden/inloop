@@ -57,7 +57,7 @@ sudo chown inloop:inloop /var/run/inloop /var/log/inloop
 
 # Install the upstart and logrotate files
 # WARNING: Don't attempt to symlink these files!
-sudo cp support/upstart/inloop.conf /etc/init
+sudo cp support/upstart/*.conf /etc/init
 sudo cp support/logrotate/inloop /etc/logrotate.d
 ```
 
@@ -133,6 +133,9 @@ inloop_env ./manage.py migrate
 
 # Create a superuser account
 inloop_env ./manage.py createsuperuser
+
+# Initialize django.contrib.sites from sites.json
+inloop_env ./manage.py loaddata sites
 
 # Collect static files
 inloop_env ./manage.py collectstatic
