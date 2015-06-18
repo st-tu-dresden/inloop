@@ -14,11 +14,6 @@ urlpatterns = patterns(
         name='user_profile'
     ),
     url(
-        r'^change_email/$',
-        account_views.change_email,
-        name='change_email'
-    ),
-    url(
         r'^change_password/$',
         account_views.change_password,
         name='change_password'
@@ -42,11 +37,6 @@ urlpatterns = patterns(
         r'^activate/(?P<key>[0-9a-f]{5,40})$',
         account_views.activate_user,
         name='user_activation'
-    ),
-    url(
-        r'activate_mail/(?P<key>[0-9a-f]{5,40})$',
-        account_views.activate_email,
-        name='activate_email'
     ),
     url(
         r'^reset_password/$',

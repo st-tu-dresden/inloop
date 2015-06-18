@@ -33,12 +33,6 @@ class UserProfile(auth_models.AbstractUser):
     def __init__(self, *args, **kwargs):
         super(UserProfile, self).__init__(*args, **kwargs)
 
-    new_email = models.EmailField(
-        default='',
-        blank=True,
-        help_text='The user\'s temporary email address waiting to be validated'
-    )
-
     activation_key = models.CharField(
         max_length=40,
         help_text='SHA1 key used to verify the user\'s email'
@@ -75,17 +69,6 @@ class UserProfile(auth_models.AbstractUser):
         self.save()
         return success
 
-    def activate_mail(self):
-        success = False
-        if self.key_expires > tmz.now():
-            self.email = self.new_email
-            success = True
-
-        self.new_email = ''
-        self.activation_key = ''
-        self.save()
-        return success
-
     def send_activation_mail(self):
         link = settings.DOMAIN + 'accounts/activate/' + self.activation_key
         subject = 'INLOOP Activation'
@@ -101,23 +84,4 @@ class UserProfile(auth_models.AbstractUser):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [self.email],
-            fail_silently=True)
-
-    def send_mail_change_mail(self, new_address):
-        self.new_email = new_address
-        self.save()
-        link = settings.DOMAIN + 'accounts/activate_mail/' + self.activation_key
-        subject = 'Your new INLOOP mail'
-        message = ('Howdy {username},\n\nClick the following link to '
-                   'change your INLOOP email address:'
-                   '\n\n{link}\n\n'
-                   'We\'re looking forward to seeing you on the site!'
-                   '\n\nCheers,'
-                   '\nYour INLOOP Team'
-                   ).format(username=self.username, link=link)
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [new_address],
             fail_silently=True)

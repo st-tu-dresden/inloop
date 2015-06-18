@@ -129,44 +129,6 @@ def user_profile(request):
 
 
 @login_required
-def change_email(request):
-    user = UserProfile.objects.get(username=request.user.username)
-    if request.method == 'POST':
-        email_form = forms.EmailForm(data=request.POST)
-        if request.POST['email'] != user.email and email_form.is_valid():
-            user.generate_activation_key()
-            user.send_mail_change_mail(request.POST['email'])
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'A validation mail has been sent \
-                to the new address!'
-            })
-
-    email_form = forms.EmailForm(initial={
-        'email': user.email
-    })
-
-    return render(request, 'accounts/change_email.html', {
-        'email_form': email_form
-    })
-
-
-def activate_email(request, key):
-    user = get_object_or_404(UserProfile, activation_key=key)
-    if user.activate_mail():
-        return render(request, 'accounts/message.html', {
-            'type': 'success',
-            'message': 'Your email has successfully been changed!'
-        })
-    else:
-        return render(request, 'accounts/message.html', {
-            'type': 'danger',
-            'message': 'Your key has expired. \
-            Please try changing your email again!'
-        })
-
-
-@login_required
 def change_password(request):
     if request.method == 'POST':
         password_form = forms.PasswordForm(
