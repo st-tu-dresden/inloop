@@ -58,3 +58,9 @@ def get_git_info():
         return (branch.strip(), rev.strip())
     except:
         return None
+
+
+def get_git_info_str():
+    "Return git info as a formatted string."
+    branch, commit = get_git_info()
+    return 'branch: {}, commit: {}'.format(branch, commit)
