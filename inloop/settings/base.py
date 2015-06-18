@@ -46,7 +46,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 )
 
-LOGIN_REDIRECT_URL = '/tasks'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/'
 ROOT_URLCONF = 'inloop.urls'
 WSGI_APPLICATION = 'inloop.wsgi.application'
 
