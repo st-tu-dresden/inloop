@@ -110,7 +110,7 @@ def index(request):
         })
     else:
         return render(request, 'registration/login.html', {
-            'show_login': True
+            'hide_login_link': True
         })
 
 

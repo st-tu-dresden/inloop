@@ -24,7 +24,7 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'tasks:index' %}">Go Back</a></li>
+                <li><a href="{% url 'index' %}">Go Back</a></li>
                 {% for page in fpages %}
                     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
                 {% endfor %}

@@ -39,7 +39,7 @@
                     {% endif %}
                     <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
                 {% else %}
-                    {% if not show_login %}
+                    {% if not hide_login_link %}
                     <li><a href="{% url 'index' %}">Login</a></li>
                     {% endif %}
                     <li><a href="{% url 'accounts:register' %}">Register</a></li>
