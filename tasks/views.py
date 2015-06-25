@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.conf import settings
@@ -17,6 +17,7 @@ from . import filesystem_utils as fsu
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def manage_categories(request):
     categories = TaskCategory.objects.all()
     return render(request, 'tasks/manage_categories.html', {
@@ -25,6 +26,7 @@ def manage_categories(request):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def delete_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     cat.delete()
@@ -32,6 +34,7 @@ def delete_category(request, short_id):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def edit_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     if request.method == 'POST':
@@ -62,6 +65,7 @@ def edit_category(request, short_id):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def new_category(request):
     if request.method == 'POST':
         cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
@@ -208,6 +212,7 @@ def get_solution_as_zip(request, slug, solution_id):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def edit(request, slug):
     task = get_object_or_404(Task, slug=slug)
     template_names = fsu.get_template_names(task.title)
@@ -272,6 +277,7 @@ def edit(request, slug):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def delete(request, slug):
     task = get_object_or_404(Task, slug=slug)
     task.delete()
@@ -287,6 +293,7 @@ def results(request, slug):
 
 
 @login_required
+@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
 def submit_new_exercise(request):
     if request.method == 'POST':
         # save form data
