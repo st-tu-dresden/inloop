@@ -27,6 +27,7 @@ if settings.DEBUG:
         '',
         url(r'^404$', sys_views.handler404),
         url(r'^500$', sys_views.handler500),
+        url(r'^trigger_error$', sys_views.trigger_error),
     )
 
 # flatpages catchall pattern
