@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
+
+from inloop.decorators import superuser_required
 
 from . import forms
 from .models import UserProfile
 
 
-@user_passes_test(test_func=lambda u: u.is_superuser, redirect_field_name=None)
+@superuser_required
 def new_course(request):
     if request.method == 'POST':
         course_form = forms.NewCourseForm(data=request.POST)
