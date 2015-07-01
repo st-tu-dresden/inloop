@@ -80,3 +80,13 @@ TEMPLATE_DIRS = (
     # otherwise django.contrib.auth won't find the custom templates
     join(BASE_DIR, 'accounts', 'templates')
 )
+
+# JVM related settings
+JAVA_COMPILER = '/usr/bin/javac'
+JAVA_RUNTIME = '/usr/bin/java'
+JAVA_RUNTIME_OPTS = ['-Xmx64m', '-XX:+DisableExplicitGC']
+JAVA_COMPILER_OPTS = ['-Xlint']
+JAVA_POLICY_FILE = None
+JAVA_LIBRARY_DIRS = ['/usr/share/java']
+JAVA_RUNTIME_TIMEOUT = 15
+JAVA_COMPILE_TIMEOUT = 15
