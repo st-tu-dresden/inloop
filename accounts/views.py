@@ -3,10 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 
+from inloop.decorators import superuser_required
+
 from . import forms
 from .models import UserProfile
 
 
+@superuser_required
 def new_course(request):
     if request.method == 'POST':
         course_form = forms.NewCourseForm(data=request.POST)

@@ -11,12 +11,14 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.conf import settings
 
+from inloop.decorators import superuser_required
 from tasks import forms
 from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+
 from . import filesystem_utils as fsu
 
 
-@login_required
+@superuser_required
 def manage_categories(request):
     categories = TaskCategory.objects.all()
     return render(request, 'tasks/manage_categories.html', {
@@ -24,14 +26,14 @@ def manage_categories(request):
     })
 
 
-@login_required
+@superuser_required
 def delete_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     cat.delete()
     return redirect('tasks:man_cat')
 
 
-@login_required
+@superuser_required
 def edit_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     if request.method == 'POST':
@@ -61,7 +63,7 @@ def edit_category(request, short_id):
     })
 
 
-@login_required
+@superuser_required
 def new_category(request):
     if request.method == 'POST':
         cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
@@ -207,7 +209,7 @@ def get_solution_as_zip(request, slug, solution_id):
     return response
 
 
-@login_required
+@superuser_required
 def edit(request, slug):
     task = get_object_or_404(Task, slug=slug)
     template_names = fsu.get_template_names(task.title)
@@ -271,7 +273,7 @@ def edit(request, slug):
     })
 
 
-@login_required
+@superuser_required
 def delete(request, slug):
     task = get_object_or_404(Task, slug=slug)
     task.delete()
@@ -286,7 +288,7 @@ def results(request, slug):
     pass
 
 
-@login_required
+@superuser_required
 def submit_new_exercise(request):
     if request.method == 'POST':
         # save form data
