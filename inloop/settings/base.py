@@ -82,7 +82,6 @@ TEMPLATE_DIRS = (
 )
 
 RUNTIME_RUNNER = 'runtimes.runner.BasicRunner'
-
 RUNTIMES = {
     'java': {
         # JVM related settings
@@ -95,4 +94,8 @@ RUNTIMES = {
         'JAVA_RUNTIME_TIMEOUT': 15,
         'JAVA_COMPILE_TIMEOUT': 15,
     }
+}
+
+CHECKER_WORKFLOWS = {
+    'java': 'checker.workflow.java_workflow'
 }
