@@ -10,7 +10,7 @@
 .pydevproject
 .DS_Store
 data/
-venv/
+venv*
 media/
 .idea/
 *.sqlite3

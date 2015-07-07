@@ -17,6 +17,13 @@ For the hook to grab, you still have to make the custom hook executable:
 chmod +x pre-commit.sh
 ```
 
+### Commit message hook
+Please also install the commit message hook to enforce consistent commit messages:
+```bash
+cd .git/hooks
+ln -s ../../support/commit_msg.py commit-msg
+```
+
 ### Compatibility
 For pre-commit checking [flake8](http://flake8.readthedocs.org/en/latest/index.html) is used. It implements wrappers for [pep8](https://pypi.python.org/pypi/pep8), the [pyflakes](https://pypi.python.org/pypi/pyflakes) linter and [mccabe](https://pypi.python.org/pypi/mccabe). The parameters for the hook are contained in [setup.cfg](https://github.com/st-tu-dresden/tud_praktomat_neu/blob/master/setup.cfg) under the `[flake8]` section.
 
