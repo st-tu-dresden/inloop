@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 from os.path import dirname, join
 from sys import version_info
 
+import checker.workflow
+import runtimes.runner
+
+
 if version_info[0] < 3:
     raise RuntimeError("INLOOP must be run with Python 3.x")
 
 BASE_DIR = dirname(dirname(dirname(__file__)))
+SUPPORT_DIR = join(BASE_DIR, 'support')
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -81,21 +86,21 @@ TEMPLATE_DIRS = (
     join(BASE_DIR, 'accounts', 'templates')
 )
 
-RUNTIME_RUNNER = 'runtimes.runner.BasicRunner'
+RUNTIME_RUNNER = runtimes.runner.BasicRunner
 RUNTIMES = {
     'java': {
         # JVM related settings
-        'JAVA_COMPILER': '/usr/bin/javac',
-        'JAVA_RUNTIME': '/usr/bin/java',
-        'JAVA_RUNTIME_OPTS': ['-Xmx64m', '-XX:+DisableExplicitGC'],
-        'JAVA_COMPILER_OPTS': ['-Xlint'],
-        'JAVA_POLICY_FILE': None,
-        'JAVA_LIBRARY_DIRS': ['/usr/share/java'],
-        'JAVA_RUNTIME_TIMEOUT': 15,
-        'JAVA_COMPILE_TIMEOUT': 15,
+        'compiler': '/usr/bin/javac',
+        'runtime': '/usr/bin/java',
+        'runtime_opts': ['-Xmx64m', '-XX:+DisableExplicitGC'],
+        'compiler_opts': ['-Xlint'],
+        'policy_file': join(SUPPORT_DIR, 'java', 'java.policy'),
+        'library_dir': join(SUPPORT_DIR, 'java', 'libs'),
+        'runtime_timeout': 15,
+        'compile_timeout': 15,
     }
 }
 
 CHECKER_WORKFLOWS = {
-    'java': 'checker.workflow.java_workflow'
+    'java': checker.workflow.java_workflow
 }

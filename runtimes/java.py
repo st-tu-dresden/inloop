@@ -12,8 +12,8 @@ class JavaFactory:
 
     def create_compiler(self):
         compiler = JavaCompiler()
-        compiler.use_runner(self.runner)
-        compiler.add_to_classpath(self.runtime['JAVA_LIBRARY_DIRS'])
+        compiler.set_runner(self.runner())
+        compiler.add_classpath(self.runtime['library_dir'])
         # ...
         return compiler
 
