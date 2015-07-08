@@ -1,30 +1,53 @@
 ## Hacking
 
-### Automatic Code Checking
-It is recommended for all developers to implement this pre-commit hook mechanism to check their code before every commit. In case the implemented linter and PEP8 style checker throw any errors, the committing process is canceled and the errors are shown for correction.
+### Unit tests and test coverage
 
-The project comes with its own pre-commit hook labeled *pre-commit.sh* in the root directory. To install it, simply clone the repository, navigate to the project root directory and issue the following commands:
-```bash
-cd .git/hooks
-ln -sf ../../support/pre-commit.sh pre-commit
-```
-This will create a symlink to the hooks in your .git directory which are called once the commit is issued.
+Developers should write unit tests in order to ensure software quality in
+an automated fashion. Python and Django provide excellent modules which
+facilitate testing:
 
-**Note:** The `-f` option *forces* an overwrite of the previously exsiting file, meaning that the original file contents in `.git/hooks/pre-commit` are lost. Create a backup copy if you don't want to lose your changes. By default, the file is empty.
+ * `unittest`,
+ * `unittest.mock` (Python >= 3.3) and
+ * `django.utils.unittest`
 
-For the hook to grab, you still have to make the custom hook executable:
-```bash
-chmod +x pre-commit.sh
-```
+The test coverage can be checked by using
 
-### Commit message hook
-Please also install the commit message hook to enforce consistent commit messages:
-```bash
-cd .git/hooks
-ln -s ../../support/commit_msg.py commit-msg
-```
+    ./coverage.py
 
-### Compatibility
-For pre-commit checking [flake8](http://flake8.readthedocs.org/en/latest/index.html) is used. It implements wrappers for [pep8](https://pypi.python.org/pypi/pep8), the [pyflakes](https://pypi.python.org/pypi/pyflakes) linter and [mccabe](https://pypi.python.org/pypi/mccabe). The parameters for the hook are contained in [setup.cfg](https://github.com/st-tu-dresden/tud_praktomat_neu/blob/master/setup.cfg) under the `[flake8]` section.
+and pointing your browser to `htmlcov/index.html`. Aim for 100%!
 
-The pre-defined command `flake8 --install-hook` is also a  means of installing the pre-commit hook as it is now, but allows less customization and more importantly lacks support for virtualenv in IDEs. The mechanism works when executed from the shell but most IDEs can't execute the git hooks within their virtualenv.
+
+### Automatic code checking git hook with flake8
+
+It is mandatory for all developers to implement this pre-commit hook mechanism to
+check their code before every commit. In case the `flake8` check throws any errors,
+the committing process is canceled and the errors are shown for correction. The
+bundled commit hook can be installed as follows:
+
+    cd .git/hooks
+    ln -sf ../../support/pre-commit.sh pre-commit
+
+
+### Commit message git hook
+
+You must also install the commit message hook to enforce consistent commit messages:
+
+    cd .git/hooks
+    ln -s ../../support/commit_msg.py commit-msg
+
+
+### Notes on flake8
+
+We use [flake8][1] for linting. It implements wrappers for [pep8][2], the [pyflakes][3]
+linter and [mccabe][4]. The parameters for the hook are contained in `setup.cfg` in the
+project root.
+
+The pre-defined command `flake8 --install-hook` is also a  means of installing the
+pre-commit hook as it is now, but allows less customization and more importantly lacks
+support for virtualenv in IDEs. The mechanism works when executed from the shell but
+most IDEs can't execute the git hooks within their virtualenv.
+
+[1]: http://flake8.readthedocs.org/en/latest/index.html
+[2]: https://pypi.python.org/pypi/pep8
+[3]: https://pypi.python.org/pypi/pyflakes
+[4]: https://pypi.python.org/pypi/mccabe
