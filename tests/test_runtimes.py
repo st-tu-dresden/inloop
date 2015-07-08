@@ -1,7 +1,11 @@
 import sys
 from tempfile import TemporaryDirectory
 from unittest import TestCase, skipIf
-from unittest.mock import Mock, patch
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from runtimes.runner import BasicRunner
 from runtimes.java import JavaCompiler, JavaCompilerException
@@ -56,11 +60,11 @@ class JavaFactoryTest(TestCase):
 
 class JavaCompilerTest(TestCase):
     def setUp(self):
-        self.runner = Mock()
-        self.runner.run = Mock()
+        self.runner = mock.Mock()
+        self.runner.run = mock.Mock()
         self.compiler = JavaCompiler()
         self.compiler.set_runner(self.runner)
-        with patch('runtimes.java.glob', return_value=['Test.java']):
+        with mock.patch('runtimes.java.glob', return_value=['Test.java']):
             self.compiler.add_dir('.')
 
     def assertCalledWith(self, *args, **kwargs):
