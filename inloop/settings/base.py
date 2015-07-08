@@ -97,7 +97,7 @@ RUNTIMES = {
         'policy_file': join(SUPPORT_DIR, 'java', 'java.policy'),
         'library_dir': join(SUPPORT_DIR, 'java', 'libs'),
         'runtime_timeout': 15,
-        'compile_timeout': 15,
+        'compiler_timeout': 15,
     }
 }
 

@@ -11,10 +11,11 @@ class JavaFactory:
 
     def create_compiler(self):
         runner = self.runner_type()
-        runner.timeout = self.runtime['compile_timeout']
+        runner.timeout = self.runtime['compiler_timeout']
         compiler = JavaCompiler()
         compiler.runner = runner
         compiler.cmd = self.runtime['compiler']
+        compiler.add_options(self.runtime['compiler_opts'])
         compiler.add_classpath(self.runtime['library_dir'], wildcard=True)
         return compiler
 
@@ -61,9 +62,9 @@ class JavaCompiler:
         if not self.files:
             raise JavaCompilerException('No java files given for compilation')
         args = [self.cmd]
+        args.extend(self.options)
         if self.classpath:
             args.append('-cp')
             args.append(':'.join(self.classpath))
-        args.extend(self.options)
         args.extend(self.files)
         self.runner.run(args)

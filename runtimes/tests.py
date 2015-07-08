@@ -98,7 +98,7 @@ class JavaFactoryTest(TestCase):
                 'policy_file': '/path/to/policy.file',
                 'library_dir': '/path/to/library',
                 'runtime_timeout': 15,
-                'compile_timeout': 10,
+                'compiler_timeout': 10,
             }
         }
 
@@ -119,7 +119,7 @@ class JavaFactoryTest(TestCase):
             compiler.add_dir('.')
         compiler.run()
         self.runner.run.assert_called_with(
-            ['/usr/bin/javac', '-cp', '/path/to/library/*', 'Test.java']
+            ['/usr/bin/javac', '-Xlint', '-cp', '/path/to/library/*', 'Test.java']
         )
 
 
