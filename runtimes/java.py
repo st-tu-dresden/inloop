@@ -6,14 +6,16 @@ from os import path
 # XXX: default values?
 class JavaFactory:
     def __init__(self, settings, runtime='java'):
-        self.runner = settings.RUNTIME_RUNNER
+        self.runner_type = settings.RUNTIME_RUNNER
         self.runtime = settings.RUNTIMES[runtime]
 
     def create_compiler(self):
+        runner = self.runner_type()
+        runner.timeout = self.runtime['compile_timeout']
         compiler = JavaCompiler()
-        compiler.set_runner(self.runner())
-        compiler.add_classpath(self.runtime['library_dir'])
-        # ...
+        compiler.runner = runner
+        compiler.cmd = self.runtime['compiler']
+        compiler.add_classpath(self.runtime['library_dir'], wildcard=True)
         return compiler
 
     def create_runtime(self):
@@ -42,12 +44,6 @@ class JavaCompiler:
         self.files = []
         self.runner = None
 
-    def set_runner(self, runner):
-        self.runner = runner
-
-    def set_cmd(self, cmd):
-        self.cmd = cmd
-
     def add_classpath(self, entry, wildcard=False):
         if wildcard:
             self.classpath.append(path.join(entry, '*'))
@@ -68,5 +64,6 @@ class JavaCompiler:
         if self.classpath:
             args.append('-cp')
             args.append(':'.join(self.classpath))
+        args.extend(self.options)
         args.extend(self.files)
         self.runner.run(args)

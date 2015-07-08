@@ -27,9 +27,9 @@ def chdir(path):
 
 class BasicRunner:
     """Simple runner that supports a timeout and uses a clean environment."""
-    def __init__(self, timeout=5, cwd=None):
-        self.timeout = timeout
-        self.cwd = cwd
+    def __init__(self):
+        self.timeout = 5
+        self.cwd = None
 
     def run(self, args):
         proc = Popen(args, env={}, cwd=self.cwd, stdout=PIPE,
