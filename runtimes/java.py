@@ -1,6 +1,5 @@
 from glob import glob
-from subprocess import check_output
-from os.path import join
+from os import path
 
 
 # XXX: docstrings
@@ -28,28 +27,46 @@ class JavaFactory:
 
     # etc.
 
+JAVAC_DEFAULT = 'javac'
+
+
+class JavaCompilerException(Exception):
+    pass
+
 
 class JavaCompiler:
     def __init__(self):
-        self.cmd = ['javac']
-        self.classpath = ['.']
-        self.dirs = []
+        self.cmd = JAVAC_DEFAULT
+        self.options = []
+        self.classpath = []
+        self.files = []
+        self.runner = None
 
-    def use_runner(self, runner):
-        pass
+    def set_runner(self, runner):
+        self.runner = runner
 
-    def add_to_classpath(self, entry):
-        self.classpath += entry
+    def set_cmd(self, cmd):
+        self.cmd = cmd
 
-    def add_dir(self, dir):
-        self.dirs += dir
+    def add_classpath(self, entry, wildcard=False):
+        if wildcard:
+            self.classpath.append(path.join(entry, '*'))
+        else:
+            self.classpath.append(entry)
 
-    def _get_java_files(self):
-        files = []
-        for d in self.dirs:
-            files += glob(join(d, '*.java'))
-        return files
+    def add_dir(self, directory):
+        filenames = glob(path.join(directory, '*.java'))
+        self.files.extend(filenames)
 
-    def execute(self, cwd=None):
-        cmd = self.cmd + ['-cp', ':'.join(self.classpath)] + self._get_java_files()
-        return check_output(cmd, cwd=cwd)
+    def add_options(self, options):
+        self.options.extend(options)
+
+    def run(self):
+        if not self.files:
+            raise JavaCompilerException('No java files given for compilation')
+        args = [self.cmd]
+        if self.classpath:
+            args.append('-cp')
+            args.append(':'.join(self.classpath))
+        args.extend(self.files)
+        self.runner.run(args)
