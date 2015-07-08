@@ -1,11 +1,57 @@
-from unittest import TestCase
+import sys
+from tempfile import TemporaryDirectory
+from unittest import TestCase, skipIf
 from unittest.mock import Mock, patch
 
+from runtimes.runner import BasicRunner
 from runtimes.java import JavaCompiler, JavaCompilerException
+
+isdarwin = (sys.platform == 'darwin')
 
 
 class BasicRunnerTest(TestCase):
-    pass
+    # FIXME: $TMP on OS X has multiple symlinked locations
+    @skipIf(isdarwin, "This test currently doesn't work on OS X.")
+    def test_cwd(self):
+        with TemporaryDirectory() as tmpdir:
+            runner = BasicRunner(cwd=tmpdir)
+            args = [sys.executable, '-c', 'import os; print(os.getcwd())']
+            out, __, code = runner.run(args)
+            self.assertEqual(code, 0)
+            self.assertEqual(out.strip(), tmpdir)
+
+    def test_timeout(self):
+        runner = BasicRunner(timeout=0.01)
+        args = [sys.executable, '-c', 'while True: pass']
+        __, __, code = runner.run(args)
+        self.assertEqual(code, -9)
+
+    def test_stdout(self):
+        runner = BasicRunner()
+        args = [sys.executable, '-c', 'print("inloop")']
+        out, err, code = runner.run(args)
+        self.assertEqual(out.strip(), 'inloop')
+        self.assertEqual(err.strip(), '')
+        self.assertEqual(code, 0)
+
+    def test_stderr(self):
+        runner = BasicRunner()
+        args = [sys.executable, '-c', 'import sys; print("inloop", file=sys.stderr)']
+        out, err, code = runner.run(args)
+        self.assertEqual(out.strip(), '')
+        self.assertEqual(err.strip(), 'inloop')
+        self.assertEqual(code, 0)
+
+    def test_code(self):
+        runner = BasicRunner()
+        args = [sys.executable, '-c', 'import sys; sys.exit(42)']
+        __, __, code = runner.run(args)
+        self.assertEqual(code, 42)
+
+
+class JavaFactoryTest(TestCase):
+    def test_settings_are_used(self):
+        pass
 
 
 class JavaCompilerTest(TestCase):

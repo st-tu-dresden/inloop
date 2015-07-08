@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from threading import Timer
 
 
@@ -12,10 +12,6 @@ def timelimit(timeout, function):
     t.cancel()
 
 
-class TimeoutExpired(Exception):
-    pass
-
-
 class BasicRunner:
     """Simple runner that supports a timeout and uses a clean environment."""
     def __init__(self, timeout=5, cwd=None):
@@ -23,7 +19,8 @@ class BasicRunner:
         self.cwd = cwd
 
     def run(self, args):
-        proc = Popen(args, env={}, cwd=self.cwd)
+        proc = Popen(args, env={}, cwd=self.cwd, stdout=PIPE,
+                     stderr=PIPE, universal_newlines=True)
         with timelimit(self.timeout, lambda: proc.kill()):
             outs, errs = proc.communicate()
         # XXX: raise exception? (means we lose the output)
