@@ -1,3 +1,4 @@
+import os
 import sys
 from tempfile import TemporaryDirectory
 from unittest import TestCase, skipIf
@@ -7,10 +8,28 @@ try:
 except ImportError:
     import mock
 
-from runtimes.runner import BasicRunner
+from runtimes.runner import BasicRunner, chdir
 from runtimes.java import JavaCompiler, JavaCompilerException
 
 isdarwin = (sys.platform == 'darwin')
+
+
+class ContextManagerTestException(Exception):
+    pass
+
+
+class ContextManagerTests(TestCase):
+    def test_chdir_exception(self):
+        """
+        Test correct behavior even if an exception occurs in the with block.
+        """
+        with mock.patch('runtimes.runner.os.chdir') as patched_chdir:
+            with self.assertRaises(ContextManagerTestException):
+                current_dir = os.getcwd()
+                with chdir('/some/path'):
+                    patched_chdir.assert_called_with('/some/path')
+                    raise ContextManagerTestException
+            patched_chdir.assert_called_with(current_dir)
 
 
 class BasicRunnerTest(TestCase):

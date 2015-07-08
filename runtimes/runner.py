@@ -1,3 +1,4 @@
+import os
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
 from threading import Timer
@@ -8,8 +9,20 @@ def timelimit(timeout, function):
     """Context manager which executes function after timeout seconds."""
     t = Timer(timeout, function)
     t.start()
-    yield
-    t.cancel()
+    try:
+        yield
+    finally:
+        t.cancel()
+
+
+@contextmanager
+def chdir(path):
+    oldpath = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpath)
 
 
 class BasicRunner:
