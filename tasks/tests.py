@@ -1,4 +1,5 @@
 from os import path
+from unittest import skip
 
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -79,6 +80,7 @@ class TaskModelTests(TestCase):
         with self.assertRaises(ValidationError):
             Task.objects.create(deadline_date='abc')
 
+    @skip
     def test_superuser_can_edit_task(self):
         task = Task.objects.get(title='active_task')
         superuser = UserProfile.objects.get(username='superuser')
