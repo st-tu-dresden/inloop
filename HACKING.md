@@ -1,30 +1,69 @@
 ## Hacking
 
-### Automatic Code Checking
-It is recommended for all developers to implement this pre-commit hook mechanism to check their code before every commit. In case the implemented linter and PEP8 style checker throw any errors, the committing process is canceled and the errors are shown for correction.
+### Git workflow
 
-The project comes with its own pre-commit hook labeled *pre-commit.sh* in the root directory. To install it, simply clone the repository, navigate to the project root directory and issue the following commands:
-```bash
-cd .git/hooks
-ln -sf ../../support/pre-commit.sh pre-commit
-```
-This will create a symlink to the hooks in your .git directory which are called once the commit is issued.
+We use the [GitHub Flow][gh-flow]. The development is based on branching, pull requests and
+peer review. You must adhere to the following rules:
 
-**Note:** The `-f` option *forces* an overwrite of the previously exsiting file, meaning that the original file contents in `.git/hooks/pre-commit` are lost. Create a backup copy if you don't want to lose your changes. By default, the file is empty.
+1. The `master` branch always contains stable code ready to be deployed. You are only allowed
+   to commit very small fixes (e.g., to correct typos) to this branch.
+2. New features, bug fixes, refactorings etc. happen on separate *feature branches*. Long
+   running feature branches should regularly merge changes from `master`.
+3. Once a feature branch is considered complete, open a pull request and assign another
+   developer for review. You are not allowed to merge the pull request yourself.
 
-For the hook to grab, you still have to make the custom hook executable:
-```bash
-chmod +x pre-commit.sh
-```
+Contributors failing to follow these rules will be warned and eventually banned from the
+repository.
 
-### Commit message hook
-Please also install the commit message hook to enforce consistent commit messages:
-```bash
-cd .git/hooks
-ln -s ../../support/commit_msg.py commit-msg
-```
 
-### Compatibility
-For pre-commit checking [flake8](http://flake8.readthedocs.org/en/latest/index.html) is used. It implements wrappers for [pep8](https://pypi.python.org/pypi/pep8), the [pyflakes](https://pypi.python.org/pypi/pyflakes) linter and [mccabe](https://pypi.python.org/pypi/mccabe). The parameters for the hook are contained in [setup.cfg](https://github.com/st-tu-dresden/tud_praktomat_neu/blob/master/setup.cfg) under the `[flake8]` section.
+### Unit tests and test coverage
 
-The pre-defined command `flake8 --install-hook` is also a  means of installing the pre-commit hook as it is now, but allows less customization and more importantly lacks support for virtualenv in IDEs. The mechanism works when executed from the shell but most IDEs can't execute the git hooks within their virtualenv.
+Developers should write unit tests in order to ensure software quality in an automated fashion.
+Python and Django provide excellent modules which facilitate testing:
+
+ * `unittest`,
+ * `unittest.mock` (Python >= 3.3) and
+ * `django.utils.unittest`
+
+The test coverage can be checked by using
+
+    ./coverage.py
+
+and pointing your browser to `htmlcov/index.html`. Aim for 100%!
+
+
+### Automatic code checking git hook with flake8
+
+It is mandatory for all developers to implement this pre-commit hook mechanism to check their
+code before every commit. In case the `flake8` check throws any errors, the committing process
+is canceled and the errors are shown for correction. The bundled commit hook can be installed
+as follows:
+
+    cd .git/hooks
+    ln -sf ../../support/pre-commit.sh pre-commit
+
+
+### Commit message git hook
+
+You must also install the commit message hook to enforce consistent commit messages:
+
+    cd .git/hooks
+    ln -s ../../support/commit_msg.py commit-msg
+
+
+### Notes on flake8
+
+We use [flake8 for linting][flake8]. It implements wrappers for the [pep8 style checker][pep8],
+the [pyflakes linter][pyflakes] linter and [mccabe complexity checker][mccabe]. The parameters
+for the hook are contained in `setup.cfg` in the project root.
+
+The pre-defined command `flake8 --install-hook` is also a  means of installing the
+pre-commit hook as it is now, but allows less customization and more importantly lacks
+support for virtualenv in IDEs. The mechanism works when executed from the shell but
+most IDEs can't execute the git hooks within their virtualenv.
+
+[flake8]: http://flake8.readthedocs.org/en/latest/index.html
+[pep8]: https://pypi.python.org/pypi/pep8
+[pyflakes]: https://pypi.python.org/pypi/pyflakes
+[mccabe]: https://pypi.python.org/pypi/mccabe
+[gh-flow]: https://guides.github.com/introduction/flow/
