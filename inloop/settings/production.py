@@ -1,9 +1,9 @@
-from os import environ as env
+import os
 
 from .base import *
 
-SECRET_KEY = env['SECRET_KEY']
-SITE_ID = env['SITE_ID']
+SECRET_KEY = os.environ['SECRET_KEY']
+SITE_ID = os.environ['SITE_ID']
 
 # No debug pages!
 DEBUG = False
@@ -16,9 +16,9 @@ DOMAIN = 'https://inloop.inf.tu-dresden.de/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env['PG_NAME'],
-        'USER': env['PG_USER'],
-        'PASSWORD': env['PG_PASSWORD'],
+        'NAME': os.environ['PG_NAME'],
+        'USER': os.environ['PG_USER'],
+        'PASSWORD': os.environ['PG_PASSWORD'],
         # HOST and PORT are omitted, defaults to using unix sockets
     }
 }
