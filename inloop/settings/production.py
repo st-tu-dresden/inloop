@@ -1,6 +1,9 @@
 import os
 
-from .base import *
+from inloop.utils import filter_uppercase_keys
+from . import base
+
+globals().update(filter_uppercase_keys(vars(base)))
 
 SECRET_KEY = os.environ['SECRET_KEY']
 SITE_ID = os.environ['SITE_ID']
