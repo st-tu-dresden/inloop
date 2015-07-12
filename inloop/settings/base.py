@@ -16,9 +16,6 @@ if version_info[0] < 3:
 
 BASE_DIR = dirname(dirname(dirname(__file__)))
 
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
-
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
 # Application definition
@@ -60,13 +57,8 @@ USE_L10N = True
 USE_TZ = True
 FIRST_DAY_OF_WEEK = 1
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# URL prefixes for static and media files
 STATIC_URL = '/static/'
-STATIC_ROOT = ''
-
-# Storage location for uploaded files
-MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Static file search path
