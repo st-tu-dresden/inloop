@@ -32,6 +32,16 @@ The test coverage can be checked by using
 and pointing your browser to `htmlcov/index.html`. Aim for 100%!
 
 
+### The requirements file
+
+Please keep all entries in `requirements.txt` sorted, like this:
+
+    pip freeze | sort -f > requirements.txt
+
+You can use `pip-review` from the package `pip-tools` to review the package versions installed
+in your virtualenv.
+
+
 ### Automatic code checking git hook with flake8
 
 It is mandatory for all developers to implement this pre-commit hook mechanism to check their
