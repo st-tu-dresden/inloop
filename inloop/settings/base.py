@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
+    'huey.djhuey',
     'accounts',
     'tasks',
 )
@@ -72,3 +73,8 @@ TEMPLATE_DIRS = (
     # otherwise django.contrib.auth won't find the custom templates
     join(BASE_DIR, 'accounts', 'templates')
 )
+
+HUEY = {
+    'backend': 'huey.backends.redis_backend',
+    'name': 'inloop-task-queue'
+}
