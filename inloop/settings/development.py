@@ -1,4 +1,5 @@
-from os import path
+from os import environ
+from os.path import join, dirname
 
 from inloop.core.utils import filter_uppercase_keys
 from inloop.settings import base
@@ -18,7 +19,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 # Storage root for uploaded files
-MEDIA_ROOT = path.join(base.PROJECT_ROOT, 'media')
+MEDIA_ROOT = join(base.PROJECT_ROOT, 'media')
 
 # Debugging SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -27,6 +28,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path.join(base.PROJECT_ROOT, 'db.sqlite3'),
+        'NAME': join(base.PROJECT_ROOT, 'db.sqlite3'),
     }
 }
+
+# The secret used for the webhook
+GITHUB_SECRET = 'secret'
+
+# Settings related to the Git import
+GIT_SSH_KEY = None
+GIT_SSH_URL = 'git@github.com:st-tu-dresden/inloop-tasks.git'
+GIT_BRANCH = 'master'
+GIT_ROOT = environ.get('GIT_ROOT', join(dirname(base.PROJECT_ROOT), 'inloop-tasks'))
