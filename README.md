@@ -1,8 +1,10 @@
 ## Getting started
 
 This file contains instructions to quickly set up a developer environment.
-Please also have a look at the documentation provided in [HACKING](HACKING.md)
-and [DEPLOY](DEPLOY.md).
+Please also have a look at the documentation provided for
+
+* [contributors](docs/HACKING.md) and
+* [administrators](docs/DEPLOY.md).
 
 ### Prerequisites
 
