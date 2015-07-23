@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tasks.models import Task, TaskCategory
+from inloop.tasks.models import Task, TaskCategory
 
 
 class TaskAdmin(admin.ModelAdmin):

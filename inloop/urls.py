@@ -6,14 +6,14 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from django.conf.urls.static import static
 
-from tasks import views as task_views
-from . import views as sys_views
+from inloop.tasks import views as task_views
+from inloop import views as sys_views
 
 urlpatterns = patterns(
     '',
     url(r'^$', task_views.index, name='index'),
-    url(r'^tasks/', include('tasks.urls', namespace='tasks')),
-    url(r'^accounts/', include('accounts.urls', namespace='accounts')),
+    url(r'^tasks/', include('inloop.tasks.urls', namespace='tasks')),
+    url(r'^accounts/', include('inloop.accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls)),
 )
 # serve static content

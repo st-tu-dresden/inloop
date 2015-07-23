@@ -1,5 +1,5 @@
 from django import forms
-from tasks.models import TaskCategory
+from inloop.tasks.models import TaskCategory
 import datetime
 
 

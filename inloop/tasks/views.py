@@ -12,10 +12,8 @@ from django.utils import timezone
 from django.conf import settings
 
 from inloop.decorators import superuser_required
-from tasks import forms
-from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
-
-from . import filesystem_utils as fsu
+from inloop.tasks import forms, filesystem_utils as fsu
+from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 
 
 @superuser_required

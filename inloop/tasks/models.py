@@ -3,7 +3,7 @@ from os.path import join
 from django.db import models
 from django.utils import timezone
 
-from accounts.models import UserProfile
+from inloop.accounts.models import UserProfile
 
 
 def generate_short_id(s):

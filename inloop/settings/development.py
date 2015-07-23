@@ -1,7 +1,7 @@
 from os import path
 
-from inloop.utils import filter_uppercase_keys
-from . import base
+from inloop.core.utils import filter_uppercase_keys
+from inloop.settings import base
 
 globals().update(filter_uppercase_keys(vars(base)))
 
@@ -18,7 +18,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 # Storage root for uploaded files
-MEDIA_ROOT = path.join(base.BASE_DIR, 'media')
+MEDIA_ROOT = path.join(base.PROJECT_ROOT, 'media')
 
 # Debugging SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -27,6 +27,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path.join(base.BASE_DIR, 'db.sqlite3'),
+        'NAME': path.join(base.PROJECT_ROOT, 'db.sqlite3'),
     }
 }

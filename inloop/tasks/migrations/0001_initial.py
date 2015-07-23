@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 from django.conf import settings
-import tasks.models
+import inloop.tasks.models
 
 
 class Migration(migrations.Migration):
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Task',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('title', models.CharField(help_text='Task name', max_length=100)),
                 ('description', models.TextField(help_text='Task description')),
                 ('publication_date', models.DateTimeField(help_text='When should the task be published?')),
@@ -31,9 +31,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TaskCategory',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('short_id', models.CharField(help_text='Short ID for URLs', max_length=50, unique=True)),
-                ('name', models.CharField(help_text='Category Name', max_length=50, unique=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
+                ('short_id', models.CharField(help_text='Short ID for URLs', unique=True, max_length=50)),
+                ('name', models.CharField(help_text='Category Name', unique=True, max_length=50)),
                 ('image', models.ImageField(upload_to='images/category_thumbs/')),
             ],
             options={
@@ -43,9 +43,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TaskSolution',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('submission_date', models.DateTimeField(help_text='When was the solution submitted?')),
-                ('is_correct', models.BooleanField(default=False, help_text='Did the checker accept the solution?')),
+                ('is_correct', models.BooleanField(help_text='Did the checker accept the solution?', default=False)),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
                 ('task', models.ForeignKey(to='tasks.Task')),
             ],
@@ -56,9 +56,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TaskSolutionFile',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('filename', models.CharField(max_length=50)),
-                ('file', models.FileField(upload_to=tasks.models.get_upload_path)),
+                ('file', models.FileField(upload_to=inloop.tasks.models.get_upload_path)),
                 ('solution', models.ForeignKey(to='tasks.TaskSolution')),
             ],
             options={

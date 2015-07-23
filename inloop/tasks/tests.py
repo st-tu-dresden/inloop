@@ -7,11 +7,11 @@ from django.test import TestCase
 from django.utils import timezone
 from django.conf import settings
 
-from accounts.models import UserProfile
-from tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+from inloop.accounts.models import UserProfile
+from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 
 
-TEST_IMAGE = path.join(settings.BASE_DIR, 'tests', 'test.jpg')
+TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
 
 
 class TaskModelTests(TestCase):

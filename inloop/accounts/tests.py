@@ -1,8 +1,8 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import AnonymousUser
 
-from accounts.models import UserProfile
-from tasks.views import index
+from inloop.accounts.models import UserProfile
+from inloop.tasks.views import index
 
 
 class LoginSystemTests(TestCase):

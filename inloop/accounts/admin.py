@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import UserProfile, CourseOfStudy
+from inloop.accounts.models import UserProfile, CourseOfStudy
 
 # Register your models here.
 

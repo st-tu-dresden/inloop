@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from tasks import views
+from inloop.tasks import views
 
 urlpatterns = patterns(
     '',

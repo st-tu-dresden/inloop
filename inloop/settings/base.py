@@ -14,7 +14,8 @@ from sys import version_info
 if version_info[0] < 3:
     raise RuntimeError("INLOOP must be run with Python 3.x")
 
-BASE_DIR = dirname(dirname(dirname(__file__)))
+PROJECT_ROOT = dirname(dirname(dirname(__file__)))
+INLOOP_ROOT = join(PROJECT_ROOT, 'inloop')
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
@@ -29,8 +30,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
     'huey.djhuey',
-    'accounts',
-    'tasks',
+    'inloop.accounts',
+    'inloop.tasks',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,14 +65,14 @@ MEDIA_URL = '/media/'
 
 # Static file search path
 STATICFILES_DIRS = (
-    join(BASE_DIR, 'static'),
+    join(PROJECT_ROOT, 'static'),
 )
 
 # Template search paths
 TEMPLATE_DIRS = (
-    join(BASE_DIR, 'templates'),
+    join(INLOOP_ROOT, 'templates'),
     # otherwise django.contrib.auth won't find the custom templates
-    join(BASE_DIR, 'accounts', 'templates')
+    join(INLOOP_ROOT, 'accounts', 'templates')
 )
 
 HUEY = {

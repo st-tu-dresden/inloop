@@ -1,7 +1,7 @@
 import os
 
-from inloop.utils import filter_uppercase_keys
-from . import base
+from inloop.core.utils import filter_uppercase_keys
+from inloop.settings import base
 
 globals().update(filter_uppercase_keys(vars(base)))
 

@@ -1,7 +1,7 @@
 from django import forms
-from accounts.models import UserProfile
-from accounts.models import CourseOfStudy as COS
-from accounts import validators as v
+from inloop.accounts.models import UserProfile
+from inloop.accounts.models import CourseOfStudy as COS
+from inloop.accounts import validators as v
 
 
 class UserForm(forms.ModelForm):

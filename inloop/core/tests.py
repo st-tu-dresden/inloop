@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from inloop.utils import filter_uppercase_keys
+from inloop.core.utils import filter_uppercase_keys
 
 
 class UtilsTest(TestCase):

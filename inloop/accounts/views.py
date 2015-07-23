@@ -5,8 +5,8 @@ from django.conf import settings
 
 from inloop.decorators import superuser_required
 
-from . import forms
-from .models import UserProfile
+from inloop.accounts import forms
+from inloop.accounts.models import UserProfile
 
 
 @superuser_required

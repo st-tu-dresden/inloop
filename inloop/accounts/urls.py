@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-import accounts.views as account_views
+import inloop.accounts.views as account_views
 
 urlpatterns = patterns(
     '',
@@ -34,7 +34,7 @@ urlpatterns = patterns(
         name='user_logout'
     ),
     url(
-        r'^activate/(?P<key>[0-9a-f]{5,40})$',
+        r'^activate/(?P<key>[0-9a-zA-Z]{40})$',
         account_views.activate_user,
         name='user_activation'
     ),
