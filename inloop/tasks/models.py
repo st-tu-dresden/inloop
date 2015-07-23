@@ -1,14 +1,11 @@
 from os.path import join
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
-
-
-def generate_short_id(s):
-    s = ''.join(e for e in s if e.isalnum())
-    return s.lower()
 
 
 def get_upload_path(instance, filename):
@@ -21,11 +18,16 @@ def get_upload_path(instance, filename):
     return path
 
 
-class TaskCategory(models.Model):
-    def save(self, *args, **kwargs):
-        self.short_id = generate_short_id(self.name)
-        super(TaskCategory, self).save(*args, **kwargs)
+class TaskCategoryManager(models.Manager):
+    def get_or_create(self, name):
+        """Retrieve TaskCategory if it exists, create it otherwise."""
+        try:
+            return self.get(name=name)
+        except ObjectDoesNotExist:
+            return self.create(name=name, short_id=slugify(name))
 
+
+class TaskCategory(models.Model):
     short_id = models.CharField(
         unique=True,
         max_length=50,
@@ -34,8 +36,8 @@ class TaskCategory(models.Model):
         unique=True,
         max_length=50,
         help_text='Category Name')
-    image = models.ImageField(
-        upload_to='images/category_thumbs/')
+    image = models.ImageField(null=True, upload_to='images/category_thumbs/')
+    objects = TaskCategoryManager()
 
     def get_tuple(self):
         return (self.short_id, self.name)
@@ -55,12 +57,38 @@ class TaskCategory(models.Model):
         return self.short_id
 
 
+class MissingTaskMetadata(Exception):
+    pass
+
+
+class TaskManager(models.Manager):
+    meta_required = ['title', 'category', 'pubdate']
+
+    def get_or_create_json(self, json, name):
+        try:
+            task = self.get(name=name)
+        except ObjectDoesNotExist:
+            task = Task(name=name)
+        return self._update_task(task, json)
+
+    def _update_task(self, task, json):
+        self._validate(json)
+        return task
+
+    def _validate(self, json):
+        missing = []
+        for meta_key in self.meta_required:
+            if meta_key not in json.keys():
+                missing.append(meta_key)
+        if missing:
+            raise MissingTaskMetadata(missing)
+
+
 class Task(models.Model):
     '''Represents the tasks that are presented to the user to solve.'''
 
-    title = models.CharField(
-        max_length=100,
-        help_text='Task name')
+    title = models.CharField(max_length=100, help_text='Task title')
+    name = models.CharField(max_length=100, help_text='Internal task name')
     author = models.ForeignKey(UserProfile)
     description = models.TextField(help_text='Task description')
     publication_date = models.DateTimeField(
@@ -71,6 +99,7 @@ class Task(models.Model):
         max_length=50,
         unique=True,
         help_text='URL name')
+    objects = TaskManager()
 
     def is_active(self):
         '''Returns True if the task is already visible to the users.'''
