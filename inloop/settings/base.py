@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     'huey.djhuey',
     'inloop.accounts',
     'inloop.tasks',
+    'inloop.gh_import',
 )
 
 MIDDLEWARE_CLASSES = (
