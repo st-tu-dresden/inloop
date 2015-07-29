@@ -89,25 +89,26 @@ class TaskManager(models.Manager):
 
 
 class Task(models.Model):
-    '''Represents the tasks that are presented to the user to solve.'''
+    """Represents the tasks that are presented to the user to solve."""
 
+    # Mandatory fields:
     title = models.CharField(max_length=100, help_text='Task title')
     name = models.CharField(max_length=100, help_text='Internal task name')
-    author = models.ForeignKey(UserProfile)
+    slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
     description = models.TextField(help_text='Task description')
-    publication_date = models.DateTimeField(
-        help_text='When should the task be published?')
-    deadline_date = models.DateTimeField(help_text='Date the task is due to')
+    publication_date = models.DateTimeField(help_text='When should the task be published?')
+
+    # Optional fields:
+    deadline_date = models.DateTimeField(help_text='Date the task is due to', null=True)
+
+    # Foreign keys:
+    author = models.ForeignKey(UserProfile)
     category = models.ForeignKey(TaskCategory)
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        help_text='URL name')
+
     objects = TaskManager()
 
     def is_active(self):
-        '''Returns True if the task is already visible to the users.'''
-
+        """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
 
 
