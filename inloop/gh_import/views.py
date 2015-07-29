@@ -7,6 +7,7 @@ from django.utils.encoding import smart_bytes
 from django.conf import settings
 
 from inloop.gh_import.utils import compute_signature
+from inloop.gh_import.tasks import update_tasks
 
 
 SIGNATURE_HEADER = 'HTTP_X_HUB_SIGNATURE'
@@ -26,4 +27,5 @@ class PayloadView(View):
         my_signature = compute_signature(GITHUB_SECRET, request)
         if not constant_time_compare(signature, my_signature):
             return HttpResponseBadRequest('Invalid signature')
+        update_tasks()
         return HttpResponse('Success')
