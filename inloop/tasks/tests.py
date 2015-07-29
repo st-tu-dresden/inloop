@@ -9,7 +9,7 @@ from django.conf import settings
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory,
-                                 TaskManager, TaskSolution, TaskSolutionFile)
+                                 TaskSolution, TaskSolutionFile)
 
 
 TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
@@ -197,10 +197,26 @@ class TaskSolutionTests(TestCase):
         self.assertFalse(sol.is_correct)
 
 
-@skip
+class TaskCategoryManagerTest(TestCase):
+    def setUp(self):
+        TaskCategory.objects.create(name="Test category")
+
+    def test_returns_existing_category(self):
+        self.assertEqual(TaskCategory.objects.count(), 1)
+        category = TaskCategory.objects.get_or_create("Test category")
+        self.assertEqual(category.name, "Test category")
+        self.assertEqual(TaskCategory.objects.count(), 1)
+
+    def test_returns_new_category(self):
+        self.assertEqual(TaskCategory.objects.count(), 1)
+        category = TaskCategory.objects.get_or_create("Another category")
+        self.assertEqual(category.name, "Another category")
+        self.assertEqual(TaskCategory.objects.count(), 2)
+
+
 class TaskManagerTest(TestCase):
     def setUp(self):
-        self.manager = TaskManager()
+        self.manager = Task.objects
         self.valid_json = {'title': 'Test title', 'category': 'Lesson',
                            'pubdate': '2015-05-01 13:37:00'}
 
@@ -224,3 +240,7 @@ class TaskManagerTest(TestCase):
 
         pubdate = task.publication_date.strftime('%Y-%m-%d %H:%M:%S')
         self.assertEqual(pubdate, self.valid_json['pubdate'])
+
+    def test_save_task_with_valid_json(self):
+        task = Task.objects.get_or_create_json(self.valid_json, "Test title")
+        task.save()

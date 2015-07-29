@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
+from inloop.gh_import.utils import parse_date
 
 
 def get_upload_path(instance, filename):
@@ -73,6 +74,9 @@ class TaskManager(models.Manager):
 
     def _update_task(self, task, json):
         self._validate(json)
+        task.title = json['title']
+        task.category = TaskCategory.objects.get_or_create(json['category'])
+        task.publication_date = parse_date(json['pubdate'])
         return task
 
     def _validate(self, json):
