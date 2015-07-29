@@ -1,6 +1,7 @@
 import json
 import logging
 from glob import glob
+from subprocess import check_call, CalledProcessError
 from os.path import basename, dirname, join
 
 from django.conf import settings
@@ -20,22 +21,28 @@ TASK_FILE = "task.md"
 
 @task()
 def update_tasks():
-    logger.info("starting task update")
-
     # git refresh
     git_root = settings.GIT_ROOT
     if not settings.DEBUG:
+        logger.info("Pulling changes from git")
         repo = GitRepository(git_root)
         repo.pull()
 
     # find task directories
     meta_files = glob(join(git_root, '*', META_FILE))
     task_dirs = [dirname(f) for f in meta_files]
-
     logger.info("found %d task directories", len(task_dirs))
-
     for task_dir in task_dirs:
         process_dir(task_dir)
+
+    # ZIP the tests
+    logger.info("zipping the unit tests w/ gradle")
+    gradlew_exe = join(git_root, 'gradlew')
+    try:
+        check_call([gradlew_exe, '-q', 'zipTests'], cwd=git_root)
+    except CalledProcessError as e:
+        logger.error("gradlew FAILED, exception follows.")
+        logger.exception(e)
 
 
 @atomic()
