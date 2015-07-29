@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 from os.path import dirname, join
 from shlex import quote
 from datetime import datetime
@@ -45,3 +47,10 @@ def ssh_options(id_rsa, shell=False, verbose=False):
     if shell:
         return ' '.join([quote(opt) for opt in opts])
     return opts
+
+
+def compute_signature(secret, data):
+    mac = hmac.new(secret, digestmod=hashlib.sha1)
+    for chunk in iter(data):
+        mac.update(chunk)
+    return 'sha1=%s' % mac.hexdigest()

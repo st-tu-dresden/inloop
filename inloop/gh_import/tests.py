@@ -1,16 +1,24 @@
 from unittest import TestCase
 from unittest.mock import patch, mock_open
 from os import path
+from io import BytesIO
 
 from django.utils import timezone
-
-from inloop.gh_import.utils import md_load, ssh_options, parse_date, parse_ssh_url
-from inloop.gh_import.utils import HOSTS_FILE
+from django.test.client import RequestFactory
+from django.core.urlresolvers import resolve
+from inloop.gh_import import views, __name__ as PACKAGE
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import import __name__ as PACKAGE
+from inloop.gh_import.utils import (compute_signature, HOSTS_FILE, md_load,
+                                    parse_date, parse_ssh_url, ssh_options)
 
 
 class UtilsTest(TestCase):
+    def test_signature_computation(self):
+        self.assertEqual(
+            compute_signature(b'secret', BytesIO(b'foo')),
+            'sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2'
+        )
+
     def test_parse_git_ssh_url_with_user(self):
         parts = parse_ssh_url('git@github.com:user/repo.git')
         self.assertEqual(parts['user'], 'git')
@@ -93,3 +101,36 @@ class GitRepositoryTest(TestCase):
         cmd_list2 = args2[0]
         self.assertEqual(cmd_list2[:2], ['git', 'pull'])
         self.assertTrue('GIT_SSH_COMMAND' in kwargs2['env'].keys())
+
+
+class PayloadHandlerTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.payload = views.PayloadView.as_view()
+
+    def test_url_resolves_to_view(self):
+        resolve('/github/payload')
+
+    def test_get_not_allowed(self):
+        request = self.factory.get('/payload')
+        response = self.payload(request)
+        self.assertEqual(response.status_code, 405)
+
+    def test_post_without_signature(self):
+        request = self.factory.post('/payload')
+        response = self.payload(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(b'missing' in response.content.lower())
+
+    def test_post_with_invalid_signature(self):
+        request = self.factory.post('/payload')
+        request.META['HTTP_X_HUB_SIGNATURE'] = 'invalid'
+        response = self.payload(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(b'invalid' in response.content.lower())
+
+    def test_post_with_valid_signature(self):
+        request = self.factory.post('/payload', data=b'foo', content_type='text/plain')
+        request.META['HTTP_X_HUB_SIGNATURE'] = 'sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2'
+        response = self.payload(request)
+        self.assertEqual(response.status_code, 200)
