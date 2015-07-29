@@ -70,7 +70,7 @@ class TaskManager(models.Manager):
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=author)
+            task = Task(name=name, author=author, slug=slugify(name))
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
