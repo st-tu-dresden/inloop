@@ -2,6 +2,7 @@ import string
 from random import SystemRandom
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth import models as auth_models
 from django.conf import settings
@@ -45,6 +46,7 @@ class UserProfile(auth_models.AbstractUser):
 
     # Characters to be used in the activation key
     CHARS = string.ascii_letters + string.digits
+
     # Length of the random key
     KEY_LENGTH = 40
 
@@ -89,3 +91,17 @@ class UserProfile(auth_models.AbstractUser):
         subject = "INLOOP Activation"
         message = ACTIVATION_EMAIL_TEXT.format(username=self.username, link=link)
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email], fail_silently=True)
+
+    @classmethod
+    def get_system_user(cls):
+        """Return the system UserProfile.
+
+        The system user should be used for task imports from the git repository.
+        """
+        # NOTE: this should probably go into a model manager class, but how is this
+        #       done for stuff that extends contrib.auth?
+        try:
+            user = cls.objects.get(username="system")
+        except ObjectDoesNotExist:
+            user = cls.objects.create_user("system")
+        return user

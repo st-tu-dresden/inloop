@@ -66,10 +66,11 @@ class TaskManager(models.Manager):
     meta_required = ['title', 'category', 'pubdate']
 
     def get_or_create_json(self, json, name):
+        author = UserProfile.get_system_user()
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name)
+            task = Task(name=name, author=author)
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
