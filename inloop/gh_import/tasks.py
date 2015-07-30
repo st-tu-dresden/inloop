@@ -45,7 +45,6 @@ def update_tasks():
         logger.exception(e)
 
 
-@atomic()
 def process_dir(task_dir):
     """Processes a single task directory."""
     task_name = basename(task_dir)
@@ -53,9 +52,10 @@ def process_dir(task_dir):
     try:
         with open(join(task_dir, META_FILE)) as json_fp:
             metadata = json.load(json_fp)
-        task = Task.objects.get_or_create_json(metadata, task_name)
-        task.description = md_load(join(task_dir, TASK_FILE))
-        task.save()
+        with atomic():
+            task = Task.objects.get_or_create_json(metadata, task_name)
+            task.description = md_load(join(task_dir, TASK_FILE))
+            task.save()
         logger.info("Successfully imported %s", task_name)
     except Exception as e:
         logger.error("Importing task %s FAILED, exception follows.", task_name)
