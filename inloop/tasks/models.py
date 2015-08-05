@@ -1,3 +1,4 @@
+import re
 from os.path import join
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -7,6 +8,16 @@ from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
 from inloop.gh_import.utils import parse_date
+
+
+def make_slug(value):
+    """Extended slugify() that also removes '(...)' from strings.
+
+    Example:
+    >>> make_slug("Some Task III (winter term 2010/2011)")
+    'some-task-iii'
+    """
+    return slugify(re.sub(r'\([^\)]+\)', '', value))
 
 
 def get_upload_path(instance, filename):
@@ -70,12 +81,13 @@ class TaskManager(models.Manager):
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=author, slug=slugify(name))
+            task = Task(name=name, author=author)
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
         self._validate(json)
         task.title = json['title']
+        task.slug = make_slug(task.title)
         task.category = TaskCategory.objects.get_or_create(json['category'])
         task.publication_date = parse_date(json['pubdate'])
         return task

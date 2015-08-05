@@ -1,4 +1,5 @@
 from os import path
+from doctest import DocTestSuite
 from unittest import skip
 
 from django.core.exceptions import ValidationError
@@ -8,11 +9,17 @@ from django.utils import timezone
 from django.conf import settings
 
 from inloop.accounts.models import UserProfile
+from inloop.tasks import models
 from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
 
-
 TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
+
+
+def load_tests(loader, tests, ignore):
+    """Initialize doctests for this module."""
+    tests.addTests(DocTestSuite(models))
+    return tests
 
 
 class TaskModelTests(TestCase):
@@ -236,6 +243,7 @@ class TaskManagerTest(TestCase):
 
         self.assertIs(task, input)
         self.assertEqual(task.title, 'Test title')
+        self.assertEqual(task.slug, 'test-title')
         self.assertEqual(task.category.name, 'Lesson')
 
         pubdate = task.publication_date.strftime('%Y-%m-%d %H:%M:%S')
