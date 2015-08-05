@@ -17,3 +17,4 @@ media/
 *.sublime-workspace
 .coverage
 htmlcov
+static/node_modules/
