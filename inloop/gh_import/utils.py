@@ -5,16 +5,9 @@ from shlex import quote
 from datetime import datetime
 
 from django.utils import timezone
-from markdown import markdown
 
 # known_hosts file prepopulated with GitHub's pubkeys
 HOSTS_FILE = join(dirname(__file__), 'github_known_hosts.txt')
-MARKDOWN_EXTS = ['markdown.extensions.toc']
-
-
-def md_load(md_file):
-    with open(md_file) as fd:
-        return markdown(fd.read(), extensions=MARKDOWN_EXTS)
 
 
 def parse_date(datestr, format='%Y-%m-%d %H:%M:%S'):

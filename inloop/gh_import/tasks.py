@@ -9,7 +9,6 @@ from django.db.transaction import atomic
 from huey.djhuey import task
 
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import.utils import md_load
 from inloop.tasks.models import Task
 
 logger = logging.getLogger(__name__)
@@ -50,11 +49,11 @@ def process_dir(task_dir):
     task_name = basename(task_dir)
     logger.info("Processing task %s", task_name)
     try:
-        with open(join(task_dir, META_FILE)) as json_fp:
-            metadata = json.load(json_fp)
         with atomic():
-            task = Task.objects.get_or_create_json(metadata, task_name)
-            task.description = md_load(join(task_dir, TASK_FILE))
+            with open(join(task_dir, META_FILE)) as json_fp:
+                task = Task.objects.get_or_create_json(json.load(json_fp), task_name)
+            with open(join(task_dir, TASK_FILE)) as markdown_fp:
+                task.description = markdown_fp.read()
             task.save()
         logger.info("Successfully imported %s", task_name)
     except Exception as e:

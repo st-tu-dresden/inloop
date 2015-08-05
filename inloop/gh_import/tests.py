@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 from os import path
 from io import BytesIO
 
@@ -8,8 +8,8 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import resolve
 from inloop.gh_import import views, __name__ as PACKAGE
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import.utils import (compute_signature, HOSTS_FILE, md_load,
-                                    parse_date, parse_ssh_url, ssh_options)
+from inloop.gh_import.utils import (compute_signature, HOSTS_FILE, parse_date,
+                                    parse_ssh_url, ssh_options)
 
 
 class UtilsTest(TestCase):
@@ -61,12 +61,6 @@ class UtilsTest(TestCase):
     def test_ssh_options_noshell(self):
         opts = ssh_options(None, shell=False)
         self.assertTrue(isinstance(opts, list))
-
-    @patch('%s.utils.open' % PACKAGE, mock_open(read_data='# Heading'), create=True)
-    def test_md_load(self):
-        markdown = md_load('path/to/file.md')
-        self.assertTrue('<h1 id="heading">' in markdown)
-        self.assertTrue('Heading' in markdown)
 
 
 @patch('%s.git.check_call' % PACKAGE)
