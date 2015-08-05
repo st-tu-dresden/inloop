@@ -1,4 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'base_site.html' %}
+
+{% block title %}Login{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
@@ -18,11 +21,13 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input class="form-control" type="text" name="username" value="" size="50" />
+                    <input class="form-control" type="text" id="username"
+                           name="username" value="" size="50" />
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input class="form-control" type="password" name="password" value="" size="50" />
+                    <input class="form-control" type="password" id="password"
+                           name="password" value="" size="50" />
                 </div>
                 <button type="submit" class="btn btn-default">Login</button>
             </form>
