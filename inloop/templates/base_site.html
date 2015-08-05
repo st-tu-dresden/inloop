@@ -1,61 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    {% load staticfiles %}
-    {% load flatpages %}
-    {% get_flatpages as fpages %}
-    <!-- Bootstrap, jQuery, Ace -->
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <!-- custom CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
-    {% block head %}
-    {% endblock %}
-    <title>TUD INLOOP</title>
-</head>
-<body>
-<nav class="navbar navbar-default navbar-static-top">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'index' %}">INLOOP</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'index' %}">Home</a></li>
-                    <li><a href="{% url 'accounts:user_profile' %}">{{ user.get_username }}</a></li>
-                    <li><a href="#">Settings</a></li>
-                    {% for page in fpages %}
-                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-                    {% endfor %}
-                    {% if user.is_superuser %}
-                        <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
-                        <li><a href="{% url 'tasks:man_cat' %}">Manage Categories</a></li>
-                        <li><a href="{% url 'accounts:new_course' %}">New Course</a></li>
-                        <li><a href="{% url 'admin:index' %}">System</a></li>
-                    {% endif %}
-                    <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
-                {% else %}
-                    {% if not hide_login_link %}
-                    <li><a href="{% url 'index' %}">Login</a></li>
-                    {% endif %}
-                    <li><a href="{% url 'accounts:register' %}">Register</a></li>
-                    {% for page in fpages %}
-                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-                    {% endfor %}
-                {% endif %}
-            </ul>
-        </div>
-        <!--/.nav-collapse -->
-    </div>
-</nav>
-<div class="container">
-    {% block content %}
-    {% endblock %}
-</div>
-<script src="{% static 'js/ace.min.js' %}"></script>
-{% block subbody_content %}
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block navigation %}
+{% if user.is_authenticated %}
+  <li><a href="{% url 'index' %}">Home</a></li>
+  <li><a href="{% url 'accounts:user_profile' %}">{{ user.get_username }}</a></li>
+  <li><a href="#">Settings</a></li>
+  {% for page in fpages %}
+    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+  {% endfor %}
+  {% if user.is_superuser %}
+    <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
+    <li><a href="{% url 'tasks:man_cat' %}">Manage Categories</a></li>
+    <li><a href="{% url 'accounts:new_course' %}">New Course</a></li>
+    <li><a href="{% url 'admin:index' %}">System</a></li>
+  {% endif %}
+  <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
+{% else %}
+  {% if not hide_login_link %}
+  <li><a href="{% url 'index' %}">Login</a></li>
+  {% endif %}
+  <li><a href="{% url 'accounts:register' %}">Register</a></li>
+  {% for page in fpages %}
+    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+  {% endfor %}
+{% endif %}
 {% endblock %}
-</body>
-</html>
+
+{% block subbody_content %}
+<script src="{% static 'js/ace.min.js' %}"></script>
+{% endblock %}

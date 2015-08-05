@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <title>{% block title %}INLOOP{% endblock %} &ndash; INLOOP</title>
     {% load staticfiles %}
     {% load flatpages %}
     {% get_flatpages as fpages %}
@@ -9,10 +10,8 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <!-- custom CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}" />
-    {% block head %}
-    {% endblock %}
-    <title>TUD INLOOP</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
+    {% block head %}{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-default navbar-static-top">
@@ -22,20 +21,23 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
+                {% block navigation %}
                 <li><a href="{% url 'index' %}">Go Back</a></li>
                 {% for page in fpages %}
                     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
                 {% endfor %}
+                {% endblock %}
             </ul>
         </div>
         <!--/.nav-collapse -->
     </div>
 </nav>
+
 <div class="container">
-    {% block content %}
-    {% endblock %}
+{% block content %}{% endblock %}
 </div>
-{% block subbody_content %}
-{% endblock %}
+
+{% block subbody_content %}{% endblock %}
+
 </body>
 </html>
