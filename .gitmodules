@@ -1,0 +1,15 @@
+[submodule "static/vendor/bootstrap"]
+	path = static/vendor/bootstrap
+	url = https://github.com/twbs/bootstrap.git
+[submodule "static/vendor/jquery"]
+	path = static/vendor/jquery
+	url = https://github.com/jquery/jquery.git
+[submodule "static/vendor/prism"]
+	path = static/vendor/prism
+	url = https://github.com/PrismJS/prism.git
+[submodule "static/vendor/ace"]
+	path = static/vendor/ace
+	url = https://github.com/ajaxorg/ace-builds
+[submodule "static/vendor/anchorjs"]
+	path = static/vendor/anchorjs
+	url = https://github.com/bryanbraun/anchorjs.git
