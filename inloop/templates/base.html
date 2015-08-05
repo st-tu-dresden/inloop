@@ -6,12 +6,10 @@
     {% load flatpages %}
     {% get_flatpages as fpages %}
     <!-- Bootstrap, jQuery, Ace -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <!-- custom CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
     {% block head %}
     {% endblock %}
     <title>TUD INLOOP</title>
@@ -56,7 +54,7 @@
     {% block content %}
     {% endblock %}
 </div>
-<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'js/ace.min.js' %}"></script>
 {% block subbody_content %}
 {% endblock %}
 </body>
