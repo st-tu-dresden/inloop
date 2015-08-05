@@ -20,12 +20,12 @@ urlpatterns = patterns(
         name='new_category'
     ),
     url(
-        r'^category/admin/(?P<short_id>[\w]+)/edit_category/$',
+        r'^category/admin/(?P<short_id>[-\w]+)/edit_category/$',
         views.edit_category,
         name='edit_category'
     ),
     url(
-        r'^category/admin/(?P<short_id>[\w]+)/delete/$',
+        r'^category/admin/(?P<short_id>[-\w]+)/delete/$',
         views.delete_category,
         name='delete_category'
     ),
@@ -35,7 +35,7 @@ urlpatterns = patterns(
         name='man_cat'
     ),
     url(
-        r'^category/(?P<short_id>[\w]+)/$',
+        r'^category/(?P<short_id>[-\w]+)/$',
         views.category,
         name='category'
     ),

@@ -1,4 +1,5 @@
 import os
+from os import path
 
 from inloop.core.utils import filter_uppercase_keys
 from inloop.settings import base
@@ -26,11 +27,13 @@ DATABASES = {
     }
 }
 
+deploy_root = '/srv/inloop.inf.tu-dresden.de'
+
 # Path where `manage.py collectstatic` collects files
-STATIC_ROOT = '/srv/inloop.inf.tu-dresden.de/static'
+STATIC_ROOT = path.join(deploy_root, 'static')
 
 # Path to media files
-MEDIA_ROOT = '/srv/inloop.inf.tu-dresden.de/media'
+MEDIA_ROOT = path.join(deploy_root, 'media')
 
 # Security related settings
 ALLOWED_HOSTS = ['inloop.inf.tu-dresden.de']
@@ -54,3 +57,12 @@ EMAIL_PORT = 25
 # terminating SSL.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+# The secret used for the webhook
+GITHUB_SECRET = os.environ['GITHUB_SECRET']
+
+# Settings related to the Git import
+GIT_SSH_KEY = path.join(deploy_root, 'github_ssh_deploy_key')
+GIT_SSH_URL = 'git@github.com:st-tu-dresden/inloop-tasks.git'
+GIT_BRANCH = 'gradle/master'
+GIT_ROOT = path.join(MEDIA_ROOT, 'tasks')

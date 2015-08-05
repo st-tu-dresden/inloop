@@ -8,7 +8,8 @@ from django.utils import timezone
 from django.conf import settings
 
 from inloop.accounts.models import UserProfile
-from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory,
+                                 TaskSolution, TaskSolutionFile)
 
 
 TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
@@ -194,3 +195,52 @@ class TaskSolutionTests(TestCase):
     def test_default_value(self):
         sol = TaskSolution.objects.get(pk=1)
         self.assertFalse(sol.is_correct)
+
+
+class TaskCategoryManagerTest(TestCase):
+    def setUp(self):
+        TaskCategory.objects.create(name="Test category")
+
+    def test_returns_existing_category(self):
+        self.assertEqual(TaskCategory.objects.count(), 1)
+        category = TaskCategory.objects.get_or_create("Test category")
+        self.assertEqual(category.name, "Test category")
+        self.assertEqual(TaskCategory.objects.count(), 1)
+
+    def test_returns_new_category(self):
+        self.assertEqual(TaskCategory.objects.count(), 1)
+        category = TaskCategory.objects.get_or_create("Another category")
+        self.assertEqual(category.name, "Another category")
+        self.assertEqual(TaskCategory.objects.count(), 2)
+
+
+class TaskManagerTest(TestCase):
+    def setUp(self):
+        self.manager = Task.objects
+        self.valid_json = {'title': 'Test title', 'category': 'Lesson',
+                           'pubdate': '2015-05-01 13:37:00'}
+
+    def test_validate_empty(self):
+        with self.assertRaises(MissingTaskMetadata) as cm:
+            self.manager._validate(dict())
+        actual = set(cm.exception.args[0])
+        expected = {'title', 'category', 'pubdate'}
+        self.assertEqual(actual, expected)
+
+    def test_validate_valid(self):
+        self.manager._validate(self.valid_json)
+
+    def test_update(self):
+        input = Task()
+        task = self.manager._update_task(input, self.valid_json)
+
+        self.assertIs(task, input)
+        self.assertEqual(task.title, 'Test title')
+        self.assertEqual(task.category.name, 'Lesson')
+
+        pubdate = task.publication_date.strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(pubdate, self.valid_json['pubdate'])
+
+    def test_save_task_with_valid_json(self):
+        task = Task.objects.get_or_create_json(self.valid_json, "Test title")
+        task.save()

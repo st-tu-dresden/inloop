@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown %}
 {% block content %}
     <div class="row">
     <div class="col-md-10 col-md-offset-1">
@@ -14,7 +15,7 @@
         </h1>
         <br/>
         <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-        <p>{{ description|escape }}</p>
+        <p>{{ description|markdown }}</p>
 
         <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
             {% csrf_token %}

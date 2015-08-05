@@ -14,6 +14,7 @@ urlpatterns = patterns(
     url(r'^$', task_views.index, name='index'),
     url(r'^tasks/', include('inloop.tasks.urls', namespace='tasks')),
     url(r'^accounts/', include('inloop.accounts.urls', namespace='accounts')),
+    url(r'^github/', include('inloop.gh_import.urls', namespace='github')),
     url(r'^admin/', include(admin.site.urls)),
 )
 # serve static content
