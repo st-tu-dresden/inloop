@@ -32,6 +32,9 @@ deploy_root = '/srv/inloop.inf.tu-dresden.de'
 # Path where `manage.py collectstatic` collects files
 STATIC_ROOT = path.join(deploy_root, 'static')
 
+# Enable cache busting through hashed file names
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
 # Path to media files
 MEDIA_ROOT = path.join(deploy_root, 'media')
 
