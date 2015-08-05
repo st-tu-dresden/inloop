@@ -103,34 +103,39 @@ class GitRepositoryTest(TestCase):
         self.assertTrue('GIT_SSH_COMMAND' in kwargs2['env'].keys())
 
 
+@patch('%s.views.update_tasks' % PACKAGE)
 class PayloadHandlerTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.payload = views.PayloadView.as_view()
 
-    def test_url_resolves_to_view(self):
+    def test_url_resolves_to_view(self, mock):
         resolve('/github/payload')
 
-    def test_get_not_allowed(self):
+    def test_get_not_allowed(self, mock):
         request = self.factory.get('/payload')
         response = self.payload(request)
         self.assertEqual(response.status_code, 405)
+        self.assertEqual(mock.call_count, 0)
 
-    def test_post_without_signature(self):
+    def test_post_without_signature(self, mock):
         request = self.factory.post('/payload')
         response = self.payload(request)
         self.assertEqual(response.status_code, 400)
         self.assertTrue(b'missing' in response.content.lower())
+        self.assertEqual(mock.call_count, 0)
 
-    def test_post_with_invalid_signature(self):
+    def test_post_with_invalid_signature(self, mock):
         request = self.factory.post('/payload')
         request.META['HTTP_X_HUB_SIGNATURE'] = 'invalid'
         response = self.payload(request)
         self.assertEqual(response.status_code, 400)
         self.assertTrue(b'invalid' in response.content.lower())
+        self.assertEqual(mock.call_count, 0)
 
-    def test_post_with_valid_signature(self):
+    def test_post_with_valid_signature(self, mock):
         request = self.factory.post('/payload', data=b'foo', content_type='text/plain')
         request.META['HTTP_X_HUB_SIGNATURE'] = 'sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2'
         response = self.payload(request)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(mock.call_count, 1)
