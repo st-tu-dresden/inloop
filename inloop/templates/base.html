@@ -6,12 +6,8 @@
     {% load staticfiles %}
     {% load flatpages %}
     {% get_flatpages as fpages %}
-    <!-- Bootstrap, jQuery, Ace -->
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <!-- custom CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
-    {% block head %}{% endblock %}
+    {% block extrahead %}{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-default navbar-static-top">
@@ -37,7 +33,9 @@
 {% block content %}{% endblock %}
 </div>
 
-{% block subbody_content %}{% endblock %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% block extrabody %}{% endblock %}
 
 </body>
 </html>
