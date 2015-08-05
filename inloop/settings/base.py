@@ -67,7 +67,7 @@ MEDIA_URL = '/media/'
 
 # Static file search path
 STATICFILES_DIRS = (
-    join(PROJECT_ROOT, 'static'),
+    join(PROJECT_ROOT, 'static', 'dist'),
 )
 
 # Template search paths
