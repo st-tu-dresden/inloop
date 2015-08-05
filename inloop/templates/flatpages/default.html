@@ -1,9 +1,10 @@
 {% extends 'base_site.html' %}
+{% load markdown %}
 
 {% block title %}{{ flatpage.title }}{% endblock %}
 
 {% block content %}
-    <div class="col-md-4 col-md-offset-4">
-        {{ flatpage.content }}
-    </div>
+<div class="col-md-4 col-md-offset-4">
+{{ flatpage.content|markdown }}
+</div>
 {% endblock %}
