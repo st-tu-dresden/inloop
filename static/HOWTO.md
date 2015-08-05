@@ -23,23 +23,25 @@ Otherwise, please read on.
 ### Static asset generation with `grunt`
 
 If you want to make changes to the layout (and therefore, files in `src`), you
-need to regenerate the `dist` files with [grunt][], which depends on [nodejs][].
+need to regenerate the `dist` files with [grunt][], which depends on [node][].
 
 If you haven't already done so, install `grunt`:
 
-    # Install node on Ubuntu/Debian
-    apt-get install nodejs
+```bash
+# Install node on Ubuntu/Debian
+apt-get install nodejs
 
-    # ... on OS X
-    brew install node
+# ... on OS X
+brew install node
 
-    # Install grunt globally (may need sudo)
-    npm install -g grunt-cli
+# Install grunt globally (may need sudo)
+npm install -g grunt-cli
 
-    # Install dependencies needed in our Gruntfile. This will create a
-    # node_modules directory (which is git-ignored).
-    cd inloop/static
-    npm install
+# Install dependencies needed in our Gruntfile. This will create a
+# node_modules directory (which is git-ignored).
+cd inloop/static
+npm install
+```
 
 The assets can be built by executing
 
@@ -58,17 +60,18 @@ There are several methods to checkout the submodules:
 
 To update a submodule to a newer version (read: commit), use
 
-    # chdir to the submodule and fetch updates:
-    cd libs/jquery
-    git fetch
+```bash
+# chdir to the submodule and fetch updates:
+cd static/vendor/jquery
+git fetch
 
-    # ALWAYS checkout a release tag, don't just checkout master!
-    git checkout v2.1.4
+# ALWAYS checkout a release tag, don't just checkout master!
+git checkout v2.1.4
 
-    # chdir back to the project dir and commit:
-    cd ../..
-    git commit -m "Update jquery submodule to v2.1.4"
-
+# chdir back to the project dir and commit:
+cd ../../..
+git commit -m "Update jquery submodule to v2.1.4"
+```
 
 [grunt]: http://gruntjs.com
 [node]: https://nodejs.org
