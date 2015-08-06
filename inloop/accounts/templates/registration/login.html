@@ -3,36 +3,36 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            {% if login_failed %}
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <strong>Error:</strong> Invalid username or password!
-                </div>
-            {% endif %}
-        </div>
+{% if login_failed %}
+<div class="alert alert-danger alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  Invalid username or password!
+</div>
+{% endif %}
+<div class="center-block" style="max-width: 25em">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Login</h2>
     </div>
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <form method="post" action="{% url 'accounts:user_login' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input class="form-control" type="text" id="username"
-                           name="username" value="" size="50" />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input class="form-control" type="password" id="password"
-                           name="password" value="" size="50" />
-                </div>
-                <button type="submit" class="btn btn-default">Login</button>
-            </form>
-            <br />
-            <a href="{% url 'accounts:password_reset' %}">I forgot my password!</a>
+    <div class="panel-body">
+      <form method="post" action="{% url 'accounts:user_login' %}" accept-charset="utf-8">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input class="form-control" type="text" id="username" name="username">
         </div>
+        <div class="form-group">
+          <label for="password">
+            Password
+            <a href="{% url 'accounts:password_reset' %}">(forgot your password?)</a>
+          </label>
+          <input class="form-control" type="password" id="password" name="password">
+        </div>
+        <button type="submit" class="btn btn-default">Login</button>
+      </form>
     </div>
+  </div><!--/.panel -->
+</div>
 {% endblock %}
