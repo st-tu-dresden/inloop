@@ -18,3 +18,4 @@ media/
 .coverage
 htmlcov
 static/node_modules/
+.vagrant/
