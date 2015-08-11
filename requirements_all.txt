@@ -1,0 +1,4 @@
+-r requirements_dev.txt
+gunicorn==19.3.0
+psycopg2==2.6.1
+setproctitle==1.1.9
