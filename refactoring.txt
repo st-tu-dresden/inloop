@@ -21,6 +21,15 @@ General
       of including it (!!!)
     - candidates: accounts.urls
 
+ * G04: don't rely on default encoding in open() and related funcs
+    - although we have been lucky until now, the old Praktomat crashed several times
+      because the code assumed the default locale was set to UTF-8
+    - solution: use `open(encoding='utf-8')`
+    - see also: C04
+
+ * G05: while we are at it, always use `open()` and related funcs (e.g., temporary files)
+   as context manager to prevent resource leaks
+
 Models
 ======
 
@@ -42,7 +51,7 @@ View code
 
  * V03: use class-based views
     - code smell: repeated pattern `if request.method == 'POST': ... else: ...`
-    - override `View.get()` and `View.post()` instead
+    - solution: override `View.get()` and `View.post()` instead
     - candidates: tasks.index()
 
 Templates
@@ -78,3 +87,7 @@ CSS/HTML
     - also see: T02
 
  * C03: HTML5 is not XML, so there's no need for `/>` on single tags (e.g., `<input>`)
+
+ * C04: specify encoding
+    - at the document level: `<meta charset="utf-8">`
+    - for forms: `<form accept-charset="utf-8">`
