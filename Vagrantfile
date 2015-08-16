@@ -27,8 +27,8 @@ Vagrant.configure(2) do |config|
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y --no-install-recommends \
-      build-essential libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
-      postgresql-9.1 python3.4 python3.4-dev redis-server zlib1g-dev
+      build-essential git libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
+      postgresql-9.1 pigz python3.4 python3.4-dev redis-server zlib1g-dev
   EOF
 
   # Self-signed certificate for integration tests
