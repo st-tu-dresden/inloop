@@ -6,6 +6,9 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/precise64"
   config.vm.hostname = "precise"
 
+  # Prevent Vagrant from auto-checking the version. This slows down the integration tests.
+  config.vm.box_check_update = false
+
   # Setup third party package repositories
   config.vm.provision :shell, privileged: true, inline: <<-EOF
     set -e

@@ -19,3 +19,4 @@ media/
 htmlcov
 static/node_modules/
 .vagrant/
+.ssh_deploy_key_*
