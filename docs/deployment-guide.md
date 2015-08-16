@@ -26,7 +26,14 @@ own process with its own user id).
 
 ### Before installing
 
-Please make sure that you have installed all packages that are defined in the
+**NOTE**: if you are testing this on the Vagrant box just use
+
+    sudo python3.4 /vagrant/setup_tools/provision.py /srv/apps
+    su - inloop
+
+and proceed with [Installation steps](#installation-steps).
+
+Please ensure that you have installed all packages that are defined in the
 `Vagrantfile`. Especially, make sure you have Python 3.4!
 
 Next, use the provisioning script to setup the recommended deployment
