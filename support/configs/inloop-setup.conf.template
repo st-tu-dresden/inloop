@@ -1,5 +1,6 @@
 description "Prepare INLOOP environment"
-start on starting inloop
+
+start on starting inloop-web
 
 task
 
@@ -9,7 +10,8 @@ task
 # We also cannot create the directory in the main upstart file,
 # because it runs as non-root user.
 script
-    mkdir -p /var/run/inloop && chown inloop:inloop /var/run/inloop
+    mkdir -p /var/run/inloop && chown %(inloop_run)s:%(inloop_run)s /var/run/inloop
+    mkdir -p /var/log/inloop && chown %(inloop_run)s:%(inloop_run)s /var/log/inloop
 end script
 
 # vim:ft=upstart

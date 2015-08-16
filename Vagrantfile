@@ -6,6 +6,9 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/precise64"
   config.vm.hostname = "precise"
 
+  # Prevent Vagrant from auto-checking the version. This slows down the integration tests.
+  config.vm.box_check_update = false
+
   # Setup third party package repositories
   config.vm.provision :shell, privileged: true, inline: <<-EOF
     set -e
@@ -24,8 +27,21 @@ Vagrant.configure(2) do |config|
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y --no-install-recommends \
-      build-essential libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
-      postgresql-9.1 python3.4 python3.4-dev redis-server zlib1g-dev
+      build-essential git libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
+      postgresql-9.1 pigz python3.4 python3.4-dev redis-server zlib1g-dev
+  EOF
+
+  # Self-signed certificate for integration tests
+  config.vm.provision :shell, privileged: true, inline: <<-EOF
+    openssl req -newkey rsa:2048 -x509 -days 365 -nodes -sha256 -subj "/CN=$(hostname)/C=DE/" \
+      -out /etc/ssl/certs/inloop.pem -keyout /etc/ssl/private/inloop.key >~/openssl.log 2>&1
+    if [ $? -eq 0 ]; then
+      chmod 600 /etc/ssl/private/inloop.key
+      rm -f ~/openssl.log
+    else
+      echo "OpenSSL certificate creation failed, see $HOME/openssl.log" >&2
+      exit 1
+    fi
   EOF
 
   # Initialize the virtualenv (on Python 3.4, we can use the bundled pyvenv) and

@@ -1,0 +1,14 @@
+description "INLOOP huey message queue"
+
+start on starting inloop-web
+stop on stopping inloop-web
+
+respawn
+respawn limit 3 10
+setuid %(inloop_run)s
+chdir %(inloop_root)s
+
+exec %(inloop_bin)s/python manage.py run_huey \
+     --settings=inloop.settings.production --workers=2
+
+# vim:ft=upstart

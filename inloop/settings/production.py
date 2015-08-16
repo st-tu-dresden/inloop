@@ -1,4 +1,3 @@
-import os
 from os import path
 
 from inloop.core.utils import filter_uppercase_keys
@@ -6,50 +5,50 @@ from inloop.settings import base
 
 globals().update(filter_uppercase_keys(vars(base)))
 
-SECRET_KEY = os.environ['SECRET_KEY']
-SITE_ID = os.environ['SITE_ID']
+local_conf = {}
+with open("local_conf.py") as f:
+    exec(f.read(), local_conf)
+
+SITE_ID = 1
+SECRET_KEY = local_conf['secret_key']
+DOMAIN = 'https://{server_name}/'.format(**local_conf)
 
 # No debug pages!
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
-
-# XXX: use contrib.sites for this, because contrib.auth does it too
-DOMAIN = 'https://inloop.inf.tu-dresden.de/'
+TEMPLATE_DEBUG = False
 
 # Postgres connection parameters
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['PG_NAME'],
-        'USER': os.environ['PG_USER'],
-        'PASSWORD': os.environ['PG_PASSWORD'],
-        # HOST and PORT are omitted, defaults to using unix sockets
+        'NAME': local_conf['pg_name'],
+        'USER': local_conf['pg_user'],
+        'PASSWORD': local_conf['pg_pass'],
+        'HOST': local_conf['pg_host'],
+        'PORT': local_conf['pg_port'],
     }
 }
 
-deploy_root = '/srv/inloop.inf.tu-dresden.de'
-
 # Path where `manage.py collectstatic` collects files
-STATIC_ROOT = path.join(deploy_root, 'static')
+STATIC_ROOT = local_conf['static_root']
 
 # Enable cache busting through hashed file names
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Path to media files
-MEDIA_ROOT = path.join(deploy_root, 'media')
+MEDIA_ROOT = local_conf['media_root']
 
 # Security related settings
-ALLOWED_HOSTS = ['inloop.inf.tu-dresden.de']
+ALLOWED_HOSTS = [local_conf['server_name']]
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # Email From: addresses
-DEFAULT_FROM_EMAIL = 'no-reply@inloop.inf.tu-dresden.de'
+DEFAULT_FROM_EMAIL = 'no-reply@{server_name}'.format(**local_conf)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# Send error reports to root (which is normally forwarded to
-# a real address)
-ADMINS = (('root', 'root@localhost'),)
+# Adresses to send error reports to (tuple of tuples (real name, email))
+ADMINS = local_conf['admins']
 
 # SMTP server settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -62,10 +61,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
 # The secret used for the webhook
-GITHUB_SECRET = os.environ['GITHUB_SECRET']
+GITHUB_SECRET = local_conf['github_secret']
 
 # Settings related to the Git import
-GIT_SSH_KEY = path.join(deploy_root, 'github_ssh_deploy_key')
-GIT_SSH_URL = 'git@github.com:st-tu-dresden/inloop-tasks.git'
-GIT_BRANCH = 'gradle/master'
 GIT_ROOT = path.join(MEDIA_ROOT, 'tasks')
+GIT_SSH_KEY = None
+GIT_SSH_URL = local_conf['tasks_repository']
+GIT_BRANCH = local_conf['tasks_branch']

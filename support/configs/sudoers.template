@@ -1,0 +1,2 @@
+%(inloop_adm)s ALL=(ALL) NOPASSWD: /usr/sbin/service inloop-web *
+%(inloop_adm)s ALL=(ALL) NOPASSWD: /usr/sbin/service inloop-queue *
