@@ -49,16 +49,16 @@ code before every commit. In case the `flake8` check throws any errors, the comm
 is canceled and the errors are shown for correction. The bundled commit hook can be installed
 as follows:
 
-    cd .git/hooks
-    ln -s ../../support/pre-commit.sh pre-commit
+    cp support/git-hooks/pre-commit .git/hooks
 
+I recommend to copy instead of symlink, which can save you from trouble when switch to a defect
+branch.
 
 ### Commit message git hook
 
 You must also install the commit message hook to enforce consistent commit messages:
 
-    cd .git/hooks
-    ln -s ../../support/commit_msg.py commit-msg
+    cp support/git-hooks/commit-msg .git/hooks
 
 
 ### Notes on flake8
