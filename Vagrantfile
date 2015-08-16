@@ -31,6 +31,19 @@ Vagrant.configure(2) do |config|
       postgresql-9.1 python3.4 python3.4-dev redis-server zlib1g-dev
   EOF
 
+  # Self-signed certificate for integration tests
+  config.vm.provision :shell, privileged: true, inline: <<-EOF
+    openssl req -newkey rsa:2048 -x509 -days 365 -nodes -sha256 -subj "/CN=$(hostname)/C=DE/" \
+      -out /etc/ssl/certs/inloop.pem -keyout /etc/ssl/private/inloop.key >~/openssl.log 2>&1
+    if [ $? -eq 0 ]; then
+      chmod 600 /etc/ssl/private/inloop.key
+      rm -f ~/openssl.log
+    else
+      echo "OpenSSL certificate creation failed, see $HOME/openssl.log" >&2
+      exit 1
+    fi
+  EOF
+
   # Initialize the virtualenv (on Python 3.4, we can use the bundled pyvenv) and
   # ensure the newest pip and setuptools are installed
   config.vm.provision :shell, privileged: false, inline: <<-EOF
