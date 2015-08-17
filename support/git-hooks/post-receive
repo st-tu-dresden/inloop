@@ -1,0 +1,51 @@
+#!/usr/bin/env python3.4
+"""
+Git post-receive hook for push deployment.
+
+You can also trigger it manually in your clone with e.g.:
+
+  echo "a b refs/heads/master" | path/to/post-receive
+
+Ported and adapted from https://gist.github.com/ryanflorence/585746.
+"""
+import os
+import sys
+from os import environ
+from subprocess import call, check_output
+
+if environ["GIT_DIR"] == ".":
+    # if called as a hook, change to the non-bare clone
+    os.chdir("../inloop")
+    environ["GIT_DIR"] = ".git"
+
+# set the PATH equal to the one we get when logging in directly
+# (includes the virtualenv)
+cmd = ["bash", "-c", "source ~/.profile; echo $PATH"]
+path = check_output(cmd, universal_newlines=True).strip()
+environ["PATH"] = path
+
+# where does HEAD point to?
+cmd = ["git", "symbolic-ref", "HEAD"]
+head = check_output(cmd, universal_newlines=True).strip()
+
+# check for local modifications
+if call(["git", "diff", "--quiet"]) != 0:
+    sys.exit("Dirty working directory.")
+
+oldrev = newrev = None
+null_ref = "0" * 40
+
+# try to find the pushed ref that corresponds to our HEAD
+for line in sys.stdin.readlines():
+    revs = line.split()
+    if revs.pop() == head:
+        oldrev, newrev = revs
+        break
+
+if not newrev or newrev == null_ref:
+    print("Nothing to do.")
+    sys.exit()
+
+# The -u switch (unbuffered) should prevent "random"
+# ordering of the different output streams
+call(["python", "-u", "deploy.py", "--pull"])

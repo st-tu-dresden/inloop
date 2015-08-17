@@ -1,4 +1,5 @@
 import os
+import sys
 from os import path
 from subprocess import call, check_call as run
 from time import strftime
@@ -18,16 +19,21 @@ os.makedirs(local_conf['static_root'], exist_ok=True)
 
 print("Enabling maintainance mode")
 offline_link = path.join(local_conf['server_root'], OFFLINE_PAGE)
+# the src *must* be absolute:
 os.symlink(path.join(path.abspath("static"), OFFLINE_PAGE), offline_link)
 
-print("Stopping services -- soft fail")
+print("Stopping services")
 call(["sudo", "service", "inloop-web", "stop"])
 
+if "--pull" in sys.argv:
+    print("Pulling changes")
+    run(["git", "pull", "-q", "--ff-only", "origin"])
+
 print("Updating pip and setuptools")
-run(["pip", "install", "--upgrade", "pip", "setuptools"])
+run(["pip", "install", "-q", "--upgrade", "pip", "setuptools"])
 
 print("Installing requirements")
-run(["pip", "install", "-r", "requirements_all.txt"])
+run(["pip", "install", "-q", "-r", "requirements_all.txt"])
 
 print("Precompiling Python sources")
 run(["python", "-m", "compileall", "-fq", "inloop"])
