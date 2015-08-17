@@ -21,7 +21,7 @@ Vagrant.configure(2) do |config|
     apt-key adv --keyserver keyserver.ubuntu.com --recv-key DB82666C
   EOF
 
-  # Install required Ubuntu packages
+  # Install required Ubuntu packages and adjust the timezone
   config.vm.provision :shell, privileged: true, inline: <<-EOF
     set -e
     export DEBIAN_FRONTEND=noninteractive
@@ -29,6 +29,16 @@ Vagrant.configure(2) do |config|
     apt-get install -y --no-install-recommends \
       build-essential git libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
       postgresql-9.1 pigz python3.4 python3.4-dev redis-server zlib1g-dev
+
+    echo "Europe/Berlin" >/etc/timezone
+    dpkg-reconfigure tzdata
+  EOF
+
+  # Add the deadsnakes Python as /usr/bin/python3
+  config.vm.provision :shell, privileged: true, inline: <<-EOF
+    update-alternatives \
+      --install /usr/bin/python3 python3 /usr/bin/python3.4 1 \
+      --slave /usr/bin/pyvenv pyvenv /usr/bin/pyvenv-3.4
   EOF
 
   # Self-signed certificate for integration tests
