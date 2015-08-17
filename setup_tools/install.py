@@ -31,12 +31,12 @@ for src, dest, mode in install:
         shutil.copyfile(src, dest)
     os.chmod(dest, mode)
 
-print("Ensuring good permissions for local_conf.py")
+print("Ensuring good permissions for local_conf.py.")
 os.chmod("local_conf.py", 0o640)
 shutil.chown("local_conf.py", local_conf["inloop_adm"], local_conf["inloop_run"])
 
-print("Creating %s" % local_conf["media_root"])
-os.mkdir(local_conf["media_root"])
+print("Creating %s if needed." % local_conf["media_root"])
+os.makedirs(local_conf["media_root"], exist_ok=True)
 shutil.chown(local_conf["media_root"], local_conf["inloop_run"], local_conf["inloop_run"])
 
 print("Done.")
