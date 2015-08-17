@@ -11,11 +11,11 @@ with open("local_conf.py") as f:
 
 configs_dir = "support/configs"
 install = [
-    ("logrotate.conf", "/etc/logrotate.d/inloop", 0o640),
-    ("nginx.conf.template", "/etc/nginx/conf.d/inloop.conf", 0o640),
-    ("inloop-web.conf.template", "/etc/init/inloop-web.conf", 0o640),
-    ("inloop-setup.conf.template", "/etc/init/inloop-setup.conf", 0o640),
-    ("inloop-queue.conf.template", "/etc/init/inloop-queue.conf", 0o640),
+    ("logrotate.conf", "/etc/logrotate.d/inloop", 0o644),
+    ("nginx.conf.template", "/etc/nginx/conf.d/inloop.conf", 0o644),
+    ("inloop-web.conf.template", "/etc/init/inloop-web.conf", 0o644),
+    ("inloop-setup.conf.template", "/etc/init/inloop-setup.conf", 0o644),
+    ("inloop-queue.conf.template", "/etc/init/inloop-queue.conf", 0o644),
     ("sudoers.template", "/etc/sudoers.d/inloop", 0o440),
 ]
 
