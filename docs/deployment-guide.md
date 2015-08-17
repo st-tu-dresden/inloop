@@ -75,12 +75,23 @@ For a fresh install:
    Try `psql --list` to see if that worked.
 7. Reload nginx with `sudo service nginx reload`.
 8. Initialize and load the application with `python deploy.py`. This can take a while.
+9. Create a Django admin account with `python manage.py createsuperuser`.
 
 Updates are easy: `git pull && python deploy.py`. Service reloading is handled by
 the deploy tool, but you can do it manually with `sudo service inloop-web restart`
 (this also restarts `inloop-queue`).
 
 The deploy tool also saves DB dumps in `~/db_snapshots` before applying migrations.
+
+
+### Push deploy
+
+It is also possible to trigger deployment with a `git push` (requires a working SSH
+login for the `inloop` user). Use the bundled tool
+
+    python setup_tools/push_deploy.py inloop@<your-host> production
+
+to trigger deployment on `<your-host>` with a simple `git push production master`.
 
 
 ### Debugging
