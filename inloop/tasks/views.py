@@ -283,7 +283,13 @@ def delete(request, slug):
 
 @login_required
 def results(request, slug):
-    pass
+    task = get_object_or_404(Task, slug=slug)
+    solution = get_object_or_404(TaskSolution, task=task)
+
+    return(render(request, 'tasks/task-result.html', {
+        'task': task,
+        'solution': solution
+    }))
 
 
 @superuser_required
