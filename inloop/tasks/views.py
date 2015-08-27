@@ -285,6 +285,7 @@ def delete(request, slug):
 def results(request, slug):
     task = get_object_or_404(Task, slug=slug)
     solution = get_object_or_404(TaskSolution, task=task)
+    # TODO: Only show tasks of current users
 
     return(render(request, 'tasks/task-result.html', {
         'task': task,
