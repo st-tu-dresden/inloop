@@ -96,3 +96,7 @@ def latest_solution_files(task, username):
         # display templates
         overview = get_task_templates(task.title)
     return overview
+
+
+def solution_file_dict(solution):
+    pass
