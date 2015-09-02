@@ -91,7 +91,7 @@
             <h4>Your latest solutions</h4>
             <ul>
             {% for sol in latest_solutions %}
-                <li>Solution from {{ sol.submission_date }} <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> <a href="{% url 'tasks:results' slug sol.id %}">Results</a></li>
+                <li>Solution from {{ sol.submission_date }} <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> - <a href="{% url 'tasks:results' slug sol.id %}">Results</a></li>
             {% endfor %}
             </ul>
         </div>
