@@ -60,7 +60,7 @@
     {% for fname in solution_files.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
-        editor.setReadOnly(true);
+        editor{{ forloop.counter }}.setReadOnly(true);
     {% endfor %}
 </script>
 {% endblock %}
