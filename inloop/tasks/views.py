@@ -282,9 +282,9 @@ def delete(request, slug):
 
 
 @login_required
-def results(request, slug):
+def results(request, slug, solution_id):
     task = get_object_or_404(Task, slug=slug)
-    solution = get_object_or_404(TaskSolution, task=task)
+    solution = get_object_or_404(TaskSolution, task=task, id=solution_id)
     solution_files = fsu.solution_file_dict(solution)
     # TODO: Only show tasks of current users
 
