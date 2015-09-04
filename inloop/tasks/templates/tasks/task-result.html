@@ -8,6 +8,19 @@
     <div class="col-md-10 col-md-offset-1">
         <h1>{{task.title}} Results</h1>
         <br />
+        <div class="checker-status">
+            {% if solution.is_correct %}
+            <div class="status-container">
+                <span class="glyphicon glyphicon-ok-sign big-icon-greeny" aria-hidden="true"></span>
+                <span class="status-text">PASSED</span>
+            </div>
+            {% else %}
+            <div class="status-container">
+                <span class="glyphicon glyphicon-remove-sign big-icon-red" aria-hidden="true"></span>
+                <span class="status-text">FAILED</span>
+            </div>
+            {% endif %}
+        </div>
         <div role="tabpanel">
             <!-- nav tabs -->
             {% if solution_files %}
