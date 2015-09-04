@@ -25,7 +25,9 @@ Otherwise, please read on.
 If you want to make changes to the layout (and therefore, files in `src`), you
 need to regenerate the `dist` files with [grunt][], which depends on [node][].
 
-If you haven't already done so, install `grunt`:
+First, ensure you have the [Git submodules ready](#vendor-submodules).
+
+Then, if you haven't already done so, install `grunt`:
 
 ```bash
 # Install node on Ubuntu/Debian
