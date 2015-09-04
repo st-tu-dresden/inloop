@@ -8,19 +8,27 @@
     <div class="col-md-10 col-md-offset-1">
         <h1>{{task.title}} Results</h1>
         <br />
-        <div class="checker-status">
-            {% if solution.is_correct %}
-            <div class="status-container">
-                <span class="glyphicon glyphicon-ok-sign big-icon-greeny" aria-hidden="true"></span>
-                <span class="status-text">PASSED</span>
-            </div>
-            {% else %}
-            <div class="status-container">
-                <span class="glyphicon glyphicon-remove-sign big-icon-red" aria-hidden="true"></span>
-                <span class="status-text">FAILED</span>
-            </div>
-            {% endif %}
+        {% if solution.is_correct %}
+        <div class="panel panel-success">
+                <div class="panel-heading">
+                    Checker Results
+                </div>
+                <div class="panel-body">
+                    <span class="glyphicon glyphicon-ok-sign big-icon-green" aria-hidden="true"></span>
+                    <span class="status-text-success">PASSED</span>
+                </div>
         </div>
+        {% else %}
+        <div class="panel panel-danger">
+                <div class="panel-heading">
+                    Checker Results
+                </div>
+                <div class="panel-body">
+                    <span class="glyphicon glyphicon-remove-sign big-icon-red" aria-hidden="true"></span>
+                    <span class="status-text-failed">FAILED</span>
+                </div>
+        </div>
+        {% endif %}
         <div role="tabpanel">
             <!-- nav tabs -->
             {% if solution_files %}
