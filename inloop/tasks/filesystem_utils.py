@@ -86,7 +86,7 @@ def latest_solution_files(task, username):
         day = leading_zero(max_int_in_dir(p))
         p = join(p, day)
         time = filter(lambda x: str(x).endswith(max_id_in_dir(p)), listdir(p))
-        p = join(p, time[0])  # filter delivers one element list
+        p = join(p, next(time))  # filter delivers one element list
 
         filenames = map(basename, glob(p + path.sep + '*.java'))
         for fname in filenames:
