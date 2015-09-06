@@ -1,5 +1,5 @@
 import zipfile
-from io import StringIO
+from io import BytesIO
 from os import path
 
 from django.http import HttpResponse
@@ -189,7 +189,7 @@ def get_solution_as_zip(request, slug, solution_id):
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'filename={}'.format(filename)
 
-    buffer = StringIO()
+    buffer = BytesIO()
     zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
 
     for tsf in solution_files:
