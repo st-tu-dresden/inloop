@@ -34,8 +34,8 @@ You'll at least need:
 
 * Tools to build Python extensions (e.g., required by Pillow and psycopg2)
     * Build tools (`gcc`/`clang`, `make`)
-    * Python development files
-* zlib and libjpeg header files (for Pillow)
+    * The `python3-dev` package (Python 3 development files)
+* For Pillow: `libtiff4-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev`
 * libpq header files (for psycopg2)
 
 If you use a Debian-based Linux, take a look at the `Vagrantfile` to get a
