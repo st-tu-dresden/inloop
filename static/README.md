@@ -31,7 +31,8 @@ Then, if you haven't already done so, install `grunt`:
 
 ```bash
 # Install node on Ubuntu/Debian
-apt-get install nodejs
+sudo apt-get install nodejs
+sudo apt-get install npm
 
 # ... on OS X
 brew install node
