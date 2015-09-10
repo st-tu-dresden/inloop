@@ -37,6 +37,12 @@ sudo apt-get install npm
 # ... on OS X
 brew install node
 
+# Resolve package name issue on Ubuntu/Debian
+ln -s /usr/bin/nodejs /usr/bin/node
+
+# Satisfy Grunt dependency on Ubuntu/Debian
+sudo npm install --save coffee-script
+
 # Install grunt globally (may need sudo)
 npm install -g grunt-cli
 
