@@ -82,11 +82,11 @@ And you will know My name is the Lord when I lay My vengeance upon thee.</pre>
                 {% for fname, content in solution_files.items %}
                     {% if forloop.first %}
                         <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                            <div class="noselection" id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                     {% else %}
                         <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                            <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
+                            <div class="noselection" id="editor{{ forloop.counter }}">{{ content|escape }}</div>
                         </div>
                     {% endif %}
                 {% empty %}
@@ -105,7 +105,11 @@ And you will know My name is the Lord when I lay My vengeance upon thee.</pre>
     {% for fname in solution_files.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
-        editor{{ forloop.counter }}.setReadOnly(true);
+        editor{{ forloop.counter }}.setOptions({
+            readOnly: true,
+            highlightActiveLine: false,
+            highlightGutterLine: false
+        });
     {% endfor %}
 </script>
 {% endblock %}

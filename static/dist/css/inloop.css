@@ -7377,6 +7377,9 @@ textarea[id^="content"] {
   margin-right: 10px;
   font-size: 18px;
 }
+.noselection .ace_cursor-layer .ace_cursor {
+  color: transparent;
+}
 /* @end */
 /* @begin task result styles*/
 .status-text-success {
