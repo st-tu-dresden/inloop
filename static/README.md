@@ -41,7 +41,7 @@ brew install node
 ln -s /usr/bin/nodejs /usr/bin/node
 
 # Satisfy Grunt dependency on Ubuntu/Debian
-sudo npm install --save coffee-script
+sudo npm install -g coffee-script
 
 # Install grunt globally (may need sudo)
 npm install -g grunt-cli
