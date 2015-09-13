@@ -51,6 +51,10 @@ class TaskCategory(models.Model):
     image = models.ImageField(null=True, upload_to='images/category_thumbs/')
     objects = TaskCategoryManager()
 
+    def save(self, *args, **kwargs):
+        self.short_id = slugify(self.name)
+        super(TaskCategory, self).save(*args, **kwargs)
+
     def get_tuple(self):
         return (self.short_id, self.name)
 
