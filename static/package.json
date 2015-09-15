@@ -1,6 +1,7 @@
 {
-  "name": "django-assets",
+  "name": "inloop-assets",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
     "grunt": "^0.4.5"
   },

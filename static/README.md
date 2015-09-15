@@ -25,26 +25,31 @@ Otherwise, please read on.
 If you want to make changes to the layout (and therefore, files in `src`), you
 need to regenerate the `dist` files with [grunt][], which depends on [node][].
 
-First, ensure you have the [Git submodules ready](#vendor-submodules).
+#### Prerequisites
 
-Then, if you haven't already done so, install `grunt`:
+1. First, ensure you have the [Git submodules ready](#vendor-submodules).
 
-```bash
-# Install node on Ubuntu/Debian
-sudo apt-get install nodejs
-sudo apt-get install npm
+2. Install node, npm, grunt and its deps:
 
-# ... on OS X
-brew install node
+    * Ubuntu/Debian:
 
-# Install grunt globally (may need sudo)
-npm install -g grunt-cli
+            sudo apt-get install nodejs npm
+            sudo ln -s /usr/bin/nodejs /usr/local/bin/node
+            sudo npm install -g coffee-script
+            sudo npm install -g grunt-cli
 
-# Install dependencies needed in our Gruntfile. This will create a
-# node_modules directory (which is git-ignored).
-cd inloop/static
-npm install
-```
+    * Mac OS X, using Homebrew
+
+            brew install node
+            npm install -g grunt-cli
+
+3. Install the dependencies listed in our `package.json`. Don't `sudo` here!
+
+        cd inloop/static
+        npm install
+
+
+#### Building it
 
 The assets can be built by executing
 
