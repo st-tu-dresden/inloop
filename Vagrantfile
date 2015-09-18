@@ -28,7 +28,8 @@ Vagrant.configure(2) do |config|
     apt-get update
     apt-get install -y --no-install-recommends \
       build-essential git libjpeg-dev libpq-dev nginx openjdk-7-jre-headless \
-      postgresql-9.1 pigz python3.4 python3.4-dev redis-server zlib1g-dev
+      postgresql-9.1 pigz python3.4 python3.4-dev python3.4-venv redis-server \
+      zlib1g-dev
 
     echo "Europe/Berlin" >/etc/timezone
     dpkg-reconfigure tzdata
