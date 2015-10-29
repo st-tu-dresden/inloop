@@ -157,9 +157,10 @@ class Checker:
 
     def start(self):
         # TODO: Give container unique name during execution
-        cmd = 'bash -c \"cd {loc} && {test}'.format(loc=self.task_location, test=self.test_cmd)
+        cmd = 'bash -c \"cd {loc}&&{test}'.format(loc=self.task_location, test=self.test_cmd)
         self._container_build('docker-test').decode()
-        result = self._container_execute(cmd.split(' '), 'docker-test', 'test').decode()
+        result = self._container_execute(cmd=cmd.split(' '), ctr_tag='docker-test', ctr_name='test')
+        result = result.decode()
         self._parse_result(result)
 
     def _container_build(ctr_tag, path='.'):
