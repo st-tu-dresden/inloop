@@ -170,11 +170,16 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, cmd=[], ctr_tag, ctr_name):
-        # TODO: Add needed volumes (multiple -v=...)
-        p = Popen(['timeout', '-s', 'SIGKILL', '2',
-                   'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag].extend(cmd),
-                  stdout=PIPE)
+    def _container_execute(self, cmd=[], ctr_tag, ctr_name, **mountpoints):
+        # Add timeout to docker process
+        popen_args = ['timeout', '-s', 'SIGKILL', '2']
+        # Remove container after exit
+        popen_args.extend(['docker', 'run', '--rm=true'])
+        popen_args.extend(['--name', ctr_name])
+        # Add mountpoints: {host: container} -> -v=host:container
+        popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        # Execute container
+        p = Popen(popen_args, stdout=PIPE)
         out = p.stdout.read()
 
         if p.wait() == -9:  # Happens on timeout
