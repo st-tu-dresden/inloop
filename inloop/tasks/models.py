@@ -166,8 +166,8 @@ class Checker:
             ctr_tag='docker-test',
             ctr_name='test',
             mountpoints={
-                self.task_location: '/home/checker/',
-                self.solution_path: '/mnt/solution'
+                self.task_location: '/home/checker/:ro',
+                self.solution_path: '/mnt/solution/'
             }).decode()
         self._parse_result(result)
 
