@@ -153,14 +153,22 @@ class TaskSolutionFile(models.Model):
 
 class Checker:
     def __init__(self, solution_path):
-        self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(solution_path)
+        self.solution_path = solution_path
+        self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
         self.task_location = ''  # TODO: Get location of task (../gradlew call) from settings?
 
     def start(self):
         # TODO: Give container unique name during execution
-        cmd = 'bash -c \"cd {} && {}'.format(self.task_location, self.test_cmd)
-        self._container_build('docker-test').decode()
-        result = self._container_execute(cmd=shplit(cmd), ctr_tag='docker-test', ctr_name='test')
+        cmd = 'bash -c \"cd /home/checker/ && ' + self.test_cmd
+        self._container_build('docker-test')
+        result = self._container_execute(
+            cmd=shplit(cmd),
+            ctr_tag='docker-test',
+            ctr_name='test',
+            mountpoints={
+                self.task_location: '/home/checker/',
+                self.solution_path: '/mnt/solution'
+            })
         result = result.decode()
         self._parse_result(result)
 
