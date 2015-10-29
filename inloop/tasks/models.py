@@ -151,9 +151,8 @@ class TaskSolutionFile(models.Model):
 
 
 class Checker:
-    def __init__(self, **config):
-        self.config = config
-        self.test_cmd = "../gradlew -q test"  # TODO: Fix path issue
+    def __init__(self, solution_path):
+        self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(solution_path)
         self.task_location = ''  # TODO: Get location of task (../gradlew call)
 
     def start(self):
