@@ -168,8 +168,7 @@ class Checker:
             mountpoints={
                 self.task_location: '/home/checker/',
                 self.solution_path: '/mnt/solution'
-            })
-        result = result.decode()
+            }).decode()
         self._parse_result(result)
 
     def _container_build(ctr_tag, path='.'):
