@@ -170,6 +170,7 @@ class Checker:
         return out
 
     def _container_execute(self, cmd=[], ctr_tag, ctr_name):
+        # TODO: Add needed volumes (multiple -v=...)
         p = Popen(['timeout', '-s', 'SIGKILL', '2',
                    'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag].extend(cmd),
                   stdout=PIPE)
