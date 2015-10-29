@@ -1,5 +1,6 @@
 import re
 from os.path import join
+from subprocess import Popen, PIPE
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -147,3 +148,47 @@ class TaskSolutionFile(models.Model):
     solution = models.ForeignKey(TaskSolution)
     filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
+
+
+class Checker:
+    def __init__(self, **config):
+        self.config = config
+        self.cmd = "gradlew -q test"
+
+    def start(self):
+        self._container_build('docker-test').decode()
+        result = self._container_execute(self.cmd, 'docker-test').decode()
+        self._parse_result(result)
+
+    def _container_build(ctr_tag, path='.'):
+        p = Popen(['timeout', '-s', 'SIGKILL', '30',
+                   'docker', 'build', '-t', ctr_tag, '--rm=true', path],
+                  stdout=PIPE)
+        out = p.stdout.read()
+        return out
+
+    def _container_execute(self, cmd, ctr_tag):
+        ctr_name = 'docker-py-test'
+        p = Popen(['timeout', '-s', 'SIGKILL', '2',
+                   'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag, cmd],
+                  stdout=PIPE)
+        out = p.stdout.read()
+
+        if p.wait() == -9:  # Happens on timeout
+            # We have to kill the container since it still runs
+            # detached from Popen and we need to remove it after because
+            # --rm is not working on killed containers
+            self._kill_and_remove(ctr_name)
+
+        return out
+
+    def _kill_and_remove(ctr_name):
+        for action in ('kill', 'rm'):
+            p = Popen('docker %s %s' % (action, ctr_name), shell=True,
+                      stdout=PIPE, stderr=PIPE)
+            if p.wait() != 0:
+                raise RuntimeError(p.stderr.read())
+
+    def _parse_result(self):
+        # create a CheckerResult
+        pass
