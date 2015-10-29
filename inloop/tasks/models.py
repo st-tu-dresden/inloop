@@ -1,6 +1,7 @@
 import re
 from os.path import join
 from subprocess import Popen, PIPE
+from shlex import split as shplit
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -159,7 +160,7 @@ class Checker:
         # TODO: Give container unique name during execution
         cmd = 'bash -c \"cd {loc}&&{test}'.format(loc=self.task_location, test=self.test_cmd)
         self._container_build('docker-test').decode()
-        result = self._container_execute(cmd=cmd.split(' '), ctr_tag='docker-test', ctr_name='test')
+        result = self._container_execute(cmd=shplit(cmd), ctr_tag='docker-test', ctr_name='test')
         result = result.decode()
         self._parse_result(result)
 
@@ -178,6 +179,8 @@ class Checker:
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        # Add the actual compilation and test command
+        popen_args.extend(cmd)
         # Execute container
         p = Popen(popen_args, stdout=PIPE)
         out = p.stdout.read()
