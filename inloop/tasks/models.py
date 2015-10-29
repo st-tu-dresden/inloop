@@ -156,8 +156,9 @@ class Checker:
         self.cmd = "gradlew -q test"
 
     def start(self):
+        # TODO: Give container unique name during execution
         self._container_build('docker-test').decode()
-        result = self._container_execute(self.cmd, 'docker-test').decode()
+        result = self._container_execute(self.cmd, 'docker-test', 'test').decode()
         self._parse_result(result)
 
     def _container_build(ctr_tag, path='.'):
@@ -167,8 +168,7 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, cmd, ctr_tag):
-        ctr_name = 'docker-py-test'
+    def _container_execute(self, cmd, ctr_tag, ctr_name):
         p = Popen(['timeout', '-s', 'SIGKILL', '2',
                    'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag, cmd],
                   stdout=PIPE)
