@@ -153,13 +153,13 @@ class TaskSolutionFile(models.Model):
 class Checker:
     def __init__(self, solution_path):
         self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(solution_path)
-        self.task_location = ''  # TODO: Get location of task (../gradlew call)
+        self.task_location = ''  # TODO: Get location of task (../gradlew call) from settings?
 
     def start(self):
         # TODO: Give container unique name during execution
         cmd = 'bash -c \"cd {loc} && {test}'.format(loc=self.task_location, test=self.test_cmd)
         self._container_build('docker-test').decode()
-        result = self._container_execute(cmd, 'docker-test', 'test').decode()
+        result = self._container_execute(cmd.split(' '), 'docker-test', 'test').decode()
         self._parse_result(result)
 
     def _container_build(ctr_tag, path='.'):
@@ -169,9 +169,9 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, cmd, ctr_tag, ctr_name):
+    def _container_execute(self, cmd=[], ctr_tag, ctr_name):
         p = Popen(['timeout', '-s', 'SIGKILL', '2',
-                   'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag, cmd],
+                   'docker', 'run', '--rm=true', '--name', ctr_name, ctr_tag].extend(cmd),
                   stdout=PIPE)
         out = p.stdout.read()
 
