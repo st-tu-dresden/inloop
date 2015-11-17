@@ -151,13 +151,17 @@ class TaskSolutionFile(models.Model):
     filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
 
+    def solution_path(self):
+        return file.url
+
 
 class Checker:
-    def __init__(self, solution_path):
-        self.solution_path = solution_path
+    def __init__(self, solution):
+        self.solution = solution
+        self.solution_path = solution.solution_path()  # Format?
+        self.task_slug = solution.task.slug
         self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
-        self.task_location = join(settings.MEDIA_ROOT, 'exercises', 'task-slug')
-        # TODO: Get slug of task for unique path
+        self.task_location = join(settings.MEDIA_ROOT, 'exercises', self.task_slug)
 
     def start(self):
         # TODO: Give container unique name during execution
