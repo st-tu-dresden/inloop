@@ -1,5 +1,5 @@
 import re
-from os.path import join
+from os.path import join, dirname, sep
 from subprocess import Popen, PIPE
 from shlex import split as shplit
 
@@ -143,6 +143,10 @@ class TaskSolution(models.Model):
         help_text='Did the checker accept the solution?',
         default=False)
 
+    def solution_path(self):
+        sol_file = TaskSolutionFile.objects.get(solution=self)[1]
+        return dirname(sol_file.file_url()) + sep
+
 
 class TaskSolutionFile(models.Model):
     '''Represents a single file as part of a solution'''
@@ -151,7 +155,7 @@ class TaskSolutionFile(models.Model):
     filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
 
-    def solution_path(self):
+    def file_url(self):
         return file.url
 
 

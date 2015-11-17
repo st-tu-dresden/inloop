@@ -130,8 +130,8 @@ def detail(request, slug):
             author=request.user,
             task=task
         )
-
         solution.save()
+        print (solution.solution_path())
 
         if request.FILES.getlist('manual-upload'):
             for file in request.FILES.getlist('manual-upload'):
