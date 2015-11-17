@@ -3,6 +3,7 @@ from os.path import join
 from subprocess import Popen, PIPE
 from shlex import split as shplit
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
@@ -155,7 +156,8 @@ class Checker:
     def __init__(self, solution_path):
         self.solution_path = solution_path
         self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
-        self.task_location = ''  # TODO: Get location of task (../gradlew call) from settings?
+        self.task_location = join(settings.MEDIA_ROOT, 'exercises', 'task-slug')
+        # TODO: Get slug of task for unique path
 
     def start(self):
         # TODO: Give container unique name during execution
