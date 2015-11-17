@@ -180,7 +180,7 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, cmd=[], ctr_tag, ctr_name, **mountpoints):
+    def _container_execute(self, ctr_tag, ctr_name, cmd=[], **mountpoints):
         # Add timeout to docker process
         popen_args = ['timeout', '-s', 'SIGKILL', '2']
         # Remove container after exit
