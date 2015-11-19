@@ -131,6 +131,9 @@ class Task(models.Model):
         """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
 
+    def task_location(self):
+        return join(settings.MEDIA_ROOT, 'exercises', self.slug)
+
 
 class TaskSolution(models.Model):
     '''Represents the user uploaded files'''
@@ -144,6 +147,7 @@ class TaskSolution(models.Model):
         default=False)
 
     def solution_path(self):
+        # Get arbitrary TaskSolution to get directory path
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
         return dirname(sol_file.file_path()) + sep
 
@@ -161,11 +165,9 @@ class TaskSolutionFile(models.Model):
 
 class Checker:
     def __init__(self, solution):
-        self.solution = solution
-        self.solution_path = solution.solution_path()  # Format?
-        self.task_slug = solution.task.slug
+        self.solution_path = solution.solution_path()  # XXX: Format?
         self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
-        self.task_location = join(settings.MEDIA_ROOT, 'exercises', self.task_slug)
+        self.task_location = solution.task.task_location()
 
     def start(self):
         # TODO: Give container unique name during execution
