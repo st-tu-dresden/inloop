@@ -13,7 +13,7 @@ from django.conf import settings
 
 from inloop.decorators import superuser_required
 from inloop.tasks import forms, filesystem_utils as fsu
-from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile, Checker
 
 
 @superuser_required
@@ -158,6 +158,11 @@ def detail(request, slug):
                         tsf.filename,
                         ContentFile(request.POST[param]))
                     tsf.save()
+
+        # TODO: Add Checker call here!
+        c = Checker(solution)
+        c.start()
+
     latest_solutions = TaskSolution.objects.filter(
         task=task,
         author=request.user)
