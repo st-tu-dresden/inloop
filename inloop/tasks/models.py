@@ -172,7 +172,7 @@ class Checker:
     def start(self):
         # TODO: Give container unique name during execution
         print("start call")
-        cmd = 'bash -c \"cd /home/checker/ && ' + self.test_cmd
+        cmd = 'bash -c \"cd /home/checker/ && ' + self.test_cmd + '"'
         self._container_build('docker-test')
         result = self._container_execute(
             cmd=shplit(cmd),
