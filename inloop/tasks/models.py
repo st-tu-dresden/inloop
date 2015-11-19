@@ -221,6 +221,7 @@ class Checker:
             if p.wait() != 0:
                 raise RuntimeError(p.stderr.read())
 
-    def _parse_result(self):
+    def _parse_result(self, result):
         # create a CheckerResult
         print("_parse_result call")
+        print(result)
