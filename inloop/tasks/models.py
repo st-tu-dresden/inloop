@@ -28,7 +28,7 @@ def get_upload_path(instance, filename):
         'solutions',
         instance.solution.author.username,
         instance.solution.task.slug,
-        timezone.now().strftime('%Y/%m/%d/%H:%M_') + str(instance.solution.id),
+        timezone.now().strftime('%Y/%m/%d/%H_%M_') + str(instance.solution.id),
         filename)
     return path
 
@@ -192,7 +192,7 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, ctr_tag, ctr_name, cmd=[], **mountpoints):
+    def _container_execute(self, ctr_tag, ctr_name, cmd=[], mountpoints={}):
         # Add timeout to docker process
         popen_args = ['timeout', '-s', 'SIGKILL', '2']
         # Remove container after exit
