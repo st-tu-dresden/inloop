@@ -173,7 +173,7 @@ class Checker:
         # TODO: Give container unique name during execution
         print("start call")
         cmd = 'bash -c \"cd /home/checker/ && ' + self.test_cmd + '"'
-        self._container_build('docker-test')
+        self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
             cmd=shplit(cmd),
             ctr_tag='docker-test',
@@ -184,7 +184,7 @@ class Checker:
             }).decode()
         self._parse_result(result)
 
-    def _container_build(ctr_tag, path='.'):
+    def _container_build(self, ctr_tag, path='.'):
         print("Building container")
         p = Popen(['timeout', '-s', 'SIGKILL', '30',
                    'docker', 'build', '-t', ctr_tag, '--rm=true', path],
