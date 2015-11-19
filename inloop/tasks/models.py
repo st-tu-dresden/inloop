@@ -144,8 +144,8 @@ class TaskSolution(models.Model):
         default=False)
 
     def solution_path(self):
-        sol_file = TaskSolutionFile.objects.get(solution=self)[1]
-        return dirname(sol_file.file_url()) + sep
+        sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
+        return dirname(sol_file.file_path()) + sep
 
 
 class TaskSolutionFile(models.Model):
@@ -155,8 +155,8 @@ class TaskSolutionFile(models.Model):
     filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
 
-    def file_url(self):
-        return file.url
+    def file_path(self):
+        return self.file.path
 
 
 class Checker:
