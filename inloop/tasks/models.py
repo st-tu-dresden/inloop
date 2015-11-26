@@ -195,7 +195,7 @@ class Checker:
 
     def _container_execute(self, ctr_tag, ctr_name, cmd=[], mountpoints={}):
         # Add timeout to docker process
-        popen_args = ['timeout', '-s', 'SIGKILL', '2']
+        popen_args = ['timeout', '-s', 'SIGKILL', '30']
         # Remove container after exit
         popen_args.extend(['docker', 'run', '--rm=true'])
         popen_args.extend(['--name', ctr_name])
