@@ -1,6 +1,5 @@
 import re
 from os.path import join, dirname, sep
-from os import getcwd
 from subprocess import Popen, PIPE
 from shlex import split as shplit
 
@@ -169,6 +168,7 @@ class Checker:
         self.solution_path = solution.solution_path()  # XXX: Format?
         self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
         self.task_location = solution.task.task_location()
+        self.gradlew_location = dirname(solution.task.task_location())
 
     def start(self):
         # TODO: Give container unique name during execution
@@ -181,6 +181,7 @@ class Checker:
             ctr_name='test',
             mountpoints={
                 self.task_location: '/home/checker/:ro',
+                self.gradlew_location: '/home/:ro',
                 self.solution_path: '/mnt/solution/'
             }).decode()
         self._parse_result(result)
