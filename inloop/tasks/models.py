@@ -1,5 +1,6 @@
 import re
 from os.path import join, dirname, sep
+from os import getcwd
 from subprocess import Popen, PIPE
 from shlex import split as shplit
 
@@ -184,7 +185,7 @@ class Checker:
             }).decode()
         self._parse_result(result)
 
-    def _container_build(self, ctr_tag, path='.'):
+    def _container_build(self, ctr_tag, path="."):
         print("Building container")
         p = Popen(['timeout', '-s', 'SIGKILL', '30',
                    'docker', 'build', '-t', ctr_tag, '--rm=true', path],
@@ -200,8 +201,11 @@ class Checker:
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        # Add the image that is to be run
+        popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
         popen_args.extend(cmd)
+        print("popen_args: ", popen_args)
         # Execute container
         p = Popen(popen_args, stdout=PIPE)
         out = p.stdout.read()
@@ -214,7 +218,7 @@ class Checker:
 
         return out
 
-    def _kill_and_remove(ctr_name):
+    def _kill_and_remove(self, ctr_name):
         for action in ('kill', 'rm'):
             p = Popen('docker %s %s' % (action, ctr_name), shell=True,
                       stdout=PIPE, stderr=PIPE)
