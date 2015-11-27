@@ -229,4 +229,4 @@ class Checker:
     def _parse_result(self, result):
         # create a CheckerResult
         print("_parse_result call")
-        print(result)
+        print(result if result else "Nothing to report here")
