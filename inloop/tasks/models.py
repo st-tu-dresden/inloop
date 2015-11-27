@@ -166,22 +166,22 @@ class TaskSolutionFile(models.Model):
 class Checker:
     def __init__(self, solution):
         self.solution_path = solution.solution_path()  # XXX: Format?
-        self.test_cmd = "../gradlew -q -DsolutionPath={} test".format(self.solution_path)
+        self.test_cmd = "../gradlew --stacktrace --debug -q -DsolutionPath={} test".format(self.solution_path)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
 
     def start(self):
         # TODO: Give container unique name during execution
         print("start call")
-        cmd = 'bash -c \"cd /home/checker/ && ' + self.test_cmd + '"'
+        cmd = 'bash -c \"cd /mnt/checker/task/ && ' + self.test_cmd + '"'
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
             cmd=shplit(cmd),
             ctr_tag='docker-test',
             ctr_name='test',
             mountpoints={
-                self.task_location: '/home/checker/',
-                self.gradlew_location: '/home/',
+                self.task_location: '/mnt/checker/task/',
+                self.gradlew_location: '/mnt/checker/',
                 self.solution_path: '/mnt/solution/'
             }).decode()
         self._parse_result(result)
