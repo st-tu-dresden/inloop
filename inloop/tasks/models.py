@@ -166,7 +166,7 @@ class TaskSolutionFile(models.Model):
 class Checker:
     def __init__(self, solution):
         self.solution_path = solution.solution_path()  # XXX: Format?
-        self.test_cmd = "../gradlew --stacktrace --debug -q -DsolutionPath={} test".format(self.solution_path)
+        self.test_cmd = "../gradlew -DsolutionPath={} test".format(self.solution_path)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
 
