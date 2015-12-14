@@ -184,7 +184,7 @@ class Checker:
                 self.task_location: '/mnt/checker/task/',
                 self.gradlew_location: '/mnt/checker/',
                 self.solution_path: '/mnt/solution/'
-            }).decode()
+            })
         self._parse_result(result)
 
     def _container_build(self, ctr_tag, path="."):
