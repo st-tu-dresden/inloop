@@ -81,3 +81,21 @@ HUEY = {
     'backend': 'huey.backends.redis_backend',
     'name': 'inloop-task-queue'
 }
+
+CHECKER = {
+    'test_cmd': '../gradlew -DsolutionPath={solutionPath} test',
+    'Container': {
+        'container_tag': 'docker-test',
+        'task_location': '/mnt/checker/task/',
+        'gradlew_location': '/mnt/checker/',
+        'solution_path': '/mnt/solution/',
+        'container_workdir': '/mnt/checker/task/',
+    },
+    'Timeouts': {
+        # All timeouts in seconds
+        'container_execution': 120,
+        'container_kill': 5,
+        'container_remove': 5,
+        'container_build': 180,
+    }
+}

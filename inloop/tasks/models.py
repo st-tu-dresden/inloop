@@ -167,7 +167,7 @@ class TaskSolutionFile(models.Model):
 class Checker:
     def __init__(self, solution):
         self.solution_path = solution.solution_path()  # XXX: Format?
-        self.test_cmd = "../gradlew -DsolutionPath={} test".format(self.solution_path)
+        self.test_cmd = settings.CHECKER.get('test_cmd').format(solutionPath=self.solution_path)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
 
@@ -177,14 +177,14 @@ class Checker:
         cmd = self.test_cmd
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
-            ctr_tag='docker-test',
+            ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name='test',
             cmd=shplit(cmd),
-            workdir='/mnt/checker/task/',
+            workdir=settings.CHECKER['Container'].get('container_workdir'),
             mountpoints={
-                self.task_location: '/mnt/checker/task/',
-                self.gradlew_location: '/mnt/checker/',
-                self.solution_path: '/mnt/solution/'
+                self.task_location: settings.CHECKER['Container'].get('task_location'),
+                self.gradlew_location: settings.CHECKER['Container'].get('gradlew_location'),
+                self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
         self._parse_result(result)
 
@@ -192,18 +192,19 @@ class Checker:
         logging.debug("Container build process started")
         build_cmd = ['docker', 'build', '-t', ctr_tag, '--rm=true', path]
         try:
-            build_output = check_output(build_cmd,
-                                        stderr=STDOUT,
-                                        timeout=180,
-                                        shell=True,
-                                        universal_newlines=True)
+            build_output = check_output(
+                build_cmd,
+                stderr=STDOUT,
+                timeout=settings.CHECKER['Timeouts'].get('container_build'),
+                shell=True,
+                universal_newlines=True)
         except CalledProcessError as e:
             logging.error("Container build for {} failed: Exit {}, {}".format(
                 ctr_tag, e.returncode, e.output))
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, cmd=[], workdir='/', mountpoints={}):
+    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=[], mountpoints={}):
         # Remove container after exit
         popen_args = ['docker', 'run', '--rm=true']
         popen_args.extend(['--name', ctr_name])
@@ -222,7 +223,10 @@ class Checker:
         # Execute container
         cont_output = None
         try:
-            cont_output = check_output(popen_args, stderr=STDOUT, timeout=120)
+            cont_output = check_output(
+                popen_args,
+                stderr=STDOUT,
+                timeout=settings.CHECKER['Timeouts'].get('container_execution'))
         except CalledProcessError as e:
             logging.error("Execution of container {} failed: Exit {}, {}".format(
                 ctr_name, e.returncode, e.output
@@ -238,8 +242,12 @@ class Checker:
 
     def _kill_and_remove(self, ctr_name):
         try:
-            check_output(['docker', 'kill', ctr_name], timeout=5)
-            check_output(['docker', 'rm', '-f', ctr_name], timeout=5)
+            check_output(
+                ['docker', 'kill', ctr_name],
+                timeout=settings.CHECKER['Timeouts'].get('container_kill'))
+            check_output(
+                ['docker', 'rm', '-f', ctr_name],
+                timeout=settings.CHECKER['Timeouts'].get('container_remove'))
         except CalledProcessError as e:
             logging.error("Kill and remove of container {} failed: Exit {}, {}".format(
                 ctr_name, e.returncode, e.output
