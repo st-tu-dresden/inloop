@@ -205,6 +205,9 @@ class Checker:
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
         # Specify the working directory
         popen_args.extend(['-w', workdir])
+        # Attach to stdout and stderr
+        popen_args.extend(['-a', 'STDERR'])
+        popen_args.extend(['-a', 'STDOUT'])
         # Add the image that is to be run
         popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
