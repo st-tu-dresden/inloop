@@ -220,6 +220,7 @@ class Checker:
         popen_args.extend(cmd)
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
+        cont_output = None
         try:
             cont_output = check_output(popen_args, stderr=STDOUT, timeout=120)
         except CalledProcessError as e:
