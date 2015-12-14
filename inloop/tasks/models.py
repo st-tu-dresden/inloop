@@ -1,6 +1,6 @@
 import re
 from os.path import join, dirname, sep
-from subprocess import Popen, PIPE
+from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
 from shlex import split as shplit
 
 from django.conf import settings
@@ -189,17 +189,22 @@ class Checker:
 
     def _container_build(self, ctr_tag, path="."):
         print("Building container")
-        p = Popen(['timeout', '-s', 'SIGKILL', '60',
-                   'docker', 'build', '-t', ctr_tag, '--rm=true', path],
-                  stdout=PIPE)
-        out = p.stdout.read()
-        return out
+        build_cmd = ['docker', 'build', '-t', ctr_tag, '--rm=true', path]
+        try:
+            build_output = check_output(build_cmd,
+                                        stderr=STDOUT,
+                                        timeout=180,
+                                        shell=True,
+                                        universal_newlines=True)
+        except CalledProcessError as e:
+            print("Build failed: ", e.returncode, e.output)
+            return None
+        else:
+            return build_output
 
     def _container_execute(self, ctr_tag, ctr_name, cmd=[], workdir='/', mountpoints={}):
-        # Add timeout to docker process
-        popen_args = ['timeout', '-s', 'SIGKILL', '180']
         # Remove container after exit
-        popen_args.extend(['docker', 'run', '--rm=true'])
+        popen_args = ['docker', 'run', '--rm=true']
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
@@ -214,23 +219,27 @@ class Checker:
         popen_args.extend(cmd)
         print("popen_args: ", popen_args)
         # Execute container
-        p = Popen(popen_args, stdout=PIPE)
-        out = p.stdout.read()
-
-        if p.wait() == -9:  # Happens on timeout
-            # We have to kill the container since it still runs
-            # detached from Popen and we need to remove it after because
-            # --rm is not working on killed containers
+        try:
+            cont_output = check_output(popen_args, stderr=STDOUT, timeout=120)
+        except CalledProcessError as e:
+            out = "Returned code {}: {}".format(e.returncode, e.output)
             self._kill_and_remove(ctr_name)
+        except TimeoutExpired as e:
+            out = "Timed out: {}".format(e.timeout)
+            self._kill_and_remove(ctr_name)
+        else:
+            out = cont_output
 
         return out
 
     def _kill_and_remove(self, ctr_name):
-        for action in ('kill', 'rm'):
-            p = Popen('docker %s %s' % (action, ctr_name), shell=True,
-                      stdout=PIPE, stderr=PIPE)
-            if p.wait() != 0:
-                raise RuntimeError(p.stderr.read())
+        try:
+            check_output(['docker', 'kill', ctr_name], timeout=5)
+            check_output(['docker', 'rm', '-f', ctr_name], timeout=5)
+        except CalledProcessError as e:
+            print("Kill and remove exit {}: {}".format(e.returncode, e.output))
+        except TimeoutExpired as e:
+            print("Timeout during kill and remove: {}".format(e.timeout))
 
     def _parse_result(self, result):
         # create a CheckerResult
