@@ -1,5 +1,5 @@
 import logging
-from os.path import join, dirname, sep
+from os.path import join, dirname
 import re
 from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
 from shlex import split as shplit
@@ -150,7 +150,7 @@ class TaskSolution(models.Model):
     def solution_path(self):
         # Get arbitrary TaskSolution to get directory path
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
-        return dirname(sol_file.file_path()) + sep
+        return join(dirname(sol_file.file_path()))
 
 
 class TaskSolutionFile(models.Model):
