@@ -173,12 +173,13 @@ class Checker:
     def start(self):
         # TODO: Give container unique name during execution
         print("start call")
-        cmd = 'bash -c \"cd /mnt/checker/task/ && ' + self.test_cmd + '"'
+        cmd = self.test_cmd
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
-            cmd=shplit(cmd),
             ctr_tag='docker-test',
             ctr_name='test',
+            cmd=shplit(cmd),
+            workdir='/mnt/checker/task/',
             mountpoints={
                 self.task_location: '/mnt/checker/task/',
                 self.gradlew_location: '/mnt/checker/',
@@ -194,7 +195,7 @@ class Checker:
         out = p.stdout.read()
         return out
 
-    def _container_execute(self, ctr_tag, ctr_name, cmd=[], mountpoints={}):
+    def _container_execute(self, ctr_tag, ctr_name, cmd=[], workdir='/', mountpoints={}):
         # Add timeout to docker process
         popen_args = ['timeout', '-s', 'SIGKILL', '180']
         # Remove container after exit
@@ -202,6 +203,8 @@ class Checker:
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        # Specify the working directory
+        popen_args.extend(['-w', workdir])
         # Add the image that is to be run
         popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
