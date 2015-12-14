@@ -1,5 +1,6 @@
-import re
+import logging
 from os.path import join, dirname, sep
+import re
 from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
 from shlex import split as shplit
 
@@ -172,7 +173,7 @@ class Checker:
 
     def start(self):
         # TODO: Give container unique name during execution
-        print("start call")
+        logging.debug("Checker start call")
         cmd = self.test_cmd
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
@@ -188,7 +189,7 @@ class Checker:
         self._parse_result(result)
 
     def _container_build(self, ctr_tag, path="."):
-        print("Building container")
+        logging.debug("Container build process started")
         build_cmd = ['docker', 'build', '-t', ctr_tag, '--rm=true', path]
         try:
             build_output = check_output(build_cmd,
@@ -197,8 +198,8 @@ class Checker:
                                         shell=True,
                                         universal_newlines=True)
         except CalledProcessError as e:
-            print("Build failed: ", e.returncode, e.output)
-            return None
+            logging.error("Container build for {} failed: Exit {}, {}".format(
+                ctr_tag, e.returncode, e.output))
         else:
             return build_output
 
@@ -217,31 +218,38 @@ class Checker:
         popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
         popen_args.extend(cmd)
-        print("popen_args: ", popen_args)
+        logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         try:
             cont_output = check_output(popen_args, stderr=STDOUT, timeout=120)
         except CalledProcessError as e:
-            out = "Returned code {}: {}".format(e.returncode, e.output)
+            logging.error("Execution of container {} failed: Exit {}, {}".format(
+                ctr_name, e.returncode, e.output
+            ))
             self._kill_and_remove(ctr_name)
         except TimeoutExpired as e:
-            out = "Timed out: {}".format(e.timeout)
+            logging.error("Execution of container {} timed out: {}".format(
+                ctr_name, e.timeout
+            ))
             self._kill_and_remove(ctr_name)
-        else:
-            out = cont_output
 
-        return out
+        return cont_output
 
     def _kill_and_remove(self, ctr_name):
         try:
             check_output(['docker', 'kill', ctr_name], timeout=5)
             check_output(['docker', 'rm', '-f', ctr_name], timeout=5)
         except CalledProcessError as e:
-            print("Kill and remove exit {}: {}".format(e.returncode, e.output))
+            logging.error("Kill and remove of container {} failed: Exit {}, {}".format(
+                ctr_name, e.returncode, e.output
+            ))
         except TimeoutExpired as e:
-            print("Timeout during kill and remove: {}".format(e.timeout))
+            logging.error("Kill and remove of container {} timed out: {}".format(
+                ctr_name, e.timeout
+            ))
 
     def _parse_result(self, result):
         # create a CheckerResult
-        print("_parse_result call")
-        print(result if result else "Nothing to report here")
+        logging.debug("Parse result call")
+        if not result:
+            logging.debug("Result parameter is empty")
