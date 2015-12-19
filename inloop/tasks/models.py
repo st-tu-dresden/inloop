@@ -268,4 +268,4 @@ class Checker:
         # create a CheckerResult
         logging.debug("Parse result call")
         if not result:
-            logging.debug("Result parameter is empty")
+            logging.debug("_parse_result got an empty result")
