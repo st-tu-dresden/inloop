@@ -6,6 +6,7 @@ from shlex import split as shplit
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -173,7 +174,8 @@ class CheckerResult(models.Model):
 
 class Checker:
     def __init__(self, solution):
-        self.solution_path = solution.solution_path()  # XXX: Format?
+        self.solution = solution
+        self.solution_path = self.solution.solution_path()
         self.test_cmd = settings.CHECKER.get('test_cmd').format(solutionPath=self.solution_path)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
@@ -265,7 +267,13 @@ class Checker:
             ))
 
     def _parse_result(self, result):
-        # create a CheckerResult
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
+        passed = False  # TODO: HERE BE CHECKS
+        cr = CheckerResult(
+            user=self.solution.author,
+            solution=self.solution,
+            result=ContentFile(result),
+            passed=passed)
+        cr.save()
