@@ -166,7 +166,6 @@ class TaskSolutionFile(models.Model):
 
 
 class CheckerResult(models.Model):
-    user = models.ForeignKey(UserProfile)
     solution = models.ForeignKey(TaskSolution)
     result = models.FileField(upload_to=get_upload_path)
     passed = models.BooleanField(default=False)
@@ -272,7 +271,6 @@ class Checker:
             logging.debug("_parse_result got an empty result")
         passed = False  # TODO: HERE BE CHECKS
         cr = CheckerResult(
-            user=self.solution.author,
             solution=self.solution,
             result=ContentFile(result),
             passed=passed)
