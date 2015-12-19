@@ -164,6 +164,13 @@ class TaskSolutionFile(models.Model):
         return self.file.path
 
 
+class CheckerResult(models.Model):
+    user = models.ForeignKey(UserProfile)
+    solution = models.ForeignKey(TaskSolution)
+    result = models.FileField(upload_to=get_upload_path)
+    passed = models.BooleanField(default=False)
+
+
 class Checker:
     def __init__(self, solution):
         self.solution_path = solution.solution_path()  # XXX: Format?
