@@ -269,9 +269,10 @@ class Checker:
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
-        passed = False  # TODO: HERE BE CHECKS
-        cr = CheckerResult(
-            solution=self.solution,
-            result=ContentFile(result),
-            passed=passed)
-        cr.save()
+        else:
+            passed = False  # TODO: HERE BE CHECKS
+            cr = CheckerResult(
+                solution=self.solution,
+                result=ContentFile(result),
+                passed=passed)
+            cr.save()
