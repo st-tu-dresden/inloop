@@ -212,9 +212,12 @@ class Checker:
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=[], mountpoints={}):
-        # Remove container after exit
-        popen_args = ['docker', 'run', '--rm=true']
+    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=[], mountpoints={}, rm=True):
+        # Base run call
+        popen_args = ['docker', 'run']
+        # Remove container after execution?
+        if rm:
+            popen_args.extend(['--rm=true'])
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
@@ -239,23 +242,23 @@ class Checker:
             logging.error("Execution of container {} failed: Exit {}, {}".format(
                 ctr_name, e.returncode, e.output
             ))
-            self._kill_and_remove(ctr_name)
         except TimeoutExpired as e:
             logging.error("Execution of container {} timed out: {}".format(
                 ctr_name, e.timeout
             ))
-            self._kill_and_remove(ctr_name)
+            self._kill_and_remove(ctr_name, rm)
 
         return cont_output
 
-    def _kill_and_remove(self, ctr_name):
+    def _kill_and_remove(self, ctr_name, rm):
         try:
             check_output(
                 ['docker', 'kill', ctr_name],
                 timeout=settings.CHECKER['Timeouts'].get('container_kill'))
-            check_output(
-                ['docker', 'rm', '-f', ctr_name],
-                timeout=settings.CHECKER['Timeouts'].get('container_remove'))
+            if rm:
+                check_output(
+                    ['docker', 'rm', '-f', ctr_name],
+                    timeout=settings.CHECKER['Timeouts'].get('container_remove'))
         except CalledProcessError as e:
             logging.error("Kill and remove of container {} failed: Exit {}, {}".format(
                 ctr_name, e.returncode, e.output
