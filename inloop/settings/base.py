@@ -83,7 +83,7 @@ HUEY = {
 }
 
 CHECKER = {
-    'test_cmd': '../gradlew -DsolutionPath={solutionPath} test',
+    'test_cmd': 'sh -c "../gradlew -DsolutionPath={solutionPath} test >> /mnt/solution/results.txt 2>&1"',
     'Container': {
         'container_tag': 'docker-test',
         'task_location': '/mnt/checker/task/',
