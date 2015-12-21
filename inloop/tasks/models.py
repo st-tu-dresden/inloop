@@ -282,7 +282,7 @@ class Checker:
         if not result:
             logging.debug("_parse_result got an empty result")
         else:
-            passed = False  # TODO: HERE BE CHECKS
+            passed = False if re.findall('BUILD (\w+)', result) == 'FAILED' else True
             cr = CheckerResult(
                 solution=self.solution,
                 result=ContentFile(result),
