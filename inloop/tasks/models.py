@@ -1,4 +1,6 @@
 import logging
+import string
+from random import SystemRandom
 from os.path import join, dirname
 import re
 from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
@@ -180,13 +182,13 @@ class Checker:
         self.gradlew_location = dirname(solution.task.task_location())
 
     def start(self):
-        # TODO: Give container unique name during execution
         logging.debug("Checker start call")
+        ctr_name = self._generate_container_name()
         cmd = self.test_cmd
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
-            ctr_name='test',
+            ctr_name=ctr_name,
             cmd=shplit(cmd),
             workdir=settings.CHECKER['Container'].get('container_workdir'),
             mountpoints={
@@ -195,6 +197,13 @@ class Checker:
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
         self._parse_result(result)
+
+    def _generate_container_name(self):
+        charset = string.ascii_letters + string.digits
+        length = 21
+        random = SystemRandom()
+        key = "".join(random.sample(charset, length))
+        return "-".join([str(self.solution.author.username), str(self.solution.task.slug), key])
 
     def _container_build(self, ctr_tag, path="."):
         logging.debug("Container build process started")
