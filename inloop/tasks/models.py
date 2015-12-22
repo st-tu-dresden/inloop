@@ -283,8 +283,8 @@ class Checker:
         if not result:
             logging.debug("_parse_result got an empty result")
         else:
-            time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result)[0])
-            passed = False if re.findall('BUILD (\w+)', result)[0] == 'FAILED' else True
+            time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
+            passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
             cr = CheckerResult(
                 solution=self.solution,
                 result=ContentFile(result),
