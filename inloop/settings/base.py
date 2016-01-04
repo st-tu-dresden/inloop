@@ -83,13 +83,13 @@ HUEY = {
 }
 
 CHECKER = {
-    'test_cmd': 'sh -c "../gradlew -DsolutionPath={solutionPath} test 2>&1 | tee /mnt/solution/results.txt"',
+    'test_cmd': 'bash -c "cd {taskSlug} && ../gradlew -DsolutionPath={solutionPath} test 2>&1 | tee /mnt/solution/results.txt"',
     'Container': {
         'container_tag': 'docker-test',
         'task_location': '/mnt/checker/task/',
         'gradlew_location': '/mnt/checker/',
         'solution_path': '/mnt/solution/',
-        'container_workdir': '/mnt/checker/task/',
+        'container_workdir': '/mnt/checker/',
     },
     'Timeouts': {
         # All timeouts in seconds

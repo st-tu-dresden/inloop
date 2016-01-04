@@ -178,7 +178,9 @@ class Checker:
     def __init__(self, solution):
         self.solution = solution
         self.solution_path = self.solution.solution_path()
-        self.test_cmd = settings.CHECKER.get('test_cmd').format(solutionPath=self.solution_path)
+        self.test_cmd = settings.CHECKER.get('test_cmd').format(
+            solutionPath=self.solution_path,
+            taskSlug=self.solution.task.slug)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
 
