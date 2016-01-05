@@ -146,14 +146,14 @@ class TaskSolution(models.Model):
         help_text='When was the solution submitted?')
     author = models.ForeignKey(UserProfile)
     task = models.ForeignKey(Task)
-    is_correct = models.BooleanField(
-        help_text='Did the checker accept the solution?',
-        default=False)
 
     def solution_path(self):
         # Get arbitrary TaskSolution to get directory path
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
         return join(dirname(sol_file.file_path()))
+
+    def passed(self):
+        return TaskSolution.objects.get(solution=self).passed
 
 
 class TaskSolutionFile(models.Model):
