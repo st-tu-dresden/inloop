@@ -96,7 +96,7 @@ def category(request, short_id):
 
 def index(request):
     if request.user.is_authenticated():
-        progress = lambda a, b: u_amt / t_amt if t_amt != 0 else 0
+        progress = lambda a, b: (u_amt / t_amt) * 100 if t_amt != 0 else 0
         queryset = TaskCategory.objects.all()
         categories = []
         for o in queryset:
