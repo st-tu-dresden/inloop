@@ -67,7 +67,7 @@ class TaskCategory(models.Model):
 
     def completed_tasks_for_user(self, user):
         '''Returns the tasks a user has already solved.'''
-        return Task.objects.filter(tasksolution__author=user, tasksolution__is_correct=True)
+        return Task.objects.filter(tasksolution__author=user, tasksolution__passed=True)
 
     def get_tasks(self):
         '''Returns a queryset of this category's task that have already been
@@ -146,14 +146,12 @@ class TaskSolution(models.Model):
         help_text='When was the solution submitted?')
     author = models.ForeignKey(UserProfile)
     task = models.ForeignKey(Task)
+    passed = models.BooleanField(default=False)
 
     def solution_path(self):
         # Get arbitrary TaskSolution to get directory path
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
         return join(dirname(sol_file.file_path()))
-
-    def passed(self):
-        return TaskSolution.objects.get(solution=self).passed
 
 
 class TaskSolutionFile(models.Model):
@@ -293,3 +291,7 @@ class Checker:
                 time_taken=time,
                 passed=passed)
             cr.save()
+            if passed:
+                ts = TaskSolution.objects.get(pk=self.solution.pk)
+                ts.passed = True
+                ts.save()
