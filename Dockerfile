@@ -1,4 +1,4 @@
-FROM java:7
+FROM java:8
 
 RUN mkdir -p /mnt/checker/task/
 VOLUME /mnt/solution/
