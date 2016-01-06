@@ -7383,19 +7383,19 @@ textarea[id^="content"] {
 /* @end */
 /* @begin task result styles*/
 .status-text-success {
-  color: #00FF00;
+  color: #33CC33;
   font-size: 16px;
 }
 .status-text-failed {
-  color: #FF0000;
+  color: #FF3300;
   font-size: 16px;
 }
 .big-icon-red {
-  color: #FF0000;
+  color: #FF3300;
   font-size: 18px;
 }
 .big-icon-green {
-  color: #00FF00;
+  color: #33CC33;
   font-size: 18px;
 }
 /* @end */

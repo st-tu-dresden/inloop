@@ -283,7 +283,7 @@ class Checker:
         if not result:
             logging.debug("_parse_result got an empty result")
         else:
-            logging.debug("Got result: " + result)
+            logging.debug("Got result: " + result.decode())
             time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
             passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
             cr = CheckerResult(
