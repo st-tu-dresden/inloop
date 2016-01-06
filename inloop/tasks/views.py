@@ -116,6 +116,7 @@ def index(request):
 
 @login_required
 def detail(request, slug):
+    # TODO: Don't let user wait but display message
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
@@ -290,6 +291,8 @@ def results(request, slug, solution_id):
     task = get_object_or_404(Task, slug=slug)
     solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
     solution_files = fsu.solution_file_dict(solution)
+    # TODO: Add actual result text
+    # TODO: Fix naming issue sol/ solution in template
 
     return(render(request, 'tasks/task-result.html', {
         'task': task,
