@@ -167,7 +167,7 @@ class TaskSolutionFile(models.Model):
 
 class CheckerResult(models.Model):
     solution = models.ForeignKey(TaskSolution)
-    result = models.FileField(upload_to=get_upload_path)
+    result = models.TextField()
     time_taken = models.FloatField()
     passed = models.BooleanField(default=False)
 
@@ -283,11 +283,12 @@ class Checker:
         if not result:
             logging.debug("_parse_result got an empty result")
         else:
+            logging.debug("Got result: " + result)
             time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
             passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
             cr = CheckerResult(
                 solution=self.solution,
-                result=ContentFile(result),
+                result=result,
                 time_taken=time,
                 passed=passed)
             cr.save()
