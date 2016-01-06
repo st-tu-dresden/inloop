@@ -296,8 +296,6 @@ def results(request, slug, solution_id):
     cr = get_object_or_404(CheckerResult, solution=solution)
     result = cr.result
 
-    # TODO: Fix naming issue sol/ solution in template
-
     return(render(request, 'tasks/task-result.html', {
         'task': task,
         'solution': solution,
