@@ -8,35 +8,35 @@ from django.conf import settings
 EXERCISE_ROOT = join(settings.MEDIA_ROOT, 'exercises')
 
 
-def get_template_names(task_name):
-    p = join(EXERCISE_ROOT, task_name)
+def get_template_names(task_slug):
+    p = join(EXERCISE_ROOT, task_slug)
     # get all java template files for task, e.g. 'template.java'
     return map(basename, glob(p + path.sep + '*.java'))
 
 
-def get_unittest_names(task_name):
-    p = join(EXERCISE_ROOT, task_name, 'unittests')
+def get_unittest_names(task_slug):
+    p = join(EXERCISE_ROOT, task_slug, 'unittests')
     # get all java template files for task, e.g. 'unittest.java'
     return map(basename, glob(p + path.sep + '*.java'))
 
 
-def del_template(f_name, task_name):
-    p = join(EXERCISE_ROOT, task_name)
+def del_template(f_name, task_slug):
+    p = join(EXERCISE_ROOT, task_slug)
     remove(join(p, f_name))
 
 
-def del_unittest(f_name, task_name):
-    p = join(EXERCISE_ROOT, task_name, 'unittests')
+def del_unittest(f_name, task_slug):
+    p = join(EXERCISE_ROOT, task_slug, 'unittests')
     remove(path.join(p, f_name))
 
 
-def del_task_files(task_name):
-    p = join(EXERCISE_ROOT, task_name)
+def del_task_files(task_slug):
+    p = join(EXERCISE_ROOT, task_slug)
     rmtree(p)
 
 
-def handle_uploaded_unittest(f, task_name):
-    p = join(EXERCISE_ROOT, task_name, 'unittests')
+def handle_uploaded_unittest(f, task_slug):
+    p = join(EXERCISE_ROOT, task_slug, 'unittests')
     if not path.exists(p):
         makedirs(p)
 
@@ -45,8 +45,8 @@ def handle_uploaded_unittest(f, task_name):
             destination.write(chunk)
 
 
-def handle_uploaded_exercise(f, task_name):
-    p = join(EXERCISE_ROOT, task_name)
+def handle_uploaded_exercise(f, task_slug):
+    p = join(EXERCISE_ROOT, task_slug)
     if not path.exists(p):
         makedirs(p)
 
@@ -55,9 +55,9 @@ def handle_uploaded_exercise(f, task_name):
             destination.write(chunk)
 
 
-def get_task_templates(task_name):
+def get_task_templates(task_slug):
     overview = {}
-    p = join(EXERCISE_ROOT, task_name)
+    p = join(EXERCISE_ROOT, task_slug)
     # get all java template files for task
     filenames = map(basename, glob(p + path.sep + '*.java'))
     # build dict overview
@@ -76,7 +76,7 @@ def latest_solution_files(task, username):
     max_id_in_dir = lambda p: str(max([int(d[6:]) for d in listdir(p)]))
 
     overview = {}
-    p = join(settings.MEDIA_ROOT, 'solutions', username, task.title)
+    p = join(settings.MEDIA_ROOT, 'solutions', username, task.slug)
 
     if path.exists(p):
         year = max_int_in_dir(p)
@@ -94,7 +94,7 @@ def latest_solution_files(task, username):
                 overview[fname] = f.read()
     else:
         # display templates
-        overview = get_task_templates(task.title)
+        overview = get_task_templates(task.slug)
     return overview
 
 
@@ -104,7 +104,7 @@ def solution_file_dict(solution):
         settings.MEDIA_ROOT,
         'solutions',
         solution.author.username,
-        solution.task.title,
+        solution.task.slug,
         solution.submission_date.strftime("%Y/%m/%d/%H:%M_") + str(solution.id))
     filenames = map(basename, glob(p + path.sep + '*.java'))
     for fname in filenames:

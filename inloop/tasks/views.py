@@ -216,8 +216,8 @@ def get_solution_as_zip(request, slug, solution_id):
 @superuser_required
 def edit(request, slug):
     task = get_object_or_404(Task, slug=slug)
-    template_names = fsu.get_template_names(task.title)
-    unittest_names = fsu.get_unittest_names(task.title)
+    template_names = fsu.get_template_names(task.slug)
+    unittest_names = fsu.get_unittest_names(task.slug)
 
     if request.method == 'POST':
         form = forms.ExerciseEditForm(
@@ -240,11 +240,11 @@ def edit(request, slug):
 
             for name, label, value in form.extra_templates():
                 if form.cleaned_data[name]:
-                    fsu.del_template(label, task.title)
+                    fsu.del_template(label, task.slug)
 
             for name, label, value in form.extra_unittests():
                 if form.cleaned_data[name]:
-                    fsu.del_unittest(label, task.title)
+                    fsu.del_unittest(label, task.slug)
 
             # populate direct task data
             cat = TaskCategory.objects.filter(
@@ -312,15 +312,16 @@ def submit_new_exercise(request):
         if form.is_valid():
             exercise_file_list = request.FILES.getlist('e_files')
             unittest_file_list = request.FILES.getlist('ut_files')
+            e_slug = slugify(str(form.data['e_title']))
             for exercise_file in exercise_file_list:
                 fsu.handle_uploaded_exercise(
                     exercise_file,
-                    form.cleaned_data['e_title'])
+                    e_slug)
 
             for unittest_file in unittest_file_list:
                 fsu.handle_uploaded_unittest(
                     unittest_file,
-                    form.cleaned_data['e_title'])
+                    e_slug)
 
             # add Task object to system
             cat = TaskCategory.objects.filter(
@@ -333,7 +334,7 @@ def submit_new_exercise(request):
                 publication_date=form.cleaned_data['e_pub_date'],
                 deadline_date=form.cleaned_data['e_dead_date'],
                 category=cat,
-                slug=slugify(str(form.data['e_title'])))
+                slug=e_slug)
             t.save()
             return render(request, 'tasks/message.html', {
                 'type': 'success',
