@@ -227,7 +227,7 @@ class Checker:
         # Add the image that is to be run
         popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
-        popen_args.extend(cmd) if cmd else logging.debug("No slug given to docker run")
+        popen_args.append(cmd) if cmd else logging.debug("No slug given to docker run")
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         cont_output = None
@@ -274,15 +274,15 @@ class Checker:
             logging.debug("_parse_result got an empty result")
         else:
             logging.debug("Got result: " + result.decode())
-            time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
-            passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
-            cr = CheckerResult(
-                solution=self.solution,
-                result=result,
-                time_taken=time,
-                passed=passed)
-            cr.save()
-            if passed:
-                ts = TaskSolution.objects.get(pk=self.solution.pk)
-                ts.passed = True
-                ts.save()
+            #time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
+            #passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
+            #cr = CheckerResult(
+            #    solution=self.solution,
+            #    result=result,
+            #    time_taken=time,
+            #    passed=passed)
+            #cr.save()
+            #if passed:
+            #    ts = TaskSolution.objects.get(pk=self.solution.pk)
+            #    ts.passed = True
+            #    ts.save()

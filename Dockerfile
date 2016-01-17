@@ -16,5 +16,5 @@ WORKDIR /home/gradle/
 
 RUN cd exercises && ./gradlew compileTestJava clean
 
-ENTRYPOINT ["/bin/sh", "run.sh"]
+ENTRYPOINT ["/bin/sh", "exercises/run.sh"]
 CMD ["invalid-task"]
