@@ -176,8 +176,6 @@ class Checker:
     def __init__(self, solution):
         self.solution = solution
         self.solution_path = self.solution.solution_path()
-        self.task_location = solution.task.task_location()
-        self.gradlew_location = dirname(solution.task.task_location())
 
     def start(self):
         logging.debug("Checker start call")
