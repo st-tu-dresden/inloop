@@ -269,6 +269,8 @@ class Checker:
             ))
 
     def _parse_result(self, result):
+        # TODO: Replace ugly regex with xml parser
+        # TODO: Add return code to logic
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
