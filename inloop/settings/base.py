@@ -86,9 +86,7 @@ CHECKER = {
     'test_cmd': 'bash -c "cd {taskSlug} && (../gradlew --daemon -PsolutionPath={solutionPath} test 2>&1 | tee /mnt/solution/results.txt)"',
     'Container': {
         'container_tag': 'docker-test',
-        'task_location': '/mnt/checker/task/',
-        'gradlew_location': '/mnt/checker/',
-        'solution_path': '/mnt/solution/',
+        'solution_path': '/home/gradle/solution/',
         'container_workdir': '/mnt/checker/',
     },
     'Timeouts': {

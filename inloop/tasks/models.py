@@ -177,26 +177,18 @@ class Checker:
     def __init__(self, solution):
         self.solution = solution
         self.solution_path = self.solution.solution_path()
-        self.test_cmd = settings.CHECKER.get('test_cmd').format(
-            #solutionPath=self.solution_path,
-            solutionPath=settings.CHECKER['Container']['solution_path'],
-            taskSlug=self.solution.task.slug)
         self.task_location = solution.task.task_location()
         self.gradlew_location = dirname(solution.task.task_location())
 
     def start(self):
         logging.debug("Checker start call")
         ctr_name = self._generate_container_name()
-        cmd = self.test_cmd
         # self._container_build(ctr_tag='docker-test')
         result = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name=ctr_name,
-            cmd=shplit(cmd),
             workdir=settings.CHECKER['Container'].get('container_workdir'),
             mountpoints={
-                self.task_location: settings.CHECKER['Container'].get('task_location'),
-                self.gradlew_location: settings.CHECKER['Container'].get('gradlew_location'),
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
         self._parse_result(result)
@@ -224,7 +216,7 @@ class Checker:
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=[], mountpoints={}, rm=True):
+    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=None, mountpoints={}, rm=True):
         # Base run call
         popen_args = ['docker', 'run']
         # Remove container after execution?
@@ -241,7 +233,7 @@ class Checker:
         # Add the image that is to be run
         popen_args.extend([ctr_tag])
         # Add the actual compilation and test command
-        popen_args.extend(cmd)
+        popen_args.extend(cmd) if cmd else logging.debug("No slug given to docker run")
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         cont_output = None
