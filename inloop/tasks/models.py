@@ -184,6 +184,7 @@ class Checker:
         result = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name=ctr_name,
+            cmd=self.solution.task.slug,
             mountpoints={
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
