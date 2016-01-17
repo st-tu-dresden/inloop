@@ -1,8 +1,19 @@
-FROM java:8
+FROM java:8-jdk
 
-RUN mkdir -p /mnt/checker/task/
-VOLUME /mnt/solution/
+RUN useradd -m -U gradle
 
-# Add task repo to container and build gradlew deps
-ADD media/exercises/ /mnt/checker/
-RUN ./mnt/checker/gradlew
+RUN mkdir -p /home/gradle/exercises/
+RUN mkdir -p /home/gradle/solution/
+ADD media/exercises/ /home/gradle/exercises/
+
+VOLUME /home/gradle/solution/
+
+RUN chown -R gradle:gradle /home/gradle/
+
+USER gradle
+WORKDIR /home/gradle/
+
+RUN cd exercises && ./gradlew compileTestJava clean
+
+ENTRYPOINT ["/bin/sh", "run.sh"]
+CMD ["sample-task"]
