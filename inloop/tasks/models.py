@@ -187,7 +187,6 @@ class Checker:
         result = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name=ctr_name,
-            workdir=settings.CHECKER['Container'].get('container_workdir'),
             mountpoints={
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
@@ -216,7 +215,7 @@ class Checker:
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, workdir, cmd=None, mountpoints={}, rm=True):
+    def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints={}, rm=True):
         # Base run call
         popen_args = ['docker', 'run']
         # Remove container after execution?
@@ -225,8 +224,6 @@ class Checker:
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
-        # Specify the working directory
-        popen_args.extend(['-w', workdir])
         # Attach to stdout and stderr
         popen_args.extend(['-a', 'STDERR'])
         popen_args.extend(['-a', 'STDOUT'])
