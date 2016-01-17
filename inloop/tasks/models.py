@@ -224,8 +224,7 @@ class Checker:
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
-        # Attach to stdout and stderr
-        popen_args.extend(['-a', 'STDERR'])
+        # Attach to stdout
         popen_args.extend(['-a', 'STDOUT'])
         # Add the image that is to be run
         popen_args.extend([ctr_tag])
