@@ -87,7 +87,6 @@ CHECKER = {
     'Container': {
         'container_tag': 'docker-test',
         'solution_path': '/home/gradle/solution/',
-        'container_workdir': '/mnt/checker/',
     },
     'Timeouts': {
         # All timeouts in seconds
