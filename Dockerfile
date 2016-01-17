@@ -5,6 +5,7 @@ RUN useradd -m -U gradle
 RUN mkdir -p /home/gradle/exercises/
 RUN mkdir -p /home/gradle/solution/
 ADD media/exercises/ /home/gradle/exercises/
+ADD run.sh /home/gradle/exercises/
 
 VOLUME /home/gradle/solution/
 
@@ -16,4 +17,4 @@ WORKDIR /home/gradle/
 RUN cd exercises && ./gradlew compileTestJava clean
 
 ENTRYPOINT ["/bin/sh", "run.sh"]
-CMD ["sample-task"]
+CMD ["invalid-task"]
