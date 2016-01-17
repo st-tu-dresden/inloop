@@ -219,6 +219,9 @@ class Checker:
         # Remove container after execution?
         if rm:
             popen_args.extend(['--rm=true'])
+        # Spawn tty
+        popen_args.append('--tty')
+        # Container name
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
         popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
