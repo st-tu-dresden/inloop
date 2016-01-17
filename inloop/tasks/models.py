@@ -4,7 +4,6 @@ from random import SystemRandom
 from os.path import join, dirname
 import re
 from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
-from shlex import split as shplit
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
