@@ -1,5 +1,4 @@
 # e.g. run.sh basic-library
-# TODO: Add solutionPath property to build.gradle
 echo $(pwd)
 echo "$1"
 cd "exercises/$1"
