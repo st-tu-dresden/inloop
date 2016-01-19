@@ -4,5 +4,5 @@ echo "$1"
 cd "exercises/$1"
 ../gradlew -PsolutionPath=/home/gradle/solution/ -q test >/dev/null 2>&1
 rc=$?
-cat /home/gradle/solution/build/test-results/*.xml
+cat build/test-results/*.xml
 exit $rc
