@@ -3,6 +3,7 @@ import string
 from random import SystemRandom
 from os.path import join, dirname
 import re
+import xml.etree.ElementTree as ET
 from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
 
 from django.conf import settings
@@ -270,13 +271,22 @@ class Checker:
             ))
 
     def _parse_result(self, result):
-        # TODO: Replace ugly regex with xml parser
         # TODO: Add return code to logic
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
         else:
-            logging.debug("Got result: " + result.decode())
+            result = result.decode()
+            logging.debug("Got result: " + result)
+            p = ET.XMLParser()
+            p.feed('<root>')  # Introduce fake root element to parse multiple XML documents
+            for xml_content in result.split('<?xml version="1.0" encoding="UTF-8"?>\r\n'):
+                p.feed(xml_content)
+            p.feed('</root>')
+            root = p.close()
+
+            for testsuite in root:
+                logging.debug(testsuite.attrib)
             #time = float(re.findall('Total time:\s(\d+\.\d+)\s\w+', result.decode())[0])
             #passed = False if re.findall('BUILD (\w+)', result.decode())[0] == 'FAILED' else True
             #cr = CheckerResult(
