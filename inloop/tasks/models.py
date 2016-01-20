@@ -182,14 +182,14 @@ class Checker:
         logging.debug("Checker start call")
         ctr_name = self._generate_container_name()
         # self._container_build(ctr_tag='docker-test')
-        result = self._container_execute(
+        result, ce = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name=ctr_name,
             cmd=self.solution.task.slug,
             mountpoints={
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
-        self._parse_result(result)
+        self._parse_result(result, ce)
 
     def _generate_container_name(self):
         charset = string.ascii_letters + string.digits
@@ -235,6 +235,7 @@ class Checker:
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         cont_output = None
+        compilerError = False
         try:
             cont_output = check_output(
                 popen_args,
@@ -243,6 +244,7 @@ class Checker:
         except CalledProcessError as e:
             if e.returncode == 42:
                 cont_output = e.output
+                compilerError = True
             else:
                 logging.error("Execution of container {} failed: Exit {}, {}".format(
                     ctr_name, e.returncode, e.output
@@ -253,7 +255,7 @@ class Checker:
             ))
             self._kill_and_remove(ctr_name, rm)
 
-        return cont_output
+        return (cont_output, compilerError)
 
     def _kill_and_remove(self, ctr_name, rm):
         try:
