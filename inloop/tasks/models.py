@@ -241,9 +241,12 @@ class Checker:
                 stderr=STDOUT,
                 timeout=settings.CHECKER['Timeouts'].get('container_execution'))
         except CalledProcessError as e:
-            logging.error("Execution of container {} failed: Exit {}, {}".format(
-                ctr_name, e.returncode, e.output
-            ))
+            if e.returncode == 42:
+                cont_output = e.output
+            else:
+                logging.error("Execution of container {} failed: Exit {}, {}".format(
+                    ctr_name, e.returncode, e.output
+                ))
         except TimeoutExpired as e:
             logging.error("Execution of container {} timed out: {}".format(
                 ctr_name, e.timeout
