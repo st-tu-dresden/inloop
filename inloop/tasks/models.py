@@ -270,11 +270,13 @@ class Checker:
                 ctr_name, e.timeout
             ))
 
-    def _parse_result(self, result):
+    def _parse_result(self, result, compilerError=False):
         # TODO: Add return code to logic
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
+        elif compilerError:
+            logging.debug("_parse_result registered a compiler error and can't parse the reports")
         else:
             result = result.decode()
             logging.debug("Got result: " + result)
