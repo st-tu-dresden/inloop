@@ -3,4 +3,11 @@ cd "exercises/$1"
 ../gradlew -PsolutionPath=/home/gradle/solution/ -q test >/dev/null 2>&1
 rc=$?
 cat build/test-results/*.xml
+if [ "$?" -ne 0 ]
+  then
+    # Test reports don't exist. Assume a compiler error
+    # happened and call javac manually for error output
+    javac -d build/classes/main/ /home/gradle/solution/*
+    rc=42
+fi
 exit $rc
