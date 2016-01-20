@@ -14,7 +14,7 @@ RUN chown -R gradle:gradle /home/gradle/
 USER gradle
 WORKDIR /home/gradle/
 
-RUN cd exercises && ./gradlew compileTestJava clean
+RUN cd exercises && ./gradlew compileTestJava
 
 ENTRYPOINT ["/bin/sh", "exercises/run.sh"]
 CMD ["invalid-task"]
