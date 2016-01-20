@@ -7,7 +7,8 @@ if [ "$?" -ne 0 ]
   then
     # Test reports don't exist. Assume a compiler error
     # happened and call javac manually for error output
-    javac -d build/classes/main/ /home/gradle/solution/*
+    # cd into directory to hide path in stdout error report
+    cd /home/gradle/solution/ && javac *
     rc=42
 fi
 exit $rc
