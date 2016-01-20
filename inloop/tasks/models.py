@@ -235,7 +235,7 @@ class Checker:
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         cont_output = None
-        compilerError = False
+        compiler_error = False
         try:
             cont_output = check_output(
                 popen_args,
@@ -244,7 +244,7 @@ class Checker:
         except CalledProcessError as e:
             if e.returncode == 42:
                 cont_output = e.output
-                compilerError = True
+                compiler_error = True
             else:
                 logging.error("Execution of container {} failed: Exit {}, {}".format(
                     ctr_name, e.returncode, e.output
@@ -255,7 +255,7 @@ class Checker:
             ))
             self._kill_and_remove(ctr_name, rm)
 
-        return (cont_output, compilerError)
+        return (cont_output, compiler_error)
 
     def _kill_and_remove(self, ctr_name, rm):
         try:
@@ -275,12 +275,12 @@ class Checker:
                 ctr_name, e.timeout
             ))
 
-    def _parse_result(self, result, compilerError=False):
+    def _parse_result(self, result, compiler_error=False):
         # TODO: Add return code to logic
         logging.debug("Parse result call")
         if not result:
             logging.debug("_parse_result got an empty result")
-        elif compilerError:
+        elif compiler_error:
             logging.debug("_parse_result registered a compiler error and can't parse the reports")
             # TODO: Here be parsing
         else:
