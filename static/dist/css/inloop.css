@@ -7377,6 +7377,27 @@ textarea[id^="content"] {
   margin-right: 10px;
   font-size: 18px;
 }
+.noselection .ace_cursor-layer .ace_cursor {
+  color: transparent;
+}
+/* @end */
+/* @begin task result styles*/
+.status-text-success {
+  color: #33CC33;
+  font-size: 16px;
+}
+.status-text-failed {
+  color: #FF3300;
+  font-size: 16px;
+}
+.big-icon-red {
+  color: #FF3300;
+  font-size: 18px;
+}
+.big-icon-green {
+  color: #33CC33;
+  font-size: 18px;
+}
 /* @end */
 .token.comment,
 .token.prolog,

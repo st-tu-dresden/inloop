@@ -13,7 +13,8 @@ from django.conf import settings
 
 from inloop.decorators import superuser_required
 from inloop.tasks import forms, filesystem_utils as fsu
-from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
+                                 TaskSolutionFile, Checker, CheckerResult)
 
 
 @superuser_required
@@ -96,7 +97,7 @@ def category(request, short_id):
 
 def index(request):
     if request.user.is_authenticated():
-        progress = lambda a, b: u_amt / t_amt if t_amt != 0 else 0
+        progress = lambda a, b: (u_amt / t_amt) * 100 if t_amt != 0 else 0
         queryset = TaskCategory.objects.all()
         categories = []
         for o in queryset:
@@ -116,6 +117,7 @@ def index(request):
 
 @login_required
 def detail(request, slug):
+    # TODO: Don't let user wait but display message
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
@@ -130,7 +132,6 @@ def detail(request, slug):
             author=request.user,
             task=task
         )
-
         solution.save()
 
         if request.FILES.getlist('manual-upload'):
@@ -159,6 +160,11 @@ def detail(request, slug):
                         tsf.filename,
                         ContentFile(request.POST[param]))
                     tsf.save()
+
+        # TODO: Add Checker call here!
+        c = Checker(solution)
+        c.start()
+
     latest_solutions = TaskSolution.objects.filter(
         task=task,
         author=request.user)
@@ -210,8 +216,8 @@ def get_solution_as_zip(request, slug, solution_id):
 @superuser_required
 def edit(request, slug):
     task = get_object_or_404(Task, slug=slug)
-    template_names = fsu.get_template_names(task.title)
-    unittest_names = fsu.get_unittest_names(task.title)
+    template_names = fsu.get_template_names(task.slug)
+    unittest_names = fsu.get_unittest_names(task.slug)
 
     if request.method == 'POST':
         form = forms.ExerciseEditForm(
@@ -234,11 +240,11 @@ def edit(request, slug):
 
             for name, label, value in form.extra_templates():
                 if form.cleaned_data[name]:
-                    fsu.del_template(label, task.title)
+                    fsu.del_template(label, task.slug)
 
             for name, label, value in form.extra_unittests():
                 if form.cleaned_data[name]:
-                    fsu.del_unittest(label, task.title)
+                    fsu.del_unittest(label, task.slug)
 
             # populate direct task data
             cat = TaskCategory.objects.filter(
@@ -282,8 +288,20 @@ def delete(request, slug):
 
 
 @login_required
-def results(request, slug):
-    pass
+def results(request, slug, solution_id):
+    task = get_object_or_404(Task, slug=slug)
+    solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
+    solution_files = fsu.solution_file_dict(solution)
+
+    cr = get_object_or_404(CheckerResult, solution=solution)
+    result = cr.result
+
+    return(render(request, 'tasks/task-result.html', {
+        'task': task,
+        'solution': solution,
+        'solution_files': solution_files,
+        'result': result
+    }))
 
 
 @superuser_required
@@ -294,15 +312,16 @@ def submit_new_exercise(request):
         if form.is_valid():
             exercise_file_list = request.FILES.getlist('e_files')
             unittest_file_list = request.FILES.getlist('ut_files')
+            e_slug = slugify(str(form.data['e_title']))
             for exercise_file in exercise_file_list:
                 fsu.handle_uploaded_exercise(
                     exercise_file,
-                    form.cleaned_data['e_title'])
+                    e_slug)
 
             for unittest_file in unittest_file_list:
                 fsu.handle_uploaded_unittest(
                     unittest_file,
-                    form.cleaned_data['e_title'])
+                    e_slug)
 
             # add Task object to system
             cat = TaskCategory.objects.filter(
@@ -315,7 +334,7 @@ def submit_new_exercise(request):
                 publication_date=form.cleaned_data['e_pub_date'],
                 deadline_date=form.cleaned_data['e_dead_date'],
                 category=cat,
-                slug=slugify(str(form.data['e_title'])))
+                slug=e_slug)
             t.save()
             return render(request, 'tasks/message.html', {
                 'type': 'success',
