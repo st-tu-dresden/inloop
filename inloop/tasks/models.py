@@ -234,7 +234,6 @@ class Checker:
         popen_args.append(cmd) if cmd else logging.debug("No slug given to docker run")
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
-        cont_output = None
         compiler_error = False
         try:
             # Runs smoothly if all tests are successful
