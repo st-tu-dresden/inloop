@@ -278,14 +278,14 @@ class Checker:
     def _parse_result(self, result, compiler_error=False):
         # TODO: Add return code to logic
         logging.debug("Parse result call")
+        passed = False
+        time = 0.0
         if not result:
             logging.debug("_parse_result got an empty result")
-            return
+            result = "For some reason I didn't get anything.. What are you doing?"
         elif compiler_error:
+            # Also stick with the default values to just display result
             logging.debug("_parse_result registered a compiler error and can't parse the reports")
-            # NOTE: Keep result as it is (compiler log), put it into CheckerResult
-            time = 0.0
-            passed = False
         else:
             result = result.decode()
             logging.debug("Got result: " + result)
@@ -296,11 +296,13 @@ class Checker:
             p.feed('</root>')
             root = p.close()
 
+            times = []
             for testsuite in root:
-                logging.debug(testsuite.attrib)
-            # TODO: Here be XML evaluation and things.
-            time = 0.0
-            passed = False
+                times.append(testsuite.attrib.get('time'))
+                if int(testsuite.attrib.get('failures')) == 0 \
+                   and int(testsuite.attrib.get('errors')) == 0:
+                    passed = True
+            time = round(sum([float(x) for x in times]), 2)
 
         cr = CheckerResult(
             solution=self.solution,
@@ -308,7 +310,8 @@ class Checker:
             time_taken=time,
             passed=passed)
         cr.save()
-        #if passed:
-        #    ts = TaskSolution.objects.get(pk=self.solution.pk)
-        #    ts.passed = True
-        #    ts.save()
+
+        if passed:
+            ts = TaskSolution.objects.get(pk=self.solution.pk)
+            ts.passed = True
+            ts.save()
