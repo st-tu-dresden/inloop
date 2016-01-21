@@ -96,3 +96,19 @@ def latest_solution_files(task, username):
         # display templates
         overview = get_task_templates(task.title)
     return overview
+
+
+def solution_file_dict(solution):
+    overview = {}
+    p = join(
+        settings.MEDIA_ROOT,
+        'solutions',
+        solution.author.username,
+        solution.task.title,
+        solution.submission_date.strftime("%Y/%m/%d/%H:%M_") + str(solution.id))
+    filenames = map(basename, glob(p + path.sep + '*.java'))
+    for fname in filenames:
+        with open(join(p, fname)) as f:
+            overview[fname] = f.read()
+
+    return overview
