@@ -243,17 +243,13 @@ class Checker:
                 stderr=STDOUT,
                 timeout=settings.CHECKER['Timeouts'].get('container_execution'))
         except CalledProcessError as e:
+            cont_output = e.output
             if e.returncode == 42:
+                logging.debug("Caught compiler error for " + ctr_name)
                 # Fires if compiler error occurred
-                cont_output = e.output
                 compiler_error = True
-            else:
-                # Fires when other return (usually 1)
-                # Happens also when unit tests fail
-                logging.error("Execution of container {} failed: Exit {}, {}".format(
-                    ctr_name, e.returncode, e.output
-                ))
         except TimeoutExpired as e:
+            cont_output = "Your code was too slow and timed out!"
             logging.error("Execution of container {} timed out: {}".format(
                 ctr_name, e.timeout
             ))
