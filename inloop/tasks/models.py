@@ -237,15 +237,19 @@ class Checker:
         cont_output = None
         compiler_error = False
         try:
+            # Runs smoothly if all tests are successful
             cont_output = check_output(
                 popen_args,
                 stderr=STDOUT,
                 timeout=settings.CHECKER['Timeouts'].get('container_execution'))
         except CalledProcessError as e:
             if e.returncode == 42:
+                # Fires if compiler error occurred
                 cont_output = e.output
                 compiler_error = True
             else:
+                # Fires when other return (usually 1)
+                # Happens also when unit tests fail
                 logging.error("Execution of container {} failed: Exit {}, {}".format(
                     ctr_name, e.returncode, e.output
                 ))
