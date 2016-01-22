@@ -1,10 +1,10 @@
 import logging
-import string
-from random import SystemRandom
-from os.path import join, dirname
 import re
+import string
 import xml.etree.ElementTree as ET
-from subprocess import STDOUT, check_output, CalledProcessError, TimeoutExpired
+from os.path import dirname, join
+from random import SystemRandom
+from subprocess import check_output, CalledProcessError, TimeoutExpired, STDOUT
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
