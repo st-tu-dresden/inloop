@@ -11,7 +11,7 @@ from django.conf import settings
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
 from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory,
-                                 TaskSolution, TaskSolutionFile)
+                                 TaskSolution, TaskSolutionFile, CheckerResult)
 
 TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
 
@@ -178,7 +178,6 @@ class TaskSolutionTests(TestCase):
             submission_date=timezone.now() - timezone.timedelta(days=1),
             author=author,
             task=t1
-            # omit is_correct as default = False
         )
 
         TaskSolutionFile.objects.create(
@@ -199,9 +198,16 @@ class TaskSolutionTests(TestCase):
             file=None
         )
 
+        CheckerResult.objects.create(
+            solution=ts1,
+            result='',
+            time_taken=13.37,
+            passed=False
+        )
+
     def test_default_value(self):
         sol = TaskSolution.objects.get(pk=1)
-        self.assertFalse(sol.is_correct)
+        self.assertFalse(sol.passed)
 
 
 class TaskCategoryManagerTest(TestCase):
