@@ -13,7 +13,8 @@ from django.conf import settings
 
 from inloop.decorators import superuser_required
 from inloop.tasks import forms, filesystem_utils as fsu
-from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
+from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
+                                 TaskSolutionFile, Checker, CheckerResult)
 
 
 @superuser_required
@@ -130,7 +131,6 @@ def detail(request, slug):
             author=request.user,
             task=task
         )
-
         solution.save()
 
         if request.FILES.getlist('manual-upload'):
@@ -287,8 +287,19 @@ def delete(request, slug):
 
 
 @login_required
-def results(request, slug):
-    pass
+def results(request, slug, solution_id):
+    task = get_object_or_404(Task, slug=slug)
+    solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
+    solution_files = fsu.solution_file_dict(solution)
+    cr = get_object_or_404(CheckerResult, solution=solution)
+    result = cr.result
+
+    return(render(request, 'tasks/task-result.html', {
+        'task': task,
+        'solution': solution,
+        'solution_files': solution_files,
+        'result': result
+    }))
 
 
 @superuser_required

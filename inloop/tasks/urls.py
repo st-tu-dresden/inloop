@@ -50,7 +50,7 @@ urlpatterns = patterns(
         name='edit'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/results/$',
+        r'^(?P<slug>[-\w]+)/results/(?P<solution_id>[\d]+)$',
         views.results,
         name='results'
     ),
