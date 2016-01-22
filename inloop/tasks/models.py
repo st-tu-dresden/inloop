@@ -15,8 +15,6 @@ from django.utils.text import slugify
 from inloop.accounts.models import UserProfile
 from inloop.gh_import.utils import parse_date
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 def make_slug(value):
     """Extended slugify() that also removes '(...)' from strings.
