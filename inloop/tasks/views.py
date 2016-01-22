@@ -159,6 +159,11 @@ def detail(request, slug):
                         tsf.filename,
                         ContentFile(request.POST[param]))
                     tsf.save()
+
+        # TODO: Add Checker call here!
+        c = Checker(solution)
+        c.start()
+
     latest_solutions = TaskSolution.objects.filter(
         task=task,
         author=request.user)
