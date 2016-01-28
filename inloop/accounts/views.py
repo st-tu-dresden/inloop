@@ -34,7 +34,7 @@ def register(request):
 
         if user_form.is_valid():
             user = user_form.save(commit=False)
-            user.set_password(user.password)
+            user.set_password(user_form.cleaned_data['password'])
             user.generate_activation_key()
             user.is_active = False
             user.save()
@@ -43,7 +43,6 @@ def register(request):
                 'type': 'success',
                 'message': 'Your activation mail has been sent!'
             })
-        # XXX: else?
 
     else:
         user_form = forms.UserForm()
