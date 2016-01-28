@@ -18,14 +18,14 @@ class UserForm(forms.ModelForm):
             'class': 'form-control',
             'autocomplete': 'off'
         }))
-    password1 = forms.CharField(
+    password = forms.CharField(
         label='Password',
         validators=[v.validate_password],
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
         }))
-    password2 = forms.CharField(
+    password_repeat = forms.CharField(
         label='Confirm password',
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -43,22 +43,22 @@ class UserForm(forms.ModelForm):
         }),
         validators=[v.validate_mat_num])
 
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+        password_repeat = self.cleaned_data.get("password_repeat")
+        if password and password_repeat and password != password_repeat:
             raise forms.ValidationError(
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
-        return password2
+        return password
 
     class Meta(object):
         model = UserProfile
         fields = ('username',
                   'email',
-                  'password1',
-                  'password2',
+                  'password',
+                  'password_repeat',
                   'course',
                   'mat_num')
 
@@ -72,7 +72,7 @@ class UserProfileForm(UserForm):
 
     class Meta(UserForm.Meta):
         model = UserProfile
-        exclude = ('username', 'email', 'password1', 'password2')
+        exclude = ('username', 'email', 'password', 'password_repeat')
         fields = ('mat_num', 'course')
 
 
@@ -85,7 +85,7 @@ class EmailForm(UserForm):
 
     class Meta(UserForm.Meta):
         model = UserProfile
-        exclude = ('username', 'password1', 'password2', 'mat_num', 'course')
+        exclude = ('username', 'password', 'password_repeat', 'mat_num', 'course')
         fields = ('email', )
 
 
@@ -105,7 +105,7 @@ class PasswordForm(UserForm):
     class Meta(UserForm.Meta):
         model = UserProfile
         exclude = ('username', 'email', 'mat_num', 'course')
-        fields = ('old_password', 'password1', 'password2')
+        fields = ('old_password', 'password', 'password_repeat')
 
 
 class NewCourseForm(forms.ModelForm):
