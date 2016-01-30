@@ -1,7 +1,8 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import AnonymousUser
 
-from inloop.accounts.models import UserProfile
+from inloop.accounts.models import UserProfile, CourseOfStudy
+from inloop.accounts.forms import UserForm
 from inloop.tasks.views import index
 
 
@@ -9,6 +10,7 @@ class LoginSystemTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.password = '123456'
+        self.course = CourseOfStudy.objects.create(name='test_course')
         self.user = UserProfile.objects.create_user(
             username='test_user',
             first_name='first_name',
@@ -17,6 +19,31 @@ class LoginSystemTests(TestCase):
             password=self.password,
             mat_num='0000000'
         )
+
+    def test_registration_password_consistency(self):
+        data = {
+            'username': 'john',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'password': 'abc123456',
+            'password_repeat': 'abc123456',
+            'course': self.course.id,
+            'mat_num': '1234567'
+        }
+        uf = UserForm(data)
+        self.assertTrue(uf.is_valid())
+        user = uf.save(commit=False)
+        user.set_password(uf.cleaned_data['password'])
+        user.is_active = True  # Skip activation mail
+        user.save()
+
+        # Test login with fresh user
+        resp = self.client.post('/accounts/login/', data=data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context['user'].is_authenticated())
+        self.assertEqual(resp.context['user'].get_username(), data['username'])
+        self.assertContains(resp, '>john<')
 
     def test_anonymous_login_form(self):
         request = self.factory.get('/')
