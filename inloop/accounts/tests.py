@@ -70,6 +70,13 @@ class LoginSystemTests(TestCase):
         self.assertContains(resp, 'This field is required.')  # From missing course choice
         self.assertContains(resp, 'The matriculation number does not have 7 digits!')
 
+    def test_registration_form_password_mismatch(self):
+        collision_data = self.data
+        collision_data['password_repeat'] = '123'
+        resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'The two password fields didn&#39;t match.')
+
     def test_registration_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/register/', follow=True)
