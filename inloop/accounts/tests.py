@@ -52,6 +52,24 @@ class LoginSystemTests(TestCase):
         self.assertTrue(user.username in mail.outbox[0].body)
         self.assertTrue(link in mail.outbox[0].body)
 
+    def test_registration_form_errors(self):
+        # Provoke username and email collision
+        collision_data = {
+            'username': 'john',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'password': '123',          # Too short
+            'password_repeat': '123',
+            'mat_num': '12345678'       # Too long
+        }
+        self.client.post('/accounts/register/', data=self.data, follow=True)
+        resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
+        self.assertContains(resp, 'User with this Username already exists.')
+        self.assertContains(resp, 'The password must have at least 8 characters!')
+        self.assertContains(resp, 'This field is required.')  # From missing course choice
+        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+
     def test_registration_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/register/', follow=True)
