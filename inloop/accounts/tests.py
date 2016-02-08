@@ -31,6 +31,11 @@ class LoginSystemTests(TestCase):
             mat_num='0000000'
         )
 
+    def test_activation_mail_notification(self):
+        resp = self.client.post('/accounts/register/', data=self.data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Your activation mail has been sent!')
+
     def test_registration_password_consistency(self):
         uf = UserForm(self.data)
         self.assertTrue(uf.is_valid())
