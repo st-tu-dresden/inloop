@@ -29,6 +29,8 @@ def new_course(request):
 
 
 def register(request):
+    if request.user.is_authenticated():
+        return redirect('/')
     if request.method == 'POST':
         user_form = forms.UserForm(data=request.POST)
 
