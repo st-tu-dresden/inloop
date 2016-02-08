@@ -1,5 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import AnonymousUser
+from django.core import mail
+from django.conf import settings
 
 from inloop.accounts.models import UserProfile, CourseOfStudy
 from inloop.accounts.forms import UserForm
@@ -35,6 +37,21 @@ class LoginSystemTests(TestCase):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Your activation mail has been sent!')
+
+    def test_activation_mail_send(self):
+        uf = UserForm(self.data)
+        self.assertTrue(uf.is_valid())
+        user = uf.save(commit=False)
+        user.set_password(uf.cleaned_data['password'])
+        user.is_active = False
+        user.save()
+        user.send_activation_mail()
+        link = "{0}accounts/activate/{1}".format(settings.DOMAIN, user.activation_key)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'INLOOP Activation')
+        self.assertTrue(user.username in mail.outbox[0].body)
+        self.assertTrue(link in mail.outbox[0].body)
 
     def test_registration_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
