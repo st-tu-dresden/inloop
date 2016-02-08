@@ -36,10 +36,10 @@ class LoginSystemTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Your activation mail has been sent!')
 
-    def registration_redirect_for_users(self):
-        self.client.post('/accounts/login/', data=self.data, follow=True)
+    def test_registration_redirect_for_users(self):
+        self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/register/', follow=True)
-        self.assertRedirects(resp, 'tasks:index')
+        self.assertRedirects(resp, '/')
 
     def test_registration_password_consistency(self):
         uf = UserForm(self.data)
