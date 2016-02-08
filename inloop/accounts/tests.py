@@ -5,7 +5,6 @@ from django.conf import settings
 
 from inloop.accounts.models import UserProfile, CourseOfStudy
 from inloop.accounts.forms import UserForm
-import inloop.accounts.views as account_views
 import inloop.tasks.views as task_views
 
 
