@@ -70,6 +70,9 @@ def activate_user(request, key):
 
 
 def user_login(request):
+    if request.user.is_authenticated():
+        return redirect('/')
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
