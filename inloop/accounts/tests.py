@@ -41,6 +41,11 @@ class LoginSystemTests(TestCase):
         resp = self.client.get('/accounts/register/', follow=True)
         self.assertRedirects(resp, '/')
 
+    def test_login_redirect_for_users(self):
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.get('/accounts/login/', follow=True)
+        self.assertRedirects(resp, '/')
+
     def test_registration_password_consistency(self):
         uf = UserForm(self.data)
         self.assertTrue(uf.is_valid())
