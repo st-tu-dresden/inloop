@@ -37,6 +37,17 @@ class LoginSystemTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Your activation mail has been sent!')
 
+    def test_activation_process_client(self):
+        self.client.post('/accounts/register/', data=self.data, follow=True)
+        user = UserProfile.objects.get(username='john')
+        link = '/accounts/activate/' + user.activation_key
+        resp = self.client.get(link, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Your account has been activated! You can now login.")
+
+        # Try to login
+        self.try_default_user_login()
+
     def test_activation_mail_send(self):
         uf = UserForm(self.data)
         self.assertTrue(uf.is_valid())
@@ -96,6 +107,9 @@ class LoginSystemTests(TestCase):
         user.save()
 
         # Test login with fresh user
+        self.try_default_user_login()
+
+    def try_default_user_login(self):
         resp = self.client.post('/accounts/login/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.context['user'].is_authenticated())
