@@ -35,6 +35,7 @@ class LoginSystemTests(TestCase):
     def test_registration_notification_redirect(self):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'accounts/message.html')
         self.assertContains(resp, 'Your activation mail has been sent!')
 
     def test_activation_process_client(self):
@@ -43,6 +44,7 @@ class LoginSystemTests(TestCase):
         link = '/accounts/activate/' + user.activation_key
         resp = self.client.get(link, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'accounts/message.html')
         self.assertContains(resp, "Your account has been activated! You can now login.")
 
         # Try to login
@@ -76,6 +78,7 @@ class LoginSystemTests(TestCase):
         }
         self.client.post('/accounts/register/', data=self.data, follow=True)
         resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
+        self.assertTemplateUsed(resp, 'registration/register.html')
         self.assertContains(resp, 'User with this Username already exists.')
         self.assertContains(resp, 'The password must have at least 8 characters!')
         self.assertContains(resp, 'This field is required.')  # From missing course choice
@@ -86,16 +89,19 @@ class LoginSystemTests(TestCase):
         collision_data['password_repeat'] = '123'
         resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'registration/register.html')
         self.assertContains(resp, 'The two password fields didn&#39;t match.')
 
     def test_registration_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/register/', follow=True)
+        self.assertTemplateUsed(resp, 'tasks/index.html')
         self.assertRedirects(resp, '/')
 
     def test_login_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/login/', follow=True)
+        self.assertTemplateUsed(resp, 'tasks/index.html')
         self.assertRedirects(resp, '/')
 
     def test_registration_password_consistency(self):
@@ -112,6 +118,7 @@ class LoginSystemTests(TestCase):
     def try_default_user_login(self):
         resp = self.client.post('/accounts/login/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'tasks/index.html')
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.data['username'])
         self.assertContains(resp, '>john<')
@@ -119,9 +126,10 @@ class LoginSystemTests(TestCase):
     def test_anonymous_login_form(self):
         request = self.factory.get('/')
         request.user = AnonymousUser()
-        response = task_views.index(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '>Login<')
+        resp = task_views.index(request)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'registration/login.html')
+        self.assertContains(resp, '>Login<')
 
     def test_successful_system_login(self):
         credentials = {
@@ -130,6 +138,7 @@ class LoginSystemTests(TestCase):
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'tasks/index.html')
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
         self.assertContains(resp, '>test_user<')
@@ -141,6 +150,7 @@ class LoginSystemTests(TestCase):
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'registration/login.html')
         self.assertFalse(resp.context['user'].is_authenticated())
         self.assertContains(resp, '>Login<')
         self.assertNotContains(resp, '>test_user<')
