@@ -160,14 +160,12 @@ def detail(request, slug):
                         ContentFile(request.POST[param]))
                     tsf.save()
 
-        # TODO: Add Checker call here!
         c = Checker(solution)
         c.start()
 
-    latest_solutions = TaskSolution.objects.filter(
-        task=task,
-        author=request.user)
-    latest_solutions.order_by('-submission_date')[:5]
+    latest_solutions = TaskSolution.objects \
+        .filter(task=task, author=request.user) \
+        .order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),
