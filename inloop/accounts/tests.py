@@ -54,6 +54,18 @@ class LoginSystemTests(TestCase):
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
 
+    def test_change_password_mismatch(self):
+        new_password = '12345678'
+        cp_data = {
+            'old_password': self.password,
+            'password': new_password,
+            'password_repeat': 'Not the new password. :('
+        }
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'The two password fields didn&#39;t match.')
+
     def test_registration_notification_redirect(self):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
