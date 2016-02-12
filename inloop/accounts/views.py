@@ -143,10 +143,11 @@ def change_password(request):
             instance=request.user)
 
         if password_form.is_valid():
+            request.user.set_password(password_form.cleaned_data['password'])
+            request.user.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'A validation mail has been sent \
-                to your email address!'
+                'message': 'Your password has been changed successfully!'
             })
     else:
         password_form = forms.PasswordForm(instance=request.user)
