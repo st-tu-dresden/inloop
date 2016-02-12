@@ -138,7 +138,7 @@ def detail(request, slug):
                 tsf = TaskSolutionFile(filename=file.name, solution=solution)
                 tsf.file.save(
                     file.name,
-                    ContentFile(''.join([s for s in file.chunks()]))
+                    ContentFile("".join([s.decode("utf-8") for s in file.chunks()]))
                 )
                 tsf.save()
         else:
