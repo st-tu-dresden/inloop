@@ -19,7 +19,7 @@
         </h1>
         <br/>
         <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-        <p>{{ description|markdown }}</p>
+        {{ description|markdown }}
 
         <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
             {% csrf_token %}
