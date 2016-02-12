@@ -70,17 +70,13 @@
                     </div>
                 </div>
             </div>
-            {% if file_dict %}
-                <div class="form-group col-md-12">
-                    <label for="manual-upload">Manual upload:</label>
-                    <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple="1">
-                </div>
-                <div class="form-group col-md-12">
-                    <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
-                </div>
-            {% else %}
-                <a class="btn btn-default" href="{% url 'index' %}">Go back</a>
-            {% endif %}
+            <div class="form-group col-md-12">
+                <label for="manual-upload">Manual upload:</label>
+                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple>
+            </div>
+            <div class="form-group col-md-12">
+                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit">
+            </div>
         </form>
     </div>
     </div>
