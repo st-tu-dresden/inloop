@@ -143,10 +143,12 @@ def detail(request, slug):
                         solution=solution,
                     )
 
+                    # TODO: is this ugly comprehension really necessary?
                     tsf.file.save(
                         file.name,
                         ContentFile(''.join([s for s in file.chunks()]))
                     )
+                    tsf.save()
         else:
             for param in request.POST:
                 if param.startswith('content') \
