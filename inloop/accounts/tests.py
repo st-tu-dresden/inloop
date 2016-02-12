@@ -32,6 +32,28 @@ class LoginSystemTests(TestCase):
             mat_num='0000000'
         )
 
+    def test_successful_change_password(self):
+        new_password = '12345678'
+        cp_data = {
+            'old_password': self.password,
+            'password': new_password,
+            'password_repeat': new_password
+        }
+        login_data = {
+            'username': self.user.username,
+            'password': new_password
+        }
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'accounts/message.html')
+        self.assertContains(resp, 'Your password has been changed successfully!')
+        self.client.logout()
+        resp = self.client.post('/accounts/login/', data=login_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context['user'].is_authenticated())
+        self.assertEqual(resp.context['user'].get_username(), self.user.username)
+
     def test_registration_notification_redirect(self):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
         self.assertEqual(resp.status_code, 200)
