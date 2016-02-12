@@ -29,6 +29,8 @@ def new_course(request):
 
 
 def register(request):
+    if request.user.is_authenticated():
+        return redirect('/')
     if request.method == 'POST':
         user_form = forms.UserForm(data=request.POST)
 
@@ -68,6 +70,9 @@ def activate_user(request, key):
 
 
 def user_login(request):
+    if request.user.is_authenticated():
+        return redirect('/')
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -114,8 +119,7 @@ def user_profile(request):
             user_profile.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'Your profile information has \
-                successfully been changed!'
+                'message': 'Your profile information has successfully been changed!'
             })
     else:
         user_profile = forms.UserProfileForm(
@@ -138,10 +142,11 @@ def change_password(request):
             instance=request.user)
 
         if password_form.is_valid():
+            request.user.set_password(password_form.cleaned_data['password'])
+            request.user.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'A validation mail has been sent \
-                to your email address!'
+                'message': 'Your password has been changed successfully!'
             })
     else:
         password_form = forms.PasswordForm(instance=request.user)

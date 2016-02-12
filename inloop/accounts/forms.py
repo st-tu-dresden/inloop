@@ -43,7 +43,7 @@ class UserForm(forms.ModelForm):
         }),
         validators=[v.validate_mat_num])
 
-    def clean_password(self):
+    def clean_password_repeat(self):
         password = self.cleaned_data.get("password")
         password_repeat = self.cleaned_data.get("password_repeat")
         if password and password_repeat and password != password_repeat:
