@@ -9,12 +9,10 @@ from inloop.accounts.forms import UserForm
 class RegistrationTests(TestCase):
     def setUp(self):
         self.password = '123456'
-        self.new_password = '12345678'
-        self.course1 = CourseOfStudy.objects.create(name='test_course')
-        self.course2 = CourseOfStudy.objects.create(name='another_test_course')
+        self.course = CourseOfStudy.objects.create(name='test_course')
         self.profile_data = {
             'mat_num': 1111111,
-            'course': self.course1.id
+            'course': self.course.id
         }
         self.data = {
             'username': 'john',
@@ -23,7 +21,7 @@ class RegistrationTests(TestCase):
             'email': 'john@example.com',
             'password': 'abc123456',
             'password_repeat': 'abc123456',
-            'course': self.course1.id,
+            'course': self.course.id,
             'mat_num': '1234567'
         }
         self.user = UserProfile.objects.create_user(
@@ -32,7 +30,7 @@ class RegistrationTests(TestCase):
             last_name='last_name',
             email='test@example.com',
             password=self.password,
-            course=self.course1,
+            course=self.course,
             mat_num='0000000'
         )
 
@@ -131,16 +129,6 @@ class ProfileTests(TestCase):
         self.profile_data = {
             'mat_num': 1111111,
             'course': self.course1.id
-        }
-        self.data = {
-            'username': 'john',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-            'password': 'abc123456',
-            'password_repeat': 'abc123456',
-            'course': self.course1.id,
-            'mat_num': '1234567'
         }
         self.user = UserProfile.objects.create_user(
             username='test_user',
@@ -273,30 +261,14 @@ class ProfileTests(TestCase):
 class LoginSystemTests(TestCase):
     def setUp(self):
         self.password = '123456'
-        self.new_password = '12345678'
-        self.course1 = CourseOfStudy.objects.create(name='test_course')
-        self.course2 = CourseOfStudy.objects.create(name='another_test_course')
-        self.profile_data = {
-            'mat_num': 1111111,
-            'course': self.course1.id
-        }
-        self.data = {
-            'username': 'john',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-            'password': 'abc123456',
-            'password_repeat': 'abc123456',
-            'course': self.course1.id,
-            'mat_num': '1234567'
-        }
+        self.course = CourseOfStudy.objects.create(name='test_course')
         self.user = UserProfile.objects.create_user(
             username='test_user',
             first_name='first_name',
             last_name='last_name',
             email='test@example.com',
             password=self.password,
-            course=self.course1,
+            course=self.course,
             mat_num='0000000'
         )
 
