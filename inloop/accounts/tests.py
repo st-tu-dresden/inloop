@@ -1,16 +1,13 @@
-from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase
 from django.core import mail
 from django.conf import settings
 
 from inloop.accounts.models import UserProfile, CourseOfStudy
 from inloop.accounts.forms import UserForm
-import inloop.tasks.views as task_views
 
 
 class RegistrationTests(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.password = '123456'
         self.new_password = '12345678'
         self.course1 = CourseOfStudy.objects.create(name='test_course')
@@ -127,7 +124,6 @@ class RegistrationTests(TestCase):
 
 class ProfileTests(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.password = '123456'
         self.new_password = '12345678'
         self.course1 = CourseOfStudy.objects.create(name='test_course')
@@ -276,7 +272,6 @@ class ProfileTests(TestCase):
 
 class LoginSystemTests(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.password = '123456'
         self.new_password = '12345678'
         self.course1 = CourseOfStudy.objects.create(name='test_course')
@@ -312,9 +307,7 @@ class LoginSystemTests(TestCase):
         self.assertRedirects(resp, '/')
 
     def test_anonymous_login_form(self):
-        request = self.factory.get('/')
-        request.user = AnonymousUser()
-        resp = task_views.index(request)
+        resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'registration/login.html')
         self.assertContains(resp, '>Login<')
