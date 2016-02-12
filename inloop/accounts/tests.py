@@ -14,6 +14,10 @@ class LoginSystemTests(TestCase):
         self.password = '123456'
         self.new_password = '12345678'
         self.course = CourseOfStudy.objects.create(name='test_course')
+        self.profile_data = {
+            'mat_num': 1111111,
+            'course': self.course.id
+        }
         self.data = {
             'username': 'john',
             'first_name': 'John',
@@ -32,6 +36,41 @@ class LoginSystemTests(TestCase):
             password=self.password,
             mat_num='0000000'
         )
+
+    def test_successful_user_profile_change_mat_num(self):
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=self.profile_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/message.html')
+        self.assertContains(resp, 'Your profile information has successfully been changed!')
+        self.assertEqual(resp.context['user'].mat_num, self.profile_data['mat_num'])
+
+    def test_user_profile_long_mat_num(self):
+        prof_data = self.profile_data.copy()
+        prof_data.update({'mat_num': 11111111})
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/profile.html')
+        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+
+    def test_user_profile_short_mat_num(self):
+        prof_data = self.profile_data.copy()
+        prof_data.update({'mat_num': 111111})
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/profile.html')
+        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+
+    def test_user_profile_alphanumeric_mat_num(self):
+        prof_data = self.profile_data.copy()
+        prof_data.update({'mat_num': '11111a'})
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/profile.html')
+        self.assertContains(resp, 'Enter a whole number.')
 
     def test_successful_change_password(self):
         cp_data = {

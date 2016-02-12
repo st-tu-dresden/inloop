@@ -119,8 +119,7 @@ def user_profile(request):
             user_profile.save()
             return render(request, 'accounts/message.html', {
                 'type': 'success',
-                'message': 'Your profile information has \
-                successfully been changed!'
+                'message': 'Your profile information has successfully been changed!'
             })
     else:
         user_profile = forms.UserProfileForm(
