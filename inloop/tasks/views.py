@@ -135,39 +135,28 @@ def detail(request, slug):
 
         if request.FILES.getlist('manual-upload'):
             for file in request.FILES.getlist('manual-upload'):
-                # only allow .java files < 1Mb
-                if file.content_type == 'text/x-java'\
-                   and file.size < 1048576:
-                    tsf = TaskSolutionFile(
-                        filename=file.name,
-                        solution=solution,
-                    )
-
-                    tsf.file.save(
-                        file.name,
-                        ContentFile(''.join([s for s in file.chunks()]))
-                    )
+                tsf = TaskSolutionFile(filename=file.name, solution=solution)
+                tsf.file.save(
+                    file.name,
+                    ContentFile("".join([s.decode("utf-8") for s in file.chunks()]))
+                )
+                tsf.save()
         else:
             for param in request.POST:
-                if param.startswith('content') \
-                   and not param.endswith('-filename'):
+                if param.startswith('content') and not param.endswith('-filename'):
                     tsf = TaskSolutionFile(
                         filename=request.POST[param + '-filename'],
-                        solution=solution)
-
-                    tsf.file.save(
-                        tsf.filename,
-                        ContentFile(request.POST[param]))
+                        solution=solution
+                    )
+                    tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
                     tsf.save()
 
-        # TODO: Add Checker call here!
         c = Checker(solution)
         c.start()
 
-    latest_solutions = TaskSolution.objects.filter(
-        task=task,
-        author=request.user)
-    latest_solutions.order_by('-submission_date')[:5]
+    latest_solutions = TaskSolution.objects \
+        .filter(task=task, author=request.user) \
+        .order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
         'file_dict': fsu.latest_solution_files(task, request.user.username),

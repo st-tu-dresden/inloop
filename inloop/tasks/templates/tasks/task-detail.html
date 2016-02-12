@@ -19,9 +19,10 @@
         </h1>
         <br/>
         <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-        <p>{{ description|markdown }}</p>
+        {{ description|markdown }}
 
-        <form id="code-area" class="form-inline" action="." method="post" enctype="multipart/form-data">
+        <form id="code-area" class="form-inline" action="." accept-charset="utf-8" method="post"
+              enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group col-md-12">
                 <div role="tabpanel">
@@ -70,17 +71,13 @@
                     </div>
                 </div>
             </div>
-            {% if file_dict %}
-                <div class="form-group col-md-12">
-                    <label for="manual-upload">Manual upload:</label>
-                    <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple="1">
-                </div>
-                <div class="form-group col-md-12">
-                    <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit"/>
-                </div>
-            {% else %}
-                <a class="btn btn-default" href="{% url 'index' %}">Go back</a>
-            {% endif %}
+            <div class="form-group col-md-12">
+                <label for="manual-upload">Manual upload:</label>
+                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple>
+            </div>
+            <div class="form-group col-md-12">
+                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit">
+            </div>
         </form>
     </div>
     </div>
