@@ -10,10 +10,6 @@ class RegistrationTests(TestCase):
     def setUp(self):
         self.password = '123456'
         self.course = CourseOfStudy.objects.create(name='test_course')
-        self.profile_data = {
-            'mat_num': 1111111,
-            'course': self.course.id
-        }
         self.data = {
             'username': 'john',
             'first_name': 'John',
