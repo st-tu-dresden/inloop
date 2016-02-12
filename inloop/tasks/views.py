@@ -136,30 +136,22 @@ def detail(request, slug):
         if request.FILES.getlist('manual-upload'):
             for file in request.FILES.getlist('manual-upload'):
                 # only allow .java files < 1Mb
-                if file.content_type == 'text/x-java'\
-                   and file.size < 1048576:
-                    tsf = TaskSolutionFile(
-                        filename=file.name,
-                        solution=solution,
-                    )
-
-                    # TODO: is this ugly comprehension really necessary?
+                if file.content_type == 'text/x-java' and file.size < 1048576:
+                    tsf = TaskSolutionFile(filename=file.name, solution=solution)
                     tsf.file.save(
                         file.name,
+                        # TODO: is this ugly comprehension really necessary?
                         ContentFile(''.join([s for s in file.chunks()]))
                     )
                     tsf.save()
         else:
             for param in request.POST:
-                if param.startswith('content') \
-                   and not param.endswith('-filename'):
+                if param.startswith('content') and not param.endswith('-filename'):
                     tsf = TaskSolutionFile(
                         filename=request.POST[param + '-filename'],
-                        solution=solution)
-
-                    tsf.file.save(
-                        tsf.filename,
-                        ContentFile(request.POST[param]))
+                        solution=solution
+                    )
+                    tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
                     tsf.save()
 
         c = Checker(solution)
