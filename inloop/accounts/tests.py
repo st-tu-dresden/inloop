@@ -34,13 +34,20 @@ class RegistrationTests(TestCase):
             mat_num='0000000'
         )
 
+    def assert_response_template_contains(self, resp, template, content):
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, template)
+        self.assertContains(resp, content)
+
     def try_default_user_login(self):
         resp = self.client.post('/accounts/login/', data=self.data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'tasks/index.html')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='tasks/index.html',
+            content='>john<'
+        )
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.data['username'])
-        self.assertContains(resp, '>john<')
 
     def test_registration_password_consistency(self):
         uf = UserForm(self.data)
@@ -76,9 +83,11 @@ class RegistrationTests(TestCase):
         collision_data = self.data
         collision_data['password_repeat'] = '123'
         resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'registration/register.html')
-        self.assertContains(resp, 'The two password fields didn&#39;t match.')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='registration/register.html',
+            content='The two password fields didn&#39;t match.'
+        )
 
     def test_registration_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
@@ -88,18 +97,22 @@ class RegistrationTests(TestCase):
 
     def test_registration_notification_redirect(self):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'accounts/message.html')
-        self.assertContains(resp, 'Your activation mail has been sent!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/message.html',
+            content='Your activation mail has been sent!'
+        )
 
     def test_activation_process_client(self):
         self.client.post('/accounts/register/', data=self.data, follow=True)
         user = UserProfile.objects.get(username='john')
         link = '/accounts/activate/' + user.activation_key
         resp = self.client.get(link, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'accounts/message.html')
-        self.assertContains(resp, "Your account has been activated! You can now login.")
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/message.html',
+            content='Your account has been activated! You can now login.'
+        )
 
         # Try to login
         self.try_default_user_login()
@@ -140,15 +153,22 @@ class ProfileTests(TestCase):
             mat_num='0000000'
         )
 
+    def assert_response_template_contains(self, resp, template, content):
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, template)
+        self.assertContains(resp, content)
+
     def test_successful_course_change(self):
         prof_data = self.profile_data.copy()
         prof_data.update({'course': self.course2.id})
 
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/message.html')
-        self.assertContains(resp, 'Your profile information has successfully been changed!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/message.html',
+            content='Your profile information has successfully been changed!'
+        )
         self.assertEqual(resp.context['user'].course.id, prof_data['course'])
 
     def test_invalid_course_change(self):
@@ -157,18 +177,21 @@ class ProfileTests(TestCase):
 
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/message.html')
-        self.assertContains(resp, ('Select a valid choice. '
-                                   'That choice is not one of the available choices.'))
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/profile.html',
+            content='Select a valid choice. That choice is not one of the available choices.'
+        )
         self.assertEqual(resp.context['user'].course.id, self.profile_data['course'])
 
     def test_successful_user_profile_change_mat_num(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=self.profile_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/message.html')
-        self.assertContains(resp, 'Your profile information has successfully been changed!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/message.html',
+            content='Your profile information has successfully been changed!'
+        )
         self.assertEqual(resp.context['user'].mat_num, self.profile_data['mat_num'])
 
     def test_user_profile_long_mat_num(self):
@@ -176,27 +199,33 @@ class ProfileTests(TestCase):
         prof_data.update({'mat_num': 11111111})
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/profile.html')
-        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/profile.html',
+            content='The matriculation number does not have 7 digits!'
+        )
 
     def test_user_profile_short_mat_num(self):
         prof_data = self.profile_data.copy()
         prof_data.update({'mat_num': 111111})
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/profile.html')
-        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/profile.html',
+            content='The matriculation number does not have 7 digits!'
+        )
 
     def test_user_profile_alphanumeric_mat_num(self):
         prof_data = self.profile_data.copy()
         prof_data.update({'mat_num': '11111a'})
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed('accounts/profile.html')
-        self.assertContains(resp, 'Enter a whole number.')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/profile.html',
+            content='Enter a whole number.'
+        )
 
     def test_successful_change_password(self):
         cp_data = {
@@ -210,9 +239,11 @@ class ProfileTests(TestCase):
         }
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'accounts/message.html')
-        self.assertContains(resp, 'Your password has been changed successfully!')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/message.html',
+            content='Your password has been changed successfully!'
+        )
         self.client.logout()
         resp = self.client.post('/accounts/login/', data=login_data, follow=True)
         self.assertEqual(resp.status_code, 200)
@@ -227,14 +258,20 @@ class ProfileTests(TestCase):
         }
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, 'The two password fields didn&#39;t match.')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/change_password.html',
+            content='The two password fields didn&#39;t match.'
+        )
 
     def change_password_missing_field_assertions(self, cp_data):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, 'This field is required.')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='accounts/change_password.html',
+            content='This field is required.'
+        )
 
     def test_change_password_missing_old_password(self):
         cp_data = {
@@ -272,6 +309,11 @@ class LoginSystemTests(TestCase):
             mat_num='0000000'
         )
 
+    def assert_response_template_contains(self, resp, template, content):
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, template)
+        self.assertContains(resp, content)
+
     def test_login_redirect_for_users(self):
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.get('/accounts/login/', follow=True)
@@ -280,9 +322,11 @@ class LoginSystemTests(TestCase):
 
     def test_anonymous_login_form(self):
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'registration/login.html')
-        self.assertContains(resp, '>Login<')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='registration/login.html',
+            content='>Login<'
+        )
 
     def test_successful_system_login(self):
         credentials = {
@@ -290,11 +334,13 @@ class LoginSystemTests(TestCase):
             'password': self.password
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'tasks/index.html')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='tasks/index.html',
+            content='>test_user<'
+        )
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
-        self.assertContains(resp, '>test_user<')
 
     def test_unsuccessful_system_login(self):
         credentials = {
@@ -302,8 +348,12 @@ class LoginSystemTests(TestCase):
             'password': 'invalid'
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
+        self.assert_response_template_contains(
+            resp=resp,
+            template='registration/login.html',
+            content='>Login<',
+        )
+        self.assertNotContains(resp, '>test_user<')
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'registration/login.html')
         self.assertFalse(resp.context['user'].is_authenticated())
-        self.assertContains(resp, '>Login<')
-        self.assertNotContains(resp, '>test_user<')
