@@ -12,6 +12,7 @@ class LoginSystemTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.password = '123456'
+        self.new_password = '12345678'
         self.course = CourseOfStudy.objects.create(name='test_course')
         self.data = {
             'username': 'john',
@@ -33,15 +34,14 @@ class LoginSystemTests(TestCase):
         )
 
     def test_successful_change_password(self):
-        new_password = '12345678'
         cp_data = {
             'old_password': self.password,
-            'password': new_password,
-            'password_repeat': new_password
+            'password': self.new_password,
+            'password_repeat': self.new_password
         }
         login_data = {
             'username': self.user.username,
-            'password': new_password
+            'password': self.new_password
         }
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
@@ -55,16 +55,42 @@ class LoginSystemTests(TestCase):
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
 
     def test_change_password_mismatch(self):
-        new_password = '12345678'
         cp_data = {
             'old_password': self.password,
-            'password': new_password,
+            'password': self.new_password,
             'password_repeat': 'Not the new password. :('
         }
         self.client.login(username=self.user.username, password=self.password)
         resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'The two password fields didn&#39;t match.')
+
+    def change_password_missing_field_assertions(self, cp_data):
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/change_password/', data=cp_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'This field is required.')
+
+    def test_change_password_missing_old_password(self):
+        cp_data = {
+            'password': self.new_password,
+            'password_repeat': self.new_password
+        }
+        self.change_password_missing_field_assertions(cp_data)
+
+    def test_change_password_missing_password(self):
+        cp_data = {
+            'old_password': self.password,
+            'password_repeat': self.new_password
+        }
+        self.change_password_missing_field_assertions(cp_data)
+
+    def test_change_password_missing_password_repeat(self):
+        cp_data = {
+            'old_password': self.password,
+            'password': self.new_password
+        }
+        self.change_password_missing_field_assertions(cp_data)
 
     def test_registration_notification_redirect(self):
         resp = self.client.post('/accounts/register/', data=self.data, follow=True)
