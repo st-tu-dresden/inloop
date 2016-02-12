@@ -13,10 +13,11 @@ class LoginSystemTests(TestCase):
         self.factory = RequestFactory()
         self.password = '123456'
         self.new_password = '12345678'
-        self.course = CourseOfStudy.objects.create(name='test_course')
+        self.course1 = CourseOfStudy.objects.create(name='test_course')
+        self.course2 = CourseOfStudy.objects.create(name='another_test_course')
         self.profile_data = {
             'mat_num': 1111111,
-            'course': self.course.id
+            'course': self.course1.id
         }
         self.data = {
             'username': 'john',
@@ -25,7 +26,7 @@ class LoginSystemTests(TestCase):
             'email': 'john@example.com',
             'password': 'abc123456',
             'password_repeat': 'abc123456',
-            'course': self.course.id,
+            'course': self.course1.id,
             'mat_num': '1234567'
         }
         self.user = UserProfile.objects.create_user(
@@ -34,8 +35,32 @@ class LoginSystemTests(TestCase):
             last_name='last_name',
             email='test@example.com',
             password=self.password,
+            course=self.course1,
             mat_num='0000000'
         )
+
+    def test_successful_course_change(self):
+        prof_data = self.profile_data.copy()
+        prof_data.update({'course': self.course2.id})
+
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/message.html')
+        self.assertContains(resp, 'Your profile information has successfully been changed!')
+        self.assertEqual(resp.context['user'].course.id, prof_data['course'])
+
+    def test_invalid_course_change(self):
+        prof_data = self.profile_data.copy()
+        prof_data.update({'course': 1337})  # Invalid course id
+
+        self.client.login(username=self.user.username, password=self.password)
+        resp = self.client.post('/accounts/profile/', data=prof_data, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed('accounts/message.html')
+        self.assertContains(resp, ('Select a valid choice. '
+                                   'That choice is not one of the available choices.'))
+        self.assertEqual(resp.context['user'].course.id, self.profile_data['course'])
 
     def test_successful_user_profile_change_mat_num(self):
         self.client.login(username=self.user.username, password=self.password)
