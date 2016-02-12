@@ -353,7 +353,9 @@ class LoginSystemTests(TestCase):
             template='registration/login.html',
             content='>Login<',
         )
-        self.assertNotContains(resp, '>test_user<')
-        self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'registration/login.html')
+        self.assert_response_template_contains(
+            resp=resp,
+            template='registration/login.html',
+            content='>test_user<'
+        )
         self.assertFalse(resp.context['user'].is_authenticated())
