@@ -90,7 +90,7 @@ class UserProfile(auth_models.AbstractUser):
         link = "{0}accounts/activate/{1}".format(settings.DOMAIN, self.activation_key)
         subject = "INLOOP Activation"
         message = ACTIVATION_EMAIL_TEXT.format(username=self.username, link=link)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email], fail_silently=True)
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
 
     @classmethod
     def get_system_user(cls):

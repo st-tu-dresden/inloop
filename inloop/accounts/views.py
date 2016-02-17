@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -5,6 +7,9 @@ from django.conf import settings
 
 from inloop.accounts import forms
 from inloop.accounts.models import UserProfile
+
+
+logger = logging.getLogger(__name__)
 
 
 def success(request, message):
@@ -34,8 +39,16 @@ def register(request):
             user.generate_activation_key()
             user.is_active = False
             user.save()
-            user.send_activation_mail()
-            return success(request, "Thanks for signing up. Your activation mail has been sent.")
+            try:
+                user.send_activation_mail()
+                return success(
+                    request,
+                    "Thanks for signing up. Your activation mail has been sent."
+                )
+            except Exception as e:
+                logger.error("Could not send activation mail, stack trace follows.")
+                logger.exception(e)
+                return failure(request, "We are having trouble sending your activation mail.")
     else:
         user_form = forms.UserForm()
 
