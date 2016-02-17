@@ -88,17 +88,16 @@ def user_profile(request):
     if request.method == 'POST':
         user_profile = forms.UserProfileForm(
             data=request.POST,
-            instance=request.user)
+            instance=request.user
+        )
         if user_profile.is_valid():
             user_profile.save()
             return success(request, "Your profile information has successfully been changed.")
     else:
         user_profile = forms.UserProfileForm(
             instance=request.user,
-            initial={
-                'course': request.user.course,
-                'mat_num': request.user.mat_num
-            })
+            initial={'course': request.user.course, 'mat_num': request.user.mat_num}
+        )
 
     return render(request, 'accounts/profile.html', {
         'user_profile': user_profile
@@ -110,7 +109,8 @@ def change_password(request):
     if request.method == 'POST':
         password_form = forms.PasswordForm(
             data=request.POST,
-            instance=request.user)
+            instance=request.user
+        )
 
         if password_form.is_valid():
             request.user.set_password(password_form.cleaned_data['password'])
