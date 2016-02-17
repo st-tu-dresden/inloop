@@ -124,7 +124,7 @@ class RegistrationTests(TestCase):
         link = "{0}accounts/activate/{1}".format(settings.DOMAIN, user.activation_key)
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'INLOOP Activation')
+        self.assertEqual(mail.outbox[0].subject, 'INLOOP account activation')
         self.assertTrue(user.username in mail.outbox[0].body)
         self.assertTrue(link in mail.outbox[0].body)
 
