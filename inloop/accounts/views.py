@@ -3,29 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 
-from inloop.decorators import superuser_required
-
 from inloop.accounts import forms
 from inloop.accounts.models import UserProfile
-
-
-@superuser_required
-def new_course(request):
-    if request.method == 'POST':
-        course_form = forms.NewCourseForm(data=request.POST)
-        if course_form.is_valid():
-            course_form.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'The course has successfully been added!'
-            })
-        # XXX: else?
-    else:
-        course_form = forms.NewCourseForm()
-
-    return render(request, 'accounts/new_course.html', {
-        'course_form': course_form
-    })
 
 
 def register(request):
