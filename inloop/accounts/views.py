@@ -7,12 +7,27 @@ from inloop.accounts import forms
 from inloop.accounts.models import UserProfile
 
 
+def success(request, message):
+    """Shortcut for displaying a success message to the user."""
+    return render(request, "accounts/message.html", {
+        "type": "success",
+        "message": message
+    })
+
+
+def failure(request, message):
+    """Shortcut for displaying a failure message to the user."""
+    return render(request, "accounts/message.html", {
+        "type": "danger",
+        "message": message
+    })
+
+
 def register(request):
     if request.user.is_authenticated():
         return redirect('/')
     if request.method == 'POST':
         user_form = forms.UserForm(data=request.POST)
-
         if user_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
@@ -20,11 +35,7 @@ def register(request):
             user.is_active = False
             user.save()
             user.send_activation_mail()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your activation mail has been sent!'
-            })
-
+            return success(request, "Thanks for signing up. Your activation mail has been sent.")
     else:
         user_form = forms.UserForm()
 
@@ -36,16 +47,9 @@ def register(request):
 def activate_user(request, key):
     user = get_object_or_404(UserProfile, activation_key=key)
     if user.activate():
-        return render(request, 'accounts/message.html', {
-            'type': 'success',
-            'message': 'Your account has been activated! You can now login.'
-        })
+        return success(request, "Your account has been activated! You can now login.")
     else:
-        return render(request, 'accounts/message.html', {
-            'type': 'danger',
-            'message': 'Your activation key has expired. \
-            Please register again!'
-        })
+        return failure(request, "Your activation key has expired. Please register again!")
 
 
 def user_login(request):
@@ -61,17 +65,11 @@ def user_login(request):
 
         if user:
             if user.is_active:
-                # everything alright
                 login(request, user)
                 return redirect(settings.LOGIN_REDIRECT_URL)
             else:
-                # account disabled
-                return render(request, 'accounts/message.html', {
-                    'type': 'danger',
-                    'message': 'Your account is disabled!'
-                })
+                return failure(request, "Your account is disabled!")
         else:
-            # invalid credentials
             return render(request, 'registration/login.html', {
                 'login_failed': True
             })
@@ -82,10 +80,7 @@ def user_login(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return render(request, 'accounts/message.html', {
-        'type': 'success',
-        'message': 'You have been logged out!'
-    })
+    return success(request, "You have been logged out!")
 
 
 @login_required
@@ -96,10 +91,7 @@ def user_profile(request):
             instance=request.user)
         if user_profile.is_valid():
             user_profile.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your profile information has successfully been changed!'
-            })
+            return success(request, "Your profile information has successfully been changed!")
     else:
         user_profile = forms.UserProfileForm(
             instance=request.user,
@@ -123,10 +115,7 @@ def change_password(request):
         if password_form.is_valid():
             request.user.set_password(password_form.cleaned_data['password'])
             request.user.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your password has been changed successfully!'
-            })
+            return success(request, "Your password has been changed successfully!")
     else:
         password_form = forms.PasswordForm(instance=request.user)
 

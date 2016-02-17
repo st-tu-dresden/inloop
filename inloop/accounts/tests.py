@@ -96,7 +96,7 @@ class RegistrationTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/message.html',
-            content='Your activation mail has been sent!'
+            content='Your activation mail has been sent.'
         )
 
     def test_activation_process_client(self):
