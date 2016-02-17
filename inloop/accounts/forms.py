@@ -1,12 +1,13 @@
 from django import forms
+
 from inloop.accounts.models import UserProfile
-from inloop.accounts.models import CourseOfStudy as COS
-from inloop.accounts import validators as v
+from inloop.accounts.models import CourseOfStudy
+from inloop.accounts.validators import validate_mat_num, validate_password
 
 
 class UserForm(forms.ModelForm):
     error_messages = {
-        'password_mismatch': 'The two password fields didn\'t match.',
+        'password_mismatch': "The two password fields didn't match.",
     }
     username = forms.CharField(
         widget=forms.TextInput(attrs={
@@ -20,7 +21,7 @@ class UserForm(forms.ModelForm):
         }))
     password = forms.CharField(
         label='Password',
-        validators=[v.validate_password],
+        validators=[validate_password],
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'autocomplete': 'off'
@@ -32,7 +33,7 @@ class UserForm(forms.ModelForm):
             'autocomplete': 'off'
         }))
     course = forms.ModelChoiceField(
-        queryset=COS.objects.all())
+        queryset=CourseOfStudy.objects.all())
     mat_num = forms.IntegerField(
         label='Matriculation number',
         widget=forms.TextInput(attrs={
@@ -41,7 +42,7 @@ class UserForm(forms.ModelForm):
             'maxlength': '7',
             'autocomplete': 'off'
         }),
-        validators=[v.validate_mat_num])
+        validators=[validate_mat_num])
 
     def clean_password_repeat(self):
         password = self.cleaned_data.get("password")
@@ -117,5 +118,5 @@ class NewCourseForm(forms.ModelForm):
         }))
 
     class Meta(object):
-        model = COS
+        model = CourseOfStudy
         fields = ('name',)
