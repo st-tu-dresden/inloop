@@ -13,9 +13,6 @@ BASE_ATTRIBUTES = {
 
 
 class UserForm(forms.ModelForm):
-    error_messages = {
-        'password_mismatch': "The two password fields didn't match.",
-    }
     username = forms.CharField(
         widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
     )
@@ -47,19 +44,17 @@ class UserForm(forms.ModelForm):
         password_repeat = self.cleaned_data.get("password_repeat")
         if password and password_repeat and password != password_repeat:
             raise forms.ValidationError(
-                self.error_messages['password_mismatch'],
+                "The two password fields didn't match.",
                 code='password_mismatch',
             )
         return password
 
     class Meta(object):
         model = UserProfile
-        fields = ('username',
-                  'email',
-                  'password',
-                  'password_repeat',
-                  'course',
-                  'mat_num')
+        fields = (
+            'username', 'email', 'password',
+            'password_repeat', 'course', 'mat_num'
+        )
 
 
 class UserProfileForm(UserForm):
