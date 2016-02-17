@@ -1,12 +1,8 @@
 import hashlib
 import hmac
-from os.path import dirname, join
 from datetime import datetime
-
-try:
-    from shlex import quote
-except ImportError:
-    from pipes import quote
+from os.path import dirname, join
+from shlex import quote
 
 from django.utils import timezone
 
