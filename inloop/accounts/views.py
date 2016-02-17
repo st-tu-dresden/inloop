@@ -49,7 +49,7 @@ def activate_user(request, key):
     if user.activate():
         return success(request, "Your account has been activated! You can now login.")
     else:
-        return failure(request, "Your activation key has expired. Please register again!")
+        return failure(request, "Your activation key has expired. Please register again.")
 
 
 def user_login(request):
@@ -68,7 +68,7 @@ def user_login(request):
                 login(request, user)
                 return redirect(settings.LOGIN_REDIRECT_URL)
             else:
-                return failure(request, "Your account is disabled!")
+                return failure(request, "Login not possible, your account is disabled.")
         else:
             return render(request, 'registration/login.html', {
                 'login_failed': True
@@ -80,7 +80,7 @@ def user_login(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return success(request, "You have been logged out!")
+    return success(request, "You have been logged out. Bye!")
 
 
 @login_required
@@ -91,7 +91,7 @@ def user_profile(request):
             instance=request.user)
         if user_profile.is_valid():
             user_profile.save()
-            return success(request, "Your profile information has successfully been changed!")
+            return success(request, "Your profile information has successfully been changed.")
     else:
         user_profile = forms.UserProfileForm(
             instance=request.user,
@@ -115,7 +115,7 @@ def change_password(request):
         if password_form.is_valid():
             request.user.set_password(password_form.cleaned_data['password'])
             request.user.save()
-            return success(request, "Your password has been changed successfully!")
+            return success(request, "Your password has been changed successfully.")
     else:
         password_form = forms.PasswordForm(instance=request.user)
 

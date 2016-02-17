@@ -163,7 +163,7 @@ class ProfileTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/message.html',
-            content='Your profile information has successfully been changed!'
+            content='Your profile information has successfully been changed.'
         )
         self.assertEqual(resp.context['user'].course.id, prof_data['course'])
 
@@ -186,7 +186,7 @@ class ProfileTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/message.html',
-            content='Your profile information has successfully been changed!'
+            content='Your profile information has successfully been changed.'
         )
         self.assertEqual(resp.context['user'].mat_num, self.profile_data['mat_num'])
 
@@ -238,7 +238,7 @@ class ProfileTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/message.html',
-            content='Your password has been changed successfully!'
+            content='Your password has been changed successfully.'
         )
         self.client.logout()
         resp = self.client.post('/accounts/login/', data=login_data, follow=True)
