@@ -5,44 +5,42 @@ from inloop.accounts.models import CourseOfStudy
 from inloop.accounts.validators import validate_mat_num, validate_password
 
 
+# HTML attributes used in all widgets
+BASE_ATTRIBUTES = {
+    "class": "form-control",
+    "autocomplete": "off"
+}
+
+
 class UserForm(forms.ModelForm):
     error_messages = {
         'password_mismatch': "The two password fields didn't match.",
     }
     username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.EmailInput(attrs=BASE_ATTRIBUTES)
+    )
     password = forms.CharField(
         label='Password',
         validators=[validate_password],
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
+    )
     password_repeat = forms.CharField(
         label='Confirm password',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
+    )
     course = forms.ModelChoiceField(
-        queryset=CourseOfStudy.objects.all())
+        queryset=CourseOfStudy.objects.all()
+    )
     mat_num = forms.IntegerField(
         label='Matriculation number',
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'pattern': '[0-9]{7}',
-            'maxlength': '7',
-            'autocomplete': 'off'
-        }),
-        validators=[validate_mat_num])
+        widget=forms.TextInput(
+            attrs=dict(BASE_ATTRIBUTES).update(pattern='[0-9]{7}', maxlength='7')
+        ),
+        validators=[validate_mat_num]
+    )
 
     def clean_password_repeat(self):
         password = self.cleaned_data.get("password")
@@ -98,10 +96,8 @@ class PasswordForm(UserForm):
             self.fields.pop(field)
 
     old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
+    )
 
     class Meta(UserForm.Meta):
         model = UserProfile
@@ -112,10 +108,8 @@ class PasswordForm(UserForm):
 class NewCourseForm(forms.ModelForm):
     name = forms.CharField(
         max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
 
     class Meta(object):
         model = CourseOfStudy
