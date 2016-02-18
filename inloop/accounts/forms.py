@@ -1,7 +1,6 @@
 from django import forms
 
-from inloop.accounts.models import UserProfile
-from inloop.accounts.models import CourseOfStudy
+from inloop.accounts.models import CourseOfStudy, UserProfile
 from inloop.accounts.validators import validate_mat_num, validate_password
 
 
