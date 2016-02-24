@@ -13,17 +13,16 @@ from inloop.accounts.validators import validate_mat_num
 
 # Activation email text template
 ACTIVATION_EMAIL_TEXT = """\
-Howdy {username},
+Hello {username},
 
-Click the following link within the next week to activate your INLOOP account and
-receive awesomeness:
+please click the following link within the next week to activate your INLOOP account:
 
   {link}
 
 We're looking forward to seeing you on the site!
 
 Cheers,
-Your INLOOP Team
+Your INLOOP team
 """
 
 
@@ -88,9 +87,9 @@ class UserProfile(auth_models.AbstractUser):
 
     def send_activation_mail(self):
         link = "{0}accounts/activate/{1}".format(settings.DOMAIN, self.activation_key)
-        subject = "INLOOP Activation"
+        subject = "INLOOP account activation"
         message = ACTIVATION_EMAIL_TEXT.format(username=self.username, link=link)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email], fail_silently=True)
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
 
     @classmethod
     def get_system_user(cls):

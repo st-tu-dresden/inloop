@@ -4,11 +4,6 @@ import inloop.accounts.views as account_views
 urlpatterns = patterns(
     '',
     url(
-        r'^new_course/$',
-        account_views.new_course,
-        name='new_course'
-    ),
-    url(
         r'^profile/$',
         account_views.user_profile,
         name='user_profile'

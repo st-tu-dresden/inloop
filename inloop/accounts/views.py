@@ -1,30 +1,30 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 
-from inloop.decorators import superuser_required
-
 from inloop.accounts import forms
 from inloop.accounts.models import UserProfile
 
 
-@superuser_required
-def new_course(request):
-    if request.method == 'POST':
-        course_form = forms.NewCourseForm(data=request.POST)
-        if course_form.is_valid():
-            course_form.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'The course has successfully been added!'
-            })
-        # XXX: else?
-    else:
-        course_form = forms.NewCourseForm()
+logger = logging.getLogger(__name__)
 
-    return render(request, 'accounts/new_course.html', {
-        'course_form': course_form
+
+def success(request, message):
+    """Shortcut for displaying a success message to the user."""
+    return render(request, "accounts/message.html", {
+        "type": "success",
+        "message": message
+    })
+
+
+def failure(request, message):
+    """Shortcut for displaying a failure message to the user."""
+    return render(request, "accounts/message.html", {
+        "type": "danger",
+        "message": message
     })
 
 
@@ -33,19 +33,22 @@ def register(request):
         return redirect('/')
     if request.method == 'POST':
         user_form = forms.UserForm(data=request.POST)
-
         if user_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
             user.generate_activation_key()
             user.is_active = False
             user.save()
-            user.send_activation_mail()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your activation mail has been sent!'
-            })
-
+            try:
+                user.send_activation_mail()
+                return success(
+                    request,
+                    "Thanks for signing up. Your activation mail has been sent."
+                )
+            except Exception as e:
+                logger.error("Could not send activation mail, stack trace follows.")
+                logger.exception(e)
+                return failure(request, "We are having trouble sending your activation mail.")
     else:
         user_form = forms.UserForm()
 
@@ -57,16 +60,9 @@ def register(request):
 def activate_user(request, key):
     user = get_object_or_404(UserProfile, activation_key=key)
     if user.activate():
-        return render(request, 'accounts/message.html', {
-            'type': 'success',
-            'message': 'Your account has been activated! You can now login.'
-        })
+        return success(request, "Your account has been activated! You can now login.")
     else:
-        return render(request, 'accounts/message.html', {
-            'type': 'danger',
-            'message': 'Your activation key has expired. \
-            Please register again!'
-        })
+        return failure(request, "Your activation key has expired. Please register again.")
 
 
 def user_login(request):
@@ -82,17 +78,11 @@ def user_login(request):
 
         if user:
             if user.is_active:
-                # everything alright
                 login(request, user)
                 return redirect(settings.LOGIN_REDIRECT_URL)
             else:
-                # account disabled
-                return render(request, 'accounts/message.html', {
-                    'type': 'danger',
-                    'message': 'Your account is disabled!'
-                })
+                return failure(request, "Login not possible, your account is disabled.")
         else:
-            # invalid credentials
             return render(request, 'registration/login.html', {
                 'login_failed': True
             })
@@ -103,10 +93,7 @@ def user_login(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return render(request, 'accounts/message.html', {
-        'type': 'success',
-        'message': 'You have been logged out!'
-    })
+    return success(request, "You have been logged out. Bye!")
 
 
 @login_required
@@ -114,20 +101,16 @@ def user_profile(request):
     if request.method == 'POST':
         user_profile = forms.UserProfileForm(
             data=request.POST,
-            instance=request.user)
+            instance=request.user
+        )
         if user_profile.is_valid():
             user_profile.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your profile information has successfully been changed!'
-            })
+            return success(request, "Your profile information has successfully been changed.")
     else:
         user_profile = forms.UserProfileForm(
             instance=request.user,
-            initial={
-                'course': request.user.course,
-                'mat_num': request.user.mat_num
-            })
+            initial={'course': request.user.course, 'mat_num': request.user.mat_num}
+        )
 
     return render(request, 'accounts/profile.html', {
         'user_profile': user_profile
@@ -139,15 +122,13 @@ def change_password(request):
     if request.method == 'POST':
         password_form = forms.PasswordForm(
             data=request.POST,
-            instance=request.user)
+            instance=request.user
+        )
 
         if password_form.is_valid():
             request.user.set_password(password_form.cleaned_data['password'])
             request.user.save()
-            return render(request, 'accounts/message.html', {
-                'type': 'success',
-                'message': 'Your password has been changed successfully!'
-            })
+            return success(request, "Your password has been changed successfully.")
     else:
         password_form = forms.PasswordForm(instance=request.user)
 
