@@ -128,7 +128,8 @@ class TaskModelTests(TestCase):
 
 class TaskCategoryTests(TestCase):
     def setUp(self):
-        self.cat = TaskCategory(name='Unittest')
+        name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
+        self.cat = TaskCategory(name=name)
         with open(TEST_IMAGE, 'rb') as fd:
             self.cat.image = File(fd)
             self.cat.save()
@@ -137,6 +138,9 @@ class TaskCategoryTests(TestCase):
         p = TaskCategory.objects.get(pk=1).image.path
         with open(p, 'rb') as fd:
             self.assertTrue(fd, 'Image file not found')
+
+    def test_slugify_on_save(self):
+        self.assertEqual(self.cat.short_id, 'whitespace-here-and-123-some-tabs-abc-things')
 
 
 class TaskSolutionTests(TestCase):
