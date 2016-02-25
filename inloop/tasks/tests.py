@@ -127,12 +127,13 @@ class TaskModelTests(TestCase):
 
 
 class TaskCategoryTests(TestCase):
-    def test_image_path(self):
-        cat = TaskCategory(name='Unittest')
+    def setUp(self):
+        self.cat = TaskCategory(name='Unittest')
         with open(TEST_IMAGE, 'rb') as fd:
-            cat.image = File(fd)
-            cat.save()
+            self.cat.image = File(fd)
+            self.cat.save()
 
+    def test_image_path(self):
         p = TaskCategory.objects.get(pk=1).image.path
         with open(p, 'rb') as fd:
             self.assertTrue(fd, 'Image file not found')
