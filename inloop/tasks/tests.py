@@ -145,6 +145,11 @@ class TaskCategoryTests(TestCase):
     def test_str(self):
         self.assertEqual(str(self.cat), 'whitespace-here-and-123-some-tabs-abc-things')
 
+    def test_get_tuple(self):
+        slug = 'whitespace-here-and-123-some-tabs-abc-things'
+        name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
+        self.assertEqual(self.cat.get_tuple(), (slug, name))
+
 
 class TaskSolutionTests(TestCase):
     def setUp(self):
