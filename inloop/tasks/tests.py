@@ -1,6 +1,5 @@
 from os import path
 from doctest import DocTestSuite
-from unittest import skip
 
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -30,24 +29,20 @@ def create_task_category(name, image):
     return cat
 
 
+def create_test_user(username='test_user', first_name='first_name', last_name='last_name',
+                     email='test@example.com', password='123456', mat_num='0000000'):
+        return UserProfile.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+            mat_num=mat_num)
+
+
 class TaskModelTests(TestCase):
     def setUp(self):
-        self.password = '123456'
-        author = UserProfile.objects.create_user(
-            username='test_user',
-            first_name='first_name',
-            last_name='last_name',
-            email='test@example.com',
-            password=self.password,
-            mat_num='0000000')
-
-        UserProfile.objects.create_superuser(
-            username='superuser',
-            email='staff@example.com',
-            password=self.password,
-            first_name='first_name',
-            last_name='last_name',
-            mat_num='1234567')
+        author = create_test_user()
 
         self.basic = create_task_category('Basic', TEST_IMAGE)
 
@@ -79,7 +74,7 @@ class TaskModelTests(TestCase):
     def test_disabled_task_not_displayed_in_index(self):
         user = UserProfile.objects.get(username='test_user')
         disabled_task = Task.objects.get(title='disabled_task')
-        self.client.login(username=user.username, password=self.password)
+        self.client.login(username=user.username, password='123456')
         resp = self.client.get('/', follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(disabled_task.title in resp.content.decode())
@@ -96,54 +91,10 @@ class TaskModelTests(TestCase):
         self.assertTrue(subpath + self.t1.slug in self.t1.task_location())  # activated
         self.assertTrue(subpath + self.t2.slug in self.t2.task_location())  # deactivated
 
-    @skip
-    def test_superuser_can_edit_task(self):
-        task = Task.objects.get(title='active_task')
-        superuser = UserProfile.objects.get(username='superuser')
-        url = '/tasks/' + task.slug + '/edit/'
-        new_title = 'New title'
-        new_desc = 'New description'
-        new_pub = timezone.now() - timezone.timedelta(days=1)
-        new_dead = timezone.now() + timezone.timedelta(days=7)
-        new_cat = TaskCategory.objects.create(
-            short_id='LE',
-            name='Lesson'
-        )
-
-        self.client.login(username=superuser.username, password=self.password)
-        # edit form accessible
-        resp = self.client.get(url, follow=True)
-        self.assertEqual(resp.status_code, 200)
-        # post new content
-        data_dict = {
-            'e_title': new_title,
-            'e_desc': new_desc,
-            'e_pub_date': new_pub.strftime('%m/%d/%Y %H:%M'),
-            'e_dead_date': new_dead.strftime('%m/%d/%Y %H:%M'),
-            'e_cat': new_cat
-        }
-        resp = self.client.post(url, data_dict, follow=True)
-        task = Task.objects.get(title=new_title)
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(task.title, new_title)
-        self.assertEqual(task.description, new_desc)
-        self.assertEqual(task.publication_date.strftime('%m/%d/%Y %H:%M'),
-                         new_pub.strftime('%m/%d/%Y %H:%M'))
-        self.assertEqual(task.deadline_date.strftime('%m/%d/%Y %H:%M'),
-                         new_dead.strftime('%m/%d/%Y %H:%M'))
-        self.assertEqual(task.category, new_cat)
-
 
 class TaskCategoryTests(TestCase):
     def setUp(self):
-        self.user = UserProfile.objects.create_user(
-            username='test_user',
-            first_name='first_name',
-            last_name='last_name',
-            email='test@example.com',
-            password='123456',
-            mat_num='0000000'
-        )
+        self.user = create_test_user()
         name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.cat = create_task_category(name, TEST_IMAGE)
         self.task = Task.objects.create(
@@ -192,23 +143,7 @@ class TaskCategoryTests(TestCase):
 
 class TaskSolutionTests(TestCase):
     def setUp(self):
-        self.password = '123456'
-
-        author = UserProfile.objects.create_user(
-            username='test_user',
-            first_name='first_name',
-            last_name='last_name',
-            email='test@example.com',
-            password=self.password,
-            mat_num='0000000')
-
-        UserProfile.objects.create_superuser(
-            username='superuser',
-            email='staff@example.com',
-            password=self.password,
-            first_name='first_name',
-            last_name='last_name',
-            mat_num='1234567')
+        author = create_test_user()
 
         self.basic = create_task_category('Basic', TEST_IMAGE)
 
