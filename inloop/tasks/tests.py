@@ -62,21 +62,30 @@ def create_test_task(author, category, description='', pub_date=None, dead_date=
         slug=slugify(title))
 
 
+def create_test_task_solution(author, task, sub_date=None, passed=False):
+    return TaskSolution.objects.create(
+        submission_date=timezone.now() - timezone.timedelta(days=1) if not sub_date else sub_date,
+        author=author,
+        task=task,
+        passed=passed
+    )
+
+
 class TaskModelTests(TestCase):
     def setUp(self):
-        self.author = create_test_user()
+        self.user = create_test_user()
 
         self.cat = create_task_category('Basic', TEST_IMAGE)
 
-        self.t1 = create_test_task(author=self.author, category=self.cat, active=True)
-        self.t2 = create_test_task(author=self.author, category=self.cat, active=False)
+        self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
+        self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
 
     def test_task_is_active(self):
         self.assertTrue(self.t1.is_active())
         self.assertFalse(self.t2.is_active())
 
     def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(username=self.author.username, password='123456')
+        self.client.login(username=self.user.username, password='123456')
         resp = self.client.get('/', follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(self.t2.title in resp.content.decode())
@@ -100,12 +109,7 @@ class TaskCategoryTests(TestCase):
         self.user = create_test_user()
         self.cat = create_task_category(cat_name, TEST_IMAGE)
         self.task = create_test_task(author=self.user, category=self.cat)
-        self.ts = TaskSolution.objects.create(
-            submission_date=timezone.now() - timezone.timedelta(days=1),
-            author=self.user,
-            task=self.task,
-            passed=True
-        )
+        self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
     def test_image_path(self):
         p = TaskCategory.objects.get(pk=1).image.path
@@ -138,32 +142,26 @@ class TaskCategoryTests(TestCase):
 
 class TaskSolutionTests(TestCase):
     def setUp(self):
-        self.author = create_test_user()
+        self.user = create_test_user()
         self.cat = create_task_category('Basic', TEST_IMAGE)
-        self.task = create_test_task(author=self.author, category=self.cat, active=True)
-
-        ts1 = TaskSolution.objects.create(
-            submission_date=timezone.now() - timezone.timedelta(days=1),
-            author=self.author,
-            task=self.task
-        )
+        self.task = create_test_task(author=self.user, category=self.cat, active=True)
+        self.ts = create_test_task_solution(author=self.user, task=self.task)
 
         self.tsf = TaskSolutionFile.objects.create(
-            solution=ts1,
+            solution=self.ts,
             filename='foo.java',
             file=None
         )
 
         CheckerResult.objects.create(
-            solution=ts1,
+            solution=self.ts,
             result='',
             time_taken=13.37,
             passed=False
         )
 
     def test_default_value(self):
-        sol = TaskSolution.objects.get(pk=1)
-        self.assertFalse(sol.passed)
+        self.assertFalse(self.ts.passed)
 
     def test_get_upload_path(self):
         self.assertRegex(
