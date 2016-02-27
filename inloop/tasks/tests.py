@@ -243,7 +243,7 @@ class TaskSolutionTests(TestCase):
         self.assertRegex(
             models.get_upload_path(self.tsf, self.tsf.filename),
             (r'solutions/test_user/active-task/'
-             '[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/foo.java')
+             '[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java')
         )
 
 
