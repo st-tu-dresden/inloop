@@ -128,11 +128,33 @@ class TaskModelTests(TestCase):
 
 class TaskCategoryTests(TestCase):
     def setUp(self):
+        self.user = UserProfile.objects.create_user(
+            username='test_user',
+            first_name='first_name',
+            last_name='last_name',
+            email='test@example.com',
+            password='123456',
+            mat_num='0000000'
+        )
         name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.cat = TaskCategory(name=name)
         with open(TEST_IMAGE, 'rb') as fd:
             self.cat.image = File(fd)
             self.cat.save()
+        self.task = Task.objects.create(
+            title='active_task',
+            author=self.user,
+            description='',
+            publication_date=timezone.now() - timezone.timedelta(days=2),
+            deadline_date=timezone.now() + timezone.timedelta(days=2),
+            category=self.cat,
+            slug='active-task')
+        self.ts = TaskSolution.objects.create(
+            submission_date=timezone.now() - timezone.timedelta(days=1),
+            author=self.user,
+            task=self.task,
+            passed=True
+        )
 
     def test_image_path(self):
         p = TaskCategory.objects.get(pk=1).image.path
@@ -149,6 +171,12 @@ class TaskCategoryTests(TestCase):
         slug = 'whitespace-here-and-123-some-tabs-abc-things'
         name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.assertEqual(self.cat.get_tuple(), (slug, name))
+
+    def test_completed_tasks_for_user(self):
+        self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
+        self.ts.passed = False
+        self.ts.save()
+        self.assertFalse(self.cat.completed_tasks_for_user(self.user).exists())
 
 
 class TaskSolutionTests(TestCase):
