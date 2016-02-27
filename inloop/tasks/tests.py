@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.text import slugify
 from django.conf import settings
 
 from inloop.accounts.models import UserProfile
@@ -40,44 +41,45 @@ def create_test_user(username='test_user', first_name='first_name', last_name='l
             mat_num=mat_num)
 
 
+def create_test_task(author, category, description='', pub_date=None, dead_date=None,
+                     title=None, active=True):
+    if active:
+        title = 'Active Task' if not title else title
+        pub_date = timezone.now() - timezone.timedelta(days=2) if not pub_date else pub_date
+        dead_date = timezone.now() + timezone.timedelta(days=2) if not dead_date else dead_date
+    else:
+        title = 'Disabled Task' if not title else title
+        pub_date = timezone.now() + timezone.timedelta(days=1)
+        dead_date = timezone.now() + timezone.timedelta(days=5)
+
+    return Task.objects.create(
+        title=title,
+        author=author,
+        description=description,
+        publication_date=pub_date,
+        deadline_date=dead_date,
+        category=category,
+        slug=slugify(title))
+
+
 class TaskModelTests(TestCase):
     def setUp(self):
-        author = create_test_user()
+        self.author = create_test_user()
 
-        self.basic = create_task_category('Basic', TEST_IMAGE)
+        self.cat = create_task_category('Basic', TEST_IMAGE)
 
-        self.t1 = Task.objects.create(
-            title='active_task',
-            author=author,
-            description='',
-            publication_date=timezone.now() - timezone.timedelta(days=2),
-            deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category=self.basic,
-            slug='active-task')
-
-        self.t2 = Task.objects.create(
-            title='disabled_task',
-            author=author,
-            description='',
-            publication_date=timezone.now() + timezone.timedelta(days=1),
-            deadline_date=timezone.now() + timezone.timedelta(days=5),
-            category=self.basic,
-            slug='disabled-task')
+        self.t1 = create_test_task(author=self.author, category=self.cat, active=True)
+        self.t2 = create_test_task(author=self.author, category=self.cat, active=False)
 
     def test_task_is_active(self):
-        active_task = Task.objects.get(title='active_task')
-        disabled_task = Task.objects.get(title='disabled_task')
-
-        self.assertTrue(active_task.is_active())
-        self.assertFalse(disabled_task.is_active())
+        self.assertTrue(self.t1.is_active())
+        self.assertFalse(self.t2.is_active())
 
     def test_disabled_task_not_displayed_in_index(self):
-        user = UserProfile.objects.get(username='test_user')
-        disabled_task = Task.objects.get(title='disabled_task')
-        self.client.login(username=user.username, password='123456')
+        self.client.login(username=self.author.username, password='123456')
         resp = self.client.get('/', follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse(disabled_task.title in resp.content.decode())
+        self.assertFalse(self.t2.title in resp.content.decode())
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
@@ -94,17 +96,10 @@ class TaskModelTests(TestCase):
 
 class TaskCategoryTests(TestCase):
     def setUp(self):
+        cat_name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.user = create_test_user()
-        name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
-        self.cat = create_task_category(name, TEST_IMAGE)
-        self.task = Task.objects.create(
-            title='active_task',
-            author=self.user,
-            description='',
-            publication_date=timezone.now() - timezone.timedelta(days=2),
-            deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category=self.cat,
-            slug='active-task')
+        self.cat = create_task_category(cat_name, TEST_IMAGE)
+        self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = TaskSolution.objects.create(
             submission_date=timezone.now() - timezone.timedelta(days=1),
             author=self.user,
@@ -143,23 +138,14 @@ class TaskCategoryTests(TestCase):
 
 class TaskSolutionTests(TestCase):
     def setUp(self):
-        author = create_test_user()
-
-        self.basic = create_task_category('Basic', TEST_IMAGE)
-
-        t1 = Task.objects.create(
-            title='active_task',
-            author=author,
-            description='',
-            publication_date=timezone.now() - timezone.timedelta(days=2),
-            deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category=self.basic,
-            slug='active-task')
+        self.author = create_test_user()
+        self.cat = create_task_category('Basic', TEST_IMAGE)
+        self.task = create_test_task(author=self.author, category=self.cat, active=True)
 
         ts1 = TaskSolution.objects.create(
             submission_date=timezone.now() - timezone.timedelta(days=1),
-            author=author,
-            task=t1
+            author=self.author,
+            task=self.task
         )
 
         self.tsf = TaskSolutionFile.objects.create(
