@@ -22,6 +22,14 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
+def create_task_category(name, image):
+    cat = TaskCategory(name=name)
+    with open(image, 'rb') as fd:
+        cat.image = File(fd)
+        cat.save()
+    return cat
+
+
 class TaskModelTests(TestCase):
     def setUp(self):
         self.password = '123456'
@@ -41,12 +49,7 @@ class TaskModelTests(TestCase):
             last_name='last_name',
             mat_num='1234567')
 
-        with open(TEST_IMAGE, 'rb') as fd:
-            basic = TaskCategory.objects.create(
-                short_id='BA',
-                name='Basic',
-                image=File(fd)
-            )
+        self.basic = create_task_category('Basic', TEST_IMAGE)
 
         Task.objects.create(
             title='active_task',
@@ -54,7 +57,7 @@ class TaskModelTests(TestCase):
             description='',
             publication_date=timezone.now() - timezone.timedelta(days=2),
             deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category=basic,
+            category=self.basic,
             slug='active-task')
 
         Task.objects.create(
@@ -63,7 +66,7 @@ class TaskModelTests(TestCase):
             description='',
             publication_date=timezone.now() + timezone.timedelta(days=1),
             deadline_date=timezone.now() + timezone.timedelta(days=5),
-            category=basic,
+            category=self.basic,
             slug='disabled-task')
 
     def test_task_is_active(self):
@@ -137,10 +140,7 @@ class TaskCategoryTests(TestCase):
             mat_num='0000000'
         )
         name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
-        self.cat = TaskCategory(name=name)
-        with open(TEST_IMAGE, 'rb') as fd:
-            self.cat.image = File(fd)
-            self.cat.save()
+        self.cat = create_task_category(name, TEST_IMAGE)
         self.task = Task.objects.create(
             title='active_task',
             author=self.user,
@@ -199,12 +199,7 @@ class TaskSolutionTests(TestCase):
             last_name='last_name',
             mat_num='1234567')
 
-        with open(TEST_IMAGE, 'rb') as fd:
-            basic = TaskCategory.objects.create(
-                short_id='BA',
-                name='Basic',
-                image=File(fd)
-            )
+        self.basic = create_task_category('Basic', TEST_IMAGE)
 
         t1 = Task.objects.create(
             title='active_task',
@@ -212,7 +207,7 @@ class TaskSolutionTests(TestCase):
             description='',
             publication_date=timezone.now() - timezone.timedelta(days=2),
             deadline_date=timezone.now() + timezone.timedelta(days=2),
-            category=basic,
+            category=self.basic,
             slug='active-task')
 
         ts1 = TaskSolution.objects.create(
