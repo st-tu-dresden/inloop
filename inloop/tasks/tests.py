@@ -174,13 +174,15 @@ class TaskCategoryTests(TestCase):
 
     def test_completed_tasks_for_user(self):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
-        self.ts.passed = False
-        self.ts.save()
-        self.assertFalse(self.cat.completed_tasks_for_user(self.user).exists())
 
     def test_completed_tasks_empty_category(self):
         empty_cat = create_task_category('empty', TEST_IMAGE)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
+
+    def test_completed_tasks_uncompleted(self):
+        self.ts.passed = False
+        self.ts.save()
+        self.assertFalse(self.cat.completed_tasks_for_user(self.user).exists())
 
 
 class TaskSolutionTests(TestCase):
