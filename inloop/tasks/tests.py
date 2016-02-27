@@ -51,7 +51,7 @@ class TaskModelTests(TestCase):
 
         self.basic = create_task_category('Basic', TEST_IMAGE)
 
-        Task.objects.create(
+        self.t1 = Task.objects.create(
             title='active_task',
             author=author,
             description='',
@@ -60,7 +60,7 @@ class TaskModelTests(TestCase):
             category=self.basic,
             slug='active-task')
 
-        Task.objects.create(
+        self.t2 = Task.objects.create(
             title='disabled_task',
             author=author,
             description='',
@@ -90,6 +90,11 @@ class TaskModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             Task.objects.create(deadline_date='abc')
+
+    def test_task_location(self):
+        subpath = 'inloop/media/exercises/'
+        self.assertTrue(subpath + self.t1.slug in self.t1.task_location())  # activated
+        self.assertTrue(subpath + self.t2.slug in self.t2.task_location())  # deactivated
 
     @skip
     def test_superuser_can_edit_task(self):
