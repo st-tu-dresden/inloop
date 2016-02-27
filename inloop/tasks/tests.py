@@ -252,7 +252,7 @@ class TaskSolutionTests(TestCase):
         )
 
 
-class TaskCategoryManagerTest(TestCase):
+class TaskCategoryManagerTests(TestCase):
     def setUp(self):
         TaskCategory.objects.create(name="Test category")
 
@@ -269,7 +269,7 @@ class TaskCategoryManagerTest(TestCase):
         self.assertEqual(TaskCategory.objects.count(), 2)
 
 
-class TaskManagerTest(TestCase):
+class TaskManagerTests(TestCase):
     def setUp(self):
         self.manager = Task.objects
         self.valid_json = {'title': 'Test title', 'category': 'Lesson',
