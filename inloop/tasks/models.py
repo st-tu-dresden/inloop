@@ -66,7 +66,11 @@ class TaskCategory(models.Model):
 
     def completed_tasks_for_user(self, user):
         '''Returns the tasks a user has already solved.'''
-        return Task.objects.filter(tasksolution__author=user, tasksolution__passed=True)
+        return Task.objects.filter(
+            tasksolution__author=user,
+            tasksolution__passed=True,
+            category=self
+        )
 
     def get_tasks(self):
         '''Returns a queryset of this category's task that have already been
