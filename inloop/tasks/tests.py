@@ -222,21 +222,9 @@ class TaskSolutionTests(TestCase):
             task=t1
         )
 
-        TaskSolutionFile.objects.create(
+        self.tsf = TaskSolutionFile.objects.create(
             solution=ts1,
             filename='foo.java',
-            file=None
-        )
-
-        TaskSolutionFile.objects.create(
-            solution=ts1,
-            filename='bar.java',
-            file=None
-        )
-
-        TaskSolutionFile.objects.create(
-            solution=ts1,
-            filename='baz.java',
             file=None
         )
 
@@ -250,6 +238,13 @@ class TaskSolutionTests(TestCase):
     def test_default_value(self):
         sol = TaskSolution.objects.get(pk=1)
         self.assertFalse(sol.passed)
+
+    def test_get_upload_path(self):
+        self.assertRegex(
+            models.get_upload_path(self.tsf, self.tsf.filename),
+            (r'solutions/test_user/active-task/'
+             '[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/foo.java')
+        )
 
 
 class TaskCategoryManagerTest(TestCase):
