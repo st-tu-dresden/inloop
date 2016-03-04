@@ -13,7 +13,10 @@ from inloop.tasks import models
 from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory, Checker,
                                  TaskSolution, TaskSolutionFile, CheckerResult)
 
-TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
+TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
+TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.java')
+MEDIA_IMAGE_PATH = path.join(settings.INLOOP_ROOT, settings.MEDIA_ROOT, 'test.jpg')
+MEDIA_CLASS_PATH = path.join(settings.INLOOP_ROOT, settings.MEDIA_ROOT, 'test.java')
 
 
 def load_tests(loader, tests, ignore):
@@ -75,7 +78,7 @@ class TaskModelTests(TestCase):
     def setUp(self):
         self.user = create_test_user()
 
-        self.cat = create_task_category('Basic', TEST_IMAGE)
+        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
 
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
@@ -107,7 +110,7 @@ class TaskCategoryTests(TestCase):
     def setUp(self):
         cat_name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.user = create_test_user()
-        self.cat = create_task_category(cat_name, TEST_IMAGE)
+        self.cat = create_task_category(cat_name, TEST_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
@@ -131,7 +134,7 @@ class TaskCategoryTests(TestCase):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
 
     def test_completed_tasks_empty_category(self):
-        empty_cat = create_task_category('empty', TEST_IMAGE)
+        empty_cat = create_task_category('empty', TEST_IMAGE_PATH)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
 
     def test_completed_tasks_uncompleted(self):
@@ -143,7 +146,7 @@ class TaskCategoryTests(TestCase):
 class TaskSolutionTests(TestCase):
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', TEST_IMAGE)
+        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
 
