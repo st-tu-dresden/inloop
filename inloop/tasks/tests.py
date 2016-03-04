@@ -10,7 +10,7 @@ from django.conf import settings
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
-from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory,
+from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory, Checker,
                                  TaskSolution, TaskSolutionFile, CheckerResult)
 
 TEST_IMAGE = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
@@ -169,6 +169,11 @@ class TaskSolutionTests(TestCase):
             (r'solutions/test_user/active-task/'
              '[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java')
         )
+
+
+class CheckerTests(TestCase):
+    def setUp(self):
+        self.c = Checker()
 
 
 class TaskCategoryManagerTests(TestCase):
