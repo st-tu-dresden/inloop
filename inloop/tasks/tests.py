@@ -1,5 +1,6 @@
-from os import path
+from os import path, remove
 from doctest import DocTestSuite
+from shutil import copy
 
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -144,6 +145,16 @@ class TaskCategoryTests(TestCase):
 
 
 class TaskSolutionTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
+        copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
+
+    @classmethod
+    def tearDownClass(cls):
+        remove(MEDIA_IMAGE_PATH)
+        remove(MEDIA_CLASS_PATH)
+
     def setUp(self):
         self.user = create_test_user()
         self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
@@ -175,6 +186,16 @@ class TaskSolutionTests(TestCase):
 
 
 class CheckerTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
+        copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
+
+    @classmethod
+    def tearDownClass(cls):
+        remove(MEDIA_IMAGE_PATH)
+        remove(MEDIA_CLASS_PATH)
+
     def setUp(self):
         self.c = Checker()
 
