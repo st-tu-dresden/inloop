@@ -3,7 +3,7 @@ from doctest import DocTestSuite
 from shutil import copy
 
 from django.core.exceptions import ValidationError
-from django.core.files import File
+from django.core.files import File, base
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.text import slugify
@@ -73,6 +73,18 @@ def create_test_task_solution(author, task, sub_date=None, passed=False):
         task=task,
         passed=passed
     )
+
+
+def create_test_task_solution_file(solution, contentpath):
+    filename = path.basename(contentpath)
+    tsf = TaskSolutionFile.objects.create(
+        solution=solution,
+        filename=filename,
+        file=None
+    )
+    with open(contentpath) as f:
+        tsf.file.save(filename, base.ContentFile(f.read()))
+    return tsf
 
 
 class TaskModelTests(TestCase):
@@ -160,12 +172,7 @@ class TaskSolutionTests(TestCase):
         self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
-
-        self.tsf = TaskSolutionFile.objects.create(
-            solution=self.ts,
-            filename='foo.java',
-            file=None
-        )
+        self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
 
         CheckerResult.objects.create(
             solution=self.ts,
@@ -197,7 +204,12 @@ class CheckerTests(TestCase):
         remove(MEDIA_CLASS_PATH)
 
     def setUp(self):
-        self.c = Checker()
+        self.user = create_test_user()
+        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
+        self.task = create_test_task(author=self.user, category=self.cat, active=True)
+        self.ts = create_test_task_solution(author=self.user, task=self.task)
+        self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
+        self.c = Checker(self.ts)
 
 
 class TaskCategoryManagerTests(TestCase):
