@@ -211,6 +211,12 @@ class CheckerTests(TestCase):
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
         self.c = Checker(self.ts)
 
+    def test_generate_container_name(self):
+        self.assertRegex(
+            self.c._generate_container_name(),
+            '-'.join([self.user.username, self.task.slug, '[\w]{21}'])
+        )
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
