@@ -214,6 +214,12 @@ class CheckerTests(TestCase):
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
         self.c = Checker(self.ts)
 
+    def test_docker_present_on_system(self):
+        try:
+            self.assertNotEqual(subprocess.check_output(('which', 'invalid'), ).decode(), '')
+        except subprocess.CalledProcessError:
+            self.fail()
+
     def test_generate_container_name_format(self):
         self.assertRegex(
             self.c._generate_container_name(),
