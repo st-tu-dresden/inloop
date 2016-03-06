@@ -272,6 +272,26 @@ class CheckerTests(TestCase):
                        '-a', 'STDOUT', 'ctr_tag', 'cmd1 cmd2'], stderr=subprocess.STDOUT,
                        timeout=settings.CHECKER['Timeouts'].get('container_execution')))
 
+    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    def test_regular_called_process_error_container_execute(self, mock_subprocess):
+        mock_subprocess.side_effect = (
+            subprocess.CalledProcessError(returncode=1, cmd='test'),
+            subprocess.CalledProcessError(returncode=42, cmd='test'))
+        self.assertEqual(self.c._container_execute(
+            ctr_tag='ctr_tag',
+            ctr_name='ctr_name',
+            cmd='cmd1 cmd2',
+            mountpoints={'dir1': 'dir2'},
+            rm=False
+        ), (None, False))
+        self.assertEqual(self.c._container_execute(
+            ctr_tag='ctr_tag',
+            ctr_name='ctr_name',
+            cmd='cmd1 cmd2',
+            mountpoints={'dir1': 'dir2'},
+            rm=False
+        ), (None, True))  # Compiler error triggered
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
