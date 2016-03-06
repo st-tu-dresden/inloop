@@ -1,6 +1,5 @@
 from os import path, remove
 from doctest import DocTestSuite
-import logging
 from shutil import copy
 import subprocess
 from unittest import mock
