@@ -241,9 +241,8 @@ class CheckerTests(TestCase):
         self.assertIsNone(result)
         self.assertTrue(mock_logging.error.called)
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
     @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
-    def test_correct_container_execute(self, mock_subprocess, mock_logging):
+    def test_correct_container_execute_with_rm(self, mock_subprocess):
         result = self.c._container_execute(
             ctr_tag='ctr_tag',
             ctr_name='ctr_name',
@@ -254,6 +253,22 @@ class CheckerTests(TestCase):
         self.assertEqual(
             mock_subprocess.call_args,
             mock.call(['docker', 'run', '--rm=true', '--tty', '--name', 'ctr_name', '-v=dir1:dir2',
+                       '-a', 'STDOUT', 'ctr_tag', 'cmd1 cmd2'], stderr=subprocess.STDOUT,
+                       timeout=settings.CHECKER['Timeouts'].get('container_execution')))
+
+    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    def test_correct_container_execute_without_rm(self, mock_subprocess):
+        result = self.c._container_execute(
+            ctr_tag='ctr_tag',
+            ctr_name='ctr_name',
+            cmd='cmd1 cmd2',
+            mountpoints={'dir1': 'dir2'},
+            rm=False
+        )
+        self.assertEqual(result, ('test', False))
+        self.assertEqual(
+            mock_subprocess.call_args,
+            mock.call(['docker', 'run', '--tty', '--name', 'ctr_name', '-v=dir1:dir2',
                        '-a', 'STDOUT', 'ctr_tag', 'cmd1 cmd2'], stderr=subprocess.STDOUT,
                        timeout=settings.CHECKER['Timeouts'].get('container_execution')))
 
