@@ -216,7 +216,7 @@ class CheckerTests(TestCase):
 
     def test_docker_present_on_system(self):
         try:
-            self.assertNotEqual(subprocess.check_output(('which', 'invalid'), ).decode(), '')
+            self.assertNotEqual(subprocess.check_output(('which', 'docker'), ).decode(), '')
         except subprocess.CalledProcessError:
             self.fail()
 
