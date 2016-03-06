@@ -1,6 +1,9 @@
 from os import path, remove
 from doctest import DocTestSuite
+import logging
 from shutil import copy
+import subprocess
+from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.core.files import File, base
@@ -216,6 +219,22 @@ class CheckerTests(TestCase):
             self.c._generate_container_name(),
             '-'.join([self.user.username, self.task.slug, '[\w]{21}'])
         )
+
+    @mock.patch('inloop.tasks.models.logging', autospec=True)
+    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    def test_correct_container_build(self, mock_subprocess, mock_logging):
+        result = self.c._container_build(ctr_tag='test', path='.')
+        mock_logging.debug.assert_called_with("Container build process started")
+        self.assertEqual(result, 'test')
+
+    @mock.patch('inloop.tasks.models.logging', autospec=True)
+    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    def test_called_process_error_build(self, mock_subprocess, mock_logging):
+        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd='test'), )
+        result = self.c._container_build(ctr_tag='test', path='.')
+        mock_logging.debug.assert_called_with("Container build process started")
+        self.assertIsNone(result)
+        self.assertTrue(mock_logging.error.called)
 
 
 class TaskCategoryManagerTests(TestCase):
