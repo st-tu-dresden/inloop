@@ -213,8 +213,19 @@ class Checker:
             return build_output
 
     def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints=None, rm=True):
-        # Base run call
-        popen_args = ['docker', 'run']
+        # Running docker is available to root or users in the group `docker` only.
+        # To not run the complete web application with such elevated privigeles, we
+        # use `sudo` to switch to group `docker` (the user remains the same) only
+        # for this particular action.
+        #
+        # In order for this to work, the administrator must whitelist the command and
+        # the options used here in /etc/sudoers.
+        #
+        # Whitelisting ensures several things:
+        #   - only the user running gunicorn can call docker this way
+        #   - it is not possible to call docker in another fashion, e.g. specifying
+        #     other options or other Docker images
+        popen_args = ['sudo', '-g', 'docker', 'docker', 'run']
         # Remove container after execution?
         if rm:
             popen_args.extend(['--rm=true'])
