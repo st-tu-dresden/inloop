@@ -183,7 +183,7 @@ class Checker:
         result, ce = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
             ctr_name=ctr_name,
-            cmd=self.solution.task.slug,
+            cmd=self.solution.task.name,
             mountpoints={
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
@@ -212,9 +212,20 @@ class Checker:
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints={}, rm=True):
-        # Base run call
-        popen_args = ['docker', 'run']
+    def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints=None, rm=True):
+        # Running docker is available to root or users in the group `docker` only.
+        # To not run the complete web application with such elevated privigeles, we
+        # use `sudo` to switch to group `docker` (the user remains the same) only
+        # for this particular action.
+        #
+        # In order for this to work, the administrator must whitelist the command and
+        # the options used here in /etc/sudoers.
+        #
+        # Whitelisting ensures several things:
+        #   - only the user running gunicorn can call docker this way
+        #   - it is not possible to call docker in another fashion, e.g. specifying
+        #     other options or other Docker images
+        popen_args = ['sudo', '-g', 'docker', 'docker', 'run']
         # Remove container after execution?
         if rm:
             popen_args.extend(['--rm=true'])
@@ -223,7 +234,8 @@ class Checker:
         # Container name
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
-        popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        if mountpoints:
+            popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
         # Attach to stdout
         popen_args.extend(['-a', 'STDOUT'])
         # Add the image that is to be run
