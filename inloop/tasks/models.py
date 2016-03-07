@@ -212,7 +212,7 @@ class Checker:
         else:
             return build_output
 
-    def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints={}, rm=True):
+    def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints=None, rm=True):
         # Base run call
         popen_args = ['docker', 'run']
         # Remove container after execution?
@@ -223,7 +223,8 @@ class Checker:
         # Container name
         popen_args.extend(['--name', ctr_name])
         # Add mountpoints: {host: container} -> -v=host:container
-        popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
+        if mountpoints:
+            popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
         # Attach to stdout
         popen_args.extend(['-a', 'STDOUT'])
         # Add the image that is to be run
