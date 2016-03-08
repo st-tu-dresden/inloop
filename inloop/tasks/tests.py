@@ -307,6 +307,27 @@ class CheckerTests(TestCase):
         self.assertTrue(mock_logging.error.called)
         self.assertTrue(mock_krm.called)
 
+    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    def test_correct_kill_and_remove(self, mock_subprocess):
+        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
+        self.assertEqual(mock_subprocess.call_count, 2)
+
+    @mock.patch('inloop.tasks.models.logging', autospec=True)
+    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    def test_called_process_error_kill_and_remove(self, mock_subprocess, mock_logging):
+        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd='test'), )
+        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
+        mock_logging.error.assert_called_with(
+            'Kill and remove of container ctr_name failed: Exit 1, None'
+        )
+
+    @mock.patch('inloop.tasks.models.logging', autospec=True)
+    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    def test_timeout_expired_kill_and_remove(self, mock_subprocess, mock_logging):
+        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd='test', timeout=1), )
+        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
+        mock_logging.error.assert_called_with('Kill and remove of container ctr_name timed out: 1')
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
