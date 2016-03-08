@@ -292,6 +292,21 @@ class CheckerTests(TestCase):
             rm=False
         ), (None, True))  # Compiler error triggered
 
+    @mock.patch('inloop.tasks.models.logging', autospec=True)
+    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    @mock.patch('inloop.tasks.models.Checker._kill_and_remove', autospec=True)
+    def test_timeout_expired_container_execute(self, mock_krm, mock_subprocess, mock_logging):
+        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd='test', timeout=1), ())
+        self.assertEqual(self.c._container_execute(
+            ctr_tag='ctr_tag',
+            ctr_name='ctr_name',
+            cmd='cmd1 cmd2',
+            mountpoints={'dir1': 'dir2'},
+            rm=False
+        ), ('Your code was too slow and timed out!', False))
+        self.assertTrue(mock_logging.error.called)
+        self.assertTrue(mock_krm.called)
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
