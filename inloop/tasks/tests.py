@@ -311,6 +311,9 @@ class CheckerTests(TestCase):
     def test_correct_kill_and_remove(self, mock_subprocess):
         self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
         self.assertEqual(mock_subprocess.call_count, 2)
+        mock_subprocess.reset_mock()
+        self.c._kill_and_remove(ctr_name='ctr_name', rm=False)
+        self.assertEqual(mock_subprocess.call_count, 1)
 
     @mock.patch('inloop.tasks.models.logging', autospec=True)
     @mock.patch('inloop.tasks.models.check_output', autospec=True)
