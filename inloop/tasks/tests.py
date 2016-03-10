@@ -331,6 +331,36 @@ class CheckerTests(TestCase):
         self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
         mock_logging.error.assert_called_with('Kill and remove of container ctr_name timed out: 1')
 
+    def test_correct_parse_result(self):
+        result = (
+            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
+            '<testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0" '
+            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.001">'
+            '<properties/>'
+            '<testcase name="testInstantiation" classname="BasicTest" time="0.0"/>'
+            '<testcase name="testToString" classname="BasicTest" time="0.0"/>'
+            '<system-out><![CDATA[]]></system-out>'
+            '<system-err><![CDATA[]]></system-err>'
+            '</testsuite>'
+            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
+            '<testsuite name="AdvancedTest" tests="4" skipped="0" failures="0" errors="0" '
+            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">'
+            '<properties/>'
+            '<testcase name="testAdd" classname="LibraryTest" time="0.004"/>'
+            '<testcase name="testSubtract" classname="AdvancedTest" time="0.001"/>'
+            '<testcase name="testWhatever" classname="AdvancedTest" time="0.001"/>'
+            '<testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>'
+            '<system-out><![CDATA[]]></system-out>'
+            '<system-err><![CDATA[]]></system-err>'
+            '</testsuite>'
+        ).encode('utf-8')
+        self.c._parse_result(result=result, compiler_error=False)
+        cr = CheckerResult.objects.get(solution=self.ts)
+        self.assertTrue(cr.passed)
+        self.assertTrue(TaskSolution.objects.get(pk=self.ts.pk).passed)
+        self.assertEqual(cr.time_taken, 0.01)
+        self.assertEqual(cr.result, result.decode())
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
