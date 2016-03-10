@@ -279,7 +279,7 @@ class Checker:
     def _parse_result(self, result, compiler_error=False):
         # TODO: Add return code to logic
         logging.debug("Parse result call")
-        passed = True
+        passed = True and not compiler_error
         time = 0.0
         if not result:
             logging.debug("_parse_result got an empty result")
