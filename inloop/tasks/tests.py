@@ -395,6 +395,14 @@ class CheckerTests(TestCase):
         self.assertEqual(cr.time_taken, 0.01)
         self.assertEqual(cr.result, result.decode())
 
+    def test_compiler_failure_parse_result(self):
+        self.c._parse_result(result='compiler trace', compiler_error=True)
+        cr = CheckerResult.objects.get(solution=self.ts)
+        self.assertFalse(cr.passed)
+        self.assertFalse(TaskSolution.objects.get(pk=self.ts.pk).passed)
+        self.assertEqual(cr.time_taken, 0.0)
+        self.assertEqual(cr.result, 'compiler trace')
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
