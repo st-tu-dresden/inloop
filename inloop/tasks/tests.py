@@ -13,6 +13,7 @@ from django.conf import settings
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
+from inloop.tasks.validators import validate_short_id
 from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory, Checker,
                                  TaskSolution, TaskSolutionFile, CheckerResult)
 
@@ -97,6 +98,22 @@ class TaskModelTests(TestCase):
 
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
+
+    def test_validate_short_id(self):
+        with self.assertRaises(ValidationError):
+            validate_short_id('ABC')
+        with self.assertRaises(ValidationError):
+            validate_short_id('abc')
+        with self.assertRaises(ValidationError):
+            validate_short_id('1a')
+        with self.assertRaises(ValidationError):
+            validate_short_id('1ab')
+        with self.assertRaises(ValidationError):
+            validate_short_id('1$')
+        self.assertIsNone(validate_short_id('ab'))
+        self.assertIsNone(validate_short_id('Ab'))
+        self.assertIsNone(validate_short_id('AB'))
+        self.assertIsNone(validate_short_id('A1'))
 
     def test_task_is_active(self):
         self.assertTrue(self.t1.is_active())
