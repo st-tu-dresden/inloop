@@ -291,7 +291,7 @@ class Checker:
     def _parse_result(self, result, compiler_error=False):
         # TODO: Add return code to logic
         logging.debug("Parse result call")
-        passed = False
+        passed = True
         time = 0.0
         if not result:
             logging.debug("_parse_result got an empty result")
@@ -312,9 +312,9 @@ class Checker:
             times = []
             for testsuite in root:
                 times.append(testsuite.attrib.get('time'))
-                if int(testsuite.attrib.get('failures')) == 0 \
-                   and int(testsuite.attrib.get('errors')) == 0:
-                    passed = True
+                if int(testsuite.attrib.get('failures')) != 0 \
+                   or int(testsuite.attrib.get('errors')) != 0:
+                    passed = False
             time = round(sum([float(x) for x in times]), 2)
 
         cr = CheckerResult(
