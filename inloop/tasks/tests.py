@@ -403,6 +403,11 @@ class CheckerTests(TestCase):
         self.assertEqual(cr.time_taken, 0.0)
         self.assertEqual(cr.result, 'compiler trace')
 
+    def test_empty_result_parse_result(self):
+        self.c._parse_result(result='', compiler_error=False)
+        cr = CheckerResult.objects.get(solution=self.ts)
+        self.assertEqual(cr.result, 'For some reason I didn\'t get anything.. What are you doing?')
+
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
