@@ -91,10 +91,18 @@ def create_test_task_solution_file(solution, contentpath):
 
 
 class TaskModelTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
+
+    @classmethod
+    def tearDownClass(cls):
+        remove(MEDIA_IMAGE_PATH)
+
     def setUp(self):
         self.user = create_test_user()
 
-        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
+        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
 
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
@@ -139,10 +147,18 @@ class TaskModelTests(TestCase):
 
 
 class TaskCategoryTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
+
+    @classmethod
+    def tearDownClass(cls):
+        remove(MEDIA_IMAGE_PATH)
+
     def setUp(self):
         cat_name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
         self.user = create_test_user()
-        self.cat = create_task_category(cat_name, TEST_IMAGE_PATH)
+        self.cat = create_task_category(cat_name, MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
@@ -188,7 +204,7 @@ class TaskSolutionTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
+        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
@@ -224,7 +240,7 @@ class CheckerTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', TEST_IMAGE_PATH)
+        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
