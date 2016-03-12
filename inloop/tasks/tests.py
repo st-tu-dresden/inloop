@@ -101,11 +101,12 @@ class TaskModelTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-
         self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
-
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
+
+    def tearDown(self):
+        remove(self.cat.image.path)
 
     def test_validate_short_id(self):
         with self.assertRaises(ValidationError):
@@ -162,6 +163,9 @@ class TaskCategoryTests(TestCase):
         self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
+    def tearDown(self):
+        remove(self.cat.image.path)
+
     def test_image_path(self):
         p = TaskCategory.objects.get(pk=1).image.path
         with open(p, 'rb') as fd:
@@ -184,6 +188,7 @@ class TaskCategoryTests(TestCase):
     def test_completed_tasks_empty_category(self):
         empty_cat = create_task_category('empty', TEST_IMAGE_PATH)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
+        remove(empty_cat.image.path)
 
     def test_completed_tasks_uncompleted(self):
         self.ts.passed = False
@@ -216,6 +221,9 @@ class TaskSolutionTests(TestCase):
             passed=False
         )
 
+    def tearDown(self):
+        remove(self.cat.image.path)
+
     def test_default_value(self):
         self.assertFalse(self.ts.passed)
 
@@ -245,6 +253,9 @@ class CheckerTests(TestCase):
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
         self.c = Checker(self.ts)
+
+    def tearDown(self):
+        remove(self.cat.image.path)
 
     def test_docker_present_on_system(self):
         try:
