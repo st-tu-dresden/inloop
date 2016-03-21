@@ -26,13 +26,6 @@ def manage_categories(request):
 
 
 @superuser_required
-def delete_category(request, short_id):
-    cat = get_object_or_404(TaskCategory, short_id=short_id)
-    cat.delete()
-    return redirect('tasks:man_cat')
-
-
-@superuser_required
 def edit_category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
     if request.method == 'POST':
