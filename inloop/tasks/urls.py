@@ -10,31 +10,6 @@ urlpatterns = patterns(
         name='index'
     ),
     url(
-        r'^new_exercise/$',
-        views.submit_new_exercise,
-        name='new_exercise'
-    ),
-    url(
-        r'^category/admin/new_category/$',
-        views.new_category,
-        name='new_category'
-    ),
-    url(
-        r'^category/admin/(?P<short_id>[-\w]+)/edit_category/$',
-        views.edit_category,
-        name='edit_category'
-    ),
-    url(
-        r'^category/admin/(?P<short_id>[-\w]+)/delete/$',
-        views.delete_category,
-        name='delete_category'
-    ),
-    url(
-        r'^category/admin/manage/$',
-        views.manage_categories,
-        name='man_cat'
-    ),
-    url(
         r'^category/(?P<short_id>[-\w]+)/$',
         views.category,
         name='category'
@@ -45,19 +20,9 @@ urlpatterns = patterns(
         name='detail'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/edit/$',
-        views.edit,
-        name='edit'
-    ),
-    url(
         r'^(?P<slug>[-\w]+)/results/(?P<solution_id>[\d]+)$',
         views.results,
         name='results'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/delete/$',
-        views.delete,
-        name='delete'
     ),
     url(
         r'^(?P<slug>[-\w]+)/download_solution/(?P<solution_id>[\d]+)/$',
