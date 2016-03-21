@@ -17,14 +17,6 @@ from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile, Checker, CheckerResult)
 
 
-@superuser_required
-def manage_categories(request):
-    categories = TaskCategory.objects.all()
-    return render(request, 'tasks/manage_categories.html', {
-        'categories': categories
-    })
-
-
 @login_required
 def category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
