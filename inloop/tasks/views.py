@@ -4,7 +4,6 @@ from os import path
 
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
-from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -135,15 +134,6 @@ def get_solution_as_zip(request, slug, solution_id):
     response.write(final_zip)
 
     return response
-
-@superuser_required
-def delete(request, slug):
-    task = get_object_or_404(Task, slug=slug)
-    task.delete()
-    return render(request, 'tasks/message.html', {
-        'type': 'success',
-        'message': 'The task has been deleted.'
-    })
 
 
 @login_required
