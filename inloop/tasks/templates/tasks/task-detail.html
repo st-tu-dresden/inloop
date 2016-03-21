@@ -7,16 +7,7 @@
 {% block content %}
     <div class="row">
     <div class="col-md-10 col-md-offset-1">
-        <h1>
-            {{ title }}
-            <small>
-                {% if user.is_staff %}
-                    <a href="{% url 'tasks:edit' slug %}">
-                        <span title="Edit" class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                    </a>
-                {% endif %}
-            </small>
-        </h1>
+        <h1>{{ title }}</h1>
         <br/>
         <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
         {{ description|markdown }}
