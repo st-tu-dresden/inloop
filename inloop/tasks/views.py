@@ -3,15 +3,13 @@ from io import BytesIO
 from os import path
 
 from django.http import HttpResponse
-from django.template.defaultfilters import slugify
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.conf import settings
 
-from inloop.decorators import superuser_required
-from inloop.tasks import forms, filesystem_utils as fsu
+from inloop.tasks import filesystem_utils as fsu
 from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile, Checker, CheckerResult)
 
