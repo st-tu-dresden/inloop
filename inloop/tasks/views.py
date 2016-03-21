@@ -25,25 +25,6 @@ def manage_categories(request):
     })
 
 
-@superuser_required
-def new_category(request):
-    if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
-        if cat_form.is_valid():
-            cat_form.save()
-            return render(request, 'tasks/message.html', {
-                'type': 'success',
-                'message': 'The new category has been added to the system.'
-            })
-        # XXX: else?
-    else:
-        cat_form = forms.NewTaskCategoryForm()
-
-    return render(request, 'tasks/new_category.html', {
-        'cat_form': cat_form
-    })
-
-
 @login_required
 def category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
