@@ -22,36 +22,6 @@ def datetime_now():
     return datetime.datetime.now()
 
 
-class NewTaskCategoryForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super(NewTaskCategoryForm, self).__init__(*args, **kwargs)
-
-    name = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'autocomplete': 'off'
-        }))
-
-    image = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={
-            'class': 'form-control'
-        }))
-
-    class Meta(object):
-        model = TaskCategory
-        exclude = ('short_id',)
-
-
-class ExerciseDeletionForm(forms.Form):
-    are_you_sure = forms.ChoiceField(
-        choices=YESNO_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-control'
-        }))
-
-
 class ExerciseEditForm(forms.Form):
     def __init__(self, *args, **kwargs):
         extra_templates = kwargs.pop('extra_templates')
