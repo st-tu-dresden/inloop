@@ -21,3 +21,4 @@ static/node_modules/
 .vagrant/
 .ssh_deploy_key_*
 local_conf.py
+.imdone/
