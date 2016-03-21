@@ -26,36 +26,6 @@ def manage_categories(request):
 
 
 @superuser_required
-def edit_category(request, short_id):
-    cat = get_object_or_404(TaskCategory, short_id=short_id)
-    if request.method == 'POST':
-        cat_form = forms.NewTaskCategoryForm(
-            request.POST,
-            request.FILES,
-            instance=cat)
-        if cat_form.is_valid():
-            cat_form.save()
-            return render(request, 'tasks/message.html', {
-                'type': 'success',
-                'message': 'The category has successfully been edited.'
-            })
-        # XXX: else?
-    else:
-        cat_form = forms.NewTaskCategoryForm(
-            instance=cat,
-            initial={
-                'short_id': cat.short_id,
-                'name': cat.name
-            }
-        )
-
-    return render(request, 'tasks/edit_category.html', {
-        'cat_form': cat_form,
-        'short_id': short_id
-    })
-
-
-@superuser_required
 def new_category(request):
     if request.method == 'POST':
         cat_form = forms.NewTaskCategoryForm(request.POST, request.FILES)
