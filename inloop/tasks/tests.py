@@ -132,7 +132,7 @@ def create_test_task_solution_file(solution, contentpath):
         filename=filename,
         file=None
     )
-    with open(contentpath) as f:
+    with open(contentpath, encoding="utf-8") as f:
         tsf.file.save(filename, base.ContentFile(f.read()))
     return tsf
 
