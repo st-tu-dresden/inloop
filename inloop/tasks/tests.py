@@ -18,10 +18,10 @@ from inloop.tasks.models import (Checker, CheckerResult, MissingTaskMetadata,
                                  TaskSolutionFile)
 from inloop.tasks.validators import validate_short_id
 
-TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
-TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.java')
-MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, 'test.jpg')
-MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, 'test.java')
+TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
+TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.java")
+MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, "test.jpg")
+MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "test.java")
 TEST_FAILURE_RESULT = """\
 <?xml version="1.0" encoding="UTF-8"?>\r\n
 <testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0"
@@ -46,7 +46,7 @@ HERE BE STACKTRACES
 <testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>
 <system-out><![CDATA[]]></system-out>
 <system-err><![CDATA[]]></system-err>
-</testsuite>""".encode('utf-8')
+</testsuite>""".encode("utf-8")
 TEST_SUCCESS_RESULT = """\
 <?xml version="1.0" encoding="UTF-8"?>\r\n
 <testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0"
@@ -67,7 +67,7 @@ timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">
 <testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>
 <system-out><![CDATA[]]></system-out>
 <system-err><![CDATA[]]></system-err>
-</testsuite>""".encode('utf-8')
+</testsuite>""".encode("utf-8")
 
 
 def load_tests(loader, tests, ignore):
@@ -78,14 +78,14 @@ def load_tests(loader, tests, ignore):
 
 def create_task_category(name, image):
     cat = TaskCategory(name=name)
-    with open(image, 'rb') as fd:
+    with open(image, "rb") as fd:
         cat.image = File(fd)
         cat.save()
     return cat
 
 
-def create_test_user(username='test_user', first_name='first_name', last_name='last_name',
-                     email='test@example.com', password='123456', mat_num='0000000'):
+def create_test_user(username="test_user", first_name="first_name", last_name="last_name",
+                     email="test@example.com", password="123456", mat_num="0000000"):
         return UserProfile.objects.create_user(
             username=username,
             first_name=first_name,
@@ -95,14 +95,14 @@ def create_test_user(username='test_user', first_name='first_name', last_name='l
             mat_num=mat_num)
 
 
-def create_test_task(author, category, description='', pub_date=None, dead_date=None,
+def create_test_task(author, category, description="", pub_date=None, dead_date=None,
                      title=None, active=True):
     if active:
-        title = 'Active Task' if not title else title
+        title = "Active Task" if not title else title
         pub_date = timezone.now() - timezone.timedelta(days=2) if not pub_date else pub_date
         dead_date = timezone.now() + timezone.timedelta(days=2) if not dead_date else dead_date
     else:
-        title = 'Disabled Task' if not title else title
+        title = "Disabled Task" if not title else title
         pub_date = timezone.now() + timezone.timedelta(days=1)
         dead_date = timezone.now() + timezone.timedelta(days=5)
 
@@ -148,7 +148,7 @@ class TaskModelTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
+        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
 
@@ -157,39 +157,39 @@ class TaskModelTests(TestCase):
 
     def test_validate_short_id(self):
         with self.assertRaises(ValidationError):
-            validate_short_id('ABC')
+            validate_short_id("ABC")
         with self.assertRaises(ValidationError):
-            validate_short_id('abc')
+            validate_short_id("abc")
         with self.assertRaises(ValidationError):
-            validate_short_id('1a')
+            validate_short_id("1a")
         with self.assertRaises(ValidationError):
-            validate_short_id('1ab')
+            validate_short_id("1ab")
         with self.assertRaises(ValidationError):
-            validate_short_id('1$')
-        self.assertIsNone(validate_short_id('ab'))
-        self.assertIsNone(validate_short_id('Ab'))
-        self.assertIsNone(validate_short_id('AB'))
-        self.assertIsNone(validate_short_id('A1'))
+            validate_short_id("1$")
+        self.assertIsNone(validate_short_id("ab"))
+        self.assertIsNone(validate_short_id("Ab"))
+        self.assertIsNone(validate_short_id("AB"))
+        self.assertIsNone(validate_short_id("A1"))
 
     def test_task_is_active(self):
         self.assertTrue(self.t1.is_active())
         self.assertFalse(self.t2.is_active())
 
     def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(username=self.user.username, password='123456')
-        resp = self.client.get('/', follow=True)
+        self.client.login(username=self.user.username, password="123456")
+        resp = self.client.get("/", follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(self.t2.title in resp.content.decode())
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
-            Task.objects.create(publication_date='abc')
+            Task.objects.create(publication_date="abc")
 
         with self.assertRaises(ValidationError):
-            Task.objects.create(deadline_date='abc')
+            Task.objects.create(deadline_date="abc")
 
     def test_task_location(self):
-        subpath = 'inloop/media/exercises/'
+        subpath = "inloop/media/exercises/"
         self.assertTrue(subpath + self.t1.slug in self.t1.task_location())  # activated
         self.assertTrue(subpath + self.t2.slug in self.t2.task_location())  # deactivated
 
@@ -204,7 +204,7 @@ class TaskCategoryTests(TestCase):
         remove(MEDIA_IMAGE_PATH)
 
     def setUp(self):
-        cat_name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
+        cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         self.user = create_test_user()
         self.cat = create_task_category(cat_name, MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat)
@@ -215,25 +215,25 @@ class TaskCategoryTests(TestCase):
 
     def test_image_path(self):
         p = TaskCategory.objects.get(pk=1).image.path
-        with open(p, 'rb') as fd:
-            self.assertTrue(fd, 'Image file not found')
+        with open(p, "rb") as fd:
+            self.assertTrue(fd, "Image file not found")
 
     def test_slugify_on_save(self):
-        self.assertEqual(self.cat.short_id, 'whitespace-here-and-123-some-tabs-abc-things')
+        self.assertEqual(self.cat.short_id, "whitespace-here-and-123-some-tabs-abc-things")
 
     def test_str(self):
-        self.assertEqual(str(self.cat), 'whitespace-here-and-123-some-tabs-abc-things')
+        self.assertEqual(str(self.cat), "whitespace-here-and-123-some-tabs-abc-things")
 
     def test_get_tuple(self):
-        slug = 'whitespace-here-and-123-some-tabs-abc-things'
-        name = 'Whitespace here and 123 some! TABS \t - "abc" (things)\n'
+        slug = "whitespace-here-and-123-some-tabs-abc-things"
+        name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         self.assertEqual(self.cat.get_tuple(), (slug, name))
 
     def test_completed_tasks_for_user(self):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
 
     def test_completed_tasks_empty_category(self):
-        empty_cat = create_task_category('empty', TEST_IMAGE_PATH)
+        empty_cat = create_task_category("empty", TEST_IMAGE_PATH)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
         remove(empty_cat.image.path)
 
@@ -253,18 +253,18 @@ class TaskSolutionTests(TestCase):
     def tearDownClass(cls):
         remove(MEDIA_IMAGE_PATH)
         remove(MEDIA_CLASS_PATH)
-        rmtree(path.join(settings.MEDIA_ROOT, 'solutions', 'test_user'))
+        rmtree(path.join(settings.MEDIA_ROOT, "solutions", "test_user"))
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
+        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
 
         CheckerResult.objects.create(
             solution=self.ts,
-            result='',
+            result="",
             time_taken=13.37,
             passed=False
         )
@@ -278,8 +278,8 @@ class TaskSolutionTests(TestCase):
     def test_get_upload_path(self):
         self.assertRegex(
             models.get_upload_path(self.tsf, self.tsf.filename),
-            (r'solutions/test_user/active-task/'
-             '[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java')
+            (r"solutions/test_user/active-task/"
+             "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java")
         )
 
 
@@ -296,7 +296,7 @@ class CheckerTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category('Basic', MEDIA_IMAGE_PATH)
+        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
@@ -306,119 +306,119 @@ class CheckerTests(TestCase):
         remove(self.cat.image.path)
 
     def test_docker_present_on_system(self):
-        self.assertIsNotNone(which('docker'), "Docker is not available on your system.")
+        self.assertIsNotNone(which("docker"), "Docker is not available on your system.")
 
     def test_generate_container_name_format(self):
         self.assertRegex(
             self.c._generate_container_name(),
-            '-'.join([self.user.username, self.task.slug, '[\\w]{21}'])
+            "-".join([self.user.username, self.task.slug, "[\\w]{21}"])
         )
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
-    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    @mock.patch("inloop.tasks.models.logging", autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True, return_value="test")
     def test_correct_container_build(self, mock_subprocess, mock_logging):
-        result = self.c._container_build(ctr_tag='test', path='.')
+        result = self.c._container_build(ctr_tag="test", path=".")
         mock_logging.debug.assert_called_with("Container build process started")
-        self.assertEqual(result, 'test')
+        self.assertEqual(result, "test")
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
-    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    @mock.patch("inloop.tasks.models.logging", autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True, return_value="test")
     def test_called_process_error_build(self, mock_subprocess, mock_logging):
-        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd='test'), )
-        result = self.c._container_build(ctr_tag='test', path='.')
+        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd="test"), )
+        result = self.c._container_build(ctr_tag="test", path=".")
         mock_logging.debug.assert_called_with("Container build process started")
         self.assertIsNone(result)
         self.assertTrue(mock_logging.error.called)
 
-    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    @mock.patch("inloop.tasks.models.check_output", autospec=True, return_value="test")
     def test_correct_container_execute_with_rm(self, mock_subprocess):
         result = self.c._container_execute(
-            ctr_tag='ctr_tag',
-            ctr_name='ctr_name',
-            cmd='cmd1 cmd2',
-            mountpoints={'dir1': 'dir2'}
+            ctr_tag="ctr_tag",
+            ctr_name="ctr_name",
+            cmd="cmd1 cmd2",
+            mountpoints={"dir1": "dir2"}
         )
-        self.assertEqual(result, ('test', False))
+        self.assertEqual(result, ("test", False))
         self.assertEqual(
             mock_subprocess.call_args,
-            mock.call(['docker', 'run', '--rm=true', '--tty', '--name', 'ctr_name', '-v=dir1:dir2',
-                       '-a', 'STDOUT', 'ctr_tag', 'cmd1 cmd2'], stderr=subprocess.STDOUT,
-                       timeout=settings.CHECKER['Timeouts'].get('container_execution')))
+            mock.call(["docker", "run", "--rm=true", "--tty", "--name", "ctr_name", "-v=dir1:dir2",
+                       "-a", "STDOUT", "ctr_tag", "cmd1 cmd2"], stderr=subprocess.STDOUT,
+                       timeout=settings.CHECKER["Timeouts"].get("container_execution")))
 
-    @mock.patch('inloop.tasks.models.check_output', autospec=True, return_value='test')
+    @mock.patch("inloop.tasks.models.check_output", autospec=True, return_value="test")
     def test_correct_container_execute_without_rm(self, mock_subprocess):
         result = self.c._container_execute(
-            ctr_tag='ctr_tag',
-            ctr_name='ctr_name',
-            cmd='cmd1 cmd2',
-            mountpoints={'dir1': 'dir2'},
+            ctr_tag="ctr_tag",
+            ctr_name="ctr_name",
+            cmd="cmd1 cmd2",
+            mountpoints={"dir1": "dir2"},
             rm=False
         )
-        self.assertEqual(result, ('test', False))
+        self.assertEqual(result, ("test", False))
         self.assertEqual(
             mock_subprocess.call_args,
-            mock.call(['docker', 'run', '--tty', '--name', 'ctr_name', '-v=dir1:dir2',
-                       '-a', 'STDOUT', 'ctr_tag', 'cmd1 cmd2'], stderr=subprocess.STDOUT,
-                       timeout=settings.CHECKER['Timeouts'].get('container_execution')))
+            mock.call(["docker", "run", "--tty", "--name", "ctr_name", "-v=dir1:dir2",
+                       "-a", "STDOUT", "ctr_tag", "cmd1 cmd2"], stderr=subprocess.STDOUT,
+                       timeout=settings.CHECKER["Timeouts"].get("container_execution")))
 
-    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True)
     def test_regular_called_process_error_container_execute(self, mock_subprocess):
         mock_subprocess.side_effect = (
-            subprocess.CalledProcessError(returncode=1, cmd='test'),
-            subprocess.CalledProcessError(returncode=42, cmd='test'))
+            subprocess.CalledProcessError(returncode=1, cmd="test"),
+            subprocess.CalledProcessError(returncode=42, cmd="test"))
         self.assertEqual(self.c._container_execute(
-            ctr_tag='ctr_tag',
-            ctr_name='ctr_name',
-            cmd='cmd1 cmd2',
-            mountpoints={'dir1': 'dir2'},
+            ctr_tag="ctr_tag",
+            ctr_name="ctr_name",
+            cmd="cmd1 cmd2",
+            mountpoints={"dir1": "dir2"},
             rm=False
         ), (None, False))
         self.assertEqual(self.c._container_execute(
-            ctr_tag='ctr_tag',
-            ctr_name='ctr_name',
-            cmd='cmd1 cmd2',
-            mountpoints={'dir1': 'dir2'},
+            ctr_tag="ctr_tag",
+            ctr_name="ctr_name",
+            cmd="cmd1 cmd2",
+            mountpoints={"dir1": "dir2"},
             rm=False
         ), (None, True))  # Compiler error triggered
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
-    @mock.patch('inloop.tasks.models.check_output', autospec=True)
-    @mock.patch('inloop.tasks.models.Checker._kill_and_remove', autospec=True)
+    @mock.patch("inloop.tasks.models.logging", autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True)
+    @mock.patch("inloop.tasks.models.Checker._kill_and_remove", autospec=True)
     def test_timeout_expired_container_execute(self, mock_krm, mock_subprocess, mock_logging):
-        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd='test', timeout=1), ())
+        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd="test", timeout=1), ())
         self.assertEqual(self.c._container_execute(
-            ctr_tag='ctr_tag',
-            ctr_name='ctr_name',
-            cmd='cmd1 cmd2',
-            mountpoints={'dir1': 'dir2'},
+            ctr_tag="ctr_tag",
+            ctr_name="ctr_name",
+            cmd="cmd1 cmd2",
+            mountpoints={"dir1": "dir2"},
             rm=False
-        ), ('Your code was too slow and timed out!', False))
+        ), ("Your code was too slow and timed out!", False))
         self.assertTrue(mock_logging.error.called)
         self.assertTrue(mock_krm.called)
 
-    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True)
     def test_correct_kill_and_remove(self, mock_subprocess):
-        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
+        self.c._kill_and_remove(ctr_name="ctr_name", rm=True)
         self.assertEqual(mock_subprocess.call_count, 2)
         mock_subprocess.reset_mock()
-        self.c._kill_and_remove(ctr_name='ctr_name', rm=False)
+        self.c._kill_and_remove(ctr_name="ctr_name", rm=False)
         self.assertEqual(mock_subprocess.call_count, 1)
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
-    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    @mock.patch("inloop.tasks.models.logging", autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True)
     def test_called_process_error_kill_and_remove(self, mock_subprocess, mock_logging):
-        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd='test'), )
-        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
+        mock_subprocess.side_effect = (subprocess.CalledProcessError(returncode=1, cmd="test"), )
+        self.c._kill_and_remove(ctr_name="ctr_name", rm=True)
         mock_logging.error.assert_called_with(
-            'Kill and remove of container ctr_name failed: Exit 1, None'
+            "Kill and remove of container ctr_name failed: Exit 1, None"
         )
 
-    @mock.patch('inloop.tasks.models.logging', autospec=True)
-    @mock.patch('inloop.tasks.models.check_output', autospec=True)
+    @mock.patch("inloop.tasks.models.logging", autospec=True)
+    @mock.patch("inloop.tasks.models.check_output", autospec=True)
     def test_timeout_expired_kill_and_remove(self, mock_subprocess, mock_logging):
-        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd='test', timeout=1), )
-        self.c._kill_and_remove(ctr_name='ctr_name', rm=True)
-        mock_logging.error.assert_called_with('Kill and remove of container ctr_name timed out: 1')
+        mock_subprocess.side_effect = (subprocess.TimeoutExpired(cmd="test", timeout=1), )
+        self.c._kill_and_remove(ctr_name="ctr_name", rm=True)
+        mock_logging.error.assert_called_with("Kill and remove of container ctr_name timed out: 1")
 
     def test_correct_parse_result(self):
         self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
@@ -437,23 +437,23 @@ class CheckerTests(TestCase):
         self.assertEqual(cr.result, TEST_FAILURE_RESULT.decode())
 
     def test_compiler_failure_parse_result(self):
-        self.c._parse_result(result='compiler trace', compiler_error=True)
+        self.c._parse_result(result="compiler trace", compiler_error=True)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertFalse(cr.passed)
         self.assertFalse(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.0)
-        self.assertEqual(cr.result, 'compiler trace')
+        self.assertEqual(cr.result, "compiler trace")
 
     def test_empty_result_parse_result(self):
-        self.c._parse_result(result='', compiler_error=False)
+        self.c._parse_result(result="", compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
-        self.assertEqual(cr.result, 'For some reason I didn\'t get anything.. What are you doing?')
+        self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
 
-    @mock.patch('inloop.tasks.models.Checker._generate_container_name', autospec=True)
-    @mock.patch('inloop.tasks.models.Checker._container_execute', autospec=True)
-    @mock.patch('inloop.tasks.models.Checker._parse_result', autospec=True)
+    @mock.patch("inloop.tasks.models.Checker._generate_container_name", autospec=True)
+    @mock.patch("inloop.tasks.models.Checker._container_execute", autospec=True)
+    @mock.patch("inloop.tasks.models.Checker._parse_result", autospec=True)
     def test_start(self, mock_gcn, mock_ce, mock_pr):
-        mock_ce.return_value = ('output', 'compiler_error')  # Otherwise unpack failure in start()
+        mock_ce.return_value = ("output", "compiler_error")  # Otherwise unpack failure in start()
         self.c.start()
         self.assertTrue(mock_gcn.called)
         self.assertTrue(mock_ce.called)
@@ -480,14 +480,14 @@ class TaskCategoryManagerTests(TestCase):
 class TaskManagerTests(TestCase):
     def setUp(self):
         self.manager = Task.objects
-        self.valid_json = {'title': 'Test title', 'category': 'Lesson',
-                           'pubdate': '2015-05-01 13:37:00'}
+        self.valid_json = {"title": "Test title", "category": "Lesson",
+                           "pubdate": "2015-05-01 13:37:00"}
 
     def test_validate_empty(self):
         with self.assertRaises(MissingTaskMetadata) as cm:
             self.manager._validate(dict())
         actual = set(cm.exception.args[0])
-        expected = {'title', 'category', 'pubdate'}
+        expected = {"title", "category", "pubdate"}
         self.assertEqual(actual, expected)
 
     def test_validate_valid(self):
@@ -498,12 +498,12 @@ class TaskManagerTests(TestCase):
         task = self.manager._update_task(input, self.valid_json)
 
         self.assertIs(task, input)
-        self.assertEqual(task.title, 'Test title')
-        self.assertEqual(task.slug, 'test-title')
-        self.assertEqual(task.category.name, 'Lesson')
+        self.assertEqual(task.title, "Test title")
+        self.assertEqual(task.slug, "test-title")
+        self.assertEqual(task.category.name, "Lesson")
 
-        pubdate = task.publication_date.strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(pubdate, self.valid_json['pubdate'])
+        pubdate = task.publication_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.assertEqual(pubdate, self.valid_json["pubdate"])
 
     def test_save_task_with_valid_json(self):
         task = Task.objects.get_or_create_json(self.valid_json, "Test title")
