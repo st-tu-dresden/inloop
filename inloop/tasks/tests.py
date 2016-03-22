@@ -1,6 +1,6 @@
 from os import path, remove
 from doctest import DocTestSuite
-from shutil import copy
+from shutil import copy, which
 import subprocess
 from unittest import mock
 
@@ -258,10 +258,7 @@ class CheckerTests(TestCase):
         remove(self.cat.image.path)
 
     def test_docker_present_on_system(self):
-        try:
-            self.assertNotEqual(subprocess.check_output(('which', 'docker'), ).decode(), '')
-        except subprocess.CalledProcessError:
-            self.fail()
+        self.assertIsNotNone(which('docker'), "Docker is not available on your system.")
 
     def test_generate_container_name_format(self):
         self.assertRegex(
