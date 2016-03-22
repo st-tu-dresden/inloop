@@ -20,7 +20,7 @@ os.makedirs(local_conf['static_root'], exist_ok=True)
 print("Enabling maintainance mode")
 offline_link = path.join(local_conf['server_root'], OFFLINE_PAGE)
 # the src *must* be absolute:
-os.symlink(path.join(path.abspath("static"), OFFLINE_PAGE), offline_link)
+os.symlink(path.join(path.abspath("support"), OFFLINE_PAGE), offline_link)
 
 print("Stopping services")
 call(["sudo", "service", "inloop-web", "stop"])
