@@ -21,6 +21,52 @@ TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.java')
 MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, 'test.jpg')
 MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, 'test.java')
+TEST_FAILURE_RESULT = """\
+<?xml version="1.0" encoding="UTF-8"?>\r\n
+<testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0"
+timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.001">
+<properties/>
+<testcase name="testInstantiation" classname="BasicTest" time="0.0"/>
+<testcase name="testToString" classname="BasicTest" time="0.0"/>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>
+<?xml version="1.0" encoding="UTF-8"?>\r\n
+<testsuite name="AdvancedTest" tests="4" skipped="0" failures="1" errors="0"
+timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">
+<properties/>
+<testcase name="testAdd" classname="AdvancedTest" time="0.016">
+<failure message="You fail!" type="java.lang.AssertionError">
+HERE BE STACKTRACES
+</failure>
+</testcase>
+<testcase name="testSubtract" classname="AdvancedTest" time="0.001"/>
+<testcase name="testWhatever" classname="AdvancedTest" time="0.001"/>
+<testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>""".encode('utf-8')
+TEST_SUCCESS_RESULT = """\
+<?xml version="1.0" encoding="UTF-8"?>\r\n
+<testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0"
+timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.001">
+<properties/>
+<testcase name="testInstantiation" classname="BasicTest" time="0.0"/>
+<testcase name="testToString" classname="BasicTest" time="0.0"/>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>
+<?xml version="1.0" encoding="UTF-8"?>\r\n
+<testsuite name="AdvancedTest" tests="4" skipped="0" failures="0" errors="0"
+timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">
+<properties/>
+<testcase name="testAdd" classname="AdvancedTest" time="0.004"/>
+<testcase name="testSubtract" classname="AdvancedTest" time="0.001"/>
+<testcase name="testWhatever" classname="AdvancedTest" time="0.001"/>
+<testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>""".encode('utf-8')
 
 
 def load_tests(loader, tests, ignore):
@@ -373,68 +419,20 @@ class CheckerTests(TestCase):
         mock_logging.error.assert_called_with('Kill and remove of container ctr_name timed out: 1')
 
     def test_correct_parse_result(self):
-        result = (
-            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
-            '<testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0" '
-            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.001">'
-            '<properties/>'
-            '<testcase name="testInstantiation" classname="BasicTest" time="0.0"/>'
-            '<testcase name="testToString" classname="BasicTest" time="0.0"/>'
-            '<system-out><![CDATA[]]></system-out>'
-            '<system-err><![CDATA[]]></system-err>'
-            '</testsuite>'
-            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
-            '<testsuite name="AdvancedTest" tests="4" skipped="0" failures="0" errors="0" '
-            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">'
-            '<properties/>'
-            '<testcase name="testAdd" classname="AdvancedTest" time="0.004"/>'
-            '<testcase name="testSubtract" classname="AdvancedTest" time="0.001"/>'
-            '<testcase name="testWhatever" classname="AdvancedTest" time="0.001"/>'
-            '<testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>'
-            '<system-out><![CDATA[]]></system-out>'
-            '<system-err><![CDATA[]]></system-err>'
-            '</testsuite>'
-        ).encode('utf-8')
-        self.c._parse_result(result=result, compiler_error=False)
+        self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertTrue(cr.passed)
         self.assertTrue(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.01)
-        self.assertEqual(cr.result, result.decode())
+        self.assertEqual(cr.result, TEST_SUCCESS_RESULT.decode())
 
     def test_failure_parse_result(self):
-        result = (
-            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
-            '<testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0" '
-            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.001">'
-            '<properties/>'
-            '<testcase name="testInstantiation" classname="BasicTest" time="0.0"/>'
-            '<testcase name="testToString" classname="BasicTest" time="0.0"/>'
-            '<system-out><![CDATA[]]></system-out>'
-            '<system-err><![CDATA[]]></system-err>'
-            '</testsuite>'
-            '<?xml version="1.0" encoding="UTF-8"?>\r\n'
-            '<testsuite name="AdvancedTest" tests="4" skipped="0" failures="1" errors="0" '
-            'timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">'
-            '<properties/>'
-            '<testcase name="testAdd" classname="AdvancedTest" time="0.016">'
-            '<failure message="You fail!" type="java.lang.AssertionError">'
-            'HERE BE STACKTRACES'
-            '</failure>'
-            '</testcase>'
-            '<testcase name="testSubtract" classname="AdvancedTest" time="0.001"/>'
-            '<testcase name="testWhatever" classname="AdvancedTest" time="0.001"/>'
-            '<testcase name="testImportantStuff" classname="AdvancedTest" time="0.001"/>'
-            '<system-out><![CDATA[]]></system-out>'
-            '<system-err><![CDATA[]]></system-err>'
-            '</testsuite>'
-        ).encode('utf-8')
-        self.c._parse_result(result=result, compiler_error=False)
+        self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertFalse(cr.passed)
         self.assertFalse(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.01)
-        self.assertEqual(cr.result, result.decode())
+        self.assertEqual(cr.result, TEST_FAILURE_RESULT.decode())
 
     def test_compiler_failure_parse_result(self):
         self.c._parse_result(result='compiler trace', compiler_error=True)
