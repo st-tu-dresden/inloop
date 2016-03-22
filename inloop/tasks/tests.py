@@ -1,7 +1,7 @@
 import subprocess
 from doctest import DocTestSuite
 from os import path, remove
-from shutil import copy, which
+from shutil import copy, which, rmtree
 from unittest import mock
 
 from django.conf import settings
@@ -253,6 +253,7 @@ class TaskSolutionTests(TestCase):
     def tearDownClass(cls):
         remove(MEDIA_IMAGE_PATH)
         remove(MEDIA_CLASS_PATH)
+        rmtree(path.join(settings.MEDIA_ROOT, 'solutions', 'test_user'))
 
     def setUp(self):
         self.user = create_test_user()
