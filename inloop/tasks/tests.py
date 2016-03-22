@@ -1,4 +1,3 @@
-import subprocess
 from doctest import DocTestSuite
 from os import makedirs, path, remove
 from shutil import copy, which, rmtree
