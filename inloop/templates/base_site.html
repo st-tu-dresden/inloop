@@ -5,13 +5,10 @@
 {% if user.is_authenticated %}
   <li><a href="{% url 'index' %}">Home</a></li>
   <li><a href="{% url 'accounts:user_profile' %}">{{ user.get_username }}</a></li>
-  <li><a href="#">Settings</a></li>
   {% for page in fpages %}
     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
   {% endfor %}
   {% if user.is_superuser %}
-    <li><a href="{% url 'tasks:new_exercise' %}">New Task</a></li>
-    <li><a href="{% url 'tasks:man_cat' %}">Manage Categories</a></li>
     <li><a href="{% url 'admin:index' %}">System</a></li>
   {% endif %}
   <li><a href="{% url 'accounts:user_logout' %}">Logout</a></li>
