@@ -115,23 +115,3 @@ def user_profile(request):
     return render(request, 'accounts/profile.html', {
         'user_profile': user_profile
     })
-
-
-@login_required
-def change_password(request):
-    if request.method == 'POST':
-        password_form = forms.PasswordForm(
-            data=request.POST,
-            instance=request.user
-        )
-
-        if password_form.is_valid():
-            request.user.set_password(password_form.cleaned_data['password'])
-            request.user.save()
-            return success(request, "Your password has been changed successfully.")
-    else:
-        password_form = forms.PasswordForm(instance=request.user)
-
-    return render(request, 'accounts/change_password.html', {
-        'password_form': password_form
-    })
