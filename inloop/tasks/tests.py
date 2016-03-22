@@ -311,7 +311,7 @@ class CheckerTests(TestCase):
     def test_generate_container_name_format(self):
         self.assertRegex(
             self.c._generate_container_name(),
-            '-'.join([self.user.username, self.task.slug, '[\w]{21}'])
+            '-'.join([self.user.username, self.task.slug, '[\\w]{21}'])
         )
 
     @mock.patch('inloop.tasks.models.logging', autospec=True)
