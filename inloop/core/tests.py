@@ -1,9 +1,9 @@
 import os
 import subprocess
 import sys
-from unittest import mock, TestCase
+from unittest import TestCase, mock
 
-from inloop.core.utils import changedir, timelimit, filter_uppercase_keys
+from inloop.core.utils import changedir, filter_uppercase_keys, timelimit
 
 
 class UtilsTest(TestCase):

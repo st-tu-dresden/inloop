@@ -1,14 +1,16 @@
+from io import BytesIO
+from os import path
 from unittest import TestCase
 from unittest.mock import patch
-from os import path
-from io import BytesIO
 
-from django.utils import timezone
-from django.test.client import RequestFactory
 from django.core.urlresolvers import resolve
-from inloop.gh_import import views, __name__ as PACKAGE
+from django.test.client import RequestFactory
+from django.utils import timezone
+
+from inloop.gh_import import __name__ as PACKAGE
+from inloop.gh_import import views
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import.utils import (compute_signature, HOSTS_FILE, parse_date,
+from inloop.gh_import.utils import (HOSTS_FILE, compute_signature, parse_date,
                                     parse_ssh_url, ssh_options)
 
 

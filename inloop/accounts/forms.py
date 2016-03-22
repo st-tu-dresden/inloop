@@ -3,7 +3,6 @@ from django import forms
 from inloop.accounts.models import CourseOfStudy, UserProfile
 from inloop.accounts.validators import validate_mat_num, validate_password
 
-
 # HTML attributes used in all widgets
 BASE_ATTRIBUTES = {
     "class": "form-control",

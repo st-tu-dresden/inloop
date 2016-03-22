@@ -7,8 +7,8 @@ some functions are only slightly modified copies.
 from datetime import datetime
 from subprocess import check_output
 
-from django.utils.lru_cache import lru_cache
 from django.conf import settings
+from django.utils.lru_cache import lru_cache
 
 
 @lru_cache()
