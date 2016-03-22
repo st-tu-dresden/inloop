@@ -1,13 +1,12 @@
 import logging
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
 from inloop.accounts import forms
 from inloop.accounts.models import UserProfile
-
 
 logger = logging.getLogger(__name__)
 

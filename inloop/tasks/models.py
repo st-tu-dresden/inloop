@@ -4,7 +4,7 @@ import string
 import xml.etree.ElementTree as ET
 from os.path import dirname, join
 from random import SystemRandom
-from subprocess import check_output, CalledProcessError, TimeoutExpired, STDOUT
+from subprocess import STDOUT, CalledProcessError, TimeoutExpired, check_output
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist

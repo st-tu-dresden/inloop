@@ -19,11 +19,12 @@ once.
 
 NOTE: The Vagrant box *may* be in an invalid state afterwards.
 """
-import sys
 import shutil
 import subprocess
+import sys
 import unittest
-from subprocess import check_call as run, check_output
+from subprocess import check_call as run
+from subprocess import check_output
 
 
 class PrepareDeployTest(unittest.TestCase):

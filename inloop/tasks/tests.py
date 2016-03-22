@@ -1,21 +1,22 @@
-from os import path, remove
-from doctest import DocTestSuite
-from shutil import copy, which
 import subprocess
+from doctest import DocTestSuite
+from os import path, remove
+from shutil import copy, which
 from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File, base
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.text import slugify
-from django.conf import settings
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
+from inloop.tasks.models import (Checker, CheckerResult, MissingTaskMetadata,
+                                 Task, TaskCategory, TaskSolution,
+                                 TaskSolutionFile)
 from inloop.tasks.validators import validate_short_id
-from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory, Checker,
-                                 TaskSolution, TaskSolutionFile, CheckerResult)
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.java')

@@ -1,13 +1,12 @@
-from django.conf.urls import patterns, include, url
+# To serve static files during development
+from django.conf import settings
+from django.conf.urls import include, patterns, url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-# To serve static files during development
-from django.conf import settings
-from django.conf.urls.static import static
-
-from inloop.tasks import views as task_views
 from inloop import views as sys_views
+from inloop.tasks import views as task_views
 
 urlpatterns = patterns(
     '',

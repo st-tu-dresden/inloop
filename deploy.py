@@ -1,7 +1,8 @@
 import os
 import sys
 from os import path
-from subprocess import call, check_call as run
+from subprocess import check_call as run
+from subprocess import call
 from time import strftime
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "inloop.settings.production"

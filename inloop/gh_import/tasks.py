@@ -1,8 +1,8 @@
 import json
 import logging
 from glob import glob
-from subprocess import check_call, CalledProcessError
 from os.path import basename, dirname, join
+from subprocess import CalledProcessError, check_call
 
 from django.conf import settings
 from django.db.transaction import atomic

@@ -1,7 +1,7 @@
-from shutil import rmtree
 from glob import glob
 from os import listdir, makedirs, path, remove
 from os.path import basename, join
+from shutil import rmtree
 
 from django.conf import settings
 

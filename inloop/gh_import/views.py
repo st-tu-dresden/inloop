@@ -1,14 +1,13 @@
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import View
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.crypto import constant_time_compare
-from django.utils.encoding import smart_bytes
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils.crypto import constant_time_compare
+from django.utils.decorators import method_decorator
+from django.utils.encoding import smart_bytes
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
 
-from inloop.gh_import.utils import compute_signature
 from inloop.gh_import.tasks import update_tasks
-
+from inloop.gh_import.utils import compute_signature
 
 SIGNATURE_HEADER = 'HTTP_X_HUB_SIGNATURE'
 GITHUB_SECRET = smart_bytes(settings.GITHUB_SECRET)
