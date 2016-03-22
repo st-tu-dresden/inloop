@@ -87,8 +87,6 @@
 {% endblock %}
 
 {% block extrabody %}
-<script src="{% static 'js/ace.min.js' %}"></script>
-<script src="{% static 'js/inloop.min.js' %}"></script>
 <script type="text/javascript">
     {% for fname in file_dict.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
