@@ -1,6 +1,6 @@
 import subprocess
 from doctest import DocTestSuite
-from os import path, remove
+from os import makedirs, path, remove
 from shutil import copy, which, rmtree
 from unittest import mock
 
@@ -68,6 +68,9 @@ timestamp="2016-03-09T22:35:21" hostname="fde9bfd357e5" time="0.007">
 <system-out><![CDATA[]]></system-out>
 <system-err><![CDATA[]]></system-err>
 </testsuite>""".encode("utf-8")
+
+if not path.exists(settings.MEDIA_ROOT):
+    makedirs(settings.MEDIA_ROOT)
 
 
 def load_tests(loader, tests, ignore):
