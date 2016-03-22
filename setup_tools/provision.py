@@ -16,11 +16,12 @@ Vagrantfile.
 """
 import argparse
 import os
-import sys
 import shutil
+import sys
 import textwrap
 from os import path
-from subprocess import CalledProcessError, check_output as run
+from subprocess import check_output as run
+from subprocess import CalledProcessError
 
 KEY_README = """\
 Please make sure you register the corresponding public keys at

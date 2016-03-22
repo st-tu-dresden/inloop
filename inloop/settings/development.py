@@ -1,5 +1,5 @@
 from os import environ
-from os.path import join, dirname
+from os.path import dirname, join
 
 from inloop.core.utils import filter_uppercase_keys
 from inloop.settings import base

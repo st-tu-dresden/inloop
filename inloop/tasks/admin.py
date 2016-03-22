@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from inloop.tasks.models import Task, TaskCategory
 
 

@@ -1,6 +1,8 @@
-from django import forms
-from inloop.tasks.models import TaskCategory
 import datetime
+
+from django import forms
+
+from inloop.tasks.models import TaskCategory
 
 
 def get_task_categories():

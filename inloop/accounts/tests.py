@@ -1,9 +1,9 @@
-from django.test import TestCase
-from django.core import mail
 from django.conf import settings
+from django.core import mail
+from django.test import TestCase
 
-from inloop.accounts.models import UserProfile, CourseOfStudy
 from inloop.accounts.forms import UserForm
+from inloop.accounts.models import CourseOfStudy, UserProfile
 
 
 class RegistrationTests(TestCase):

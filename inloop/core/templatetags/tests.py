@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from inloop.core.templatetags.markdown import markdown
 
+
 FENCED_CODE = """
 ```python
 print("Hello, World")

@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+
 import inloop.accounts.views as account_views
 
 urlpatterns = patterns(

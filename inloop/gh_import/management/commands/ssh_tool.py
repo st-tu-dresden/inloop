@@ -1,11 +1,11 @@
-from subprocess import check_output, CalledProcessError, STDOUT
-from os.path import splitext
 from optparse import make_option
+from os.path import splitext
+from subprocess import STDOUT, CalledProcessError, check_output
 
-from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 
-from inloop.gh_import.utils import ssh_options, parse_ssh_url
+from inloop.gh_import.utils import parse_ssh_url, ssh_options
 
 
 class Command(BaseCommand):
