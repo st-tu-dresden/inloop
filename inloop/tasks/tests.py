@@ -19,9 +19,9 @@ from inloop.tasks.models import (Checker, CheckerResult, MissingTaskMetadata,
 from inloop.tasks.validators import validate_short_id
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
-TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.java")
+TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
 MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, "test.jpg")
-MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "test.java")
+MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "HelloWorld.java")
 TEST_FAILURE_RESULT = """\
 <?xml version="1.0" encoding="UTF-8"?>\r\n
 <testsuite name="BasicTest" tests="2" skipped="0" failures="0" errors="0"
