@@ -17,7 +17,7 @@ media/
 *.sublime-workspace
 .coverage
 htmlcov
-static/node_modules/
+node_modules/
 .vagrant/
 .ssh_deploy_key_*
 local_conf.py
