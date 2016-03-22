@@ -65,11 +65,6 @@ FIRST_DAY_OF_WEEK = 1
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-# Static file search path
-STATICFILES_DIRS = (
-    join(PROJECT_ROOT, 'static', 'dist'),
-)
-
 # Template search paths
 TEMPLATE_DIRS = (
     join(INLOOP_ROOT, 'templates'),
