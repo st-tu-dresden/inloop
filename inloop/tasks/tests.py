@@ -19,8 +19,8 @@ from inloop.tasks.models import (MissingTaskMetadata, Task, TaskCategory, Checke
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.jpg')
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, 'tests', 'test.java')
-MEDIA_IMAGE_PATH = path.join(settings.INLOOP_ROOT, settings.MEDIA_ROOT, 'test.jpg')
-MEDIA_CLASS_PATH = path.join(settings.INLOOP_ROOT, settings.MEDIA_ROOT, 'test.java')
+MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, 'test.jpg')
+MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, 'test.java')
 
 
 def load_tests(loader, tests, ignore):
