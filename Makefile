@@ -1,3 +1,8 @@
+##
+## MAKEFILE VARIABLES
+##
+
+# Nodejs commands and flags
 UGLIFY = node_modules/.bin/uglifyjs
 UGLIFYFLAGS =
 LESS = node_modules/.bin/lessc
@@ -5,10 +10,12 @@ LESSFLAGS= --compress --include-path=vendor/bootstrap/less
 WATCHY = node_modules/.bin/watchy
 WATCHYFLAGS = --wait 5 --no-init-spawn --silent
 
-js_bundle = inloop/core/static/js/inloop.min.js
+# Target file for the JS bundle
+js_bundle := inloop/core/static/js/inloop.min.js
 
-# Order is important: jQuery > other 3rd party JS > INLOOP JS
-js_sources = \
+# Javascript source files to be combined
+# (order is important: jQuery > other 3rd party JS > INLOOP JS)
+js_sources := \
 			vendor/jquery/dist/jquery.min.js \
 			vendor/bootstrap/dist/js/bootstrap.min.js \
 			vendor/ace/src/ace.js \
@@ -18,8 +25,15 @@ js_sources = \
 			vendor/anchorjs/anchor.js \
 			$(shell find js -name '*.js')
 
-css_bundle = inloop/core/static/css/inloop.min.css
-less_sources = less/inloop.less
+# Target file for the CSS bundle
+css_bundle := inloop/core/static/css/inloop.min.css
+
+# Source file for the CSS bundle
+less_sources := less/inloop.less
+
+##
+## MAKEFILE TARGETS
+##
 
 $(js_bundle): $(js_sources)
 	@$(UGLIFY) $(UGLIFYFLAGS) $(js_sources) > $@
@@ -35,4 +49,11 @@ assets: npm $(js_bundle) $(css_bundle)
 watch:
 	@$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
 
-.PHONY: npm assets watch
+test:
+	@python manage.py test --verbosity 2 --failfast
+
+coverage:
+	@coverage run manage.py test
+	@coverage html
+
+.PHONY: npm assets watch test coverage
