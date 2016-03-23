@@ -7,8 +7,8 @@ This is INLOOP, an interactive learning center for object-oriented programming.
 This file contains instructions to quickly set up a developer environment.
 Please also have a look at the documentation provided for
 
-* [contributors](docs/HACKING.md) and
-* [administrators](docs/DEPLOY.md).
+* [contributors](docs/developer-guide.md) and
+* [administrators](docs/deployment-guide.md).
 
 ### Prerequisites
 
