@@ -63,7 +63,6 @@ class UserProfile(auth_models.AbstractUser):
         help_text="The key's deprecation time"
     )
     mat_num = models.IntegerField(
-        max_length=7,
         help_text="Matriculation Number",
         null=True,
         validators=[validate_mat_num]
