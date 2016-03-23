@@ -1,9 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 import inloop.accounts.views as account_views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^profile/$',
         account_views.user_profile,
@@ -67,4 +66,4 @@ urlpatterns = patterns(
         {'template_name': 'registration/password_reset_complete.html'},
         name='password_reset_complete'
     ),
-)
+]

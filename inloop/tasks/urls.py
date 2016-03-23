@@ -1,9 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from inloop.tasks import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^$',
         views.index,
@@ -29,4 +28,4 @@ urlpatterns = patterns(
         views.get_solution_as_zip,
         name='solution_as_zip'
     ),
-)
+]
