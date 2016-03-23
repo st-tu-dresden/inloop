@@ -29,7 +29,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
-    'huey.djhuey',
+    'huey.contrib.djhuey',
     'inloop.core',
     'inloop.accounts',
     'inloop.tasks',
@@ -86,8 +86,8 @@ TEMPLATES = [
 ]
 
 HUEY = {
-    'backend': 'huey.backends.redis_backend',
-    'name': 'inloop-task-queue'
+    'name': 'inloop-task-queue',
+    'always_eager': False,
 }
 
 CHECKER = {
