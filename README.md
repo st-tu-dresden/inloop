@@ -34,17 +34,32 @@ For a local developer setup you will need:
 
 * Git
 * Python >= 3.3
-* Redis Server
-* Tools and libraries to build Python extensions (for Pillow and optionally psygopg2)
+* Docker
+* Redis
+* Tools and libraries to build Python extensions (for Pillow and optionally psycopg2)
+* Optional: node.js and npm (to rebuild CSS and Javascript bundles)
 
-On Ubuntu >= 14.04 or Debian >= 8 you can install above dependencies as follows:
+On Ubuntu >= 14.04 or Debian >= 8 you can install all above dependencies as follows:
 
-    apt-get install build-essential git libfreetype6-dev libjpeg8-dev liblcms2-dev \
-        libpq-dev libtiff4-dev libwebp-dev python3 python3-dev tcl8.5-dev tk8.5-dev zlib1g-dev
+    sudo apt-get install build-essential docker.io git libfreetype6-dev libjpeg8-dev \
+        liblcms2-dev libpq-dev libtiff5-dev libwebp-dev nodejs npm python3 \
+        python3-dev redis-server tcl8.5-dev tk8.5-dev zlib1g-dev
 
-On OS X (using Homebrew):
+    sudo apt-get install python3-venv || sudo apt-get install python3.4-venv
 
-    brew install python3 redis
+For some silly reason I dare not explain here, on Ubuntu/Debian the `node` command is called
+`nodejs` and you have to symlink it as follows in order to get `make assets` to work.
+
+    sudo ln -s /usr/bin/nodejs /usr/local/bin/node
+
+The same is true for `pyvenv`, which on Ubuntu 14.04 is called `pyvenv-3.4`. I recommend to
+symlink it as well:
+
+    sudo ln -s /usr/bin/pyvenv-3.4 /usr/local/bin/pyvenv
+
+On OS X using Homebrew, it is as easy as:
+
+    brew install docker docker-machine node python3 redis
 
 
 ### Local development setup
@@ -69,7 +84,7 @@ pip install -r requirements_dev.txt
 ./manage.py createsuperuser
 
 # run and monitor all required components in developer mode
-honcho run
+honcho start
 ```
 
 ### Working on static assets (CSS and Javascript)
