@@ -28,22 +28,29 @@ For deployment, we recommend to use Ubuntu 12.04 or 14.04.
 Note: Ubuntu 12.04 only ships with Python 3.2, which means you should install
 a more recent version (see the `Vagrantfile`).
 
-#### Tools and libraries
+#### Dependencies
 
-You'll at least need:
+For a local developer setup you will need:
 
-* Tools to build Python extensions (e.g., required by Pillow and psycopg2)
-    * Build tools (`gcc`/`clang`, `make`)
-    * The `python3-dev` package (Python 3 development files)
-* For Pillow: `libtiff4-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev`
-* libpq header files (for psycopg2)
+* Git
+* Python >= 3.3
+* Redis Server
+* Tools and libraries to build Python extensions (for Pillow and optionally psygopg2)
 
-If you use a Debian-based Linux, take a look at the `Vagrantfile` to get a
-list of packages you need to install.
+On Ubuntu >= 14.04 or Debian >= 8 you can install above dependencies as follows:
+
+    apt-get install build-essential git libfreetype6-dev libjpeg8-dev liblcms2-dev \
+        libpq libtiff4-dev libwebp-dev python3 python3-dev tcl8.5-dev tk8.5-dev zlib1g-dev
+
+On OS X (using Homebrew):
+
+    brew install python3 redis
+
 
 ### Local development setup
 
-Assuming you already cloned this repository and changed to the directory:
+The following steps assume that you already have installed the dependencies listed above
+and cloned this repo to your local machine. From inside your clone, execute:
 
 ```bash
 # setup a virtual environment ...
@@ -61,8 +68,8 @@ pip install -r requirements_dev.txt
 # create a first user with superuser privileges
 ./manage.py createsuperuser
 
-# run Django's integrated development webserver
-./manage.py runserver
+# run and monitor all required components in developer mode
+honcho run
 ```
 
 ### Working on static assets (CSS and Javascript)
