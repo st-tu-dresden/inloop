@@ -27,19 +27,9 @@ Python and Django provide excellent modules which facilitate testing:
 
 The test coverage can be checked by using
 
-    ./run_coverage.py
+    make coverage
 
 and pointing your browser to `htmlcov/index.html`. Aim for 100%!
-
-
-### The requirements file
-
-Please keep all entries in `requirements.txt` sorted, like this:
-
-    pip freeze | sort -f > requirements.txt
-
-You can use `pip-review` from the package `pip-tools` to review the package versions installed
-in your virtualenv.
 
 
 ### Automatic code checking git hook with flake8
@@ -59,6 +49,16 @@ branch.
 You must also install the commit message hook to enforce consistent commit messages:
 
     cp support/git-hooks/commit-msg .git/hooks
+
+
+### Synchronize your virtualenv to the currently checked out branch
+
+We have a `post-checkout` git hook that supports this in a safe way:
+
+    cp support/git-hooks/post-checkout .git/hooks
+
+This works only *if* you have a virtualenv enabled which belongs to the project. Whenever
+you do a `git checkout`, this hook will run `pip install -r requirements_dev.txt`.
 
 
 ### Notes on flake8
