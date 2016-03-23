@@ -1,3 +1,4 @@
+import django.contrib.auth.views as auth_views
 from django.conf.urls import url
 
 import inloop.accounts.views as account_views
@@ -10,13 +11,13 @@ urlpatterns = [
     ),
     url(
         r'^password_change/$',
-        'django.contrib.auth.views.password_change',
+        auth_views.password_change,
         {'post_change_redirect': 'accounts:password_change_done'},
         name='password_change'
     ),
     url(
         r'^password_change_done/$',
-        'django.contrib.auth.views.password_change_done',
+        auth_views.password_change_done,
         name='password_change_done'
     ),
     url(
@@ -41,19 +42,19 @@ urlpatterns = [
     ),
     url(
         r'^reset_password/$',
-        'django.contrib.auth.views.password_reset',
+        auth_views.password_reset,
         {'post_reset_redirect': '/accounts/reset_password/done/'},
         name='password_reset'
     ),
     url(
         r'^reset_password/done/$',
-        'django.contrib.auth.views.password_reset_done',
+        auth_views.password_change_done,
         {'template_name': 'registration/password_reset_done.html'},
         name='password_reset_done'
     ),
     url(
         r'^reset_password/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
+        auth_views.password_reset_confirm,
         {
             'template_name': 'registration/password_reset_confirm.html',
             'post_reset_redirect': '/accounts/reset_password/complete/'
@@ -62,7 +63,7 @@ urlpatterns = [
     ),
     url(
         r'^reset_password/complete/$',
-        'django.contrib.auth.views.password_reset_complete',
+        auth_views.password_reset_complete,
         {'template_name': 'registration/password_reset_complete.html'},
         name='password_reset_complete'
     ),

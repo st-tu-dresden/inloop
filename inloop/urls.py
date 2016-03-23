@@ -6,13 +6,16 @@ from django.contrib.flatpages import views as flatpage_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from inloop import views as sys_views
+from inloop.accounts import urls as account_urls
+from inloop.gh_import import urls as github_urls
+from inloop.tasks import urls as task_urls
 from inloop.tasks import views as task_views
 
 urlpatterns = [
     url(r'^$', task_views.index, name='index'),
-    url(r'^tasks/', include('inloop.tasks.urls', namespace='tasks')),
-    url(r'^accounts/', include('inloop.accounts.urls', namespace='accounts')),
-    url(r'^github/', include('inloop.gh_import.urls', namespace='github')),
+    url(r'^tasks/', include(task_urls, namespace='tasks')),
+    url(r'^accounts/', include(account_urls, namespace='accounts')),
+    url(r'^github/', include(github_urls, namespace='github')),
     url(r'^admin/', include(admin.site.urls)),
 ]
 
