@@ -40,7 +40,7 @@ For a local developer setup you will need:
 On Ubuntu >= 14.04 or Debian >= 8 you can install above dependencies as follows:
 
     apt-get install build-essential git libfreetype6-dev libjpeg8-dev liblcms2-dev \
-        libpq libtiff4-dev libwebp-dev python3 python3-dev tcl8.5-dev tk8.5-dev zlib1g-dev
+        libpq-dev libtiff4-dev libwebp-dev python3 python3-dev tcl8.5-dev tk8.5-dev zlib1g-dev
 
 On OS X (using Homebrew):
 
