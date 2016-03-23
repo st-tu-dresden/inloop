@@ -15,7 +15,6 @@ DOMAIN = 'https://{server_name}/'.format(**local_conf)
 
 # No debug pages!
 DEBUG = False
-TEMPLATE_DEBUG = False
 
 # Postgres connection parameters
 DATABASES = {

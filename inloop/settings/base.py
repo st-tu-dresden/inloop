@@ -65,12 +65,25 @@ FIRST_DAY_OF_WEEK = 1
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-# Template search paths
-TEMPLATE_DIRS = (
-    join(INLOOP_ROOT, 'templates'),
-    # otherwise django.contrib.auth won't find the custom templates
-    join(INLOOP_ROOT, 'accounts', 'templates')
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            join(INLOOP_ROOT, 'templates'),
+            # otherwise django.contrib.auth won't find the custom templates:
+            join(INLOOP_ROOT, 'accounts', 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 HUEY = {
     'backend': 'huey.backends.redis_backend',
