@@ -22,3 +22,4 @@ node_modules/
 .ssh_deploy_key_*
 local_conf.py
 .imdone/
+dump.rdb
