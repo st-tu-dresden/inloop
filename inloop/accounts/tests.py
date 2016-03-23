@@ -70,7 +70,7 @@ class RegistrationTests(TestCase):
         self.client.post('/accounts/register/', data=self.data, follow=True)
         resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
         self.assertTemplateUsed(resp, 'registration/register.html')
-        self.assertContains(resp, 'User with this Username already exists.')
+        self.assertContains(resp, 'A user with that username already exists.')
         self.assertContains(resp, 'The password must have at least 8 characters!')
         self.assertContains(resp, 'This field is required.')  # From missing course choice
         self.assertContains(resp, 'The matriculation number does not have 7 digits!')
