@@ -16,7 +16,6 @@ SITE_ID = 1
 DOMAIN = 'http://localhost:8000/'
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 # Storage root for uploaded files
 MEDIA_ROOT = join(base.PROJECT_ROOT, 'media')

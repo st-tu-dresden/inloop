@@ -142,11 +142,13 @@ def create_test_task_solution_file(solution, contentpath):
 class TaskModelTests(TestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
 
     @classmethod
     def tearDownClass(cls):
         remove(MEDIA_IMAGE_PATH)
+        super().tearDownClass()
 
     def setUp(self):
         self.user = create_test_user()
@@ -199,11 +201,13 @@ class TaskModelTests(TestCase):
 class TaskCategoryTests(TestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
 
     @classmethod
     def tearDownClass(cls):
         remove(MEDIA_IMAGE_PATH)
+        super().tearDownClass()
 
     def setUp(self):
         cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
@@ -248,6 +252,7 @@ class TaskCategoryTests(TestCase):
 class TaskSolutionTests(TestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
         copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
 
@@ -256,6 +261,7 @@ class TaskSolutionTests(TestCase):
         remove(MEDIA_IMAGE_PATH)
         remove(MEDIA_CLASS_PATH)
         rmtree(path.join(settings.MEDIA_ROOT, "solutions", "test_user"))
+        super().tearDownClass()
 
     def setUp(self):
         self.user = create_test_user()
@@ -288,6 +294,7 @@ class TaskSolutionTests(TestCase):
 class CheckerTests(TestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
         copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
 
@@ -295,6 +302,7 @@ class CheckerTests(TestCase):
     def tearDownClass(cls):
         remove(MEDIA_IMAGE_PATH)
         remove(MEDIA_CLASS_PATH)
+        super().tearDownClass()
 
     def setUp(self):
         self.user = create_test_user()
