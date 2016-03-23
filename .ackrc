@@ -1,0 +1,5 @@
+--ignore-dir=venvs
+--ignore-dir=venv
+--ignore-dir=vendor
+--context
+--sort-files
