@@ -1,0 +1,16 @@
+{
+  "name": "inloop",
+  "version": "1.0.0",
+  "description": "Interactive Learning environment for Object-Oriented Programming",
+  "dependencies": {
+    "less": "^2.6.1",
+    "uglify-js": "^2.6.2",
+    "watchy": "^0.6.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/st-tu-dresden/inloop.git"
+  },
+  "author": "",
+  "license": "GPL-3.0"
+}
