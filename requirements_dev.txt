@@ -3,9 +3,9 @@ Django==1.8.11
 flake8==2.5.4
 honcho==0.6.6
 huey==0.4.8
-Markdown==2.6.2
+Markdown==2.6.6
 mccabe==0.4.0
 pep8==1.7.0
-Pillow==2.8.1
+Pillow==3.1.1
 pyflakes==1.1.0
-redis==2.10.3
+redis==2.10.5
