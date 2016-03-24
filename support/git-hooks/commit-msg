@@ -1,34 +1,76 @@
 #!/usr/bin/env python3
-import sys
+import re
+import os
+import subprocess
 
 
-def check_commit_line(line_number, line):
+def check_commit_message(lines):
     errors = []
-    if line_number == 0:
-        if line[0].islower():
-            errors.append('The first word in the summary line is not capitalized.')
-        if len(line) > 50:
-            errors.append('The summary line is longer than 50 chars.')
+    lineno = 0
+    for line in lines:
+        if line.startswith("#"):
+            continue
+        lineno += 1
+        line = line.rstrip()
+        if lineno == 1:
+            errors += _check_subject(line)
+        elif lineno == 2:
+            errors += _check_separator(line)
+        else:
+            errors += _check_body(line)
+    return set(errors)
 
-    not_comment = not line.startswith('#')
-    if line_number == 1 and not_comment:
-        if line.strip() != "":
-            errors.append('The second line is not empty.')
 
-    if not_comment:
-        if len(line) > 72:
-            errors.append('Line {} is longer than 72 chars.'.format(line_number + 1))
-
+def _check_subject(line):
+    errors = []
+    if len(line) > 50:
+        errors.append("subject line is too long (limit is 50 chars)")
+    if line[0].islower():
+        errors.append("subject line is not capitalized")
+    if line[-1] == ".":
+        errors.append("subject line ends with a period")
+    if re.match('^[a-z]+ed', line, re.I):
+        errors.append("subject line uses past tense")
     return errors
 
-errors = []
-commit_file = sys.argv[1]
-with open(commit_file) as f:
-    for line_number, line in enumerate(f):
-        errors.extend(check_commit_line(line_number, line))
-if errors:
-    print('Sorry. Your commit message has {} issue(s):'.format(len(errors)))
-    for error in errors:
-        print('  - {}'.format(error))
-    print('The commit message was saved in {}'.format(commit_file))
-    sys.exit(len(errors))
+
+def _check_separator(line):
+    errors = []
+    if line != "":
+        errors.append("subject and body are not separated by a blank line")
+    return errors
+
+
+def _check_body(line):
+    errors = []
+    if len(line) > 72:
+        errors.append("message body exceeds maximum width of 72 chars")
+    return errors
+
+
+def check_file(fname):
+    with open(fname) as f:
+        return check_commit_message(f)
+
+
+def main(args):
+    # git hooks get /dev/null as stdin, but we need a tty for input()
+    sys.stdin = open("/dev/tty")
+    editor = os.environ.get("EDITOR", "mvim -f")
+    while True:
+        errors = check_file(args[0])
+        if not errors:
+            break
+        print("Your commit message is malformed:")
+        for error in errors:
+            print(" - %s" % error)
+        answer = input("Edit again? [Y/n] ")
+        if answer.strip().lower() not in ["n", "no"]:
+            subprocess.call(editor.split() + args)
+        else:
+            sys.exit(len(errors))
+
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1:])
