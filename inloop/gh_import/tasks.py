@@ -6,7 +6,7 @@ from subprocess import CalledProcessError, check_call
 
 from django.conf import settings
 from django.db.transaction import atomic
-from huey.djhuey import task
+from huey.contrib.djhuey import db_task
 
 from inloop.gh_import.git import GitRepository
 from inloop.tasks.models import Task
@@ -18,7 +18,7 @@ META_FILE = "meta.json"
 TASK_FILE = "task.md"
 
 
-@task()
+@db_task()
 def update_tasks():
     # git refresh
     git_root = settings.GIT_ROOT
