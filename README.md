@@ -1,6 +1,12 @@
-# INLOOP
+        ___       ___       ___       ___       ___       ___
+       /\  \     /\__\     /\__\     /\  \     /\  \     /\  \
+      _\:\  \   /:| _|_   /:/  /    /::\  \   /::\  \   /::\  \
+     /\/::\__\ /::|/\__\ /:/__/    /:/\:\__\ /:/\:\__\ /::\:\__\
+     \::/\/__/ \/|::/  / \:\  \    \:\/:/  / \:\/:/  / \/\::/  /
+      \:\__\     |:/  /   \:\__\    \::/  /   \::/  /     \/__/
+       \/__/     \/__/     \/__/     \/__/     \/__/
 
-This is INLOOP, an interactive learning center for object-oriented programming.
+This is INLOOP, the interactive learning center for object-oriented programming.
 
 ## Getting started
 
