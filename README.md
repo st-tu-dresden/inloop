@@ -40,10 +40,10 @@ The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` wit
 
 In general you'll need:
 
-* Git
+* Git >= 2.3
 * Python >= 3.3
-* Docker
-* Redis
+* Docker >= 1.10
+* Redis >= 2.6
 * Tools and libraries to build Python extensions (for Pillow and optionally psycopg2)
 * Optional: node.js and npm (to rebuild CSS and Javascript bundles)
 
@@ -74,8 +74,8 @@ Platform specific instructions:
 
 ## Further documentation
 
-* [Contributor's guide](docs/developer-guide.md)
-* [Deployment HOWTO](docs/deployment-guide.md).
+* [Contributor's guide](CONTRIBUTING.md)
+* [Deployment HOWTO](docs/deployment-guide.md)
 * [Building CSS and Javascript bundles](docs/static-assets.md)
 
 

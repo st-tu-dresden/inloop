@@ -6,7 +6,7 @@
 UGLIFY = node_modules/.bin/uglifyjs
 UGLIFYFLAGS =
 LESS = node_modules/.bin/lessc
-LESSFLAGS= --compress --include-path=vendor/bootstrap/less
+LESSFLAGS = --compress --include-path=vendor/bootstrap/less
 WATCHY = node_modules/.bin/watchy
 WATCHYFLAGS = --wait 5 --no-init-spawn --silent
 
@@ -30,6 +30,10 @@ css_bundle := inloop/core/static/css/inloop.min.css
 
 # Source file for the CSS bundle
 less_sources := less/inloop.less
+
+# Source and target directories for git hook setup
+hook_source := support/git-hooks
+hook_target := .git/hooks
 
 ##
 ## MAKEFILE TARGETS
@@ -56,4 +60,16 @@ coverage:
 	@coverage run manage.py test
 	@coverage html
 
-.PHONY: npm assets watch test coverage
+hookup:
+	install -b -m 755 $(hook_source)/commit-msg $(hook_target)
+	install -b -m 755 $(hook_source)/pre-commit $(hook_target)
+
+hookup-all: hookup
+	install -b -m 755 $(hook_source)/post-checkout $(hook_target)
+
+unhookup:
+	rm -f $(hook_target)/commit-msg
+	rm -f $(hook_target)/pre-commit
+	rm -f $(hook_target)/post-checkout
+
+.PHONY: npm assets watch test coverage hookup hookup-all unhookup
