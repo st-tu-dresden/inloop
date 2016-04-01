@@ -74,8 +74,8 @@ Platform specific instructions:
 
 ## Further documentation
 
-* [Contributor's guide](docs/developer-guide.md)
-* [Deployment HOWTO](docs/deployment-guide.md).
+* [Contributor's guide](CONTRIBUTING.md)
+* [Deployment HOWTO](docs/deployment-guide.md)
 * [Building CSS and Javascript bundles](docs/static-assets.md)
 
 
