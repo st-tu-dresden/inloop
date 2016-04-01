@@ -25,9 +25,9 @@ def _check_subject(line):
     errors = []
     if len(line) > 50:
         errors.append("subject line is too long (limit is 50 chars)")
-    if line[0].islower():
+    if line and line[0].islower():
         errors.append("subject line is not capitalized")
-    if line[-1] == ".":
+    if line and line[-1] == ".":
         errors.append("subject line ends with a period")
     if re.match('^[a-z]+ed', line, re.I):
         errors.append("subject line uses past tense")
