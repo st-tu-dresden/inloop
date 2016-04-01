@@ -1,79 +1,72 @@
-## Hacking
+Thanks for your interest in contributing to our project.
 
-### Git workflow
+## How to contribute to INLOOP
 
-We use the [GitHub Flow][gh-flow]. The development is based on branching, pull requests and
-peer review. You must adhere to the following rules:
+### Report bugs or suggest new features
 
-1. The `master` branch always contains stable code ready to be deployed. You are only allowed
-   to commit very small fixes (e.g., to correct typos) to this branch.
-2. New features, bug fixes, refactorings etc. happen on separate *feature branches*. Long
-   running feature branches should regularly merge changes from `master`.
-3. Once a feature branch is considered complete, open a pull request and assign another
-   developer for review. You are not allowed to merge the pull request yourself.
-
-Contributors failing to follow these rules will be warned and eventually banned from the
-repository.
+INLOOP is made by humans and humans make mistakes. We encourage anyone to open issues in
+our [issue tracker][inloop-issues]. Bug reports should clearly describe the problem and
+include a step by step description on how to reliably reproduce the problem.
 
 
-### Unit tests and test coverage
+### Submit pull requests
 
-Developers should write unit tests in order to ensure software quality in an automated fashion.
-Python and Django provide excellent modules which facilitate testing:
+This is the **preferred way of contributing**. We also use this approach (aka the
+[Github flow][gh-flow]) internally to peer review changes.
 
- * `unittest`,
- * `unittest.mock` (Python >= 3.3) and
- * `django.utils.unittest`
+1. Fork off our repo and create a branch for the feature or bugfix. The branch name
+   must be descriptive (e.g., `refactor-html`, `registration-tests`).
+2. Add commits and be sure to follow our [rules for commit messages](#commit-messages).
+   Don't mix unrelated changes into one commit.
+3. Open a pull request so we can review the changes and give feedback.
 
-The test coverage can be checked by using
-
-    make coverage
-
-and pointing your browser to `htmlcov/index.html`. Aim for 100%!
-
-
-### Automatic code checking git hook with flake8
-
-It is mandatory for all developers to implement this pre-commit hook mechanism to check their
-code before every commit. In case the `flake8` check throws any errors, the committing process
-is canceled and the errors are shown for correction. The bundled commit hook can be installed
-as follows:
-
-    cp support/git-hooks/pre-commit .git/hooks
-
-I recommend to copy instead of symlink, which can save you from trouble when switch to a defect
-branch.
-
-### Commit message git hook
-
-You must also install the commit message hook to enforce consistent commit messages:
-
-    cp support/git-hooks/commit-msg .git/hooks
+It goes without saying, but you have to include [unit tests][django-testing], documentation
+and follow our [coding conventions](#coding-conventions).
 
 
-### Synchronize your virtualenv to the currently checked out branch
+## Rules for contributing code
 
-We have a `post-checkout` git hook that supports this in a safe way:
+### Coding conventions
 
-    cp support/git-hooks/post-checkout .git/hooks
+* In general, indent using 4 spaces instead of tabs (except for the `Makefile`) and use UNIX
+  line endings.
+* Python code must be formatted according to [PEP8][pep8] and a maximum line length of 99
+  characters. [Install the pre-commit hook](#git-hooks) to automatically reject commits which
+  violate these rules.
+* HTML must be indented using 2 spaces. Don't use XML style empty tags (e.g., use `<br>`
+  instead of `<br />`).
 
-This works only *if* you have a virtualenv enabled which belongs to the project. Whenever
-you do a `git checkout`, this hook will run `pip install -r requirements_dev.txt`.
+
+### Commit messages
+
+We care about a [usable Git history][good-commits1] and are picky about [well-formed commit
+messages][good-commits2]. Put as much effort into your commit messages as into your code,
+other people will appreciate it.
+
+Pull requests containing [unhelpful commit messages][ugly-commits] won't be accepted.
 
 
-### Notes on flake8
+## Tools and helpers
 
-We use [flake8 for linting][flake8]. It implements wrappers for the [pep8 style checker][pep8],
-the [pyflakes linter][pyflakes] linter and [mccabe complexity checker][mccabe]. The parameters
-for the hook are contained in `setup.cfg` in the project root.
+### Git hooks
 
-The pre-defined command `flake8 --install-hook` is also a  means of installing the
-pre-commit hook as it is now, but allows less customization and more importantly lacks
-support for virtualenv in IDEs. The mechanism works when executed from the shell but
-most IDEs can't execute the git hooks within their virtualenv.
+We provide the following commit hooks:
 
-[flake8]: http://flake8.readthedocs.org/en/latest/index.html
-[pep8]: https://pypi.python.org/pypi/pep8
-[pyflakes]: https://pypi.python.org/pypi/pyflakes
-[mccabe]: https://pypi.python.org/pypi/mccabe
+* `pre-commit`: enforces PEP8 coding convention
+* `commit-msg`: enforces proper formatting of the Git commit messages
+* `post-checkout`: synchronizes your virtualenv with the currently checked
+  out `pip` requirements file
+
+Our `Makefile` includes targets to install the above hooks into your working copy:
+
+* `make hookup`: symlinks `pre-commit` and `commit-msg`
+* `make hookup-all`: symlinks `pre-commit`, `commit-msg` and `post-checkout`
+
+
+[django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
+[inloop-issues]: https://github.com/st-tu-dresden/inloop/issues
+[pep8]: https://www.python.org/dev/peps/pep-0008/
 [gh-flow]: https://guides.github.com/introduction/flow/
+[ugly-commits]: http://stopwritingramblingcommitmessages.com/
+[good-commits1]: http://chris.beams.io/posts/git-commit/
+[good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
