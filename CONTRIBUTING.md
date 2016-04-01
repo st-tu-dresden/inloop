@@ -52,15 +52,15 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 
 We provide the following commit hooks:
 
-* `pre-commit`: enforces PEP8 coding convention
-* `commit-msg`: enforces proper formatting of the Git commit messages
-* `post-checkout`: synchronizes your virtualenv with the currently checked
+* `pre-commit` enforces PEP8 coding convention
+* `commit-msg` enforces proper formatting of the Git commit messages
+* `post-checkout` synchronizes your virtualenv with the currently checked
   out `pip` requirements file
 
 Our `Makefile` includes targets to install the above hooks into your working copy:
 
-* `make hookup`: installs `pre-commit` and `commit-msg`
-* `make hookup-all`: installs `pre-commit`, `commit-msg` and `post-checkout`
+* `make hookup` installs `pre-commit` and `commit-msg`
+* `make hookup-all` installs `pre-commit`, `commit-msg` and `post-checkout`
 
 
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
