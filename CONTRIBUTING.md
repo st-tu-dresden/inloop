@@ -59,8 +59,8 @@ We provide the following commit hooks:
 
 Our `Makefile` includes targets to install the above hooks into your working copy:
 
-* `make hookup`: symlinks `pre-commit` and `commit-msg`
-* `make hookup-all`: symlinks `pre-commit`, `commit-msg` and `post-checkout`
+* `make hookup`: installs `pre-commit` and `commit-msg`
+* `make hookup-all`: installs `pre-commit`, `commit-msg` and `post-checkout`
 
 
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
