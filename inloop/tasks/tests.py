@@ -230,9 +230,6 @@ class TaskCategoryTests(TestCase):
     def test_slugify_on_save(self):
         self.assertEqual(self.cat.short_id, "whitespace-here-and-123-some-tabs-abc-things")
 
-    def test_str(self):
-        self.assertEqual(str(self.cat), "whitespace-here-and-123-some-tabs-abc-things")
-
     def test_get_tuple(self):
         slug = "whitespace-here-and-123-some-tabs-abc-things"
         name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"

@@ -80,7 +80,7 @@ class TaskCategory(models.Model):
             publication_date__lt=timezone.now())
 
     def __str__(self):
-        return self.short_id
+        return self.name
 
 
 class MissingTaskMetadata(Exception):
@@ -141,6 +141,9 @@ class Task(models.Model):
     def task_location(self):
         return join(settings.MEDIA_ROOT, 'exercises', self.slug)
 
+    def __str__(self):
+        return self.name
+
 
 class TaskSolution(models.Model):
     '''Represents the user uploaded files'''
@@ -156,6 +159,14 @@ class TaskSolution(models.Model):
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
         return join(dirname(sol_file.file_path()))
 
+    def __str__(self):
+        return "TaskSolution(author='{}', task='{}', submitted={}, passed={})".format(
+            self.author.username,
+            self.task,
+            self.submission_date,
+            self.passed
+        )
+
 
 class TaskSolutionFile(models.Model):
     '''Represents a single file as part of a solution'''
@@ -167,12 +178,18 @@ class TaskSolutionFile(models.Model):
     def file_path(self):
         return self.file.path
 
+    def __str__(self):
+        return "TaskSolutionFile('%s')" % self.file
+
 
 class CheckerResult(models.Model):
     solution = models.ForeignKey(TaskSolution)
     result = models.TextField()
     time_taken = models.FloatField()
     passed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
 
 
 class Checker:
