@@ -1,12 +1,14 @@
 from doctest import DocTestSuite
 from os import makedirs, path, remove
-from shutil import copy, which, rmtree
+from shutil import copy, rmtree, which
 from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File, base
-from django.test import TestCase
+from django.http.response import Http404
+from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -16,6 +18,7 @@ from inloop.tasks.models import (Checker, CheckerResult, MissingTaskMetadata,
                                  Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile)
 from inloop.tasks.validators import validate_short_id
+from inloop.tasks.views import sendfile_nginx
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
@@ -412,3 +415,34 @@ class TaskManagerTests(TestCase):
     def test_save_task_with_valid_json(self):
         task = Task.objects.get_or_create_json(self.valid_json, "Test title")
         task.save()
+
+
+@override_settings(MEDIA_ROOT=settings.INLOOP_ROOT, SENDFILE_NGINX_URL="/sendfile")
+class NginxSendfileTests(TestCase):
+    def setUp(self):
+        # we don't need a valid factory, but it doesn't hurt either
+        factory = RequestFactory()
+        self.request = factory.get("/request/to/test.jpg")
+
+        # a subdir of MEDIA_ROOT is a valid docroot
+        self.valid_docroot = path.join(settings.INLOOP_ROOT, "tests")
+
+        # the parent directory of MEDIA_ROOT is not a valid docroot
+        self.invalid_docroot = path.dirname(settings.INLOOP_ROOT)
+
+    def test_nginx_sendfile(self):
+        response = sendfile_nginx(self.request, "test.jpg", self.valid_docroot)
+        self.assertEqual(response["X-Accel-Redirect"], "/sendfile/tests/test.jpg")
+        self.assertNotIn("Content-Type", response)
+
+    def test_nginx_sendfile_abspath(self):
+        with self.assertRaises(ValueError):
+            sendfile_nginx(self.request, "/test.jpg", self.valid_docroot)
+
+    def test_nginx_sendfile_nodocroot(self):
+        with self.assertRaises(ValueError):
+            sendfile_nginx(self.request, "test.jpg")
+
+    def test_nginx_sendfile_not_a_subdir(self):
+        with self.assertRaises(Http404):
+            sendfile_nginx(self.request, "test.jpg", self.invalid_docroot)
