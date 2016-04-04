@@ -55,7 +55,8 @@ class UserProfile(auth_models.AbstractUser):
     # FIXME: use activation key which encodes expiration
     activation_key = models.CharField(
         max_length=KEY_LENGTH,
-        help_text="Random key used to verify the user's email"
+        help_text="Random key used to verify the user's email",
+        blank=True
     )
     key_expires = models.DateTimeField(
         default=next_week,
