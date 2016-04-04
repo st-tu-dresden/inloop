@@ -1,44 +1,40 @@
 {% extends 'base_site.html' %}
 
-{% block title %}Create a new account{% endblock %}
+{% block title %}Sign up for INLOOP{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <form autocomplete="off" id="user_form" method="post" action="." class="form-horizontal" enctype="multipart/form-data">
-            {% csrf_token %}
-            <!-- Get rid of Chrome autocomplete -->
-            <input style="display:none">
-            <input type="password" style="display:none">
 
-            {% for field in user_form %}
-                {% if field.errors %}
-                <div class="form-group has-error">
-                {% else %}
-                <div class="form-group">
-                {% endif %}
-                    <label for="{{ field.auto_id }}" class="col-md-2 control-label">{{ field.label }}</label>
-                    <div class="col-md-10">
-                        {% if field.errors %}
-                            <div class="panel panel-danger">
-                                {% with field.errors|first as error %}
-                                    <div class="panel-heading">{{ error }}</div>
-                                    <div class="panel-body">{{ field }}</div>
-                                {% endwith %}
-                            </div>
-                        {% else %}
-                            {{ field }}
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
+{% if user_form.errors %}
+<div class="alert alert-danger alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  Please correct the marked fields.
+</div>
+{% endif %}
 
-            <div class="form-group">
-                <div class="col-md-8 col-md-offset-2">
-                    <button type="submit" class="btn btn-default" value="submit">Register</button>
-                </div>
-            </div>
-        </form>
+<div class="center-box-md">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Sign up for INLOOP</h2>
     </div>
+    <div class="panel-body">
+      <p>Please fill in the following form to sign up. All fields are required.</p>
+      <form action="{% url 'accounts:register' %}" method="post"
+            accept-charset="utf-8" class="">
+        {% csrf_token %}
+        {% for field in user_form %}
+        <div class="form-group{% if field.errors %} has-error{% endif %}">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+          <span class="help-block">{{ field.errors|first }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Sign up</button>
+      </form>
+    </div>
+  </div><!--/.panel-->
 </div>
 {% endblock %}
