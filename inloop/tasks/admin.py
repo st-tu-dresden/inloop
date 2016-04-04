@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from inloop.tasks.models import Task, TaskCategory
+from inloop.tasks.models import (CheckerResult, Task, TaskCategory,
+                                 TaskSolution, TaskSolutionFile)
 
 
 class TaskAdmin(admin.ModelAdmin):
@@ -16,5 +17,8 @@ class TaskAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
+admin.site.register(CheckerResult)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(TaskCategory)
+admin.site.register(TaskSolution)
+admin.site.register(TaskSolutionFile)
