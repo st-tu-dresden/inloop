@@ -37,11 +37,6 @@ class RegistrationTests(TestCase):
 
     def try_default_user_login(self):
         resp = self.client.post('/accounts/login/', data=self.data, follow=True)
-        self.assert_response_template_contains(
-            resp=resp,
-            template='tasks/index.html',
-            content='>john<'
-        )
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.data['username'])
 
@@ -329,11 +324,6 @@ class LoginSystemTests(TestCase):
             'password': self.password
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
-        self.assert_response_template_contains(
-            resp=resp,
-            template='tasks/index.html',
-            content='>test_user<'
-        )
         self.assertTrue(resp.context['user'].is_authenticated())
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
 
