@@ -1,13 +1,17 @@
+import re
 import zipfile
 from io import BytesIO
-from os import path
+from os.path import isabs, join, relpath, split
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.views.static import serve
 
 from inloop.tasks import filesystem_utils as fsu
 from inloop.tasks.models import (Checker, CheckerResult, Task, TaskCategory,
@@ -120,7 +124,7 @@ def get_solution_as_zip(request, slug, solution_id):
     zf = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
 
     for tsf in solution_files:
-        tsf_dir, tsf_name = path.split(path.join(settings.MEDIA_ROOT, tsf.file.name))
+        tsf_dir, tsf_name = split(join(settings.MEDIA_ROOT, tsf.file.name))
         zf.writestr(tsf_name, tsf.file.read())
 
     zf.close()
@@ -148,3 +152,79 @@ def results(request, slug, solution_id):
         'solution_files': solution_files,
         'result': result
     }))
+
+
+@login_required
+def serve_attachment(request, slug, path):
+    """
+    Serve static files from a task subdirectory.
+
+    Access is granted exclusively to whitelisted subdirectories.
+    """
+    if re.search("^(images|attachments)/", path) is None:
+        raise PermissionDenied
+
+    if ".." in unquote(path):
+        raise PermissionDenied
+
+    # translate the slug into the internal task name
+    task = get_object_or_404(Task, slug=slug)
+    filesystem_path = join(task.name, path)
+
+    return sendfile(request, filesystem_path, settings.GIT_ROOT)
+
+
+def sendfile_nginx(request, path, document_root=None):
+    """
+    Serve a file via Nginx' X-Accel-Redirect header.
+
+    Requires a Nginx internal location to be configured like this:
+
+        location <SENDFILE_NGINX_URL> {
+            internal;
+            alias <MEDIA_ROOT>;
+        }
+
+    (replace with the values from the production settings module)
+
+    Currently, document_root must be a subdirectory of MEDIA_ROOT and path
+    must be relative.
+    """
+    if isabs(path):
+        raise ValueError("path must be relative")
+
+    if not document_root:
+        raise ValueError("no document_root given")
+
+    if not document_root.startswith(settings.MEDIA_ROOT):
+        # not a subdirectory, there will be no relative path to MEDIA_ROOT
+        raise Http404
+
+    # the complete path to the file on the filesystem
+    filename = join(document_root, path)
+
+    # the path relative to the MEDIA_ROOT (= alias directive)
+    filename_rel = relpath(filename, settings.MEDIA_ROOT)
+
+    # send the path relative to MEDIA_ROOT, prefixed with Nginx' location
+    response = HttpResponse()
+    response["X-Accel-Redirect"] = join(settings.SENDFILE_NGINX_URL, filename_rel)
+
+    # we rely on nginx to set all approprioate headers (mime type, length, mod time etc.)
+    if 'Content-Type' in response:
+        del response['Content-Type']
+
+    return response
+
+
+def select_sendfile():
+    method = getattr(settings, "SENDFILE_METHOD", "django")
+    if method == "django":
+        return serve
+    elif method == "nginx":
+        return sendfile_nginx
+    else:
+        raise NotImplemented("Unknown SENDFILE_METHOD %s" % method)
+
+
+sendfile = select_sendfile()
