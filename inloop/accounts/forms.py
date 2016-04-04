@@ -1,7 +1,7 @@
 from django import forms
 
 from inloop.accounts.models import CourseOfStudy, UserProfile
-from inloop.accounts.validators import validate_mat_num
+from inloop.accounts.validators import validate_mat_num, validate_zih_mail
 
 # HTML attributes used in all widgets
 BASE_ATTRIBUTES = {
@@ -15,7 +15,8 @@ class UserForm(forms.ModelForm):
         widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
     )
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs=BASE_ATTRIBUTES)
+        widget=forms.EmailInput(attrs=BASE_ATTRIBUTES),
+        validators=[validate_zih_mail]
     )
     password = forms.CharField(
         label='Password',
