@@ -57,7 +57,7 @@ def detail(request, slug):
     task = get_object_or_404(Task, slug=slug)
 
     if request.method == 'POST':
-        if timezone.now() > task.deadline_date:
+        if task.deadline_date and timezone.now() > task.deadline_date:
             return render(request, 'tasks/message.html', {
                 'type': 'danger',
                 'message': 'This task has already expired!'
