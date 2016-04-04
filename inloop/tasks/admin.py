@@ -17,8 +17,13 @@ class TaskAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
+class TaskSolutionAdmin(admin.ModelAdmin):
+    list_display = ('author', 'task', 'submission_date', 'passed')
+    list_filter = ['passed']
+
+
 admin.site.register(CheckerResult)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(TaskCategory)
-admin.site.register(TaskSolution)
+admin.site.register(TaskSolution, TaskSolutionAdmin)
 admin.site.register(TaskSolutionFile)
