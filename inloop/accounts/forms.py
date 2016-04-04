@@ -26,7 +26,8 @@ class UserForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
     )
     course = forms.ModelChoiceField(
-        queryset=CourseOfStudy.objects.all(),
+        # TODO add hidden model attribute
+        queryset=CourseOfStudy.objects.exclude(name__exact="Internal"),
         widget=forms.Select(attrs=BASE_ATTRIBUTES),
         empty_label=None
     )
