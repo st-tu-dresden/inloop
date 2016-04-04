@@ -90,6 +90,7 @@
 
 {% block extrabody %}
 <script type="text/javascript">
+    anchors.add("h2, h3");
     {% for fname in file_dict.keys %}
         var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
         editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
