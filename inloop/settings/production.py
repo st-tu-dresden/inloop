@@ -67,3 +67,7 @@ GIT_ROOT = path.join(MEDIA_ROOT, 'tasks')
 GIT_SSH_KEY = None
 GIT_SSH_URL = local_conf['tasks_repository']
 GIT_BRANCH = local_conf['tasks_branch']
+
+# Nginx X-Accel-Redirect support
+SENDFILE_METHOD = "nginx"
+SENDFILE_NGINX_URL = "/sendfile"

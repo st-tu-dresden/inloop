@@ -103,3 +103,5 @@ CHECKER = {
         'container_build': 180,
     }
 }
+
+SENDFILE_METHOD = "django"
