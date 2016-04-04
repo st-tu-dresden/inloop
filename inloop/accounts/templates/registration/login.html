@@ -21,16 +21,16 @@
         {% csrf_token %}
         <div class="form-group">
           <label for="username">Username</label>
-          <input class="form-control" type="text" id="username" name="username">
+          <input class="form-control" type="text" id="username" name="username" tabindex="1">
         </div>
         <div class="form-group">
           <label for="password">
             Password
-            <a href="{% url 'accounts:password_reset' %}">(forgot your password?)</a>
+            <a href="{% url 'accounts:password_reset' %}" tabindex="4">(forgot your password?)</a>
           </label>
-          <input class="form-control" type="password" id="password" name="password">
+          <input class="form-control" type="password" id="password" name="password" tabindex="2">
         </div>
-        <button type="submit" class="btn btn-default">Login</button>
+        <button type="submit" class="btn btn-default" tabindex="3">Login</button>
       </form>
     </div>
   </div><!--/.panel -->
