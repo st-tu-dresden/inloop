@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}INLOOP{% endblock %} &ndash; INLOOP</title>
-    {% load staticfiles %}
-    {% load flatpages %}
-    {% get_flatpages as fpages %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
-    {% block extrahead %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{% block title %}INLOOP{% endblock %} &ndash; INLOOP</title>
+
+  {% load staticfiles %}
+  {% load flatpages %}
+
+  {% get_flatpages as fpages %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
+  {% block extrahead %}{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-default navbar-static-top">
