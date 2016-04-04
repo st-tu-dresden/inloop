@@ -71,9 +71,8 @@ class RegistrationTests(TestCase):
         resp = self.client.post('/accounts/register/', data=collision_data, follow=True)
         self.assertTemplateUsed(resp, 'registration/register.html')
         self.assertContains(resp, 'A user with that username already exists.')
-        self.assertContains(resp, 'The password must have at least 8 characters!')
         self.assertContains(resp, 'This field is required.')  # From missing course choice
-        self.assertContains(resp, 'The matriculation number does not have 7 digits!')
+        self.assertContains(resp, 'The matriculation number consists of 7 digits.')
 
     def test_registration_form_password_mismatch(self):
         collision_data = self.data
@@ -82,7 +81,7 @@ class RegistrationTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='registration/register.html',
-            content='The two password fields didn&#39;t match.'
+            content='The two password fields do not match.'
         )
 
     def test_registration_redirect_for_users(self):
@@ -198,7 +197,7 @@ class ProfileTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/profile.html',
-            content='The matriculation number does not have 7 digits!'
+            content='The matriculation number consists of 7 digits.'
         )
 
     def test_user_profile_short_mat_num(self):
@@ -209,7 +208,7 @@ class ProfileTests(TestCase):
         self.assert_response_template_contains(
             resp=resp,
             template='accounts/profile.html',
-            content='The matriculation number does not have 7 digits!'
+            content='The matriculation number consists of 7 digits.'
         )
 
     def test_user_profile_alphanumeric_mat_num(self):
