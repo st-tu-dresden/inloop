@@ -9,10 +9,16 @@ BASE_ATTRIBUTES = {
     "required": "required"
 }
 
+# base HTML attributes + autofocus for the first widget
+AF_ATTRIBUTE = BASE_ATTRIBUTES.copy()
+AF_ATTRIBUTE.update({
+    "autofocus": "autofocus"
+})
+
 
 class UserForm(forms.ModelForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+        widget=forms.TextInput(attrs=AF_ATTRIBUTE)
     )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs=BASE_ATTRIBUTES),
