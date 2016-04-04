@@ -10,5 +10,4 @@ def validate_password(value):
 
 def validate_mat_num(value):
     if len(str(value)) != 7:
-        raise ValidationError('The matriculation number'
-                              ' does not have 7 digits!')
+        raise ValidationError('The matriculation number consists of 7 digits.')

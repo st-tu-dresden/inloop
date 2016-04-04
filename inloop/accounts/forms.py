@@ -1,12 +1,12 @@
 from django import forms
 
 from inloop.accounts.models import CourseOfStudy, UserProfile
-from inloop.accounts.validators import validate_mat_num, validate_password
+from inloop.accounts.validators import validate_mat_num
 
 # HTML attributes used in all widgets
 BASE_ATTRIBUTES = {
     "class": "form-control",
-    "autocomplete": "off"
+    "required": "required"
 }
 
 
@@ -19,7 +19,6 @@ class UserForm(forms.ModelForm):
     )
     password = forms.CharField(
         label='Password',
-        validators=[validate_password],
         widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
     )
     password_repeat = forms.CharField(
@@ -27,13 +26,13 @@ class UserForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
     )
     course = forms.ModelChoiceField(
-        queryset=CourseOfStudy.objects.all()
+        queryset=CourseOfStudy.objects.all(),
+        widget=forms.Select(attrs=BASE_ATTRIBUTES),
+        empty_label=None
     )
     mat_num = forms.IntegerField(
         label='Matriculation number',
-        widget=forms.TextInput(
-            attrs=dict(BASE_ATTRIBUTES).update(pattern='[0-9]{7}', maxlength='7')
-        ),
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES),
         validators=[validate_mat_num]
     )
 
@@ -42,7 +41,7 @@ class UserForm(forms.ModelForm):
         password_repeat = self.cleaned_data.get("password_repeat")
         if password and password_repeat and password != password_repeat:
             raise forms.ValidationError(
-                "The two password fields didn't match.",
+                "The two password fields do not match.",
                 code='password_mismatch',
             )
         return password
