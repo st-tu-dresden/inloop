@@ -14,7 +14,7 @@ class RegistrationTests(TestCase):
             'username': 'john',
             'first_name': 'John',
             'last_name': 'Doe',
-            'email': 'john@example.com',
+            'email': 's4810525@mail.zih.tu-dresden.de',
             'password': 'abc123456',
             'password_repeat': 'abc123456',
             'course': self.course.id,
@@ -24,7 +24,7 @@ class RegistrationTests(TestCase):
             username='test_user',
             first_name='first_name',
             last_name='last_name',
-            email='test@example.com',
+            email='s4810525@mail.zih.tu-dresden.de',
             password=self.password,
             course=self.course,
             mat_num='0000000'
