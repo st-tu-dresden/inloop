@@ -3,30 +3,36 @@
 {% block title %}{{ name }} tasks{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-    <h2>{{ name }}</h2>
-      {% if task_list %}
-        <table class="task-listing table">
-            <tr>
-                <th>Title</th>
-                <th>Published</th>
-                <th>Due to</th>
-                <th>Completed</th>
-            </tr>
-      {% endif %}
-      {% for task in task_list %}
-          <tr>
-              <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-              <td>{{ task.publication_date|date:"d/m/y" }}</td>
-              <td>{{ task.deadline_date|date:"d/m/y" }}</td>
-              <td>
-                  <p><strong>ICON</strong></p>
-              </td>
-          </tr>
-      {% empty %}
-          <p class="no-tasks">No {{ name }} exercises to do.</p>
-      {% endfor %}
-    </div>
-</div>
+
+<h2>{{ name }} tasks</h2>
+
+{% if task_list %}
+  <table class="table table-align-pretty">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Publication date</th>
+      <th>Deadline</th>
+      <th>Completed</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for task in task_list %}
+    <tr>
+      <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+      <td>{{ task.publication_date|date:"d/m/y" }}</td>
+      <td>{% firstof task.deadline_date|date:"d/m/y" "-"  %}</td>
+      <td>
+        <!-- show a question mark until this gets implemented -->
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="alert alert-info">You are lucky! Nothing to do here.</div>
+{% endif %}
+
 {% endblock %}
