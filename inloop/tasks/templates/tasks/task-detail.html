@@ -5,44 +5,52 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-        <h1>{{ title }}</h1>
-        <br/>
-        {% if deadline_date %}
-        <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-        {% endif %}
-        {{ description|markdown }}
+<h1>{{ title }}</h1>
 
-        <form class="form-inline" action="." accept-charset="utf-8" method="post"
-              enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group col-md-12">
-                <label for="manual-upload">Manual upload:</label>
-                <input class="form-control" name="manual-upload" type="file" multiple>
-            </div>
-            <div class="form-group col-md-12">
-                <input class="btn btn-default detail-btn" type="submit" value="Submit">
-            </div>
-        </form>
-    </div>
-    </div>
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <br />
-            <hr />
-            <h4>Your latest solutions</h4>
-            <ul>
-            {% for sol in latest_solutions %}
-                <li>Solution from {{ sol.submission_date }} <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> - <a href="{% url 'tasks:results' slug sol.id %}">Results</a></li>
-            {% endfor %}
-            </ul>
-        </div>
-    </div>
+{% if deadline_date %}
+<p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
+{% endif %}
+
+{{ description|markdown }}
+
+<hr>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Manual upload</h3>
+    <form class="form-inline" action="." accept-charset="utf-8"
+          method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <input class="form-control" name="manual-upload" type="file" multiple>
+      </div>
+      <div class="form-group">
+        <input class="btn btn-primary" type="submit" value="Submit">
+      </div>
+    </form>
+  </div><!--/.col-md-6-->
+
+  <div class="col-md-6">
+    <h3>Your solutions</h3>
+    {% if latest_solutions %}
+    <ul class="list-group">
+      {% for sol in latest_solutions %}
+      <li class="list-group-item">
+        Uploaded on {{ sol.submission_date }}<br>
+        <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> -
+        <a href="{% url 'tasks:results' slug sol.id %}">View results</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>You haven't uploaded anything yet.</p>
+    {% endif %}
+  </div><!--/.col-md-6-->
+</div><!--/.row-->
 {% endblock %}
 
 {% block extrabody %}
 <script type="text/javascript">
-    anchors.add("h2, h3");
+  anchors.add("h2, h3");
 </script>
 {% endblock %}
