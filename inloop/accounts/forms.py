@@ -17,6 +17,11 @@ AF_ATTRIBUTE.update({
 
 
 class UserForm(forms.ModelForm):
+    """
+    Base of all other forms that handle INLOOP user data.
+
+    This form is used during account signup.
+    """
     username = forms.CharField(
         widget=forms.TextInput(attrs=AF_ATTRIBUTE)
     )
@@ -43,8 +48,17 @@ class UserForm(forms.ModelForm):
         widget=forms.TextInput(attrs=BASE_ATTRIBUTES),
         validators=[validate_mat_num]
     )
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
 
     def clean_password_repeat(self):
+        """
+        Check if the password confirmation field matches the password field.
+        """
         password = self.cleaned_data.get("password")
         password_repeat = self.cleaned_data.get("password_repeat")
         if password and password_repeat and password != password_repeat:
@@ -54,17 +68,28 @@ class UserForm(forms.ModelForm):
             )
         return password
 
-    class Meta(object):
+    class Meta:
         model = UserProfile
         fields = (
-            'username', 'email', 'password',
+            'username', 'first_name', 'last_name', 'email', 'password',
             'password_repeat', 'course', 'mat_num'
         )
 
 
 class UserProfileForm(UserForm):
+    """
+    Form that will be used on the profile page.
+
+    We don't want the user to change his username or email, and changing
+    the password is handled in the PasswordForm.
+    """
+    # overridden to add autofocus attribute
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs=AF_ATTRIBUTE)
+    )
+
     def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # remove unwanted fields
         for field in self.Meta.exclude:
             self.fields.pop(field)
@@ -72,45 +97,4 @@ class UserProfileForm(UserForm):
     class Meta(UserForm.Meta):
         model = UserProfile
         exclude = ('username', 'email', 'password', 'password_repeat')
-        fields = ('mat_num', 'course')
-
-
-class EmailForm(UserForm):
-    def __init__(self, *args, **kwargs):
-        super(EmailForm, self).__init__(*args, **kwargs)
-        # remove unwanted fields
-        for field in self.Meta.exclude:
-            self.fields.pop(field)
-
-    class Meta(UserForm.Meta):
-        model = UserProfile
-        exclude = ('username', 'password', 'password_repeat', 'mat_num', 'course')
-        fields = ('email', )
-
-
-class PasswordForm(UserForm):
-    def __init__(self, *args, **kwargs):
-        super(PasswordForm, self).__init__(*args, **kwargs)
-        # remove unwanted fields
-        for field in self.Meta.exclude:
-            self.fields.pop(field)
-
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
-    )
-
-    class Meta(UserForm.Meta):
-        model = UserProfile
-        exclude = ('username', 'email', 'mat_num', 'course')
-        fields = ('old_password', 'password', 'password_repeat')
-
-
-class NewCourseForm(forms.ModelForm):
-    name = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
-    )
-
-    class Meta(object):
-        model = CourseOfStudy
-        fields = ('name',)
+        fields = ('first_name', 'last_name', 'mat_num', 'course')
