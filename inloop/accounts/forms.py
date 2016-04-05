@@ -17,6 +17,11 @@ AF_ATTRIBUTE.update({
 
 
 class UserForm(forms.ModelForm):
+    """
+    Base of all other forms that handle INLOOP user data.
+
+    This form is used during account signup.
+    """
     username = forms.CharField(
         widget=forms.TextInput(attrs=AF_ATTRIBUTE)
     )
@@ -45,6 +50,9 @@ class UserForm(forms.ModelForm):
     )
 
     def clean_password_repeat(self):
+        """
+        Check if the password confirmation field matches the password field.
+        """
         password = self.cleaned_data.get("password")
         password_repeat = self.cleaned_data.get("password_repeat")
         if password and password_repeat and password != password_repeat:
@@ -63,6 +71,12 @@ class UserForm(forms.ModelForm):
 
 
 class UserProfileForm(UserForm):
+    """
+    Form that will be used on the profile page.
+
+    We don't want the user to change his username or email, and changing
+    the password is handled in the PasswordForm.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # remove unwanted fields
@@ -76,6 +90,9 @@ class UserProfileForm(UserForm):
 
 
 class PasswordForm(UserForm):
+    """
+    Form that will be used on the "change password" page.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # remove unwanted fields
