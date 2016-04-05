@@ -70,6 +70,7 @@ class UserProfile(auth_models.AbstractUser):
     )
     course = models.ForeignKey(CourseOfStudy, null=True)
 
+    # Supports values from 0 to 32767 with all databases
     bonus_points = models.PositiveSmallIntegerField(
         default=0,
         blank=False,
