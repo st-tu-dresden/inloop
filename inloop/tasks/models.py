@@ -346,7 +346,7 @@ class Checker:
 
         if passed:
             # If previously unsolved exam task: give bonus point
-            if self.solution.task.category.name in settings.BONUS_TASKS \
+            if self.solution.task.category.name in settings.BONUS_CATEGORIES \
                and not self.solution.previously_solved():
                 self.solution.author.bonus_points += 1
             # Mark TaskSolution as passed

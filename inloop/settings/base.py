@@ -90,7 +90,7 @@ HUEY = {
     'always_eager': False,
 }
 
-BONUS_TASKS = []  # Tasks that are rewarded with bonus points
+BONUS_CATEGORIES = []  # Category names that are rewarded with bonus points
 CHECKER = {
     'Container': {
         'container_tag': 'docker-test',
