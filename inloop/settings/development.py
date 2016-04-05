@@ -39,3 +39,4 @@ GIT_SSH_KEY = None
 GIT_SSH_URL = 'git@github.com:st-tu-dresden/inloop-tasks.git'
 GIT_BRANCH = 'master'
 GIT_ROOT = environ.get('GIT_ROOT', join(dirname(base.PROJECT_ROOT), 'inloop-tasks'))
+base.BONUS_CATEGORIES.append('test')  # default category name for tests

@@ -78,7 +78,7 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-def create_task_category(name, image):
+def create_task_category(image, name="test"):
     cat = TaskCategory(name=name)
     with open(image, "rb") as fd:
         cat.image = File(fd)
@@ -152,7 +152,7 @@ class TaskModelTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
 
@@ -212,7 +212,7 @@ class TaskCategoryTests(TestCase):
     def setUp(self):
         cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         self.user = create_test_user()
-        self.cat = create_task_category(cat_name, MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH, name=cat_name)
         self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
@@ -236,7 +236,7 @@ class TaskCategoryTests(TestCase):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
 
     def test_completed_tasks_empty_category(self):
-        empty_cat = create_task_category("empty", TEST_IMAGE_PATH)
+        empty_cat = create_task_category(TEST_IMAGE_PATH)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
         remove(empty_cat.image.path)
 
@@ -262,7 +262,7 @@ class TaskSolutionTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
@@ -287,6 +287,12 @@ class TaskSolutionTests(TestCase):
              "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java")
         )
 
+    def test_previously_solved(self):
+        self.assertFalse(self.ts.previously_solved())
+        self.ts.passed = True
+        self.ts.save()
+        self.assertTrue(self.ts.previously_solved())
+
 
 class CheckerTests(TestCase):
     @classmethod
@@ -303,7 +309,7 @@ class CheckerTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
@@ -349,6 +355,22 @@ class CheckerTests(TestCase):
         self.c._parse_result(result="", compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
+
+    def test_successful_bonus_point(self):
+        self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 1)
+
+    def test_previously_solved_bonus_point(self):
+        self.ts.passed = True
+        self.ts.save()
+        self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 0)
+
+    def test_failure_bonus_points(self):
+        self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 0)
+        self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=True)
+        self.assertEqual(self.user.bonus_points, 0)
 
     @mock.patch("inloop.tasks.models.Checker._generate_container_name", autospec=True)
     @mock.patch("inloop.tasks.models.Checker._container_execute", autospec=True)

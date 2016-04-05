@@ -41,7 +41,7 @@ class CourseOfStudy(models.Model):
 
 
 class UserProfile(auth_models.AbstractUser):
-    """Extended user model with support for course of studies."""
+    """Extended user model with support for course of studies and bonus points."""
 
     # Characters to be used in the activation key
     CHARS = string.ascii_letters + string.digits
@@ -69,6 +69,13 @@ class UserProfile(auth_models.AbstractUser):
         validators=[validate_mat_num]
     )
     course = models.ForeignKey(CourseOfStudy, null=True)
+
+    # Supports values from 0 to 32767 with all databases
+    bonus_points = models.PositiveSmallIntegerField(
+        default=0,
+        blank=False,
+        help_text='Bonus points for solved exam tasks'
+    )
 
     def generate_activation_key(self):
         """Generate a secure random key with length and charset specified above."""
