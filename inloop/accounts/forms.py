@@ -98,23 +98,3 @@ class UserProfileForm(UserForm):
         model = UserProfile
         exclude = ('username', 'email', 'password', 'password_repeat')
         fields = ('first_name', 'last_name', 'mat_num', 'course')
-
-
-class PasswordForm(UserForm):
-    """
-    Form that will be used on the "change password" page.
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # remove unwanted fields
-        for field in self.Meta.exclude:
-            self.fields.pop(field)
-
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs=BASE_ATTRIBUTES)
-    )
-
-    class Meta(UserForm.Meta):
-        model = UserProfile
-        exclude = ('username', 'email', 'mat_num', 'course')
-        fields = ('old_password', 'password', 'password_repeat')
