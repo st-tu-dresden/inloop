@@ -81,7 +81,7 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-def create_task_category(name, image):
+def create_task_category(image, name="test"):
     cat = TaskCategory(name=name)
     with open(image, "rb") as fd:
         cat.image = File(fd)
@@ -155,7 +155,7 @@ class TaskModelTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
         self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
 
@@ -215,7 +215,7 @@ class TaskCategoryTests(TestCase):
     def setUp(self):
         cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         self.user = create_test_user()
-        self.cat = create_task_category(cat_name, MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH, name=cat_name)
         self.task = create_test_task(author=self.user, category=self.cat)
         self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
 
@@ -239,7 +239,7 @@ class TaskCategoryTests(TestCase):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
 
     def test_completed_tasks_empty_category(self):
-        empty_cat = create_task_category("empty", TEST_IMAGE_PATH)
+        empty_cat = create_task_category(TEST_IMAGE_PATH)
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
         remove(empty_cat.image.path)
 
@@ -265,7 +265,7 @@ class TaskSolutionTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
@@ -306,7 +306,7 @@ class CheckerTests(TestCase):
 
     def setUp(self):
         self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
+        self.cat = create_task_category(MEDIA_IMAGE_PATH)
         self.task = create_test_task(author=self.user, category=self.cat, active=True)
         self.ts = create_test_task_solution(author=self.user, task=self.task)
         self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
