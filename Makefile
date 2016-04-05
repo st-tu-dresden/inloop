@@ -6,7 +6,7 @@
 UGLIFY = node_modules/.bin/uglifyjs
 UGLIFYFLAGS =
 LESS = node_modules/.bin/lessc
-LESSFLAGS = --compress --include-path=vendor/bootstrap/less
+LESSFLAGS = --compress
 WATCHY = node_modules/.bin/watchy
 WATCHYFLAGS = --wait 5 --no-init-spawn --silent
 
@@ -29,7 +29,11 @@ js_sources := \
 css_bundle := inloop/core/static/css/inloop.min.css
 
 # Source file for the CSS bundle
-less_sources := less/inloop.less
+bootstrap_path := vendor/bootstrap/less
+less_source := less/inloop.less
+less_watch := \
+	$(shell find less -name '*.less') \
+	$(shell find $(bootstrap_path) -name '*.less')
 
 # Source and target directories for git hook setup
 hook_source := support/git-hooks
@@ -40,25 +44,25 @@ hook_target := .git/hooks
 ##
 
 $(js_bundle): $(js_sources)
-	@$(UGLIFY) $(UGLIFYFLAGS) $(js_sources) > $@
+	$(UGLIFY) $(UGLIFYFLAGS) $(js_sources) > $@
 
-$(css_bundle): $(less_sources)
-	@$(LESS) $(LESSFLAGS) $(less_sources) > $@
+$(css_bundle): $(less_watch)
+	$(LESS) $(LESSFLAGS) --include-path=$(bootstrap_path) $(less_source) > $@
 
 npm:
-	@npm install >/dev/null
+	npm install >/dev/null
 
-assets: npm $(js_bundle) $(css_bundle)
+assets: $(js_bundle) $(css_bundle)
 
 watch:
-	@$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
+	$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
 
 test:
-	@python manage.py test --verbosity 2 --failfast
+	python manage.py test --verbosity 2 --failfast
 
 coverage:
-	@coverage run manage.py test
-	@coverage html
+	coverage run manage.py test
+	coverage html
 
 hookup:
 	install -b -m 755 $(hook_source)/commit-msg $(hook_target)

@@ -3,40 +3,38 @@
 {% block title %}Homepage{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-    <div class="row">
-    {% for cat, data in categories %}
-        {% if forloop.counter|divisibleby:"3" %}
-        </div>
-        <div class="row">
+<div class="center-box-md">
+
+  <div class="row">
+  {% for cat, data in categories %}
+  {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
+    <div class="col-md-6">
+      <div class="thumbnail">
+        {% if cat.image %}
+        <img src="{{ cat.image.url }}" alt="category image for {{ cat.name }}">
         {% endif %}
-        <div class="col-md-6">
-            <div class="thumbnail">
-                {% if cat.image %}
-                <img src="{{ cat.image.url }}" alt="category image for {{ cat.name }}">
+        <div class="caption">
+          <a href="{% url 'tasks:category' cat.short_id %}">
+            <h3>{{ cat.name }}</h3>
+            <hr>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.1 }}"
+                  aria-valuemin="0" aria-valuemax="{{ data.0 }}" style="width: {{ data.2 }}%;">
+                {% if data.1 > 0 %}
+                {{ data.1 }} / {{ data.0 }}
+                {% else %}
+                <span class="sr-only">No completed tasks</span>
                 {% endif %}
-                <div class="caption">
-                    <a href="{% url 'tasks:category' cat.short_id %}"><h3>{{ cat.name }}</h3>
-                    <hr>
-                    <p>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.1 }}" aria-valuemin="0" aria-valuemax="{{ data.0 }}" style="width: {{ data.2 }}%;">
-                                {% if data.1 > 0 %}
-                                    {{ data.1 }} / {{ data.0 }}
-                                {% else %}
-                                    <span class="sr-only">No completed tasks</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </p>
-                </div>
-            </div>
-        </div>
+              </div><!--/.progress-bar-->
+            </div><!--/.progress-->
+          </a>
+        </div><!--/.caption-->
+      </div><!--/.thumbnail-->
+    </div><!--/.col-md6-->
     {% empty %}
-        <p>There are currently no tasks in the system.</p>
+    <p>There are currently no tasks in the system.</p>
     {% endfor %}
-    </div>
-    </div>
-</div>
+  </div><!--/.row-->
+
+</div><!--./center-box-md-->
 {% endblock %}

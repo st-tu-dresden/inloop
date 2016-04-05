@@ -5,102 +5,52 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-        <h1>{{ title }}</h1>
-        <br/>
-        {% if deadline_date %}
-        <p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
-        {% endif %}
-        {{ description|markdown }}
+<h1>{{ title }}</h1>
 
-        <form id="code-area" class="form-inline" action="." accept-charset="utf-8" method="post"
-              enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group col-md-12">
-                <div role="tabpanel">
-                    <!-- nav tabs -->
-                    {% if file_dict %}
-                    <ul class="nav nav-tabs" role="tablist">
-                        {% for fname in file_dict.keys %}
-                            {% if forloop.first %}
-                            <li role="presentation" class="active">
-                                <a href="#{{ forloop.counter }}"
-                                   role="tab"
-                                   data-toggle="tab">{{ fname|escape }}
-                                </a>
-                            </li>
-                            {% else %}
-                            <li role="presentation">
-                                <a href="#{{ forloop.counter }}"
-                                   role="tab"
-                                   data-toggle="tab">{{ fname|escape }}
-                                </a>
-                            </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+{% if deadline_date %}
+<p><strong>Due to: </strong>{{ deadline_date|date:"l, d. F Y P" }}</p>
+{% endif %}
 
-                    <!-- tab panes -->
-                    <div class="tab-content">
-                        {% for fname, content in file_dict.items %}
-                            {% if forloop.first %}
-                                <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                                </div>
-                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                                <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                            {% else %}
-                                <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                                </div>
-                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                                <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                            {% endif %}
-                        {% empty %}
-                            <p>But chief! There are no files in here!</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group col-md-12">
-                <label for="manual-upload">Manual upload:</label>
-                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple>
-            </div>
-            <div class="form-group col-md-12">
-                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit">
-            </div>
-        </form>
-    </div>
-    </div>
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <br />
-            <hr />
-            <h4>Your latest solutions</h4>
-            <ul>
-            {% for sol in latest_solutions %}
-                <li>Solution from {{ sol.submission_date }} <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> - <a href="{% url 'tasks:results' slug sol.id %}">Results</a></li>
-            {% endfor %}
-            </ul>
-        </div>
-    </div>
+{{ description|markdown }}
+
+<hr>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Manual upload</h3>
+    <form class="form-inline" action="." accept-charset="utf-8"
+          method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <input class="form-control" name="manual-upload" type="file" multiple>
+      </div>
+      <div class="form-group">
+        <input class="btn btn-primary" type="submit" value="Submit">
+      </div>
+    </form>
+  </div><!--/.col-md-6-->
+
+  <div class="col-md-6">
+    <h3>Your solutions</h3>
+    {% if latest_solutions %}
+    <ul class="list-group">
+      {% for sol in latest_solutions %}
+      <li class="list-group-item">
+        Uploaded on {{ sol.submission_date }}<br>
+        <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> -
+        <a href="{% url 'tasks:results' slug sol.id %}">View results</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>You haven't uploaded anything yet.</p>
+    {% endif %}
+  </div><!--/.col-md-6-->
+</div><!--/.row-->
 {% endblock %}
 
 {% block extrabody %}
 <script type="text/javascript">
-    anchors.add("h2, h3");
-    {% for fname in file_dict.keys %}
-        var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
-        editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
-    {% endfor %}
-    $("#submit").on("click", function() {
-        if (document.getElementById("manual-upload").files.length == 0) {
-            {% for fname in file_dict.keys %}
-                $("#content{{ forloop.counter }}").val(editor{{ forloop.counter }}.getSession().getValue());
-            {% endfor %}
-        };
-    });
+  anchors.add("h2, h3");
 </script>
 {% endblock %}
