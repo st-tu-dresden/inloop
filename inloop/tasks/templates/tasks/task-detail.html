@@ -14,62 +14,15 @@
         {% endif %}
         {{ description|markdown }}
 
-        <form id="code-area" class="form-inline" action="." accept-charset="utf-8" method="post"
+        <form class="form-inline" action="." accept-charset="utf-8" method="post"
               enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group col-md-12">
-                <div role="tabpanel">
-                    <!-- nav tabs -->
-                    {% if file_dict %}
-                    <ul class="nav nav-tabs" role="tablist">
-                        {% for fname in file_dict.keys %}
-                            {% if forloop.first %}
-                            <li role="presentation" class="active">
-                                <a href="#{{ forloop.counter }}"
-                                   role="tab"
-                                   data-toggle="tab">{{ fname|escape }}
-                                </a>
-                            </li>
-                            {% else %}
-                            <li role="presentation">
-                                <a href="#{{ forloop.counter }}"
-                                   role="tab"
-                                   data-toggle="tab">{{ fname|escape }}
-                                </a>
-                            </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-
-                    <!-- tab panes -->
-                    <div class="tab-content">
-                        {% for fname, content in file_dict.items %}
-                            {% if forloop.first %}
-                                <div role="tabpanel" class="tab-pane active" id="{{ forloop.counter }}">
-                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                                </div>
-                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                                <input id)"content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                            {% else %}
-                                <div role="tabpanel" class="tab-pane" id="{{ forloop.counter }}">
-                                    <div id="editor{{ forloop.counter }}">{{ content|escape }}</div>
-                                </div>
-                                <input id="content{{ forloop.counter }}" name="content{{ forloop.counter }}" type="hidden" />
-                                <input id="content{{ forloop.counter }}-filename" name="content{{ forloop.counter }}-filename" type="hidden" value="{{ fname }}">
-                            {% endif %}
-                        {% empty %}
-                            <p>But chief! There are no files in here!</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group col-md-12">
                 <label for="manual-upload">Manual upload:</label>
-                <input class="form-control" name="manual-upload" id="manual-upload" type="file" multiple>
+                <input class="form-control" name="manual-upload" type="file" multiple>
             </div>
             <div class="form-group col-md-12">
-                <input class="btn btn-default detail-btn" id="submit" type="submit" value="Submit">
+                <input class="btn btn-default detail-btn" type="submit" value="Submit">
             </div>
         </form>
     </div>
@@ -91,16 +44,5 @@
 {% block extrabody %}
 <script type="text/javascript">
     anchors.add("h2, h3");
-    {% for fname in file_dict.keys %}
-        var editor{{ forloop.counter }} = ace.edit("editor{{ forloop.counter }}");
-        editor{{ forloop.counter }}.getSession().setMode("ace/mode/java");
-    {% endfor %}
-    $("#submit").on("click", function() {
-        if (document.getElementById("manual-upload").files.length == 0) {
-            {% for fname in file_dict.keys %}
-                $("#content{{ forloop.counter }}").val(editor{{ forloop.counter }}.getSession().getValue());
-            {% endfor %}
-        };
-    });
 </script>
 {% endblock %}
