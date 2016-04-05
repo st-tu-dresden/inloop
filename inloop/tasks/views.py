@@ -39,8 +39,8 @@ def index(request):
         queryset = TaskCategory.objects.all()
         categories = []
         for o in queryset:
-            t_amt = len(o.get_tasks())
-            u_amt = len(o.completed_tasks_for_user(request.user))
+            t_amt = o.get_tasks().count()
+            u_amt = o.completed_tasks_for_user(request.user).count()
             if t_amt > 0:
                 categories.append((o, (t_amt, u_amt, progress(u_amt, t_amt))))
 
