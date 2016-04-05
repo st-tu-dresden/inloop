@@ -290,6 +290,12 @@ class TaskSolutionTests(TestCase):
              "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java")
         )
 
+    def test_previously_solved(self):
+        self.assertFalse(self.ts.previously_solved())
+        self.ts.passed = True
+        self.ts.save()
+        self.assertTrue(self.ts.previously_solved())
+
 
 class CheckerTests(TestCase):
     @classmethod
