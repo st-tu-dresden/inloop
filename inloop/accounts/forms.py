@@ -48,6 +48,12 @@ class UserForm(forms.ModelForm):
         widget=forms.TextInput(attrs=BASE_ATTRIBUTES),
         validators=[validate_mat_num]
     )
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
+    )
 
     def clean_password_repeat(self):
         """
@@ -65,7 +71,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = (
-            'username', 'email', 'password',
+            'username', 'first_name', 'last_name', 'email', 'password',
             'password_repeat', 'course', 'mat_num'
         )
 

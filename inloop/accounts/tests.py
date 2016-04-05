@@ -131,7 +131,9 @@ class ProfileTests(TestCase):
         self.course2 = CourseOfStudy.objects.create(name='another_test_course')
         self.profile_data = {
             'mat_num': 1111111,
-            'course': self.course1.id
+            'course': self.course1.id,
+            'first_name': 'Chuck',
+            'last_name': 'Norris'
         }
         self.user = UserProfile.objects.create_user(
             username='test_user',
