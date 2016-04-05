@@ -359,6 +359,22 @@ class CheckerTests(TestCase):
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
 
+    def test_successful_bonus_point(self):
+        self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 1)
+
+    def test_previously_solved_bonus_point(self):
+        self.ts.passed = True
+        self.ts.save()
+        self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 0)
+
+    def test_failure_bonus_points(self):
+        self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=False)
+        self.assertEqual(self.user.bonus_points, 0)
+        self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=True)
+        self.assertEqual(self.user.bonus_points, 0)
+
     @mock.patch("inloop.tasks.models.Checker._generate_container_name", autospec=True)
     @mock.patch("inloop.tasks.models.Checker._container_execute", autospec=True)
     @mock.patch("inloop.tasks.models.Checker._parse_result", autospec=True)
