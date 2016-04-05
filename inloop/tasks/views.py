@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 
 from inloop.core.sendfile import sendfile
@@ -55,6 +55,9 @@ def index(request):
 @login_required
 def detail(request, slug):
     task = get_object_or_404(Task, slug=slug)
+
+    if task.publication_date > timezone.now():
+        return redirect("/")
 
     if request.method == 'POST':
         if task.deadline_date and timezone.now() > task.deadline_date:
