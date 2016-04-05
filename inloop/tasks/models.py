@@ -70,7 +70,7 @@ class TaskCategory(models.Model):
             tasksolution__author=user,
             tasksolution__passed=True,
             category=self
-        )
+        ).distinct()
 
     def get_tasks(self):
         '''Returns a queryset of this category's task that have already been
