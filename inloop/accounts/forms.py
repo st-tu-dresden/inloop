@@ -83,6 +83,11 @@ class UserProfileForm(UserForm):
     We don't want the user to change his username or email, and changing
     the password is handled in the PasswordForm.
     """
+    # overridden to add autofocus attribute
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs=AF_ATTRIBUTE)
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # remove unwanted fields
