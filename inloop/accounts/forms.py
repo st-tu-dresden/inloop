@@ -54,7 +54,7 @@ class UserForm(forms.ModelForm):
             )
         return password
 
-    class Meta(object):
+    class Meta:
         model = UserProfile
         fields = (
             'username', 'email', 'password',
@@ -64,7 +64,7 @@ class UserForm(forms.ModelForm):
 
 class UserProfileForm(UserForm):
     def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # remove unwanted fields
         for field in self.Meta.exclude:
             self.fields.pop(field)
@@ -72,12 +72,12 @@ class UserProfileForm(UserForm):
     class Meta(UserForm.Meta):
         model = UserProfile
         exclude = ('username', 'email', 'password', 'password_repeat')
-        fields = ('mat_num', 'course')
+        fields = ('first_name', 'last_name', 'mat_num', 'course')
 
 
 class PasswordForm(UserForm):
     def __init__(self, *args, **kwargs):
-        super(PasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # remove unwanted fields
         for field in self.Meta.exclude:
             self.fields.pop(field)
