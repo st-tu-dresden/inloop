@@ -75,19 +75,6 @@ class UserProfileForm(UserForm):
         fields = ('mat_num', 'course')
 
 
-class EmailForm(UserForm):
-    def __init__(self, *args, **kwargs):
-        super(EmailForm, self).__init__(*args, **kwargs)
-        # remove unwanted fields
-        for field in self.Meta.exclude:
-            self.fields.pop(field)
-
-    class Meta(UserForm.Meta):
-        model = UserProfile
-        exclude = ('username', 'password', 'password_repeat', 'mat_num', 'course')
-        fields = ('email', )
-
-
 class PasswordForm(UserForm):
     def __init__(self, *args, **kwargs):
         super(PasswordForm, self).__init__(*args, **kwargs)
@@ -103,14 +90,3 @@ class PasswordForm(UserForm):
         model = UserProfile
         exclude = ('username', 'email', 'mat_num', 'course')
         fields = ('old_password', 'password', 'password_repeat')
-
-
-class NewCourseForm(forms.ModelForm):
-    name = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs=BASE_ATTRIBUTES)
-    )
-
-    class Meta(object):
-        model = CourseOfStudy
-        fields = ('name',)
