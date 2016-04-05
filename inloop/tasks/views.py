@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
@@ -93,6 +94,7 @@ def detail(request, slug):
 
         c = Checker(solution)
         c.start()
+        return redirect("%s#your-solutions" % reverse("tasks:detail", kwargs={"slug": slug}))
 
     latest_solutions = TaskSolution.objects \
         .filter(task=task, author=request.user) \
