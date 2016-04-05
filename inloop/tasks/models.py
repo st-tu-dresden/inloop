@@ -159,6 +159,9 @@ class TaskSolution(models.Model):
         sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
         return join(dirname(sol_file.file_path()))
 
+    def previously_solved(self):
+        return TaskSolution.objects.filter(passed=True).exists()
+
     def __str__(self):
         return "TaskSolution(author='{}', task='{}', submitted={}, passed={})".format(
             self.author.username,
@@ -342,6 +345,11 @@ class Checker:
         cr.save()
 
         if passed:
+            # If previously unsolved exam task: give bonus point
+            if self.solution.task.category.name in settings.BONUS_TASKS \
+               and not self.solution.previously_solved():
+                self.solution.author.bonus_points += 1
+            # Mark TaskSolution as passed
             ts = TaskSolution.objects.get(pk=self.solution.pk)
             ts.passed = True
             ts.save()
