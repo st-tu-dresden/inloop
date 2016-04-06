@@ -77,10 +77,10 @@ def detail(request, slug):
 
         if request.FILES.getlist('manual-upload'):
             for file in request.FILES.getlist('manual-upload'):
-                tsf = TaskSolutionFile(filename=file.name, solution=solution)
-                tsf.file.save(
-                    file.name,
-                    ContentFile("".join([s.decode("utf-8") for s in file.chunks()]))
+                tsf = TaskSolutionFile(
+                    filename=file.name,
+                    solution=solution,
+                    file=file
                 )
                 tsf.save()
         else:
