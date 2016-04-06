@@ -81,3 +81,9 @@ class CheckerTests(TestCase):
         self.c._parse_result(result="", compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
+
+    def test_whitespace_handling(self):
+        result_crlf = TEST_SUCCESS_RESULT.replace(b"\n", b"\r\n")
+        self.c._parse_result(result=result_crlf, compiler_error=False)
+        cr = CheckerResult.objects.get(solution=self.ts)
+        self.assertEqual(cr.result, result_crlf.decode())
