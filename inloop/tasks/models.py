@@ -157,11 +157,9 @@ class TaskSolution(models.Model):
         return join(dirname(sol_file.file_path()))
 
     def __str__(self):
-        return "TaskSolution(author='{}', task='{}', submitted={}, passed={})".format(
+        return "TaskSolution(author='{}', task='{}')".format(
             self.author.username,
-            self.task,
-            self.submission_date,
-            self.passed
+            self.task
         )
 
 
@@ -180,10 +178,39 @@ class TaskSolutionFile(models.Model):
 
 
 class CheckerResult(models.Model):
+    """
+    Saves low-level information about the checker execution.
+
+    This currently includes the process' stdout, stderr, return code and wall time.
+    """
     solution = models.ForeignKey(TaskSolution)
-    result = models.TextField()
-    time_taken = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    stdout = models.TextField(default="")
+    stderr = models.TextField(default="")
+    return_code = models.SmallIntegerField(default=-1)
+    time_taken = models.FloatField(default=0.0)
+
+    # to be removed:
     passed = models.BooleanField(default=False)
+
+    def user(self):
+        return self.solution.author
+
+    def task(self):
+        return self.solution.task
 
     def __str__(self):
         return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
+
+
+class CheckerOutput(models.Model):
+    """
+    Represents output of a checker execution step.
+
+    A CheckerResult has multiple CheckerOutputs, for each step of a checker
+    execution (for instance: compiler output, JUnit logs). This output is
+    intended to be interpreted later by parsers/pretty printers/etc.
+    """
+    result = models.ForeignKey(CheckerResult)
+    name = models.CharField(max_length=30)
+    output = models.TextField()

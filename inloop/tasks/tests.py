@@ -223,7 +223,7 @@ class TaskSolutionTests(TestCase):
 
         CheckerResult.objects.create(
             solution=self.ts,
-            result="",
+            stdout="",
             time_taken=13.37,
             passed=False
         )
