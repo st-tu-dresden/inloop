@@ -139,7 +139,7 @@ class Checker:
             logging.debug("Got result: " + result)
             p = ET.XMLParser()
             p.feed('<root>')  # Introduce fake root element to parse multiple XML documents
-            for xml_content in result.split('<?xml version="1.0" encoding="UTF-8"?>\r\n'):
+            for xml_content in result.split('<?xml version="1.0" encoding="UTF-8"?>\n'):
                 p.feed(xml_content)
             p.feed('</root>')
             root = p.close()
