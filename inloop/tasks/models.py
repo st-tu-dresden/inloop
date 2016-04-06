@@ -205,6 +205,9 @@ class CheckerResult(models.Model):
     def task(self):
         return self.solution.task
 
+    def is_success(self):
+        return self.return_code == 0
+
     def __str__(self):
         return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
 
