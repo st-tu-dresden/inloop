@@ -15,8 +15,9 @@ from django.utils import timezone
 
 from inloop.core.sendfile import sendfile
 from inloop.tasks import filesystem_utils as fsu
-from inloop.tasks.models import (Checker, CheckerResult, Task, TaskCategory,
+from inloop.tasks.models import (CheckerResult, Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
+from inloop.tasks.docker import Checker
 
 
 @login_required

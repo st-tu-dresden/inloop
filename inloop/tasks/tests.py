@@ -11,7 +11,8 @@ from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
-from inloop.tasks.models import (Checker, CheckerResult, MissingTaskMetadata,
+from inloop.tasks.docker import Checker
+from inloop.tasks.models import (CheckerResult, MissingTaskMetadata,
                                  Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile)
 from inloop.tasks.validators import validate_short_id
