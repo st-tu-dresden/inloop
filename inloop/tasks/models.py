@@ -187,3 +187,16 @@ class CheckerResult(models.Model):
 
     def __str__(self):
         return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
+
+
+class CheckerOutput(models.Model):
+    """
+    Represents output of a checker execution step.
+
+    A CheckerResult has multiple CheckerOutputs, for each step of a checker
+    execution (for instance: compiler output, JUnit logs). This output is
+    intended to be interpreted later by parsers/pretty printers/etc.
+    """
+    result = models.ForeignKey(CheckerResult)
+    name = models.CharField(max_length=30)
+    output = models.TextField()
