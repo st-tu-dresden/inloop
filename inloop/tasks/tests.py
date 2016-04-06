@@ -1,7 +1,6 @@
 from doctest import DocTestSuite
 from os import makedirs, path, remove
 from shutil import copy, rmtree, which
-from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -349,16 +348,6 @@ class CheckerTests(TestCase):
         self.c._parse_result(result="", compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
         self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
-
-    @mock.patch("inloop.tasks.models.Checker._generate_container_name", autospec=True)
-    @mock.patch("inloop.tasks.models.Checker._container_execute", autospec=True)
-    @mock.patch("inloop.tasks.models.Checker._parse_result", autospec=True)
-    def test_start(self, mock_gcn, mock_ce, mock_pr):
-        mock_ce.return_value = ("output", "compiler_error")  # Otherwise unpack failure in start()
-        self.c.start()
-        self.assertTrue(mock_gcn.called)
-        self.assertTrue(mock_ce.called)
-        self.assertTrue(mock_pr.called)
 
 
 class TaskCategoryManagerTests(TestCase):
