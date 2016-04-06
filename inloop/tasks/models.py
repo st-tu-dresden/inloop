@@ -157,11 +157,9 @@ class TaskSolution(models.Model):
         return join(dirname(sol_file.file_path()))
 
     def __str__(self):
-        return "TaskSolution(author='{}', task='{}', submitted={}, passed={})".format(
+        return "TaskSolution(author='{}', task='{}')".format(
             self.author.username,
-            self.task,
-            self.submission_date,
-            self.passed
+            self.task
         )
 
 
@@ -194,6 +192,12 @@ class CheckerResult(models.Model):
 
     # to be removed:
     passed = models.BooleanField(default=False)
+
+    def user(self):
+        return self.solution.author
+
+    def task(self):
+        return self.solution.task
 
     def __str__(self):
         return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
