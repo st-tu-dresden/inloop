@@ -180,9 +180,20 @@ class TaskSolutionFile(models.Model):
 
 
 class CheckerResult(models.Model):
+    """
+    Saves low-level information about the checker execution.
+
+    This currently includes the process' stdout, stderr, return code and wall time.
+    """
     solution = models.ForeignKey(TaskSolution)
-    result = models.TextField()
-    time_taken = models.FloatField()
+    result = models.TextField(default="")
+    time_taken = models.FloatField(default=0.0)
+
+    stderr = models.TextField(default="")
+    return_code = models.SmallIntegerField(default=-1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # to be removed:
     passed = models.BooleanField(default=False)
 
     def __str__(self):
