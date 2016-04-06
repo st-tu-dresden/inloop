@@ -26,18 +26,25 @@ and follow our [coding conventions](#coding-conventions).
 
 ## Rules for contributing code
 
+In general, do one thing at a time and don't bite off more than you can chew. Long living
+branches are usually a signal that a feature needs splitting up. Furthermore, chances are
+high that such a branch will be hard to integrate into `master`. Divide and conquer!
+
+
 ### Coding conventions
 
-* In general, indent using 4 spaces instead of tabs (except for the `Makefile`) and use UNIX
-  line endings.
-* Python code must be formatted according to [PEP8][pep8] and a maximum line length of 99
+* Indent using 4 spaces instead of tabs (except for the `Makefile`) and use UNIX line endings.
+* Python 3 code must be formatted according to [PEP8][pep8] and a maximum line length of 99
   characters. [Install the pre-commit hook](#git-hooks) to automatically reject commits which
   violate these rules.
 * HTML must be indented using 2 spaces. Don't use XML style empty tags (e.g., use `<br>`
-  instead of `<br />`).
+  instead of `<br />`). Use tools like the [W3C Validator][w3c-validator] to verify that the
+  output of processed templates is valid HTML5.
 
 
 ### Commit messages
+
+First of all, [setup your Git client][git-setup] using your real name and email.
 
 We care about a [usable Git history][good-commits1] and are picky about [well-formed commit
 messages][good-commits2]. Put as much effort into your commit messages as into your code,
@@ -70,3 +77,5 @@ Our `Makefile` includes targets to install the above hooks into your working cop
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[git-setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#Your-Identity
+[w3c-validator]: https://validator.w3.org/
