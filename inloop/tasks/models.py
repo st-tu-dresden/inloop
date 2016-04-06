@@ -144,7 +144,13 @@ class Task(models.Model):
 
 
 class TaskSolution(models.Model):
-    '''Represents the user uploaded files'''
+    """
+    Represents the user uploaded files.
+
+    After a solution has been checked, a CheckerResult will be created for it. In
+    other words, a TaskSolution without a CheckerResult has a pending asynchronous
+    checker job.
+    """
 
     submission_date = models.DateTimeField(help_text='When was the solution submitted?')
     author = models.ForeignKey(UserProfile)
