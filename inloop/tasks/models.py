@@ -27,7 +27,8 @@ def get_upload_path(instance, filename):
         instance.solution.author.username,
         instance.solution.task.slug,
         timezone.now().strftime('%Y/%m/%d/%H_%M_') + str(instance.solution.id),
-        filename)
+        filename
+    )
     return path
 
 
@@ -44,11 +45,13 @@ class TaskCategory(models.Model):
     short_id = models.CharField(
         unique=True,
         max_length=50,
-        help_text='Short ID for URLs')
+        help_text='Short ID for URLs'
+    )
     name = models.CharField(
         unique=True,
         max_length=50,
-        help_text='Category Name')
+        help_text='Category Name'
+    )
     image = models.ImageField(null=True, upload_to='images/category_thumbs/')
     objects = TaskCategoryManager()
 
@@ -143,8 +146,7 @@ class Task(models.Model):
 class TaskSolution(models.Model):
     '''Represents the user uploaded files'''
 
-    submission_date = models.DateTimeField(
-        help_text='When was the solution submitted?')
+    submission_date = models.DateTimeField(help_text='When was the solution submitted?')
     author = models.ForeignKey(UserProfile)
     task = models.ForeignKey(Task)
     passed = models.BooleanField(default=False)
