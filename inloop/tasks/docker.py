@@ -9,6 +9,71 @@ from django.conf import settings
 from inloop.tasks.models import CheckerResult, TaskSolution
 
 
+class DockerSubProcessChecker:
+    """
+    Checker implementation using a local `docker` binary.
+
+    The checker is only responsible for executing the specified image using
+    the provided inputs and for collecting the outputs. Interpretation of the
+    output must be handled in a separate stage.
+
+    Communication is achieved using:
+
+        - command line arguments
+        - stdout/stderr unix pipes
+        - process return codes
+        - file sharing via mounted volumes
+
+    Each task repository must provide a Dockerfile. The resulting Docker image
+    is expected to be self-contained and must implement the following interface:
+
+      1. A non-zero return code indicates that the check failed for some reason.
+         Possible reasons include: failed compilation, failed unit test, internal
+         error due to misconfiguration/crash.
+
+      2. The image must provide an entrypoint that accepts the task name as one
+         and only argument.
+
+      3. The image mounts a read-only VOLUME at the path:
+
+            /checker/input
+
+         This is the place where user-submitted files are dropped.
+
+         Caveat: The hierarchy of the dropped files currently is flat, i.e., there
+         are *no* subdirectories and there is currently no way to specify them.
+
+      4. The image mounts a writable VOLUME at the path:
+
+            /checker/output
+
+         This is the place where the different execution stages can drop their
+         output as files (e.g., unit test result XML files, Findbug reports).
+
+      5. The image may output diagnostic information via stdout or stderr, which
+         will be saved for later examination.
+    """
+
+    def __init__(self, config, image_name):
+        """
+        Initialize the checker with a dict-like config and the name of the Docker image.
+        """
+        pass
+
+    def check_task(self, task_name, input_path):
+        """
+        Execute a check for the given task name using the files under the path specified
+        by input_path.
+
+        The method blocks as long as the `docker` subprocess has not returned. The child
+        may be force-killed after certain resource limits (time, memory, etc.) have been
+        reached.
+
+        Return a CheckerResult and its associated CheckerOutputs, in an unsaved state.
+        """
+        pass
+
+
 # TODO: remove coupling to django and our models
 class Checker:
     def __init__(self, solution):
