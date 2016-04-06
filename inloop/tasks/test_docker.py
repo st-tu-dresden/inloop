@@ -59,7 +59,7 @@ class CheckerTests(TestCase):
         self.assertTrue(cr.passed)
         self.assertTrue(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.01)
-        self.assertEqual(cr.result, TEST_SUCCESS_RESULT.decode())
+        self.assertEqual(cr.stdout, TEST_SUCCESS_RESULT.decode())
 
     def test_failure_parse_result(self):
         self.c._parse_result(result=TEST_FAILURE_RESULT, compiler_error=False)
@@ -67,7 +67,7 @@ class CheckerTests(TestCase):
         self.assertFalse(cr.passed)
         self.assertFalse(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.01)
-        self.assertEqual(cr.result, TEST_FAILURE_RESULT.decode())
+        self.assertEqual(cr.stdout, TEST_FAILURE_RESULT.decode())
 
     def test_compiler_failure_parse_result(self):
         self.c._parse_result(result="compiler trace", compiler_error=True)
@@ -75,15 +75,15 @@ class CheckerTests(TestCase):
         self.assertFalse(cr.passed)
         self.assertFalse(TaskSolution.objects.get(pk=self.ts.pk).passed)
         self.assertEqual(cr.time_taken, 0.0)
-        self.assertEqual(cr.result, "compiler trace")
+        self.assertEqual(cr.stdout, "compiler trace")
 
     def test_empty_result_parse_result(self):
         self.c._parse_result(result="", compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
-        self.assertEqual(cr.result, "For some reason I didn't get anything.. What are you doing?")
+        self.assertEqual(cr.stdout, "For some reason I didn't get anything.. What are you doing?")
 
     def test_whitespace_handling(self):
         result_crlf = TEST_SUCCESS_RESULT.replace(b"\n", b"\r\n")
         self.c._parse_result(result=result_crlf, compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
-        self.assertEqual(cr.result, result_crlf.decode())
+        self.assertEqual(cr.stdout, result_crlf.decode())

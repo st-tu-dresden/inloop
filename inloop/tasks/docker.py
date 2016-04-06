@@ -154,7 +154,7 @@ class Checker:
 
         cr = CheckerResult(
             solution=self.solution,
-            result=result,
+            stdout=result,
             time_taken=time,
             passed=passed)
         cr.save()

@@ -150,7 +150,7 @@ def results(request, slug, solution_id):
     solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
     solution_files = fsu.solution_file_dict(solution)
     cr = get_object_or_404(CheckerResult, solution=solution)
-    result = cr.result
+    result = cr.stdout
 
     return(render(request, 'tasks/task-result.html', {
         'task': task,

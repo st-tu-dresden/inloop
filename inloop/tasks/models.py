@@ -186,12 +186,11 @@ class CheckerResult(models.Model):
     This currently includes the process' stdout, stderr, return code and wall time.
     """
     solution = models.ForeignKey(TaskSolution)
-    result = models.TextField(default="")
-    time_taken = models.FloatField(default=0.0)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    stdout = models.TextField(default="")
     stderr = models.TextField(default="")
     return_code = models.SmallIntegerField(default=-1)
-    created_at = models.DateTimeField(auto_now_add=True)
+    time_taken = models.FloatField(default=0.0)
 
     # to be removed:
     passed = models.BooleanField(default=False)
