@@ -50,9 +50,9 @@ def process_dir(task_dir):
     logger.info("Processing task %s", task_name)
     try:
         with atomic():
-            with open(join(task_dir, META_FILE)) as json_fp:
+            with open(join(task_dir, META_FILE), encoding="utf-8") as json_fp:
                 task = Task.objects.get_or_create_json(json.load(json_fp), task_name)
-            with open(join(task_dir, TASK_FILE)) as markdown_fp:
+            with open(join(task_dir, TASK_FILE), encoding="utf-8") as markdown_fp:
                 task.description = markdown_fp.read()
             task.save()
         logger.info("Successfully imported %s", task_name)
