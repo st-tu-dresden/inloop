@@ -51,6 +51,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/'
 ROOT_URLCONF = 'inloop.urls'
 WSGI_APPLICATION = 'inloop.wsgi.application'
+FILE_UPLOAD_HANDLERS = ("django.core.files.uploadhandler.TemporaryFileUploadHandler", )
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
