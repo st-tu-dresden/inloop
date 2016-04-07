@@ -23,9 +23,9 @@ def collect_files(path):
     mapping filename to file content.
     """
     retval = dict()
-    files = [f for f in os.listdir(path) if isfile(f)]
+    files = [f for f in os.listdir(path) if isfile(join(path, f))]
     for filename in files:
-        with open(filename, encoding="utf-8") as f:
+        with open(join(path, filename), encoding="utf-8") as f:
             retval[filename] = f.read()
     return retval
 
