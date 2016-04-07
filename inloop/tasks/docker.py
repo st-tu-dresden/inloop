@@ -89,6 +89,12 @@ class DockerSubProcessChecker:
     def __init__(self, config, image_name):
         """
         Initialize the checker with a dict-like config and the name of the Docker image.
+
+        The following config keywords are supported:
+
+            - timeout: maximum runtime of a container in seconds (default: 30)
+            - tmpdir:  directory where we should store temporary files
+                       (default: platform-dependent)
         """
         self.config = config
         self.image_name = image_name
@@ -107,7 +113,7 @@ class DockerSubProcessChecker:
         if not isdir(input_path):
             raise ValueError("Not a directory: %s" % input_path)
 
-        with tempfile.TemporaryDirectory() as output_path:
+        with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
@@ -137,7 +143,7 @@ class DockerSubProcessChecker:
 
         proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = proc.communicate(timeout=30)
+            stdout, stderr = proc.communicate(timeout=self.config.get("timeout", 30))
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             # kill container *and* the client process (SIGKILL is not proxied)
