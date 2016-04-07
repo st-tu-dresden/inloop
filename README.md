@@ -36,6 +36,21 @@ the shell:
 The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
 
 
+### Test suite
+
+Use one of the following equivalent commands to run the test suite:
+
+    make test
+
+or
+
+    ./manage.py test
+
+You'll need to build the Docker test image once before with:
+
+    make docker-image
+
+
 ### Dependencies
 
 In general you'll need:
