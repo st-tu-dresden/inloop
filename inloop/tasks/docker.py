@@ -8,7 +8,7 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 from collections import namedtuple
-from os.path import isdir, isfile
+from os.path import isdir, isfile, join
 from random import SystemRandom
 from subprocess import STDOUT, CalledProcessError, TimeoutExpired, check_output
 
@@ -64,9 +64,12 @@ class DockerSubProcessChecker:
          Caveat: The hierarchy of the dropped files currently is flat, i.e., there
          are *no* subdirectories and there is currently no way to specify them.
 
-      4. The image mounts a writable VOLUME at the path:
+      4. The image mounts a writable VOLUME at the path
 
             /checker/output
+
+         containing a world-writable directory "storage". On the host, this is a
+         private directory bound to one container.
 
          This is the place where the different execution stages can drop their
          output as files (e.g., unit test result XML files, Findbug reports).
@@ -113,11 +116,17 @@ class DockerSubProcessChecker:
         if not isdir(input_path):
             raise ValueError("Not a directory: %s" % input_path)
 
+        # output_path will be private and unique directory bind mounted to /checker/output
+        # inside the container. To allow users other than root to write outputs, we create
+        # a world-writable subdirectory called "storage" (because a world-writable mount
+        # point would have security implications).
         with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
             start_time = time.perf_counter()
+            storage_dir = join(output_path, "storage")
+            os.mkdir(storage_dir, mode=0o777)
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
-            file_dict = collect_files(output_path)
+            file_dict = collect_files(storage_dir)
 
         return self.Result(rc, stdout, stderr, duration, file_dict)
 
