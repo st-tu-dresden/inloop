@@ -151,13 +151,16 @@ class DockerSubProcessChecker:
             task_name
         ]
 
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(
+            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+        )
+
         try:
             stdout, stderr = proc.communicate(timeout=self.config.get("timeout", 30))
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             # kill container *and* the client process (SIGKILL is not proxied)
-            subprocess.call(["docker", "kill", ctr_id])
+            subprocess.call(["docker", "kill", str(ctr_id)])
             proc.kill()
             stdout, stderr = proc.communicate()
             rc = signal.SIGKILL
