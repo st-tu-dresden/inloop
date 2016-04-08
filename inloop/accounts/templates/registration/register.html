@@ -20,6 +20,16 @@
     </div>
     <div class="panel-body">
       <p>Please fill in the following form to sign up. All fields are required.</p>
+      <p>
+        <strong>NOTE:</strong> make sure you are using the correct TU Dresden
+        email address, otherwise you won't receive the confirmation link. Valid
+        formats for students are:
+        <ul>
+          <li>sXXXXXXX@mail.zih.tu-dresden.de,</li>
+          <li>first_name.last_name[n]@mailbox.tu-dresden.de</li>
+        </ul>
+        Addresses ending in @tu-dresden.de are reserved for employees.
+      </p>
       <form action="{% url 'accounts:register' %}" method="post"
             accept-charset="utf-8" class="">
         {% csrf_token %}
