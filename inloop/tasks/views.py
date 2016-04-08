@@ -1,3 +1,4 @@
+import logging
 import re
 import zipfile
 from io import BytesIO
@@ -7,17 +8,25 @@ from urllib.parse import unquote
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 
 from inloop.core.sendfile import sendfile
-from inloop.tasks import filesystem_utils as fsu
 from inloop.tasks.models import (CheckerResult, Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
 from inloop.tasks.docker import Checker
+
+
+logger = logging.getLogger(__name__)
+
+
+def error(request, message):
+    return render(request, 'tasks/message.html', {
+        'type': 'danger',
+        'message': message
+    })
 
 
 @login_required
@@ -62,39 +71,33 @@ def detail(request, slug):
         return redirect("/")
 
     if request.method == 'POST':
-        if task.deadline_date and timezone.now() > task.deadline_date:
-            return render(request, 'tasks/message.html', {
-                'type': 'danger',
-                'message': 'This task has already expired!'
-            })
+        manual_uploads = request.FILES.getlist('manual-upload')
 
-        solution = TaskSolution(
+        if not manual_uploads:
+            return error(request, "No files provided.")
+
+        if task.deadline_date and timezone.now() > task.deadline_date:
+            return error(request, "This task has already expired!")
+
+        solution_files = []
+        for uploaded_file in manual_uploads:
+            # this is only quick and dirty hack
+            if not uploaded_file.name.endswith(".java"):
+                return error(request, "Invalid files uploaded (allowed: *.java)")
+
+            solution_files.append(
+                TaskSolutionFile(filename=uploaded_file.name, file=uploaded_file)
+            )
+
+        solution = TaskSolution.objects.create(
             submission_date=timezone.now(),
             author=request.user,
             task=task
         )
-        solution.save()
+        solution.tasksolutionfile_set = solution_files
 
-        if request.FILES.getlist('manual-upload'):
-            for file in request.FILES.getlist('manual-upload'):
-                tsf = TaskSolutionFile(
-                    filename=file.name,
-                    solution=solution,
-                    file=file
-                )
-                tsf.save()
-        else:
-            for param in request.POST:
-                if param.startswith('content') and not param.endswith('-filename'):
-                    tsf = TaskSolutionFile(
-                        filename=request.POST[param + '-filename'],
-                        solution=solution
-                    )
-                    tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
-                    tsf.save()
+        Checker(solution).start()
 
-        c = Checker(solution)
-        c.start()
         return redirect("%s#your-solutions" % reverse("tasks:detail", kwargs={"slug": slug}))
 
     latest_solutions = TaskSolution.objects \
@@ -102,7 +105,6 @@ def detail(request, slug):
         .order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
-        'file_dict': fsu.latest_solution_files(task, request.user.username),
         'latest_solutions': latest_solutions,
         'user': request.user,
         'title': task.title,
@@ -148,7 +150,15 @@ def get_solution_as_zip(request, slug, solution_id):
 def results(request, slug, solution_id):
     task = get_object_or_404(Task, slug=slug)
     solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
-    solution_files = fsu.solution_file_dict(solution)
+
+    solution_files = {}
+    for solution_file in TaskSolutionFile.objects.filter(solution=solution):
+        try:
+            with open(solution_file.file_path(), encoding="utf-8") as f:
+                solution_files[solution_file.filename] = f.read()
+        except FileNotFoundError:
+            logger.error("Dangling TaskSolutionFile(id=%d) detected" % solution_file.id)
+
     cr = get_object_or_404(CheckerResult, solution=solution)
     result = cr.stdout
 
