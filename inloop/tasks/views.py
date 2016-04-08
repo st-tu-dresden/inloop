@@ -1,3 +1,4 @@
+import logging
 import re
 import zipfile
 from io import BytesIO
@@ -13,10 +14,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 
 from inloop.core.sendfile import sendfile
-from inloop.tasks import filesystem_utils as fsu
 from inloop.tasks.models import (CheckerResult, Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
 from inloop.tasks.docker import Checker
+
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -144,7 +147,15 @@ def get_solution_as_zip(request, slug, solution_id):
 def results(request, slug, solution_id):
     task = get_object_or_404(Task, slug=slug)
     solution = get_object_or_404(TaskSolution, task=task, id=solution_id, author=request.user)
-    solution_files = fsu.solution_file_dict(solution)
+
+    solution_files = {}
+    for solution_file in TaskSolutionFile.objects.filter(solution=solution):
+        try:
+            with open(solution_file.file_path(), encoding="utf-8") as f:
+                solution_files[solution_file.filename] = f.read()
+        except FileNotFoundError:
+            logger.error("Dangling TaskSolutionFile(id=%d) detected" % solution_file.id)
+
     cr = get_object_or_404(CheckerResult, solution=solution)
     result = cr.stdout
 
