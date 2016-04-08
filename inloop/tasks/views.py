@@ -7,7 +7,6 @@ from urllib.parse import unquote
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -83,15 +82,6 @@ def detail(request, slug):
                     file=file
                 )
                 tsf.save()
-        else:
-            for param in request.POST:
-                if param.startswith('content') and not param.endswith('-filename'):
-                    tsf = TaskSolutionFile(
-                        filename=request.POST[param + '-filename'],
-                        solution=solution
-                    )
-                    tsf.file.save(tsf.filename, ContentFile(request.POST[param]))
-                    tsf.save()
 
         c = Checker(solution)
         c.start()
