@@ -159,11 +159,11 @@ class DockerSubProcessChecker:
             stdout, stderr = proc.communicate(timeout=self.config.get("timeout", 30))
             rc = proc.returncode
         except subprocess.TimeoutExpired:
-            # kill container *and* the client process (SIGKILL is not proxied)
-            subprocess.call(["docker", "kill", str(ctr_id)])
             proc.kill()
             stdout, stderr = proc.communicate()
             rc = signal.SIGKILL
+            # kill container *and* the client process (SIGKILL is not proxied)
+            subprocess.call(["docker", "rm", "--force", str(ctr_id)])
         return (rc, stdout, stderr)
 
 
