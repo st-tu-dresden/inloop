@@ -66,9 +66,7 @@ Platform specific instructions:
 
 * Ubuntu >= 14.04 and Debian >= 8:
 
-        sudo apt-get install build-essential docker.io git libfreetype6-dev libjpeg8-dev \
-            liblcms2-dev libpq-dev libtiff5-dev libwebp-dev nodejs npm python3 \
-            python3-dev redis-server tcl8.5-dev tk8.5-dev zlib1g-dev
+        sudo apt-get install build-essential docker.io git libfreetype6-dev libjpeg8-dev liblcms2-dev libpq-dev libtiff5-dev libwebp-dev nodejs npm python3 python3-dev redis-server tcl8.5-dev tk8.5-dev zlib1g-dev
 
         sudo apt-get install python3-venv || sudo apt-get install python3.4-venv
 
