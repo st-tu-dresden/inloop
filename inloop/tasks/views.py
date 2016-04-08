@@ -22,6 +22,13 @@ from inloop.tasks.docker import Checker
 logger = logging.getLogger(__name__)
 
 
+def error(request, message):
+    return render(request, 'tasks/message.html', {
+        'type': 'danger',
+        'message': message
+    })
+
+
 @login_required
 def category(request, short_id):
     cat = get_object_or_404(TaskCategory, short_id=short_id)
@@ -67,34 +74,30 @@ def detail(request, slug):
         manual_uploads = request.FILES.getlist('manual-upload')
 
         if not manual_uploads:
-            return render(request, 'tasks/message.html', {
-                "type": "danger",
-                "message": "No files provided."
-            })
+            return error(request, "No files provided.")
 
         if task.deadline_date and timezone.now() > task.deadline_date:
-            return render(request, 'tasks/message.html', {
-                'type': 'danger',
-                'message': 'This task has already expired!'
-            })
+            return error(request, "This task has already expired!")
 
-        solution = TaskSolution(
+        solution_files = []
+        for uploaded_file in manual_uploads:
+            # this is only quick and dirty hack
+            if not uploaded_file.name.endswith(".java"):
+                return error(request, "Invalid files uploaded (allowed: *.java)")
+
+            solution_files.append(
+                TaskSolutionFile(filename=uploaded_file.name, file=uploaded_file)
+            )
+
+        solution = TaskSolution.objects.create(
             submission_date=timezone.now(),
             author=request.user,
             task=task
         )
-        solution.save()
+        solution.tasksolutionfile_set = solution_files
 
-        for file in manual_uploads:
-            tsf = TaskSolutionFile(
-                filename=file.name,
-                solution=solution,
-                file=file
-            )
-            tsf.save()
+        Checker(solution).start()
 
-        c = Checker(solution)
-        c.start()
         return redirect("%s#your-solutions" % reverse("tasks:detail", kwargs={"slug": slug}))
 
     latest_solutions = TaskSolution.objects \
