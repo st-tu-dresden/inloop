@@ -102,7 +102,6 @@ def detail(request, slug):
         .order_by('-submission_date')[:5]
 
     return render(request, 'tasks/task-detail.html', {
-        'file_dict': fsu.latest_solution_files(task, request.user.username),
         'latest_solutions': latest_solutions,
         'user': request.user,
         'title': task.title,
