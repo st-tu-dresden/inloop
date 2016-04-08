@@ -61,6 +61,14 @@ def detail(request, slug):
         return redirect("/")
 
     if request.method == 'POST':
+        manual_uploads = request.FILES.getlist('manual-upload')
+
+        if not manual_uploads:
+            return render(request, 'tasks/message.html', {
+                "type": "danger",
+                "message": "No files provided."
+            })
+
         if task.deadline_date and timezone.now() > task.deadline_date:
             return render(request, 'tasks/message.html', {
                 'type': 'danger',
@@ -74,14 +82,13 @@ def detail(request, slug):
         )
         solution.save()
 
-        if request.FILES.getlist('manual-upload'):
-            for file in request.FILES.getlist('manual-upload'):
-                tsf = TaskSolutionFile(
-                    filename=file.name,
-                    solution=solution,
-                    file=file
-                )
-                tsf.save()
+        for file in manual_uploads:
+            tsf = TaskSolutionFile(
+                filename=file.name,
+                solution=solution,
+                file=file
+            )
+            tsf.save()
 
         c = Checker(solution)
         c.start()
