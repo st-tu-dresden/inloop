@@ -154,7 +154,7 @@ def results(request, slug, solution_id):
     solution_files = {}
     for solution_file in TaskSolutionFile.objects.filter(solution=solution):
         try:
-            with open(solution_file.file_path(), encoding="utf-8") as f:
+            with open(solution_file.file_path(), encoding="utf-8", errors="replace") as f:
                 solution_files[solution_file.filename] = f.read()
         except FileNotFoundError:
             logger.error("Dangling TaskSolutionFile(id=%d) detected" % solution_file.id)
