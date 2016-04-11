@@ -4,19 +4,20 @@
 {% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
-        <h1>Results for task "{{task.title}}"</h1>
-        <p>Submission date: {{ solution.submission_date }}</p>
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h1>{{task.title}} Results</h1>
+        <br />
         {% if solution.passed %}
         <div class="panel panel-success">
                 <div class="panel-heading">
                     Checker Results
                 </div>
                 <div class="panel-body">
-                  <p>
                     <span class="glyphicon glyphicon-ok-sign big-icon-green" aria-hidden="true"></span>
                     <span class="status-text-success">PASSED</span>
-                  </p>
-                  <pre class="topbot">{{ result }}</pre>
+                    <br>
+                    <pre class="topbot">{{ result }}</pre>
                 </div>
         </div>
         {% else %}
@@ -25,14 +26,10 @@
                     Checker Results
                 </div>
                 <div class="panel-body">
-                    <p>
-                      <span class="glyphicon glyphicon-remove-sign big-icon-red" aria-hidden="true"></span>
-                      <span class="status-text-failed">FAILED</span>
-                    </p>
+                    <span class="glyphicon glyphicon-remove-sign big-icon-red" aria-hidden="true"></span>
+                    <span class="status-text-failed">FAILED</span>
+                    <br>
                     <pre class="topbot">{{ result }}</pre>
-                    {% if "Permission" in result %}
-                    <p>Got a <code>Permission denied</code> error? Try removing the <code>package</code> declaration from your class(es).</p>
-                    {% endif %}
                 </div>
         </div>
         {% endif %}
@@ -76,7 +73,9 @@
                     <p>This solution does not contain any files.</p>
                 {% endfor %}
             </div>
-</div>
+        </div>
+    </div>
+    </div>
 {% endblock %}
 
 {% block extrabody %}
