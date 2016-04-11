@@ -2,14 +2,15 @@ import os
 import shutil
 import signal
 import subprocess
-from os.path import dirname, join
+from os.path import abspath, dirname, join
 from unittest import skipUnless
 
+from django.conf import settings
 from django.test import TestCase
 
 from inloop.tasks.docker import DockerSubProcessChecker, collect_files
 
-TEST_DIR = join(dirname(__file__), "tests")
+TEST_DIR = join(abspath(dirname(__file__)), "tests")
 
 
 class CollectorTest(TestCase):
@@ -49,7 +50,7 @@ class DockerSubProcessCheckerTests(TestCase):
     # docker-machine on OS X needs a mount point below $HOME
     options = {
         "timeout": 1.5,
-        "tmpdir": join(TEST_DIR, ".tmp_docker")
+        "tmpdir": join(settings.PROJECT_ROOT, ".tmp_docker")
     }
 
     @classmethod

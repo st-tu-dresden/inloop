@@ -8,7 +8,7 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 from collections import namedtuple
-from os.path import isdir, isfile, join
+from os.path import isabs, isdir, isfile, join, normpath
 from random import SystemRandom
 from subprocess import STDOUT, CalledProcessError, TimeoutExpired, check_output
 
@@ -102,8 +102,21 @@ class DockerSubProcessChecker:
             - tmpdir:  directory where we should store temporary files
                        (default: platform-dependent)
         """
+        tmpdir = config.get("tmpdir")
+        if tmpdir:
+            self.ensure_absolute_dir(tmpdir)
+
         self.config = config
         self.image_name = image_name
+
+    def ensure_absolute_dir(self, path):
+        """
+        Tests if the given path is absolute and a directory, raises ValueError otherwise.
+        """
+        if not isabs(path):
+            raise ValueError("not an absolute path: %s" % path)
+        if not isdir(path):
+            raise ValueError("not a directory: %s" % path)
 
     def check_task(self, task_name, input_path):
         """
@@ -116,27 +129,39 @@ class DockerSubProcessChecker:
 
         Returns a Result tuple.
         """
-        if not isdir(input_path):
-            raise ValueError("Not a directory: %s" % input_path)
+        self.ensure_absolute_dir(input_path)
 
-        # output_path will be private and unique directory bind mounted to /checker/output
+        # output_path will be a private and unique directory bind mounted to /checker/output
         # inside the container. To allow users other than root to write outputs, we create
         # a world-writable subdirectory called "storage" (because a world-writable mount
         # point would have security implications).
         with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
-            start_time = time.perf_counter()
+            self.ensure_absolute_dir(output_path)
+
             storage_dir = join(output_path, "storage")
             os.mkdir(storage_dir, mode=0o777)
+
+            start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
             file_dict = collect_files(storage_dir)
 
         return self.Result(rc, stdout, stderr, duration, file_dict)
 
+    def subpath_check(self, path1, path2):
+        """
+        Tests if paths are not a subdirectory of each other, raises ValueError otherwise.
+        """
+        path1 = normpath(path1)
+        path2 = normpath(path2)
+        if path1.startswith(path2) or path2.startswith(path1):
+            raise ValueError("a mountpoint must not be a subdirectory of another mountpoint")
+
     def communicate(self, task_name, input_path, output_path):
         """
         Creates the container and communicates inputs and outputs.
         """
+        self.subpath_check(input_path, output_path)
         ctr_id = uuid.uuid4()
         args = [
             "docker",
