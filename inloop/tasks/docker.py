@@ -17,6 +17,9 @@ from django.conf import settings
 from inloop.tasks.models import CheckerResult, TaskSolution
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 def collect_files(path):
     """
     Collect files in the directory specified by path non-recursively into a dict,
@@ -151,6 +154,8 @@ class DockerSubProcessChecker:
             task_name
         ]
 
+        LOGGER.debug("Popen args: %s", args)
+
         proc = subprocess.Popen(
             args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         )
@@ -164,6 +169,11 @@ class DockerSubProcessChecker:
             rc = signal.SIGKILL
             # kill container *and* the client process (SIGKILL is not proxied)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)])
+
+        if rc in (125, 126, 127):
+            # exit codes set exclusively by the Docker daemon
+            LOGGER.error("docker failure (rc=%d): %s", rc, stderr)
+
         return (rc, stdout, stderr)
 
 
