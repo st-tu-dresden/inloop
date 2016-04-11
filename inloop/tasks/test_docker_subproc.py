@@ -125,3 +125,11 @@ class DockerSubProcessCheckerTests(TestCase):
         result = self.checker.check_task("id -un", TEST_DIR)
         self.assertEqual(result.rc, 0)
         self.assertEqual(result.stdout.strip(), "nobody")
+
+    def test_maximum_file_size(self):
+        """Test file size limits."""
+        result = self.checker.check_task(
+            "dd if=/dev/zero of=/checker/scratch/largefile bs=1M count=100",
+            TEST_DIR
+        )
+        self.assertNotEqual(result.rc, 0)
