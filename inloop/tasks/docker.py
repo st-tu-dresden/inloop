@@ -138,8 +138,10 @@ class DockerSubProcessChecker:
         with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
             self.ensure_absolute_dir(output_path)
 
+            os.chmod(output_path, mode=0o755)
             storage_dir = join(output_path, "storage")
-            os.mkdir(storage_dir, mode=0o777)
+            os.mkdir(storage_dir)
+            os.chmod(storage_dir, mode=0o1777)
 
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)

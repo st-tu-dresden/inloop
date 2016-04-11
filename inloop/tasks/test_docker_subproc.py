@@ -109,8 +109,19 @@ class DockerSubProcessCheckerTests(TestCase):
         result = self.checker.check_task("touch /checker/input/test_file", TEST_DIR)
         self.assertNotEqual(result.rc, 0)
 
+    def test_storage_exists(self):
+        """Test if the storage directory exists."""
+        result = self.checker.check_task("test -d /checker/output/storage", TEST_DIR)
+        self.assertEqual(result.rc, 0)
+
     def test_output_filedict(self):
-        """Test if a created file appears in the file_dict."""
+        """Test if we can create a file which appears in the file_dict."""
         result = self.checker.check_task("echo -n FOO >/checker/output/storage/bar", TEST_DIR)
         self.assertEqual(result.rc, 0)
         self.assertEqual("FOO", result.file_dict["bar"])
+
+    def test_container_unprivileged(self):
+        """Test if we execute commands as unprivileged user."""
+        result = self.checker.check_task("id -un", TEST_DIR)
+        self.assertEqual(result.rc, 0)
+        self.assertEqual(result.stdout.strip(), "nobody")
