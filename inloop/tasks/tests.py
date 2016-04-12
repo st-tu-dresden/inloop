@@ -15,7 +15,6 @@ from inloop.tasks import models
 from inloop.tasks.models import (CheckerResult, MissingTaskMetadata,
                                  Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile)
-from inloop.tasks.validators import validate_short_id
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
@@ -112,22 +111,6 @@ class TaskModelTests(TestCase):
 
     def tearDown(self):
         remove(self.cat.image.path)
-
-    def test_validate_short_id(self):
-        with self.assertRaises(ValidationError):
-            validate_short_id("ABC")
-        with self.assertRaises(ValidationError):
-            validate_short_id("abc")
-        with self.assertRaises(ValidationError):
-            validate_short_id("1a")
-        with self.assertRaises(ValidationError):
-            validate_short_id("1ab")
-        with self.assertRaises(ValidationError):
-            validate_short_id("1$")
-        self.assertIsNone(validate_short_id("ab"))
-        self.assertIsNone(validate_short_id("Ab"))
-        self.assertIsNone(validate_short_id("AB"))
-        self.assertIsNone(validate_short_id("A1"))
 
     def test_task_is_active(self):
         self.assertTrue(self.t1.is_active())
