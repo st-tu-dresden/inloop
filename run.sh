@@ -9,7 +9,7 @@ set -o pipefail
 # yes, the only return code that will mark a solution as not passed is 42
 cd "exercises/$1" || exit 42
 
-solution_path=/home/gradle/solution
+solution_path=$HOME/solution
 
 # try to show a friendly message if students use the package statement
 if grep -q '^package ' $solution_path/*.java; then
@@ -21,7 +21,7 @@ fi
 
 # compile separately while redirecting compiler errors to stdout, disguise internal path in output
 ../gradlew -q --console=plain -PsolutionPath=$solution_path compileTestJava 2>&1 \
-    | sed "s|$solution_path|/sandbox|g"
+    | sed "s|$HOME|/sandbox|g"
 
 # compiler error -> return 42
 if [ $? -ne 0 ]; then
