@@ -1,15 +1,9 @@
-from os import remove
 from os.path import dirname, join
-from shutil import copy, which
-
-from django.test import TestCase
 
 from inloop.tasks.docker import Checker
 from inloop.tasks.models import CheckerResult, TaskSolution
-from inloop.tasks.tests import (create_test_user, create_task_category, create_test_task,
-                                create_test_task_solution, create_test_task_solution_file)
-from inloop.tasks.tests import (TEST_IMAGE_PATH, MEDIA_IMAGE_PATH,
-                                TEST_CLASS_PATH, MEDIA_CLASS_PATH)
+from inloop.tasks.test_base import TasksTestBase
+
 
 TEST_DATA = join(dirname(__file__), "tests")
 
@@ -20,32 +14,12 @@ with open(join(TEST_DATA, "test_failure.xml"), mode="rb") as f:
     TEST_FAILURE_RESULT = f.read()
 
 
-class CheckerTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
-        copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
-
-    @classmethod
-    def tearDownClass(cls):
-        remove(MEDIA_IMAGE_PATH)
-        remove(MEDIA_CLASS_PATH)
-        super().tearDownClass()
-
+class CheckerTests(TasksTestBase):
     def setUp(self):
-        self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
-        self.task = create_test_task(author=self.user, category=self.cat, active=True)
-        self.ts = create_test_task_solution(author=self.user, task=self.task)
-        self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
+        super().setUp()
+        self.ts = self.create_solution()
+        self.tsf = self.create_solution_file(self.ts)
         self.c = Checker(self.ts)
-
-    def tearDown(self):
-        remove(self.cat.image.path)
-
-    def test_docker_present_on_system(self):
-        self.assertIsNotNone(which("docker"), "Docker is not available on your system.")
 
     def test_generate_container_name_format(self):
         self.assertRegex(
