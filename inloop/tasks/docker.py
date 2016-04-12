@@ -1,12 +1,33 @@
 import logging
+import os
+import signal
 import string
+import subprocess
+import tempfile
+import time
+import uuid
 import xml.etree.ElementTree as ET
+from collections import namedtuple
+from os.path import isdir, isfile
 from random import SystemRandom
 from subprocess import STDOUT, CalledProcessError, TimeoutExpired, check_output
 
 from django.conf import settings
 
 from inloop.tasks.models import CheckerResult, TaskSolution
+
+
+def collect_files(path):
+    """
+    Collect files in the directory specified by path non-recursively into a dict,
+    mapping filename to file content.
+    """
+    retval = dict()
+    files = [f for f in os.listdir(path) if isfile(f)]
+    for filename in files:
+        with open(filename, encoding="utf-8") as f:
+            retval[filename] = f.read()
+    return retval
 
 
 class DockerSubProcessChecker:
@@ -50,15 +71,27 @@ class DockerSubProcessChecker:
          This is the place where the different execution stages can drop their
          output as files (e.g., unit test result XML files, Findbug reports).
 
-      5. The image may output diagnostic information via stdout or stderr, which
+      5. The rootfs of the container is mounted read-only. To store intermediate
+         results such as compiled class files, the scratch tmpfs at
+
+            /checker/scratch
+
+         must be used.
+
+      6. The image may output diagnostic information via stdout or stderr, which
          will be saved for later examination.
+
+    This class expects that the Docker image specified by image_name has already
+    been built (e.g., during the import of a task repository).
     """
+    Result = namedtuple("DockerSubProcessCheckerResult", "rc stdout stderr duration file_dict")
 
     def __init__(self, config, image_name):
         """
         Initialize the checker with a dict-like config and the name of the Docker image.
         """
-        pass
+        self.config = config
+        self.image_name = image_name
 
     def check_task(self, task_name, input_path):
         """
@@ -69,9 +102,50 @@ class DockerSubProcessChecker:
         may be force-killed after certain resource limits (time, memory, etc.) have been
         reached.
 
-        Return a CheckerResult and its associated CheckerOutputs, in an unsaved state.
+        Returns a Result tuple.
         """
-        pass
+        if not isdir(input_path):
+            raise ValueError("Not a directory: %s" % input_path)
+
+        with tempfile.TemporaryDirectory() as output_path:
+            start_time = time.perf_counter()
+            rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
+            duration = time.perf_counter() - start_time
+            file_dict = collect_files(output_path)
+
+        return self.Result(rc, stdout, stderr, duration, file_dict)
+
+    def communicate(self, task_name, input_path, output_path):
+        """
+        Creates the container and communicates inputs and outputs.
+        """
+        ctr_id = uuid.uuid4()
+        args = [
+            "docker",
+            "run",
+            "--rm",
+            "--readonly",
+            "--net=none",
+            "--memory=128m",
+            "--volume=%s:/checker/input:ro" % input_path,
+            "--volume=%s:/checker/output" % output_path,
+            "--tmpfs=/checker/scratch",
+            "--name=%s" % ctr_id,
+            self.image_name,
+            task_name
+        ]
+
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            stdout, stderr = proc.communicate(timeout=30)
+            rc = proc.returncode
+        except subprocess.TimeoutExpired:
+            # kill container *and* the client process (SIGKILL is not proxied)
+            subprocess.call(["docker", "kill", ctr_id])
+            proc.kill()
+            stdout, stderr = proc.communicate()
+            rc = signal.SIGKILL
+        return (rc, stdout, stderr)
 
 
 # TODO: remove coupling to django and our models
