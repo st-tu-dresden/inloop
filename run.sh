@@ -4,6 +4,7 @@
 # this stuff and the ol' checker will be removed soon, but until the new
 # one gets deployed we have to fix the most annoying bugs here.
 
+set -o pipefail
 
 # yes, the only return code that will mark a solution as not passed is 42
 cd "exercises/$1" || exit 42
