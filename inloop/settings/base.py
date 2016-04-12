@@ -8,6 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+from os import environ
 from os.path import dirname, join
 from sys import version_info
 
@@ -106,3 +107,20 @@ CHECKER = {
 }
 
 SENDFILE_METHOD = "django"
+
+# Use the environment var INLOOP_LOG_LEVEL to adjust INLOOP logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'inloop': {
+            'handlers': ['console'],
+            'level': environ.get('INLOOP_LOG_LEVEL', 'INFO'),
+        },
+    },
+}

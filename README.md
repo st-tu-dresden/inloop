@@ -36,6 +36,21 @@ the shell:
 The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
 
 
+### Test suite
+
+Use one of the following equivalent commands to run the test suite:
+
+    make test
+
+or
+
+    ./manage.py test
+
+You'll need to build the Docker test image once before with:
+
+    make docker-image
+
+
 ### Dependencies
 
 In general you'll need:
@@ -51,9 +66,7 @@ Platform specific instructions:
 
 * Ubuntu >= 14.04 and Debian >= 8:
 
-        sudo apt-get install build-essential docker.io git libfreetype6-dev libjpeg8-dev \
-            liblcms2-dev libpq-dev libtiff5-dev libwebp-dev nodejs npm python3 \
-            python3-dev redis-server tcl8.5-dev tk8.5-dev zlib1g-dev
+        sudo apt-get install build-essential git libfreetype6-dev libjpeg8-dev liblcms2-dev libpq-dev libtiff5-dev libwebp-dev nodejs npm python3 python3-dev redis-server tcl8.5-dev tk8.5-dev zlib1g-dev
 
         sudo apt-get install python3-venv || sudo apt-get install python3.4-venv
 
@@ -70,6 +83,37 @@ Platform specific instructions:
 * Mac OS X using Homebrew:
 
         brew install docker docker-machine node python3 redis
+
+
+#### Docker setup on Ubuntu/Debian
+
+The `docker.io` package shipped with Ubuntu and Debian is usually too old. Install
+from the upstream Docker APT repositories instead:
+
+* Ubuntu: https://docs.docker.com/engine/installation/linux/ubuntulinux/
+* Debian: https://docs.docker.com/engine/installation/linux/debian/
+
+Ensure you have at least Docker version 1.10 by checking the output of
+
+    docker --version
+
+INLOOP depends on the `--memory` option to limit memory available to a container.
+If you have followed the linked installation docs carefully, running
+
+    grep -o swapaccount=1 /proc/cmdline
+
+should print
+
+    swapaccount=1
+
+If not, you need update your GRUB config to add the `swapaccount=1` param to your
+kernel command line and reboot (see the linked Docker docs for details).
+
+Finally run
+
+    docker run hello-world
+
+to verify you can connect to the Docker daemon.
 
 
 ## Further documentation

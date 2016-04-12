@@ -58,7 +58,7 @@ watch:
 	$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
 
 test:
-	python manage.py test --verbosity 2 --failfast
+	python manage.py test --verbosity 2
 
 coverage:
 	coverage run manage.py test
@@ -76,4 +76,11 @@ unhookup:
 	rm -f $(hook_target)/pre-commit
 	rm -f $(hook_target)/post-checkout
 
-.PHONY: npm assets watch test coverage hookup hookup-all unhookup
+docker-image:
+	$(MAKE) -C inloop/tasks/tests/docker
+
+docker-clean:
+	-docker rm $(shell docker ps -q -f status=exited) >/dev/null 2>&1
+	-docker rmi $(shell docker images -q -f dangling=true) >/dev/null 2>&1
+
+.PHONY: npm assets watch test coverage hookup hookup-all unhookup docker-clean docker-image
