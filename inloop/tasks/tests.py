@@ -1,94 +1,18 @@
 from doctest import DocTestSuite
-from os import makedirs, path
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
-
-from django.core.files import File, base
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.text import slugify
 
-from inloop.accounts.models import UserProfile
 from inloop.tasks import models
-from inloop.tasks.models import (CheckerResult, MissingTaskMetadata, Task,
-                                 TaskCategory, TaskSolution, TaskSolutionFile)
+from inloop.tasks.models import CheckerResult, MissingTaskMetadata, Task, TaskCategory
 from inloop.tasks.test_base import TasksTestBase
-
-TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
-TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
-MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, "test.jpg")
-MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "HelloWorld.java")
-
-if not path.exists(settings.MEDIA_ROOT):
-    makedirs(settings.MEDIA_ROOT)
 
 
 def load_tests(loader, tests, ignore):
     """Initialize doctests for this module."""
     tests.addTests(DocTestSuite(models))
     return tests
-
-
-def create_task_category(name, image):
-    cat = TaskCategory(name=name)
-    with open(image, "rb") as fd:
-        cat.image = File(fd)
-        cat.save()
-    return cat
-
-
-def create_test_user(username="test_user", first_name="first_name", last_name="last_name",
-                     email="test@example.com", password="123456", mat_num="0000000"):
-        return UserProfile.objects.create_user(
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            password=password,
-            mat_num=mat_num)
-
-
-def create_test_task(author, category, description="", pub_date=None, dead_date=None,
-                     title=None, active=True):
-    if active:
-        title = "Active Task" if not title else title
-        pub_date = timezone.now() - timezone.timedelta(days=2) if not pub_date else pub_date
-        dead_date = timezone.now() + timezone.timedelta(days=2) if not dead_date else dead_date
-    else:
-        title = "Disabled Task" if not title else title
-        pub_date = timezone.now() + timezone.timedelta(days=1)
-        dead_date = timezone.now() + timezone.timedelta(days=5)
-
-    return Task.objects.create(
-        title=title,
-        author=author,
-        description=description,
-        publication_date=pub_date,
-        deadline_date=dead_date,
-        category=category,
-        slug=slugify(title))
-
-
-def create_test_task_solution(author, task, sub_date=None, passed=False):
-    return TaskSolution.objects.create(
-        submission_date=timezone.now() - timezone.timedelta(days=1) if not sub_date else sub_date,
-        author=author,
-        task=task,
-        passed=passed
-    )
-
-
-def create_test_task_solution_file(solution, contentpath):
-    filename = path.basename(contentpath)
-    tsf = TaskSolutionFile.objects.create(
-        solution=solution,
-        filename=filename,
-        file=None
-    )
-    with open(contentpath, encoding="utf-8") as f:
-        tsf.file.save(filename, base.ContentFile(f.read()))
-    return tsf
 
 
 class TaskModelTests(TasksTestBase):
