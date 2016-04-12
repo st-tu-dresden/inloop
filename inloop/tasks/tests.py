@@ -1,6 +1,5 @@
 from doctest import DocTestSuite
-from os import makedirs, path, remove
-from shutil import copy, rmtree
+from os import makedirs, path
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -160,45 +159,19 @@ class TaskCategoryTests(TasksTestBase):
         self.assertEqual(self.cat.completed_tasks_for_user(self.user).count(), 2)
 
 
-class TaskSolutionTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
-        copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
-
-    @classmethod
-    def tearDownClass(cls):
-        remove(MEDIA_IMAGE_PATH)
-        remove(MEDIA_CLASS_PATH)
-        rmtree(path.join(settings.MEDIA_ROOT, "solutions", "test_user"))
-        super().tearDownClass()
-
-    def setUp(self):
-        self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
-        self.task = create_test_task(author=self.user, category=self.cat, active=True)
-        self.ts = create_test_task_solution(author=self.user, task=self.task)
-        self.tsf = create_test_task_solution_file(solution=self.ts, contentpath=MEDIA_CLASS_PATH)
-
-        CheckerResult.objects.create(
-            solution=self.ts,
-            stdout="",
-            time_taken=13.37,
-            passed=False
-        )
-
-    def tearDown(self):
-        remove(self.cat.image.path)
-
+class TaskSolutionTests(TasksTestBase):
     def test_default_value(self):
-        self.assertFalse(self.ts.passed)
+        solution = self.create_solution()
+        result = CheckerResult.objects.create(solution=solution)
+        self.assertFalse(result.passed)
 
     def test_get_upload_path(self):
+        solution = self.create_solution()
+        tsf = self.create_solution_file(solution=solution)
         self.assertRegex(
-            models.get_upload_path(self.tsf, self.tsf.filename),
-            (r"solutions/test_user/active-task/"
-             "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/[\w]+.java")
+            models.get_upload_path(tsf, tsf.filename),
+            (r"solutions/chuck_norris/active-task/"
+             "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/HelloWorld.java")
         )
 
 

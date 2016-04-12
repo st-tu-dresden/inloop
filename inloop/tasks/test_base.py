@@ -3,12 +3,13 @@ import shutil
 from os import path
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
-from inloop.tasks.models import Task, TaskCategory, TaskSolution
+from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
 
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
@@ -84,6 +85,18 @@ class TasksTestBase(TestCase):
         kwargs.setdefault("author", self.user)
         kwargs.setdefault("task", self.task)
         return TaskSolution.objects.create(**kwargs)
+
+    def create_solution_file(self, solution, contentpath=MEDIA_CLASS_PATH):
+        # FIXME: basename should be figured out by SolutionFile
+        filename = path.basename(contentpath)
+        tsf = TaskSolutionFile.objects.create(
+            solution=solution,
+            filename=filename,
+            file=None
+        )
+        with open(contentpath, encoding="utf-8") as f:
+            tsf.file.save(filename, ContentFile(f.read()))
+        return tsf
 
     def test_selftest(self):
         """Test if the test data was wired up correctly."""
