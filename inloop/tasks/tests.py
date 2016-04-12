@@ -125,52 +125,39 @@ class TaskModelTests(TasksTestBase):
         self.assertIn(subpath % self.inactive_task.slug, self.inactive_task.task_location())
 
 
-class TaskCategoryTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
-
-    @classmethod
-    def tearDownClass(cls):
-        remove(MEDIA_IMAGE_PATH)
-        super().tearDownClass()
-
-    def setUp(self):
-        cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
-        self.user = create_test_user()
-        self.cat = create_task_category(cat_name, MEDIA_IMAGE_PATH)
-        self.task = create_test_task(author=self.user, category=self.cat)
-        self.ts = create_test_task_solution(author=self.user, task=self.task, passed=True)
-
-    def tearDown(self):
-        remove(self.cat.image.path)
-
-    def test_image_path(self):
-        p = TaskCategory.objects.get(pk=1).image.path
-        with open(p, "rb") as fd:
-            self.assertTrue(fd, "Image file not found")
-
+class TaskCategoryTests(TasksTestBase):
     def test_slugify_on_save(self):
-        self.assertEqual(self.cat.short_id, "whitespace-here-and-123-some-tabs-abc-things")
-
-    def test_get_tuple(self):
+        cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         slug = "whitespace-here-and-123-some-tabs-abc-things"
-        name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
-        self.assertEqual(self.cat.get_tuple(), (slug, name))
-
-    def test_completed_tasks_for_user(self):
-        self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
+        category = self.create_category(name=cat_name)
+        self.assertEqual(category.short_id, slug)
+        self.assertEqual(category.get_tuple(), (slug, cat_name))
 
     def test_completed_tasks_empty_category(self):
-        empty_cat = create_task_category("empty", TEST_IMAGE_PATH)
+        empty_cat = self.create_category(name="empty")
         self.assertFalse(empty_cat.completed_tasks_for_user(self.user).exists())
-        remove(empty_cat.image.path)
 
-    def test_completed_tasks_uncompleted(self):
-        self.ts.passed = False
-        self.ts.save()
+    def test_tasks_uncompleted(self):
+        solution = self.create_solution()
+        self.assertFalse(solution.passed)
         self.assertFalse(self.cat.completed_tasks_for_user(self.user).exists())
+
+    def test_tasks_completed_multiple_solutions(self):
+        solution1 = self.create_solution(passed=True)
+        solution2 = self.create_solution(passed=True)
+        self.assertTrue(solution1.passed)
+        self.assertTrue(solution2.passed)
+        self.assertEqual(self.cat.completed_tasks_for_user(self.user).count(), 1)
+        self.assertEqual(self.cat.completed_tasks_for_user(self.user)[0], self.task)
+
+        task2 = self.create_task(title="Another task")
+        solution3 = self.create_solution(task=task2)
+        self.assertFalse(solution3.passed)
+        self.assertEqual(self.cat.completed_tasks_for_user(self.user).count(), 1)
+
+        solution4 = self.create_solution(task=task2, passed=True)
+        self.assertTrue(solution4.passed)
+        self.assertEqual(self.cat.completed_tasks_for_user(self.user).count(), 2)
 
 
 class TaskSolutionTests(TestCase):
