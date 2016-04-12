@@ -12,9 +12,9 @@ from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
 from inloop.tasks import models
-from inloop.tasks.models import (CheckerResult, MissingTaskMetadata,
-                                 Task, TaskCategory, TaskSolution,
-                                 TaskSolutionFile)
+from inloop.tasks.models import (CheckerResult, MissingTaskMetadata, Task,
+                                 TaskCategory, TaskSolution, TaskSolutionFile)
+from inloop.tasks.test_base import TasksTestBase
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
@@ -92,35 +92,25 @@ def create_test_task_solution_file(solution, contentpath):
     return tsf
 
 
-class TaskModelTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
-
-    @classmethod
-    def tearDownClass(cls):
-        remove(MEDIA_IMAGE_PATH)
-        super().tearDownClass()
-
+class TaskModelTests(TasksTestBase):
     def setUp(self):
-        self.user = create_test_user()
-        self.cat = create_task_category("Basic", MEDIA_IMAGE_PATH)
-        self.t1 = create_test_task(author=self.user, category=self.cat, active=True)
-        self.t2 = create_test_task(author=self.user, category=self.cat, active=False)
-
-    def tearDown(self):
-        remove(self.cat.image.path)
+        super().setUp()
+        self.inactive_task = self.create_task(
+            title="Inactive task",
+            publication_date=timezone.now() + timezone.timedelta(days=2)
+        )
 
     def test_task_is_active(self):
-        self.assertTrue(self.t1.is_active())
-        self.assertFalse(self.t2.is_active())
+        self.assertTrue(self.task.is_active())
+        self.assertFalse(self.inactive_task.is_active())
 
     def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(username=self.user.username, password="123456")
-        resp = self.client.get("/", follow=True)
-        self.assertEqual(resp.status_code, 200)
-        self.assertFalse(self.t2.title in resp.content.decode())
+        self.client.login(
+            username=self.user_defaults["username"],
+            password=self.user_defaults["password"]
+        )
+        response = self.client.get("/", follow=True)
+        self.assertNotContains(response, self.inactive_task.title)
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
@@ -130,9 +120,9 @@ class TaskModelTests(TestCase):
             Task.objects.create(deadline_date="abc")
 
     def test_task_location(self):
-        subpath = "inloop/media/exercises/"
-        self.assertTrue(subpath + self.t1.slug in self.t1.task_location())  # activated
-        self.assertTrue(subpath + self.t2.slug in self.t2.task_location())  # deactivated
+        subpath = "inloop/media/exercises/%s"
+        self.assertIn(subpath % self.task.slug, self.task.task_location())
+        self.assertIn(subpath % self.inactive_task.slug, self.inactive_task.task_location())
 
 
 class TaskCategoryTests(TestCase):
