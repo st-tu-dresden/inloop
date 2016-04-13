@@ -8,7 +8,7 @@ from unittest import skipUnless
 from django.conf import settings
 from django.test import TestCase
 
-from inloop.tasks.docker import DockerSubProcessChecker, collect_files
+from inloop.tasks.checker import DockerSubProcessChecker, collect_files
 
 TEST_DIR = join(abspath(dirname(__file__)), "tests")
 
