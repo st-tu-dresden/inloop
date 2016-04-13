@@ -63,19 +63,15 @@ class TaskCategory(models.Model):
         return (self.short_id, self.name)
 
     def completed_tasks_for_user(self, user):
-        '''Returns the tasks a user has already solved.'''
-        return Task.objects.filter(
+        """Return tasks of this category a user has already solved."""
+        return self.task_set.filter(
             tasksolution__author=user,
-            tasksolution__passed=True,
-            category=self
+            tasksolution__passed=True
         ).distinct()
 
     def get_tasks(self):
-        '''Returns a queryset of this category's task that have already been
-        published'''
-        return Task.objects.filter(
-            category=self,
-            publication_date__lt=timezone.now())
+        """Return tasks of this category that have already been published."""
+        return self.task_set.filter(publication_date__lt=timezone.now())
 
     def __str__(self):
         return self.name
@@ -158,9 +154,12 @@ class TaskSolution(models.Model):
     passed = models.BooleanField(default=False)
 
     def solution_path(self):
-        # Get arbitrary TaskSolution to get directory path
-        sol_file = TaskSolutionFile.objects.filter(solution=self)[0]
-        return join(dirname(sol_file.file_path()))
+        if self.tasksolutionfile_set.count() < 1:
+            raise ValueError("No files associated to TaskSolution(id=%d)" % self.id)
+
+        # derive the directory from the first associated TaskSolutionFile
+        solution_file = self.tasksolutionfile_set.first()
+        return join(dirname(solution_file.file_path()))
 
     def __str__(self):
         return "TaskSolution(author='{}', task='{}')".format(
