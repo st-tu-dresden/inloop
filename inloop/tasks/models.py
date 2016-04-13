@@ -40,7 +40,7 @@ def get_upload_path(instance, filename):
 @db_task()
 def check_solution(solution_id):
     """
-    Huey job which calls TaskSolution.check() for the TaskSolution specified
+    Huey job which calls TaskSolution.do_check() for the TaskSolution specified
     by solution_id.
 
     This function will not block, instead it submits the job to the queue
@@ -57,7 +57,7 @@ def check_solution(solution_id):
     #
     solution = TaskSolution.objects.get(pk=solution_id)
     checker = DockerSubProcessChecker(settings.CHECKER, settings.DOCKER_IMAGE)
-    result = solution.check(checker)
+    result = solution.do_check(checker)
     return result.id
 
 
@@ -200,7 +200,7 @@ class TaskSolution(models.Model):
         solution_file = self.tasksolutionfile_set.first()
         return join(dirname(solution_file.file_path()))
 
-    def check(self, checker):
+    def do_check(self, checker):
         """
         Check this solution using the specified checker.
 

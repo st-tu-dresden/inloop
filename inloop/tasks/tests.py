@@ -98,13 +98,13 @@ class TaskSolutionTests(TasksTestBase):
         return checker
 
     def test_precondition(self):
-        """Verify there are no results before calling TaskSolution.check()."""
+        """Verify there are no results before calling TaskSolution.do_check()."""
         self.assertEqual(self.solution.checkerresult_set.count(), 0)
         self.assertFalse(self.solution.passed)
 
     def test_checkerresult_saved(self):
         """Test if the CheckerResult is saved with the right values."""
-        self.solution.check(self.create_mock_checker(
+        self.solution.do_check(self.create_mock_checker(
             ResultTuple(0, "OUT", "ERR", 1.2, dict())
         ))
 
@@ -121,7 +121,7 @@ class TaskSolutionTests(TasksTestBase):
 
     def test_checkeroutputs_saved(self):
         """Test if CheckerOutputs are saved."""
-        self.solution.check(self.create_mock_checker(
+        self.solution.do_check(self.create_mock_checker(
             ResultTuple(1, "OUT", "ERR", 0.2, {"test.txt": "content", "test2.txt": "content2"})
         ))
 
@@ -134,7 +134,7 @@ class TaskSolutionTests(TasksTestBase):
 
     def test_failure_means_not_passed(self):
         """Test if non-zero rc marks the solution as not passed."""
-        self.solution.check(self.create_mock_checker(
+        self.solution.do_check(self.create_mock_checker(
             ResultTuple(1, "OUT", "ERR", 0.2, dict())
         ))
         results = self.solution.checkerresult_set.all()
@@ -146,7 +146,7 @@ class TaskSolutionTests(TasksTestBase):
         checker = self.create_mock_checker(
             ResultTuple(0, "OUT", "ERR", 1.2, dict())
         )
-        self.solution.check(checker)
+        self.solution.do_check(checker)
         checker.check_task.assert_called_with(
             self.task_defaults["name"],
             path.dirname(self.solutionfile.file.path)
