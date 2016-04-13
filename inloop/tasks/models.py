@@ -26,6 +26,8 @@ def get_upload_path(instance, filename):
         'solutions',
         instance.solution.author.username,
         instance.solution.task.slug,
+        # FIXME: race condition at minute boundary causes files to be saved in different dirs
+        # FIXME: don't use timezone.now(), use submission_date instead
         timezone.now().strftime('%Y/%m/%d/%H_%M_') + str(instance.solution.id),
         filename
     )
@@ -41,7 +43,9 @@ class TaskCategoryManager(models.Manager):
             return self.create(name=name, short_id=slugify(name))
 
 
+# FIXME: __repr__ vs __str__
 class TaskCategory(models.Model):
+    # FIXME: that's a slug
     short_id = models.CharField(
         unique=True,
         max_length=50,
@@ -59,6 +63,7 @@ class TaskCategory(models.Model):
         self.short_id = slugify(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
 
+    # FIXME: used anywhere?
     def get_tuple(self):
         return (self.short_id, self.name)
 
@@ -69,6 +74,7 @@ class TaskCategory(models.Model):
             tasksolution__passed=True
         ).distinct()
 
+    # FIXME: method name
     def get_tasks(self):
         """Return tasks of this category that have already been published."""
         return self.task_set.filter(publication_date__lt=timezone.now())
@@ -109,6 +115,9 @@ class TaskManager(models.Manager):
             raise MissingTaskMetadata(missing)
 
 
+# FIXME: add creation/update timestamp
+# FIXME: auto slugify
+# FIXME: __repr__ vs __str__
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
@@ -128,6 +137,7 @@ class Task(models.Model):
 
     objects = TaskManager()
 
+    # FIXME: method name
     def is_active(self):
         """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
@@ -139,6 +149,8 @@ class Task(models.Model):
         return self.name
 
 
+# FIXME: default values
+# FIXME: __repr__ vs __str__
 class TaskSolution(models.Model):
     """
     Represents the user uploaded files.
