@@ -25,6 +25,12 @@ def collect_files(path):
     return retval
 
 
+class ResultTuple(namedtuple("_ResultTuple", "rc stdout stderr duration file_dict")):
+    """
+    Container type wrapping the outputs of a checker run.
+    """
+
+
 class DockerSubProcessChecker:
     """
     Checker implementation using a local `docker` binary.
@@ -82,7 +88,6 @@ class DockerSubProcessChecker:
     This class expects that the Docker image specified by image_name has already
     been built (e.g., during the import of a task repository).
     """
-    Result = namedtuple("DockerSubProcessCheckerResult", "rc stdout stderr duration file_dict")
 
     def __init__(self, config, image_name):
         """
@@ -140,7 +145,7 @@ class DockerSubProcessChecker:
             duration = time.perf_counter() - start_time
             file_dict = collect_files(storage_dir)
 
-        return self.Result(rc, stdout, stderr, duration, file_dict)
+        return ResultTuple(rc, stdout, stderr, duration, file_dict)
 
     def subpath_check(self, path1, path2):
         """
