@@ -208,8 +208,8 @@ class TaskSolution(models.Model):
         more CheckerOutputs) will be saved to the database and returned.
 
         This method will block until the checker is finished. For this reason, views
-        should call it through the asynchronous TaskSolution.check_async() wrapper,
-        otherwise the whole request will get stuck.
+        should call it through the asynchronous check_solution() wrapper, otherwise
+        the whole request will get stuck.
         """
         result_tuple = checker.check_task(self.task.name, self.solution_path())
 
@@ -228,12 +228,6 @@ class TaskSolution(models.Model):
             self.save()
 
         return result
-
-    def check_async(self):
-        """
-        Non-blocking wrapper for TaskSolution.check().
-        """
-        return check_solution(self.id)
 
     def __str__(self):
         return "TaskSolution(author='{}', task='{}')".format(
