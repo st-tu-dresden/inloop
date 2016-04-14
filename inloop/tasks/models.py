@@ -188,6 +188,9 @@ class TaskSolution(models.Model):
     task = models.ForeignKey(Task)
     passed = models.BooleanField(default=False)
 
+    # time after a solution without a CheckerResult is regarded as timed out
+    TIMEOUT = timezone.timedelta(minutes=5)
+
     def solution_path(self):
         if self.tasksolutionfile_set.count() < 1:
             raise AssertionError("No files associated to TaskSolution(id=%d)" % self.id)
@@ -231,6 +234,16 @@ class TaskSolution(models.Model):
     def __repr__(self):
         return "<%s: id=%r author=%r task=%r>" % \
             (self.__class__.__name__, self.id, str(self.author), str(self.task))
+
+    def status(self):
+        """Query the status of this TaskSolution."""
+        if self.checkerresult_set.exists():
+            status = "success" if self.passed else "failure"
+        elif self.submission_date + self.TIMEOUT < timezone.now():
+            status = "timeout"
+        else:
+            status = "pending"
+        return status
 
     def __str__(self):
         return "Solution #%d" % self.id
