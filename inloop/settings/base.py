@@ -136,3 +136,6 @@ LOGGING = {
         },
     },
 }
+
+# TODO: investigate a better method to align Bootstrap alerts and contrib.messages
+MESSAGE_TAGS = {10: "info", 40: "danger"}
