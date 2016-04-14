@@ -30,6 +30,7 @@ def _check_subject(line):
     if line and line[-1] == ".":
         errors.append("subject line ends with a period")
     if re.match('^[a-z]+ed', line, re.I):
+        # FIXME: should not match "Redesign sth"
         errors.append("subject line uses past tense")
     return errors
 
@@ -64,6 +65,7 @@ def main(args):
         print("Your commit message is malformed:")
         for error in errors:
             print(" - %s" % error)
+        # FIXME: add veto option
         answer = input("Edit again? [Y/n] ")
         if answer.strip().lower() not in ["n", "no"]:
             subprocess.call(editor.split() + args)

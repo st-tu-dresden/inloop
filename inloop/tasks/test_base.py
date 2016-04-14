@@ -94,6 +94,7 @@ class TasksTestBase(TestCase):
             filename=filename,
             file=None
         )
+        # FIXME: file handling -- is this supposed to work this way?
         with open(contentpath, encoding="utf-8") as f:
             tsf.file.save(filename, ContentFile(f.read()))
         return tsf

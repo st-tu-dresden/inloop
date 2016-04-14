@@ -114,6 +114,7 @@ def detail(request, slug):
     })
 
 
+# FIXME: this should be async as well
 @login_required
 def get_solution_as_zip(request, slug, solution_id):
     ts = get_object_or_404(TaskSolution, id=solution_id, author=request.user)
