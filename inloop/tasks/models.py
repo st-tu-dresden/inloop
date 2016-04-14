@@ -145,6 +145,7 @@ class TaskManager(models.Manager):
 # FIXME: add creation/update timestamp
 # FIXME: auto slugify
 # FIXME: __repr__ vs __str__
+# FIXME: some fields should be blankable
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
