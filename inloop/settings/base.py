@@ -7,12 +7,11 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
-
-from os import environ
+import sys
+from os import environ, makedirs
 from os.path import dirname, join
-from sys import version_info
 
-if version_info[0] < 3:
+if sys.version_info[0] < 3:
     raise RuntimeError("INLOOP must be run with Python 3.x")
 
 PROJECT_ROOT = dirname(dirname(dirname(__file__)))
@@ -106,6 +105,16 @@ CHECKER = {
     }
 }
 
+# Docker image to be used by the DockerSubProcessChecker
+DOCKER_IMAGE = "inloop-java-checker"
+
+# Docker on Mac OS X specific:
+#  - docker-machine implements mounted volumes using VirtualBox shared folders
+#  - shared folders must be located below the user's home directory
+if sys.platform == "darwin":
+    CHECKER["tmpdir"] = join(PROJECT_ROOT, ".tmp_docker")
+    makedirs(CHECKER["tmpdir"], exist_ok=True)
+
 SENDFILE_METHOD = "django"
 
 # Use the environment var INLOOP_LOG_LEVEL to adjust INLOOP logging
@@ -124,6 +133,3 @@ LOGGING = {
         },
     },
 }
-
-# Docker image to be used by the DockerSubProcessChecker
-DOCKER_IMAGE = "inloop-java-checker"

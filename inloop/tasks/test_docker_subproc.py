@@ -49,10 +49,9 @@ class DockerSubProcessCheckerTests(TestCase):
 
     input_path = TEST_DIR
 
-    # docker-machine on OS X needs a mount point below $HOME
     options = {
         "timeout": 1.5,
-        "tmpdir": join(settings.PROJECT_ROOT, ".tmp_docker")
+        "tmpdir": settings.CHECKER.get("tmpdir")
     }
 
     @classmethod
