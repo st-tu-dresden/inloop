@@ -2,10 +2,10 @@
 Base settings for inloop project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
+https://docs.djangoproject.com/en/1.8/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
+https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import sys
 from os import environ, makedirs
@@ -86,11 +86,13 @@ TEMPLATES = [
     },
 ]
 
+# setup for the asynchronous task queue
 HUEY = {
     'name': 'inloop-task-queue',
     'always_eager': False,
 }
 
+# checker setup
 CHECKER = {
     'Container': {
         'container_tag': 'docker-test',
@@ -115,6 +117,7 @@ if sys.platform == "darwin":
     CHECKER["tmpdir"] = join(PROJECT_ROOT, ".tmp_docker")
     makedirs(CHECKER["tmpdir"], exist_ok=True)
 
+# which sendfile() implementation should be used ("django" or "nginx")
 SENDFILE_METHOD = "django"
 
 # Use the environment var INLOOP_LOG_LEVEL to adjust INLOOP logging
