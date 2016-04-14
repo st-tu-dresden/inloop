@@ -4,11 +4,14 @@ from os.path import dirname, join
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.text import slugify
+from huey.contrib.djhuey import db_task
 
 from inloop.accounts.models import UserProfile
 from inloop.gh_import.utils import parse_date
+from inloop.tasks.checker import DockerSubProcessChecker
 
 
 def make_slug(value):
@@ -32,6 +35,30 @@ def get_upload_path(instance, filename):
         filename
     )
     return path
+
+
+@db_task()
+def check_solution(solution_id):
+    """
+    Huey job which calls TaskSolution.do_check() for the TaskSolution specified
+    by solution_id.
+
+    This function will not block, instead it submits the job to the queue
+    and returns an AsyncData object immediately.
+
+    Blocking behavior can be achieved by calling check_solution.call_local(),
+    which circumvents the huey queue.
+
+    The job's return value will be the id of the created CheckerResult.
+    """
+    #
+    # model ids are used here since parameters and return values of huey
+    # jobs have to be simple types (e.g., int)
+    #
+    solution = TaskSolution.objects.get(pk=solution_id)
+    checker = DockerSubProcessChecker(settings.CHECKER, settings.DOCKER_IMAGE)
+    result = solution.do_check(checker)
+    return result.id
 
 
 class TaskCategoryManager(models.Manager):
@@ -172,6 +199,35 @@ class TaskSolution(models.Model):
         # derive the directory from the first associated TaskSolutionFile
         solution_file = self.tasksolutionfile_set.first()
         return join(dirname(solution_file.file_path()))
+
+    def do_check(self, checker):
+        """
+        Check this solution using the specified checker.
+
+        If the checker returns normally, a CheckerResult (possibly containing one or
+        more CheckerOutputs) will be saved to the database and returned.
+
+        This method will block until the checker is finished. For this reason, views
+        should call it through the asynchronous check_solution() wrapper, otherwise
+        the whole request will get stuck.
+        """
+        result_tuple = checker.check_task(self.task.name, self.solution_path())
+
+        with atomic():
+            result = CheckerResult.objects.create(
+                solution=self,
+                stdout=result_tuple.stdout,
+                stderr=result_tuple.stderr,
+                return_code=result_tuple.rc,
+                time_taken=result_tuple.duration
+            )
+            result.checkeroutput_set = [
+                CheckerOutput(name=k, output=v) for k, v in result_tuple.file_dict.items()
+            ]
+            self.passed = result.is_success()
+            self.save()
+
+        return result
 
     def __str__(self):
         return "TaskSolution(author='{}', task='{}')".format(

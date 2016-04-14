@@ -1,11 +1,14 @@
 from doctest import DocTestSuite
+from os import path
+from unittest.mock import MagicMock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from inloop.tasks import models
-from inloop.tasks.models import CheckerResult, MissingTaskMetadata, Task, TaskCategory
+from inloop.tasks.checker import ResultTuple
+from inloop.tasks.models import MissingTaskMetadata, Task, TaskCategory
 from inloop.tasks.test_base import TasksTestBase
 
 
@@ -84,10 +87,70 @@ class TaskCategoryTests(TasksTestBase):
 
 
 class TaskSolutionTests(TasksTestBase):
-    def test_default_value(self):
-        solution = self.create_solution()
-        result = CheckerResult.objects.create(solution=solution)
-        self.assertFalse(result.passed)
+    def setUp(self):
+        super().setUp()
+        self.solution = self.create_solution()
+        self.solutionfile = self.create_solution_file(solution=self.solution)
+
+    def create_mock_checker(self, return_value):
+        checker = MagicMock()
+        checker.check_task = MagicMock(return_value=return_value)
+        return checker
+
+    def test_precondition(self):
+        """Verify there are no results before calling TaskSolution.do_check()."""
+        self.assertEqual(self.solution.checkerresult_set.count(), 0)
+        self.assertFalse(self.solution.passed)
+
+    def test_checkerresult_saved(self):
+        """Test if the CheckerResult is saved with the right values."""
+        self.solution.do_check(self.create_mock_checker(
+            ResultTuple(0, "OUT", "ERR", 1.2, dict())
+        ))
+
+        result_set = self.solution.checkerresult_set
+        self.assertEqual(result_set.count(), 1)
+
+        result = result_set.first()
+        self.assertEqual(result.stdout, "OUT")
+        self.assertEqual(result.stderr, "ERR")
+        self.assertEqual(result.return_code, 0)
+        self.assertEqual(result.time_taken, 1.2)
+
+        self.assertTrue(self.solution.passed)
+
+    def test_checkeroutputs_saved(self):
+        """Test if CheckerOutputs are saved."""
+        self.solution.do_check(self.create_mock_checker(
+            ResultTuple(1, "OUT", "ERR", 0.2, {"test.txt": "content", "test2.txt": "content2"})
+        ))
+
+        output_set = self.solution.checkerresult_set.first().checkeroutput_set
+        self.assertEqual(output_set.count(), 2)
+        self.assertEqual(output_set.filter(name="test.txt").count(), 1)
+        self.assertEqual(output_set.filter(name="test2.txt").count(), 1)
+        self.assertEqual(output_set.filter(name="test.txt").first().output, "content")
+        self.assertEqual(output_set.filter(name="test2.txt").first().output, "content2")
+
+    def test_failure_means_not_passed(self):
+        """Test if non-zero rc marks the solution as not passed."""
+        self.solution.do_check(self.create_mock_checker(
+            ResultTuple(1, "OUT", "ERR", 0.2, dict())
+        ))
+        results = self.solution.checkerresult_set.all()
+        self.assertEqual(results.count(), 1)
+        self.assertFalse(self.solution.passed)
+
+    def test_solution_input_is_used(self):
+        """Test if TaskSolutionFiles are passed to the Checker."""
+        checker = self.create_mock_checker(
+            ResultTuple(0, "OUT", "ERR", 1.2, dict())
+        )
+        self.solution.do_check(checker)
+        checker.check_task.assert_called_with(
+            self.task_defaults["name"],
+            path.dirname(self.solutionfile.file.path)
+        )
 
     def test_get_upload_path(self):
         solution = self.create_solution()

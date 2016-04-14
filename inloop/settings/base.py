@@ -124,3 +124,6 @@ LOGGING = {
         },
     },
 }
+
+# Docker image to be used by the DockerSubProcessChecker
+DOCKER_IMAGE = "inloop-java-checker"
