@@ -103,7 +103,8 @@ CHECKER = {
         'container_kill': 5,
         'container_remove': 5,
         'container_build': 180,
-    }
+    },
+    "timeout": 120
 }
 
 # Docker image to be used by the DockerSubProcessChecker
