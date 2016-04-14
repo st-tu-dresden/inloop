@@ -1,4 +1,3 @@
-import os
 import shutil
 import signal
 import subprocess
@@ -49,20 +48,11 @@ class DockerSubProcessCheckerTests(TestCase):
 
     input_path = TEST_DIR
 
+    # NOTE: tmpdir=None means using the platform default (e.g., TMPDIR)
     options = {
         "timeout": 1.5,
         "tmpdir": settings.CHECKER.get("tmpdir")
     }
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        os.makedirs(cls.options["tmpdir"], exist_ok=True)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.options["tmpdir"])
-        super().tearDownClass()
 
     def setUp(self):
         self.checker = DockerSubProcessChecker(self.options, self.image_name)
