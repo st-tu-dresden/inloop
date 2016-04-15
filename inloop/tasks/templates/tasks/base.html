@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.short_id %}">{{ task.category }}</a></li>
+  <li class="active">{{ task.title }}</li>
+</ol>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active">
+    <a href="{% url 'tasks:detail' task.slug %}">Description</a>
+  </li>
+  <li role="presentation">
+    <a href="#">Manual upload</a>
+  </li>
+  <li role="presentation">
+    <a href="#">
+      Your solutions <span class="label label-info">NEW</span>
+    </a>
+  </li>
+</ul>
+
+{% block tab_content %}{% endblock %}
+{% endblock %}
