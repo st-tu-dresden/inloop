@@ -13,7 +13,7 @@
     <a href="{% url 'tasks:detail' task.slug %}">Description</a>
   </li>
   <li role="presentation">
-    <a href="#">Manual upload</a>
+    <a href="{% url 'tasks:solutionupload' task.slug %}">Manual upload</a>
   </li>
   <li role="presentation">
     <a href="#">
@@ -22,5 +22,8 @@
   </li>
 </ul>
 
+<div style="margin: 1em">
 {% block tab_content %}{% endblock %}
+</div>
+
 {% endblock %}

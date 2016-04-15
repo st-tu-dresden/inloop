@@ -3,11 +3,13 @@ Class based views to manage tasks, task categories and submitted solutions.
 """
 from django import VERSION as DJANGO_VERSION
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import Http404, get_object_or_404, render
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
+from django.contrib import messages
+from django.utils import timezone
 
-from inloop.tasks.models import Task, TaskSolution
+from inloop.tasks.models import check_solution, Task, TaskSolution, TaskSolutionFile
 
 
 # Once we have upgraded to Django 1.9, we can use the shipped contrib.auth Mixins.
@@ -41,3 +43,34 @@ class TaskDetailView(LoginRequiredMixin, View):
         return render(request, "tasks/detail.html", {
             'task': get_active_task_or_404(slug=slug)
         })
+
+
+class SolutionUploadView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        task = get_active_task_or_404(slug=slug)
+        return render(request, "tasks/upload_form.html", {"task": task})
+
+    def post(self, request, slug):
+        task = get_active_task_or_404(slug=slug)
+        uploads = request.FILES.getlist('uploads')
+
+        if not uploads:
+            messages.error(request, "You haven't uploaded any files.")
+            return redirect("tasks:solutionupload", slug=slug)
+
+        if not all([f.name.endswith(".java") for f in uploads]):
+            messages.error(request, "You have uploaded invalid files (allowed: *.java).")
+            return redirect("tasks:solutionupload", slug=slug)
+
+        solution = TaskSolution.objects.create(
+            submission_date=timezone.now(),
+            author=request.user,
+            task=task
+        )
+        solution.tasksolutionfile_set = [
+            TaskSolutionFile(filename=f.name, file=f) for f in uploads
+        ]
+
+        check_solution(solution.id)
+        messages.success(request, "Your solution has been submitted to the checker.")
+        return redirect("tasks:detail", slug=slug)
