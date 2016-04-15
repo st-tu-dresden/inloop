@@ -9,13 +9,13 @@
 </ol>
 
 <ul class="nav nav-tabs">
-  <li role="presentation" class="active">
+  <li role="presentation" {% if active_tab == 0 %}class="active"{% endif %}>
     <a href="{% url 'tasks:detail' task.slug %}">Description</a>
   </li>
-  <li role="presentation">
+  <li role="presentation" {% if active_tab == 1 %}class="active"{% endif %}>
     <a href="{% url 'tasks:solutionupload' task.slug %}">Manual upload</a>
   </li>
-  <li role="presentation">
+  <li role="presentation" {% if active_tab == 2 %}class="active"{% endif %}>
     <a href="#">
       Your solutions <span class="label label-info">NEW</span>
     </a>

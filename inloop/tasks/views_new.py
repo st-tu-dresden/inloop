@@ -41,14 +41,17 @@ class SolutionStatusView(LoginRequiredMixin, View):
 class TaskDetailView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return render(request, "tasks/detail.html", {
-            'task': get_active_task_or_404(slug=slug)
+            'task': get_active_task_or_404(slug=slug),
+            'active_tab': 0
         })
 
 
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        task = get_active_task_or_404(slug=slug)
-        return render(request, "tasks/upload_form.html", {"task": task})
+        return render(request, "tasks/upload_form.html", {
+            'task': get_active_task_or_404(slug=slug),
+            'active_tab': 1
+        })
 
     def post(self, request, slug):
         task = get_active_task_or_404(slug=slug)
