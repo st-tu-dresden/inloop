@@ -31,10 +31,7 @@ class TaskModelTests(TasksTestBase):
         self.assertFalse(self.unpublished_task.is_published())
 
     def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(
-            username=self.user_defaults["username"],
-            password=self.user_defaults["password"]
-        )
+        self.client.login(username="chuck_norris", password="s3cret")
         response = self.client.get("/", follow=True)
         self.assertNotContains(response, self.unpublished_task.title)
 

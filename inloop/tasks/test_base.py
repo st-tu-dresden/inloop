@@ -22,15 +22,6 @@ class TasksTestBase(TestCase):
     """
     Abstract base class which unifies some common test setup tasks.
     """
-    user_defaults = {
-        "username": "chuck_norris",
-        "first_name": "Chuck",
-        "last_name": "Norris",
-        "email": "chuck.norris@example.org",
-        "password": "s3cret",
-        "mat_num": "1234567"
-    }
-
     category_defaults = {
         "name": "Basic",
     }
@@ -57,14 +48,23 @@ class TasksTestBase(TestCase):
         super().tearDownClass()
 
     def setUp(self):
-        self.user = self.create_user()
+        self.user = self.create_user("Chuck Norris")
         self.cat = self.create_category()
         self.task = self.create_task()
 
-    def create_user(self, **kwargs):
-        for k, v in self.user_defaults.items():
-            kwargs.setdefault(k, v)
-        return UserProfile.objects.create_user(**kwargs)
+    def create_user(self, name):
+        first_name, last_name = name.split()
+        username = "%s_%s" % (first_name, last_name)
+        email = "%s.%s@example.org" % (first_name, last_name)
+
+        return UserProfile.objects.create_user(
+            username=username.lower(),
+            first_name=first_name,
+            last_name=last_name,
+            email=email.lower(),
+            password="s3cret",
+            mat_num="1234567"
+        )
 
     def create_category(self, **kwargs):
         for k, v in self.category_defaults.items():
@@ -100,8 +100,8 @@ class TasksTestBase(TestCase):
 
     def test_selftest(self):
         """Test if the test data was wired up correctly."""
-        self.assertEqual(self.user.username, self.user_defaults["username"])
-        self.assertEqual(self.user.email, self.user_defaults["email"])
+        self.assertEqual(self.user.username, "chuck_norris")
+        self.assertEqual(self.user.email, "chuck.norris@example.org")
         self.assertEqual(self.cat.name, self.category_defaults["name"])
         self.assertEqual(self.task.author, self.user)
         self.assertEqual(self.task.category, self.cat)
