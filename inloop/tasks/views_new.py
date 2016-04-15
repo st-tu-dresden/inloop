@@ -25,5 +25,5 @@ class LoginRequiredMixin:
 
 class SolutionStatusView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
-        solution = get_object_or_404(TaskSolution, pk=solution_id)
+        solution = get_object_or_404(TaskSolution, pk=solution_id, author=request.user)
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
