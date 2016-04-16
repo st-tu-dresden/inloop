@@ -76,4 +76,17 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
         check_solution(solution.id)
         messages.success(request, "Your solution has been submitted to the checker.")
-        return redirect("tasks:detail", slug=slug)
+        return redirect("tasks:solutionlist", slug=slug)
+
+
+class SolutionListView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        task = get_active_task_or_404(slug=slug)
+        solutions = TaskSolution.objects \
+            .filter(task=task, author=request.user) \
+            .order_by("-id")[:5]
+        return render(request, "tasks/solutions.html", {
+            'task': task,
+            'solutions': solutions,
+            'active_tab': 2
+        })

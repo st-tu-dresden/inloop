@@ -1,0 +1,39 @@
+{% extends "tasks/base.html" %}
+
+{% block title %}{{ task.title }} solutions{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+.solstatus {
+  display: inline-block;
+  float: right;
+  vertical-align: middle;
+  line-height: 40px;
+  font-size: 20px;
+}
+</style>
+{% endblock %}
+
+{% block tab_content %}
+{% if solutions %}
+<div class="list-group">
+{% for solution in solutions %}
+  <a class="list-group-item" href="#">
+  {% if solution.status == "success" %}
+    <span class="solstatus glyphicon glyphicon-ok"></span>
+  {% elif solution.status == "pending" %}
+    <span class="solstatus glyphicon glyphicon-cog"></span>
+  {% else %}
+    <span class="solstatus glyphicon glyphicon-minus-sign"></span>
+  {% endif %}
+    <h4 class="list-group-item-heading">#{{ solution.id }}</h4>
+    <p class="list-group-item-text">
+      Submitted on {{ solution.submission_date }}
+    </p>
+  </a>
+{% endfor %}
+</div>
+{% else %}
+<p>You haven't submitted anything yet.</p>
+{% endif %}
+{% endblock %}
