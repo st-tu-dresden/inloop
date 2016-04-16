@@ -1,5 +1,7 @@
 {% extends 'tasks/base.html' %}
 
+{% block title %}Solution upload - {{ task.title }} {% endblock %}
+
 {% block tab_content %}
 <form class="form-inline" action="{% url 'tasks:solutionupload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
