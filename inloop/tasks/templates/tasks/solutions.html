@@ -11,6 +11,16 @@
   line-height: 40px;
   font-size: 20px;
 }
+.spinner {
+  -webkit-animation-name: spin;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
 </style>
 {% endblock %}
 
@@ -22,7 +32,7 @@
   {% if solution.status == "success" %}
     <span class="solstatus glyphicon glyphicon-ok"></span>
   {% elif solution.status == "pending" %}
-    <span class="solstatus glyphicon glyphicon-cog"></span>
+    <span class="solstatus spinner glyphicon glyphicon-cog"></span>
   {% else %}
     <span class="solstatus glyphicon glyphicon-minus-sign"></span>
   {% endif %}
