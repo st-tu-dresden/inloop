@@ -90,3 +90,20 @@ class SolutionListView(LoginRequiredMixin, View):
             'solutions': solutions,
             'active_tab': 2
         })
+
+
+class SolutionDetailView(LoginRequiredMixin, View):
+    def get(self, request, solution_id):
+        solution = get_object_or_404(TaskSolution, pk=solution_id)
+
+        if not (solution.author == request.user or request.user.is_staff):
+            raise Http404()
+
+        if solution.status() == "pending":
+            messages.info(request, "This solution is still being checked. Please try again later.")
+            return redirect("tasks:solutionlist", slug=solution.task.slug)
+
+        return render(request, "tasks/solutiondetail.html", {
+            'solution': solution,
+            'result': solution.checkerresult_set.last()
+        })

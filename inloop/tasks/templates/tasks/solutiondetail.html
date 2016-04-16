@@ -1,0 +1,16 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+{% with task=solution.task %}
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.short_id %}">{{ task.category }}</a></li>
+  <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
+  <li class="active">Solution #{{ solution.id }}</li>
+</ol>
+{% endwith %}
+
+<pre><code>{{ result.stdout }}</code></pre>
+
+{% endblock %}

@@ -18,7 +18,7 @@
 {% if solutions %}
 <div class="list-group">
 {% for solution in solutions %}
-  <a class="list-group-item" href="#">
+  <a class="list-group-item" href="{% url 'tasks:solutiondetail' solution.id %}">
   {% if solution.status == "success" %}
     <span class="solstatus glyphicon glyphicon-ok"></span>
   {% elif solution.status == "pending" %}
