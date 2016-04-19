@@ -1,7 +1,19 @@
 {% extends "base_site.html" %}
 
+{% block extrabody %}
+<style class="text/css">
+.result_stdout {
+  font-size: 86%;
+}
+.result_stdout code {
+  white-space: pre;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
+{# Breadcrumb #}
 {% with task=solution.task %}
 <ol class="breadcrumb">
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
@@ -10,7 +22,43 @@
   <li class="active">Solution #{{ solution.id }}</li>
 </ol>
 {% endwith %}
+{# /Breadcrumb #}
 
-<pre><code>{{ result.stdout }}</code></pre>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active">
+    <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
+  </li>
+  <li role="presentation">
+    <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
+  </li>
+</ul>
+
+<div class="tab-content" style="margin: 1em">
+  <div role="tabpanel" class="tab-pane active" id="home">
+  {% if solution.passed %}
+    <p class="alert alert-success">
+      Congratulations, your solution passed all tests.
+    </p>
+  {% elif solution.status == "failure" %}
+    <p class="alert alert-danger">
+      Your solution did not pass the tests.
+    </p>
+  {% elif solution.status == "killed" %}
+    <p class="alert alert-danger">
+      Your solution took too long to complete and has been terminated.
+    </p>
+  {% endif %}
+  </div><!-- /#overview -->
+
+  <div role="tabpanel" class="tab-pane" id="console">
+  {% if result.stdout or result.stderr %}
+    <pre class="result_stdout"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
+  {% else %}
+    <p>Nothing to show here.</p>
+  {% endif %}
+  </div><!-- /#console -->
+</div><!-- /.tab-content -->
+
 
 {% endblock %}
