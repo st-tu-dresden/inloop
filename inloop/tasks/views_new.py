@@ -103,6 +103,14 @@ class SolutionDetailView(LoginRequiredMixin, View):
             messages.info(request, "This solution is still being checked. Please try again later.")
             return redirect("tasks:solutionlist", slug=solution.task.slug)
 
+        if solution.status() in ["lost", "error"]:
+            messages.warning(
+                request,
+                "Sorry, but the server had trouble checking this solution. Please try "
+                "to upload it again or contact the administrator if the problem persists."
+            )
+            return redirect("tasks:solutionlist", slug=solution.task.slug)
+
         return render(request, "tasks/solutiondetail.html", {
             'solution': solution,
             'result': solution.checkerresult_set.last()
