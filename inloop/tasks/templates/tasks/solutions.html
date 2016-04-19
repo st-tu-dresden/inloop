@@ -8,7 +8,7 @@
   display: inline-block;
   float: right;
   vertical-align: middle;
-  line-height: 40px;
+  line-height: 50px;
   font-size: 20px;
 }
 .spinner {
@@ -29,13 +29,17 @@
 <div class="list-group">
 {% for solution in solutions %}
   <a class="list-group-item" href="{% url 'tasks:solutiondetail' solution.id %}">
-  {% if solution.status == "success" %}
-    <span class="solstatus glyphicon glyphicon-ok"></span>
-  {% elif solution.status == "pending" %}
-    <span class="solstatus spinner glyphicon glyphicon-cog"></span>
-  {% else %}
-    <span class="solstatus glyphicon glyphicon-minus-sign"></span>
-  {% endif %}
+
+    <div class="solstatus">
+    {% if solution.status == "success" %}
+      <span class="glyphicon glyphicon-ok"></span>
+    {% elif solution.status == "pending" %}
+      <span class="spinner glyphicon glyphicon-cog"></span>
+    {% else %}
+      <span class="glyphicon glyphicon-minus-sign"></span>
+    {% endif %}
+    </div>
+
     <h4 class="list-group-item-heading">#{{ solution.id }}</h4>
     <p class="list-group-item-text">
       Submitted on {{ solution.submission_date }}
