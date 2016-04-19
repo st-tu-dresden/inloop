@@ -35,8 +35,10 @@
       <span class="glyphicon glyphicon-ok"></span>
     {% elif solution.status == "pending" %}
       <span class="spinner glyphicon glyphicon-cog"></span>
-    {% else %}
+    {% elif solution.status == "failure" %}
       <span class="glyphicon glyphicon-minus-sign"></span>
+    {% else %}
+      <span class="glyphicon glyphicon-exclamation-sign"></span>
     {% endif %}
     </div>
 
