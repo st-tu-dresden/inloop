@@ -1,4 +1,5 @@
 import re
+import signal
 from os.path import dirname, join
 
 from django.conf import settings
@@ -236,14 +237,23 @@ class TaskSolution(models.Model):
             (self.__class__.__name__, self.id, str(self.author), str(self.task))
 
     def status(self):
-        """Query the status of this TaskSolution."""
-        if self.checkerresult_set.exists():
-            status = "success" if self.passed else "failure"
-        elif self.submission_date + self.TIMEOUT < timezone.now():
-            status = "timeout"
-        else:
-            status = "pending"
-        return status
+        """
+        Query the status of this TaskSolution.
+
+        Possible states are: success, failure, error, lost, killed, pending. State
+        `failure` means that a solution did not pass a test. In contrast to a
+        `failure`, an `error` signals an internal, server-side bug or
+        misconfiguration encountered during test execution.
+
+        State `lost` means there was no response from the background queue
+        after a reasonable amount of time.
+        """
+        result = self.checkerresult_set.last()
+        if result:
+            return result.status()
+        if self.submission_date + self.TIMEOUT < timezone.now():
+            return "lost"
+        return "pending"
 
     def __str__(self):
         return "Solution #%d" % self.id
@@ -294,6 +304,15 @@ class CheckerResult(models.Model):
     def __repr__(self):
         return "<%s: solution_id=%r return_code=%r>" % \
             (self.__class__.__name__, self.solution_id, self.return_code)
+
+    def status(self):
+        if self.return_code == 0:
+            return "success"
+        if self.return_code == signal.SIGKILL:
+            return "killed"
+        if self.return_code in (125, 126, 127):
+            return "error"
+        return "failure"
 
     def __str__(self):
         return "Result #%s" % self.id

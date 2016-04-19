@@ -157,12 +157,12 @@ class TaskSolutionTests(TasksTestBase):
         self.assertFalse(solution.checkerresult_set.exists())
         self.assertEqual(solution.status(), "pending")
 
-    def test_solution_timeout_status(self):
+    def test_solution_lost_status(self):
         solution = self.create_solution()
         mocked_time = timezone.now() + timezone.timedelta(minutes=6)
         with mock.patch("django.utils.timezone.now", return_value=mocked_time):
             self.assertFalse(solution.checkerresult_set.exists())
-            self.assertEqual(solution.status(), "timeout")
+            self.assertEqual(solution.status(), "lost")
 
     def test_solution_failure_status(self):
         solution = self.create_solution()
