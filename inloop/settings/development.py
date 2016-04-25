@@ -1,3 +1,6 @@
+"""
+Quick start development settings which work out of the box -- UNSUITABLE for production.
+"""
 from os import environ
 from os.path import dirname, join
 
@@ -6,8 +9,6 @@ from inloop.settings import base
 
 globals().update(filter_uppercase_keys(vars(base)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 SECRET_KEY = '8b)5ax&m^6ce8-id_0n%*5=rjsb-#(it91y9e0i_$p8o&2a#9a'
 SITE_ID = 1

@@ -1,3 +1,6 @@
+"""
+Production ready settings module -- see the deployment docs for details.
+"""
 from os import path
 
 from inloop.core.utils import filter_uppercase_keys

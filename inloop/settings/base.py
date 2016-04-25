@@ -1,11 +1,10 @@
 """
-Base settings for inloop project.
+INLOOP base settings module
 
-For more information on this file, see
-https://docs.djangoproject.com/en/1.8/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.8/ref/settings/
+NOTE: This is not intended to be used directly. INLOOP ships with two default
+settings modules (development.py and production.py) for different environments,
+which both build upon this module and provide sane defaults which should work
+out of the box.
 """
 import sys
 from os import environ, makedirs
