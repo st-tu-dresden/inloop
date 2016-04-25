@@ -36,8 +36,8 @@ class TasksTestBase(TestCase):
     }
 
     task_defaults = {
-        "title": "Active task",
-        "name": "ActiveTask",
+        "title": "Published task",
+        "name": "PublishedTask",
         "publication_date": timezone.now(),
         "deadline_date": timezone.now() + timezone.timedelta(days=2),
         "description": "# Heading\nSome text.\n"

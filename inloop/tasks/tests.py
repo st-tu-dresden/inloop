@@ -21,14 +21,14 @@ def load_tests(loader, tests, ignore):
 class TaskModelTests(TasksTestBase):
     def setUp(self):
         super().setUp()
-        self.inactive_task = self.create_task(
-            title="Inactive task",
+        self.unpublished_task = self.create_task(
+            title="Unpublished task",
             publication_date=timezone.now() + timezone.timedelta(days=2)
         )
 
-    def test_task_is_active(self):
-        self.assertTrue(self.task.is_active())
-        self.assertFalse(self.inactive_task.is_active())
+    def test_task_is_published(self):
+        self.assertTrue(self.task.is_published())
+        self.assertFalse(self.unpublished_task.is_published())
 
     def test_disabled_task_not_displayed_in_index(self):
         self.client.login(
@@ -36,7 +36,7 @@ class TaskModelTests(TasksTestBase):
             password=self.user_defaults["password"]
         )
         response = self.client.get("/", follow=True)
-        self.assertNotContains(response, self.inactive_task.title)
+        self.assertNotContains(response, self.unpublished_task.title)
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
@@ -48,7 +48,7 @@ class TaskModelTests(TasksTestBase):
     def test_task_location(self):
         subpath = "inloop/media/exercises/%s"
         self.assertIn(subpath % self.task.slug, self.task.task_location())
-        self.assertIn(subpath % self.inactive_task.slug, self.inactive_task.task_location())
+        self.assertIn(subpath % self.unpublished_task.slug, self.unpublished_task.task_location())
 
 
 class TaskCategoryTests(TasksTestBase):
@@ -156,7 +156,7 @@ class TaskSolutionTests(TasksTestBase):
         tsf = self.create_solution_file(solution=solution)
         self.assertRegex(
             models.get_upload_path(tsf, tsf.filename),
-            (r"solutions/chuck_norris/active-task/"
+            (r"solutions/chuck_norris/published-task/"
              "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/HelloWorld.java")
         )
 

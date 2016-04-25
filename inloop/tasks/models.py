@@ -97,8 +97,7 @@ class TaskCategory(models.Model):
             tasksolution__passed=True
         ).distinct()
 
-    # FIXME: method name
-    def get_tasks(self):
+    def published_tasks(self):
         """Return tasks of this category that have already been published."""
         return self.task_set.filter(publication_date__lt=timezone.now())
 
@@ -161,8 +160,7 @@ class Task(models.Model):
 
     objects = TaskManager()
 
-    # FIXME: method name
-    def is_active(self):
+    def is_published(self):
         """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
 
