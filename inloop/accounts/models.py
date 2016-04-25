@@ -34,6 +34,9 @@ def next_week():
 class CourseOfStudy(models.Model):
     """Represents the course of study of the respective user."""
 
+    class Meta:
+        verbose_name_plural = "Courses of study"
+
     name = models.CharField(max_length=50, help_text="The course name", unique=True)
 
     def __str__(self):
