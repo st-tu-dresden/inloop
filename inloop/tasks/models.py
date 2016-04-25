@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from huey.contrib.djhuey import db_task
 
-from inloop.accounts.models import UserProfile
+from inloop.accounts.models import UserProfile, SYSTEM_USER
 from inloop.gh_import.utils import parse_date
 from inloop.tasks.checker import DockerSubProcessChecker
 
@@ -107,11 +107,10 @@ class TaskManager(models.Manager):
     meta_required = ['title', 'category', 'pubdate']
 
     def get_or_create_json(self, json, name):
-        author = UserProfile.get_system_user()
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=author)
+            task = Task(name=name, author=SYSTEM_USER)
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
