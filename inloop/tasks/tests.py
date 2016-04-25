@@ -45,11 +45,6 @@ class TaskModelTests(TasksTestBase):
         with self.assertRaises(ValidationError):
             Task.objects.create(deadline_date="abc")
 
-    def test_task_location(self):
-        subpath = "inloop/media/exercises/%s"
-        self.assertIn(subpath % self.task.slug, self.task.task_location())
-        self.assertIn(subpath % self.unpublished_task.slug, self.unpublished_task.task_location())
-
 
 class TaskCategoryTests(TasksTestBase):
     def test_slugify_on_save(self):

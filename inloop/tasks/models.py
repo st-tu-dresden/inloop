@@ -164,9 +164,6 @@ class Task(models.Model):
         """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
 
-    def task_location(self):
-        return join(settings.MEDIA_ROOT, 'exercises', self.slug)
-
     def __str__(self):
         return self.name
 
