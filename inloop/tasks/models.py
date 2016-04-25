@@ -133,7 +133,6 @@ class TaskManager(models.Manager):
 # FIXME: add creation/update timestamp
 # FIXME: auto slugify
 # FIXME: __repr__ vs __str__
-# FIXME: some fields should be blankable
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
@@ -145,7 +144,11 @@ class Task(models.Model):
     publication_date = models.DateTimeField(help_text='When should the task be published?')
 
     # Optional fields:
-    deadline_date = models.DateTimeField(help_text='Date the task is due to', null=True)
+    deadline_date = models.DateTimeField(
+        help_text="Optional Date the task is due to",
+        null=True,
+        blank=True
+    )
 
     # Foreign keys:
     author = models.ForeignKey(UserProfile)
