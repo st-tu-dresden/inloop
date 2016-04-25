@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from inloop.tasks import models
 from inloop.tasks.checker import ResultTuple
-from inloop.tasks.models import MissingTaskMetadata, Task, TaskCategory
+from inloop.tasks.models import Task, TaskCategory
 from inloop.tasks.test_base import TasksTestBase
 
 
@@ -180,11 +180,8 @@ class TaskManagerTests(TestCase):
                            "pubdate": "2015-05-01 13:37:00"}
 
     def test_validate_empty(self):
-        with self.assertRaises(MissingTaskMetadata) as cm:
+        with self.assertRaises(ValueError):
             self.manager._validate(dict())
-        actual = set(cm.exception.args[0])
-        expected = {"title", "category", "pubdate"}
-        self.assertEqual(actual, expected)
 
     def test_validate_valid(self):
         self.manager._validate(self.valid_json)

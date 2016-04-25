@@ -103,10 +103,6 @@ class TaskCategory(models.Model):
         return self.name
 
 
-class MissingTaskMetadata(Exception):
-    pass
-
-
 class TaskManager(models.Manager):
     meta_required = ['title', 'category', 'pubdate']
 
@@ -132,7 +128,7 @@ class TaskManager(models.Manager):
             if meta_key not in json.keys():
                 missing.append(meta_key)
         if missing:
-            raise MissingTaskMetadata(missing)
+            raise ValueError("Missing metadata keys: %s" % ", ".join(missing))
 
 
 # FIXME: add creation/update timestamp
