@@ -24,17 +24,15 @@ def make_slug(value):
     return slugify(re.sub(r'\([^\)]+\)', '', value))
 
 
-def get_upload_path(instance, filename):
-    path = join(
+def get_upload_path(obj, filename):
+    solution = obj.solution
+    return join(
         'solutions',
-        instance.solution.author.username,
-        instance.solution.task.slug,
-        # FIXME: race condition at minute boundary causes files to be saved in different dirs
-        # FIXME: don't use timezone.now(), use submission_date instead
-        timezone.now().strftime('%Y/%m/%d/%H_%M_') + str(instance.solution.id),
+        solution.author.username,
+        solution.task.slug,
+        "%s_%s" % (solution.submission_date.strftime("%Y/%m/%d/%H_%M"), solution.id),
         filename
     )
-    return path
 
 
 @db_task()
