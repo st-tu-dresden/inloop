@@ -90,10 +90,6 @@ class TaskCategory(models.Model):
         self.short_id = slugify(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
 
-    # FIXME: used anywhere?
-    def get_tuple(self):
-        return (self.short_id, self.name)
-
     def completed_tasks_for_user(self, user):
         """Return tasks of this category a user has already solved."""
         return self.task_set.filter(

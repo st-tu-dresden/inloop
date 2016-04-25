@@ -57,7 +57,6 @@ class TaskCategoryTests(TasksTestBase):
         slug = "whitespace-here-and-123-some-tabs-abc-things"
         category = self.create_category(name=cat_name)
         self.assertEqual(category.short_id, slug)
-        self.assertEqual(category.get_tuple(), (slug, cat_name))
 
     def test_completed_tasks_empty_category(self):
         empty_cat = self.create_category(name="empty")
