@@ -68,7 +68,6 @@ class TaskCategoryManager(models.Manager):
             return self.create(name=name, short_id=slugify(name))
 
 
-# FIXME: __repr__ vs __str__
 class TaskCategory(models.Model):
     # FIXME: that's a slug
     short_id = models.CharField(
@@ -132,7 +131,6 @@ class TaskManager(models.Manager):
 
 # FIXME: add creation/update timestamp
 # FIXME: auto slugify
-# FIXME: __repr__ vs __str__
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
@@ -165,7 +163,6 @@ class Task(models.Model):
 
 
 # FIXME: default values
-# FIXME: __repr__ vs __str__
 class TaskSolution(models.Model):
     """
     Represents the user uploaded files.
@@ -217,11 +214,12 @@ class TaskSolution(models.Model):
 
         return result
 
+    def __repr__(self):
+        return "<%s: id=%r author=%r task=%r>" % \
+            (self.__class__.__name__, self.id, str(self.author), str(self.task))
+
     def __str__(self):
-        return "TaskSolution(author='{}', task='{}')".format(
-            self.author.username,
-            self.task
-        )
+        return "Solution #%d" % self.id
 
 
 class TaskSolutionFile(models.Model):
@@ -235,7 +233,7 @@ class TaskSolutionFile(models.Model):
         return self.file.path
 
     def __str__(self):
-        return "TaskSolutionFile('%s')" % self.file
+        return str(self.file)
 
 
 class CheckerResult(models.Model):
@@ -263,8 +261,12 @@ class CheckerResult(models.Model):
     def is_success(self):
         return self.return_code == 0
 
+    def __repr__(self):
+        return "<%s: solution_id=%r return_code=%r>" % \
+            (self.__class__.__name__, self.solution_id, self.return_code)
+
     def __str__(self):
-        return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
+        return "Result #%s" % self.id
 
 
 class CheckerOutput(models.Model):
@@ -278,3 +280,6 @@ class CheckerOutput(models.Model):
     result = models.ForeignKey(CheckerResult)
     name = models.CharField(max_length=30)
     output = models.TextField()
+
+    def __str__(self):
+        return self.name
