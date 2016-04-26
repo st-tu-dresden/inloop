@@ -14,7 +14,7 @@
         <img src="{{ cat.image.url }}" alt="category image for {{ cat.name }}">
         {% endif %}
         <div class="caption">
-          <a href="{% url 'tasks:category' cat.short_id %}">
+          <a href="{% url 'tasks:category' cat.slug %}">
             <h3>{{ cat.name }}</h3>
             <hr>
             <div class="progress">

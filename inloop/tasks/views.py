@@ -30,8 +30,8 @@ def error(request, message):
 
 
 @login_required
-def category(request, short_id):
-    cat = get_object_or_404(TaskCategory, short_id=short_id)
+def category(request, slug):
+    cat = get_object_or_404(TaskCategory, slug=slug)
     task_list = Task.objects.filter(
         category=cat,
         publication_date__lt=timezone.now())

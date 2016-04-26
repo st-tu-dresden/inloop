@@ -66,12 +66,11 @@ class TaskCategoryManager(models.Manager):
         try:
             return self.get(name=name)
         except ObjectDoesNotExist:
-            return self.create(name=name, short_id=slugify(name))
+            return self.create(name=name, slug=slugify(name))
 
 
 class TaskCategory(models.Model):
-    # FIXME: that's a slug
-    short_id = models.CharField(
+    slug = models.CharField(
         unique=True,
         max_length=50,
         help_text='Short ID for URLs'
@@ -85,7 +84,7 @@ class TaskCategory(models.Model):
     objects = TaskCategoryManager()
 
     def save(self, *args, **kwargs):
-        self.short_id = slugify(self.name)
+        self.slug = slugify(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
 
     def completed_tasks_for_user(self, user):
