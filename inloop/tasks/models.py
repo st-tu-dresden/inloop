@@ -3,6 +3,7 @@ from os.path import dirname, join
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.transaction import atomic
 from django.utils import timezone
@@ -215,6 +216,9 @@ class TaskSolution(models.Model):
             self.save()
 
         return result
+
+    def get_absolute_url(self):
+        return reverse("tasks:results", kwargs={'slug': self.task.slug, 'solution_id': self.id})
 
     def __repr__(self):
         return "<%s: id=%r author=%r task=%r>" % \
