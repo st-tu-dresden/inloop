@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 from inloop.tasks.models import (CheckerResult, CheckerOutput, Task,
                                  TaskCategory, TaskSolution, TaskSolutionFile)
@@ -62,9 +63,20 @@ class CheckerResultAdmin(admin.ModelAdmin):
     inlines = [
         CheckerOutputInline
     ]
-    list_display = ('user', 'task', 'created_at', 'time_taken', 'return_code', 'passed')
-    list_filter = ['passed']
-    readonly_fields = ('solution', 'return_code', 'passed', 'stdout', 'stderr', 'time_taken')
+    list_display = ('id', 'linked_solution', 'created_at', 'runtime', 'return_code', 'is_success')
+    list_filter = ['return_code']
+    readonly_fields = (
+        'linked_solution', 'created_at', 'runtime',
+        'return_code', 'is_success', 'stdout', 'stderr'
+    )
+    exclude = ('passed', 'time_taken', 'solution')
+
+    def linked_solution(self, obj):
+        link = reverse("admin:tasks_tasksolution_change", args=[obj.solution_id])
+        return '<a href="%s">%s</a>' % (link, obj.solution)
+
+    linked_solution.allow_tags = True
+    linked_solution.short_description = "Solution"
 
 
 admin.site.register(CheckerResult, CheckerResultAdmin)
