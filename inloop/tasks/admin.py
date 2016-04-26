@@ -23,12 +23,32 @@ class TaskSolutionFileInline(admin.StackedInline):
     max_num = 0
 
 
+class CheckerResultInline(admin.StackedInline):
+    model = CheckerResult
+    max_num = 0
+    readonly_fields = ('is_success', 'runtime', 'stdout', 'stderr')
+    exclude = ('passed', 'return_code', 'time_taken')
+    show_change_link = True
+
+    def get_queryset(self, request):
+        # show the latest CheckerResults first
+        qs = super().get_queryset(request)
+        return qs.order_by("-id")
+
+
 class TaskSolutionAdmin(admin.ModelAdmin):
     inlines = [
-        TaskSolutionFileInline
+        TaskSolutionFileInline,
+        CheckerResultInline
     ]
     list_display = ('author', 'task', 'submission_date', 'passed')
-    list_filter = ['passed']
+    list_filter = ['passed', 'task']
+    search_fields = [
+        'author__username',
+        'author__email',
+        'author__first_name',
+        'author__last_name'
+    ]
     readonly_fields = ('task', 'submission_date', 'task', 'author', 'passed')
 
 

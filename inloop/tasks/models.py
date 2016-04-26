@@ -262,14 +262,17 @@ class CheckerResult(models.Model):
     # to be removed:
     passed = models.BooleanField(default=False)
 
-    def user(self):
-        return self.solution.author
-
-    def task(self):
-        return self.solution.task
-
     def is_success(self):
         return self.return_code == 0
+
+    is_success.boolean = True
+    is_success.short_description = "Successful"
+
+    def runtime(self):
+        return "%.2f" % self.time_taken
+
+    runtime.admin_order_field = "time_taken"
+    runtime.short_description = "Runtime (seconds)"
 
     def __repr__(self):
         return "<%s: solution_id=%r return_code=%r>" % \
