@@ -162,7 +162,6 @@ class Task(models.Model):
         return self.name
 
 
-# FIXME: default values
 class TaskSolution(models.Model):
     """
     Represents the user uploaded files.
@@ -172,7 +171,10 @@ class TaskSolution(models.Model):
     checker job.
     """
 
-    submission_date = models.DateTimeField(help_text='When was the solution submitted?')
+    submission_date = models.DateTimeField(
+        help_text="When was the solution submitted?",
+        auto_now_add=True
+    )
     author = models.ForeignKey(UserProfile)
     task = models.ForeignKey(Task)
     passed = models.BooleanField(default=False)
