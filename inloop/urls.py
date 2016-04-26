@@ -36,3 +36,8 @@ if settings.DEBUG:
 urlpatterns += [
     url(r'^(?P<url>.*/)$', flatpage_views.flatpage),
 ]
+
+# customized titles and headers for the generated admin site
+admin.site.site_header = "INLOOP administration"
+admin.site.site_title = "INLOOP"
+admin.site.index_title = "Manage accounts, tasks and solutions"
