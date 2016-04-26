@@ -70,6 +70,11 @@ class TaskCategoryManager(models.Manager):
 
 
 class TaskCategory(models.Model):
+    """Task categories may be used to arbitrarily group tasks."""
+
+    class Meta:
+        verbose_name_plural = "Task categories"
+
     slug = models.CharField(
         unique=True,
         max_length=50,
