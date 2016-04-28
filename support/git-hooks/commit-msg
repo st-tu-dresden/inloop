@@ -29,8 +29,7 @@ def _check_subject(line):
         errors.append("subject line is not capitalized")
     if line and line[-1] == ".":
         errors.append("subject line ends with a period")
-    if re.match('^[a-z]+ed', line, re.I):
-        # FIXME: should not match "Redesign sth"
+    if re.match(r'^[a-z]+ed\b', line, re.IGNORECASE):
         errors.append("subject line uses past tense")
     return errors
 
