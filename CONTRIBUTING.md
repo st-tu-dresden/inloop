@@ -33,13 +33,18 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
 
 ### Coding conventions
 
-* Indent using 4 spaces instead of tabs (except for the `Makefile`) and use UNIX line endings.
-* Python 3 code must be formatted according to [PEP8][pep8] and a maximum line length of 99
-  characters. [Install the pre-commit hook](#git-hooks) to automatically reject commits which
-  violate these rules.
-* HTML must be indented using 2 spaces. Don't use XML style empty tags (e.g., use `<br>`
-  instead of `<br />`). Use tools like the [W3C Validator][w3c-validator] to verify that the
-  output of processed templates is valid HTML5.
+* Indent using spaces instead of tabs (except for the `Makefile`).
+* Use UNIX line endings.
+* Python:
+  * Use Python 3.
+  * Code must be formatted according to [PEP8][pep8] and a maximum line length of 99 characters.
+  * [Install the pre-commit hook](#git-hooks) to automatically reject commits which violate
+    these rules.
+* HTML (Django templates):
+  * Indent using 2 spaces.
+  * Don't use XML style empty tags (e.g., use `<br>` instead of `<br />`).
+  * Use tools like the [W3C Validator][w3c-validator] to verify that the output of processed
+    templates is valid HTML5.
 
 
 ### Commit messages
