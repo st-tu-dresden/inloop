@@ -38,6 +38,9 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
 * Python:
   * Use Python 3.
   * Code must be formatted according to [PEP8][pep8] and a maximum line length of 99 characters.
+  * Don't use relative imports.
+  * Docstrings must follow the [Google Python Style Guide for Comments][google-style]. Don't
+    use reStructured Text style comments.
   * [Install the pre-commit hook](#git-hooks) to automatically reject commits which violate
     these rules.
 * HTML (Django templates):
@@ -78,6 +81,7 @@ Our `Makefile` includes targets to install the above hooks into your working cop
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
 [inloop-issues]: https://github.com/st-tu-dresden/inloop/issues
 [pep8]: https://www.python.org/dev/peps/pep-0008/
+[google-style]: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
 [gh-flow]: https://guides.github.com/introduction/flow/
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
