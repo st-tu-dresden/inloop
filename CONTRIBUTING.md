@@ -42,12 +42,12 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
   * Docstrings must follow the [Google Python Style Guide for Comments][google-style]. Don't
     use reStructured Text style comments.
   * [Install the pre-commit hook](#git-hooks) to automatically reject commits which violate
-    these rules.
+    our rules. Alternatively, use `flake8` to check conformance manually.
 * HTML (Django templates):
   * Indent using 2 spaces.
-  * Don't use XML style empty tags (e.g., use `<br>` instead of `<br />`).
-  * Use tools like the [W3C Validator][w3c-validator] to verify that the output of processed
-    templates is valid HTML5.
+  * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
+  * Use the [W3C Validator][w3c-validator] to verify that the output of processed templates is
+    valid HTML5.
 
 
 ### Commit messages
