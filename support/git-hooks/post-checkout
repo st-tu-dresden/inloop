@@ -5,4 +5,4 @@ import subprocess
 # run only if we are in a virtualenv that is part of the project tree
 if os.getcwd() in os.environ.get("VIRTUAL_ENV", ""):
     print("[post-checkout] syncing pip requirements ...")
-    subprocess.call("pip -q install -r requirements_dev.txt".split())
+    subprocess.call("pip -q install -r requirements/development.txt".split())
