@@ -1,5 +1,6 @@
 -r base.txt
 bpython
+django-debug-toolbar
 flake8==2.5.4
 flake8-docstrings==0.2.5
 honcho==0.6.6

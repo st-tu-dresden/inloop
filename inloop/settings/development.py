@@ -17,6 +17,10 @@ DOMAIN = 'http://localhost:8000/'
 
 DEBUG = True
 
+INSTALLED_APPS = base.INSTALLED_APPS + (
+    'debug_toolbar',
+)
+
 # Storage root for uploaded files
 MEDIA_ROOT = join(base.PROJECT_ROOT, 'media')
 
