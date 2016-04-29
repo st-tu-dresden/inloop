@@ -1,0 +1,7 @@
+-r base.txt
+bpython
+flake8==2.5.4
+honcho==0.6.6
+mccabe==0.4.0
+pep8==1.7.0
+pyflakes==1.1.0

@@ -34,7 +34,7 @@ print("Updating pip and setuptools")
 run(["pip", "install", "-q", "--upgrade", "pip", "setuptools"])
 
 print("Installing requirements")
-run(["pip", "install", "-q", "-r", "requirements_all.txt"])
+run(["pip", "install", "-q", "-r", "requirements/production.txt"])
 
 print("Precompiling Python sources")
 run(["python", "-m", "compileall", "-fq", "inloop"])
