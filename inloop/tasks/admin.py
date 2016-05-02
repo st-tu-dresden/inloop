@@ -42,7 +42,7 @@ class TaskSolutionAdmin(admin.ModelAdmin):
         TaskSolutionFileInline,
         CheckerResultInline
     ]
-    list_display = ('author', 'task', 'submission_date', 'passed')
+    list_display = ('id', 'author', 'task', 'submission_date', 'passed', 'view_on_site')
     list_filter = ['passed', 'task']
     search_fields = [
         'author__username',
