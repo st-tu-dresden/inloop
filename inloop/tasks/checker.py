@@ -98,6 +98,8 @@ class DockerSubProcessChecker:
             - timeout: maximum runtime of a container in seconds (default: 30)
             - tmpdir:  directory where we should store temporary files
                        (default: platform-dependent)
+            - memory:  maximum memory a container may use, passed in as string
+                       to the Docker CLI as --memory=XXX (defaut: 256m)
         """
         tmpdir = config.get("tmpdir")
         if tmpdir:
@@ -169,7 +171,7 @@ class DockerSubProcessChecker:
             # TODO: activate this when the Docker image switched to ant
             # "--read-only",
             "--net=none",
-            "--memory=128m",
+            "--memory=%s" % self.config.get("memory", "256m"),
             "--volume=%s:/checker/input:ro" % input_path,
             "--volume=%s:/checker/output" % output_path,
             "--tmpfs=/checker/scratch",
