@@ -1,7 +1,6 @@
 import logging
-import string
+import uuid
 import xml.etree.ElementTree as ET
-from random import SystemRandom
 from subprocess import STDOUT, CalledProcessError, TimeoutExpired, check_output
 
 from django.conf import settings
@@ -17,7 +16,7 @@ class Checker:
 
     def start(self):
         logging.debug("Checker start call")
-        ctr_name = self._generate_container_name()
+        ctr_name = str(uuid.uuid4())
         # self._container_build(ctr_tag='docker-test')
         result, ce = self._container_execute(
             ctr_tag=settings.CHECKER['Container'].get('container_tag'),
@@ -27,13 +26,6 @@ class Checker:
                 self.solution_path: settings.CHECKER['Container'].get('solution_path')
             })
         self._parse_result(result, ce)
-
-    def _generate_container_name(self):
-        charset = string.ascii_letters + string.digits
-        length = 21
-        random = SystemRandom()
-        key = "".join(random.sample(charset, length))
-        return "-".join([str(self.solution.author.username), str(self.solution.task.slug), key])
 
     def _container_build(self, ctr_tag, path="."):
         logging.debug("Container build process started")

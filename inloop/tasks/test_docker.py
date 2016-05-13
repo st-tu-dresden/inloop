@@ -21,12 +21,6 @@ class CheckerTests(TasksTestBase):
         self.tsf = self.create_solution_file(self.ts)
         self.c = Checker(self.ts)
 
-    def test_generate_container_name_format(self):
-        self.assertRegex(
-            self.c._generate_container_name(),
-            "-".join([self.user.username, self.task.slug, "[\\w]{21}"])
-        )
-
     def test_correct_parse_result(self):
         self.c._parse_result(result=TEST_SUCCESS_RESULT, compiler_error=False)
         cr = CheckerResult.objects.get(solution=self.ts)
