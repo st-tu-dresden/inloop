@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="1" hostname="localhost" name="TaxiTest" skipped="0" tests="5" time="0.119" timestamp="2016-04-02T13:37:00">
+  <properties />
+  <testcase classname="TaxiTest" name="testTaxiAdd" time="0.002" />
+  <testcase classname="TaxiTest" name="testHuman" time="0.0" />
+  <testcase classname="TaxiTest" name="testTaxiAllGetOutEmptyTaxi" time="0.0" />
+  <testcase classname="TaxiTest" name="testTaxiDriverAssigned" time="0.0" />
+  <testcase classname="TaxiTest" name="taxiAllGetOutTaxiNotEmpty" time="0.015">
+    <failure message="The method allGetOut() of the class Taxi should return four passengers if the taxi had four passengers! expected:&lt;4&gt; but was:&lt;0&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: The method allGetOut() of the class Taxi should return four passengers if the taxi had four passengers! expected:&lt;4&gt; but was:&lt;0&gt;
+	at TaxiTest.taxiAllGetOutTaxiNotEmpty(TaxiTest.java:102)
+</failure>
+  </testcase>
+  <system-out><![CDATA[Andrea Bora gets in.
+Franzi Ada gets in.
+Leah Posh gets in.
+Susi Fresh gets in.
+We are sorry, Lucky Fuke. The taxi is full.
+Andrea Bora gets in.
+Franzi Ada gets in.
+Leah Posh gets in.
+Susi Fresh gets in.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
