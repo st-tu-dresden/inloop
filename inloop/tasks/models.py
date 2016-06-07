@@ -131,6 +131,10 @@ class TaskManager(models.Manager):
         task.slug = make_slug(task.title)
         task.category = TaskCategory.objects.get_or_create(json['category'])
         task.publication_date = parse_date(json['pubdate'])
+        try:
+            task.deadline_date = parse_date(json['deadline'])
+        except KeyError:
+            task.deadline_date = None
         return task
 
     def _validate(self, json):
