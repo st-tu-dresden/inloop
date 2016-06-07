@@ -22,7 +22,7 @@ the shell:
     pyvenv venv && source venv/bin/activate
 
     # install required Python libraries
-    pip install -r requirements_dev.txt
+    pip install -r requirements/development.txt
 
     # initialize the database (uses SQLite locally)
     ./manage.py migrate
