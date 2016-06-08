@@ -40,5 +40,7 @@ if [ $? -ne 0 ] && [ $rc -ne 0 ]; then
     echo "Your solution failed the test, but I can't find any test reports "
     echo "that would assist you while debugging the problem :-("
     # ensure passed will be set to False:
-    exit 42
+    exit $rc
 fi
+
+exit $rc
