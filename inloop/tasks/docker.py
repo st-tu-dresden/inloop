@@ -44,6 +44,14 @@ class Checker:
             return build_output
 
     def _container_execute(self, ctr_tag, ctr_name, cmd=None, mountpoints=None, rm=True):
+        popen_args = ['docker', 'run', '--rm', '--attach=STDOUT', '--name={}'.format(ctr_name)]
+
+        if mountpoints:
+            popen_args.extend(['--volume={}:{}'.format(k, v) for k, v in mountpoints.items()])
+
+        popen_args.append(ctr_tag)
+        popen_args.append(cmd) if cmd else logging.debug("No slug given to docker run")
+
         # Running docker is available to root or users in the group `docker` only.
         # To not run the complete web application with such elevated privigeles, we
         # use `sudo` to switch to group `docker` (the user remains the same) only
@@ -56,23 +64,9 @@ class Checker:
         #   - only the user running gunicorn can call docker this way
         #   - it is not possible to call docker in another fashion, e.g. specifying
         #     other options or other Docker images
-        popen_args = ['sudo', '-g', 'docker', 'docker', 'run']
-        # Remove container after execution?
-        if rm:
-            popen_args.extend(['--rm=true'])
-        # Spawn tty
-        popen_args.append('--tty')
-        # Container name
-        popen_args.extend(['--name', ctr_name])
-        # Add mountpoints: {host: container} -> -v=host:container
-        if mountpoints:
-            popen_args.extend(['-v={}:{}'.format(k, v) for k, v in mountpoints.items()])
-        # Attach to stdout
-        popen_args.extend(['-a', 'STDOUT'])
-        # Add the image that is to be run
-        popen_args.extend([ctr_tag])
-        # Add the actual compilation and test command
-        popen_args.append(cmd) if cmd else logging.debug("No slug given to docker run")
+        if settings.CHECKER.get('USE_SUDO'):
+            popen_args = ['sudo', '-g', 'docker'] + popen_args
+
         logging.debug("Container execution arguments: {}".format(popen_args))
         # Execute container
         compiler_error = False
