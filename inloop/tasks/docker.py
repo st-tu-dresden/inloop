@@ -53,7 +53,7 @@ class Checker:
         popen_args.append(cmd) if cmd else logging.debug("No slug given to docker run")
 
         # Running docker is available to root or users in the group `docker` only.
-        # To not run the complete web application with such elevated privigeles, we
+        # To not run the complete web application with such elevated privileges, we
         # use `sudo` to switch to group `docker` (the user remains the same) only
         # for this particular action.
         #
