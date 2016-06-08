@@ -71,3 +71,6 @@ GIT_BRANCH = local_conf['tasks_branch']
 # Nginx X-Accel-Redirect support
 SENDFILE_METHOD = "nginx"
 SENDFILE_NGINX_URL = "/sendfile"
+
+# Use sudo to run docker
+base.CHECKER["USE_SUDO"] = True
