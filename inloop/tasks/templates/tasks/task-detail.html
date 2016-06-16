@@ -38,7 +38,7 @@
       <li class="list-group-item">
         Uploaded on {{ sol.submission_date }}<br>
         <a href="{% url 'tasks:solution_as_zip' slug sol.id %}">Download</a> -
-        <a href="{% url 'tasks:results' slug sol.id %}">View results</a>
+        <a href="{{ sol.get_absolute_url }}">View results</a>
       </li>
       {% endfor %}
     </ul>

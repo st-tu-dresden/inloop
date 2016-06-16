@@ -36,8 +36,8 @@ class TasksTestBase(TestCase):
     }
 
     task_defaults = {
-        "title": "Active task",
-        "name": "ActiveTask",
+        "title": "Published task",
+        "name": "PublishedTask",
         "publication_date": timezone.now(),
         "deadline_date": timezone.now() + timezone.timedelta(days=2),
         "description": "# Heading\nSome text.\n"
@@ -81,8 +81,6 @@ class TasksTestBase(TestCase):
         return Task.objects.create(**kwargs)
 
     def create_solution(self, **kwargs):
-        # FIXME: a sane default should be set in the model
-        kwargs.setdefault("submission_date", timezone.now())
         kwargs.setdefault("author", self.user)
         kwargs.setdefault("task", self.task)
         return TaskSolution.objects.create(**kwargs)

@@ -3,13 +3,14 @@ from os.path import dirname, join
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.text import slugify
 from huey.contrib.djhuey import db_task
 
-from inloop.accounts.models import UserProfile
+from inloop.accounts.models import UserProfile, SYSTEM_USER
 from inloop.gh_import.utils import parse_date
 from inloop.tasks.checker import DockerSubProcessChecker
 
@@ -24,17 +25,15 @@ def make_slug(value):
     return slugify(re.sub(r'\([^\)]+\)', '', value))
 
 
-def get_upload_path(instance, filename):
-    path = join(
+def get_upload_path(obj, filename):
+    solution = obj.solution
+    return join(
         'solutions',
-        instance.solution.author.username,
-        instance.solution.task.slug,
-        # FIXME: race condition at minute boundary causes files to be saved in different dirs
-        # FIXME: don't use timezone.now(), use submission_date instead
-        timezone.now().strftime('%Y/%m/%d/%H_%M_') + str(instance.solution.id),
+        solution.author.username,
+        solution.task.slug,
+        "%s_%s" % (solution.submission_date.strftime("%Y/%m/%d/%H_%M"), solution.id),
         filename
     )
-    return path
 
 
 @db_task()
@@ -67,13 +66,16 @@ class TaskCategoryManager(models.Manager):
         try:
             return self.get(name=name)
         except ObjectDoesNotExist:
-            return self.create(name=name, short_id=slugify(name))
+            return self.create(name=name, slug=slugify(name))
 
 
-# FIXME: __repr__ vs __str__
 class TaskCategory(models.Model):
-    # FIXME: that's a slug
-    short_id = models.CharField(
+    """Task categories may be used to arbitrarily group tasks."""
+
+    class Meta:
+        verbose_name_plural = "Task categories"
+
+    slug = models.CharField(
         unique=True,
         max_length=50,
         help_text='Short ID for URLs'
@@ -87,12 +89,8 @@ class TaskCategory(models.Model):
     objects = TaskCategoryManager()
 
     def save(self, *args, **kwargs):
-        self.short_id = slugify(self.name)
+        self.slug = slugify(self.name)
         super(TaskCategory, self).save(*args, **kwargs)
-
-    # FIXME: used anywhere?
-    def get_tuple(self):
-        return (self.short_id, self.name)
 
     def completed_tasks_for_user(self, user):
         """Return tasks of this category a user has already solved."""
@@ -101,8 +99,7 @@ class TaskCategory(models.Model):
             tasksolution__passed=True
         ).distinct()
 
-    # FIXME: method name
-    def get_tasks(self):
+    def published_tasks(self):
         """Return tasks of this category that have already been published."""
         return self.task_set.filter(publication_date__lt=timezone.now())
 
@@ -110,19 +107,14 @@ class TaskCategory(models.Model):
         return self.name
 
 
-class MissingTaskMetadata(Exception):
-    pass
-
-
 class TaskManager(models.Manager):
     meta_required = ['title', 'category', 'pubdate']
 
     def get_or_create_json(self, json, name):
-        author = UserProfile.get_system_user()
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=author)
+            task = Task(name=name, author=SYSTEM_USER)
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
@@ -143,13 +135,11 @@ class TaskManager(models.Manager):
             if meta_key not in json.keys():
                 missing.append(meta_key)
         if missing:
-            raise MissingTaskMetadata(missing)
+            raise ValueError("Missing metadata keys: %s" % ", ".join(missing))
 
 
 # FIXME: add creation/update timestamp
 # FIXME: auto slugify
-# FIXME: __repr__ vs __str__
-# FIXME: some fields should be blankable
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
@@ -161,7 +151,11 @@ class Task(models.Model):
     publication_date = models.DateTimeField(help_text='When should the task be published?')
 
     # Optional fields:
-    deadline_date = models.DateTimeField(help_text='Date the task is due to', null=True)
+    deadline_date = models.DateTimeField(
+        help_text="Optional Date the task is due to",
+        null=True,
+        blank=True
+    )
 
     # Foreign keys:
     author = models.ForeignKey(UserProfile)
@@ -169,20 +163,14 @@ class Task(models.Model):
 
     objects = TaskManager()
 
-    # FIXME: method name
-    def is_active(self):
+    def is_published(self):
         """Returns True if the task is already visible to the users."""
         return timezone.now() > self.publication_date
-
-    def task_location(self):
-        return join(settings.MEDIA_ROOT, 'exercises', self.slug)
 
     def __str__(self):
         return self.name
 
 
-# FIXME: default values
-# FIXME: __repr__ vs __str__
 class TaskSolution(models.Model):
     """
     Represents the user uploaded files.
@@ -192,7 +180,10 @@ class TaskSolution(models.Model):
     checker job.
     """
 
-    submission_date = models.DateTimeField(help_text='When was the solution submitted?')
+    submission_date = models.DateTimeField(
+        help_text="When was the solution submitted?",
+        auto_now_add=True
+    )
     author = models.ForeignKey(UserProfile)
     task = models.ForeignKey(Task)
     passed = models.BooleanField(default=False)
@@ -234,11 +225,15 @@ class TaskSolution(models.Model):
 
         return result
 
+    def get_absolute_url(self):
+        return reverse("tasks:results", kwargs={'slug': self.task.slug, 'solution_id': self.id})
+
+    def __repr__(self):
+        return "<%s: id=%r author=%r task=%r>" % \
+            (self.__class__.__name__, self.id, str(self.author), str(self.task))
+
     def __str__(self):
-        return "TaskSolution(author='{}', task='{}')".format(
-            self.author.username,
-            self.task
-        )
+        return "Solution #%d" % self.id
 
 
 class TaskSolutionFile(models.Model):
@@ -252,7 +247,7 @@ class TaskSolutionFile(models.Model):
         return self.file.path
 
     def __str__(self):
-        return "TaskSolutionFile('%s')" % self.file
+        return str(self.file)
 
 
 class CheckerResult(models.Model):
@@ -271,17 +266,24 @@ class CheckerResult(models.Model):
     # to be removed:
     passed = models.BooleanField(default=False)
 
-    def user(self):
-        return self.solution.author
-
-    def task(self):
-        return self.solution.task
-
     def is_success(self):
         return self.return_code == 0
 
+    is_success.boolean = True
+    is_success.short_description = "Successful"
+
+    def runtime(self):
+        return "%.2f" % self.time_taken
+
+    runtime.admin_order_field = "time_taken"
+    runtime.short_description = "Runtime (seconds)"
+
+    def __repr__(self):
+        return "<%s: solution_id=%r return_code=%r>" % \
+            (self.__class__.__name__, self.solution_id, self.return_code)
+
     def __str__(self):
-        return "CheckerResult(solution_id=%d, passed=%s)" % (self.solution.id, self.passed)
+        return "Result #%s" % self.id
 
 
 class CheckerOutput(models.Model):
@@ -295,3 +297,6 @@ class CheckerOutput(models.Model):
     result = models.ForeignKey(CheckerResult)
     name = models.CharField(max_length=30)
     output = models.TextField()
+
+    def __str__(self):
+        return self.name
