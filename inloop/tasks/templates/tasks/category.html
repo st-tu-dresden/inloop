@@ -1,12 +1,17 @@
 {% extends 'base_site.html' %}
 
-{% block title %}{{ name }} tasks{% endblock %}
+{% block title %}{{ category.name }} tasks{% endblock %}
 
 {% block content %}
 
-<h2>{{ name }} tasks</h2>
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li class="active">{{ category.name }}</li>
+</ol>
 
-{% if task_list %}
+<h2>{{ category.name }} tasks</h2>
+
+{% if tasks %}
   <table class="table table-align-pretty">
     <thead>
     <tr>
@@ -18,7 +23,7 @@
     </thead>
 
     <tbody>
-    {% for task in task_list %}
+    {% for task in tasks %}
     <tr>
       <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
       <td>{{ task.publication_date|date:"d/m/y" }}</td>

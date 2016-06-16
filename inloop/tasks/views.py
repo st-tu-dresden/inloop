@@ -31,15 +31,14 @@ def error(request, message):
 
 @login_required
 def category(request, slug):
-    cat = get_object_or_404(TaskCategory, slug=slug)
-    task_list = Task.objects.filter(
-        category=cat,
-        publication_date__lt=timezone.now())
-
+    category = get_object_or_404(TaskCategory, slug=slug)
+    tasks = Task.objects.filter(
+        category=category,
+        publication_date__lt=timezone.now()
+    )
     return render(request, 'tasks/category.html', {
-        'user': request.user,
-        'name': cat.name,
-        'task_list': task_list
+        'category': category,
+        'tasks': tasks
     })
 
 

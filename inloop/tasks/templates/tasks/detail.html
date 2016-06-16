@@ -1,0 +1,15 @@
+{% extends "tasks/base.html" %}
+{% load markdown %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block tab_content %}
+<h1>{{ task.title }}</h1>
+{{ task.description|markdown }}
+{% endblock %}
+
+{% block extrabody %}
+<script type="text/javascript">
+  anchors.add("h2, h3");
+</script>
+{% endblock %}

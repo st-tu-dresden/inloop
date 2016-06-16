@@ -1,0 +1,29 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
+  <li class="active">{{ task.title }}</li>
+</ol>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" {% if active_tab == 0 %}class="active"{% endif %}>
+    <a href="{% url 'tasks:detail' task.slug %}">Description</a>
+  </li>
+  <li role="presentation" {% if active_tab == 1 %}class="active"{% endif %}>
+    <a href="{% url 'tasks:solutionupload' task.slug %}">Manual upload</a>
+  </li>
+  <li role="presentation" {% if active_tab == 2 %}class="active"{% endif %}>
+    <a href="{% url 'tasks:solutionlist' task.slug %}">
+      Your solutions <span class="label label-info">NEW</span>
+    </a>
+  </li>
+</ul>
+
+<div style="margin: 1em">
+{% block tab_content %}{% endblock %}
+</div>
+
+{% endblock %}

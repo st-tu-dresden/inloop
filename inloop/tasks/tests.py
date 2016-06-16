@@ -1,6 +1,6 @@
 from doctest import DocTestSuite
 from os import path
-from unittest.mock import MagicMock
+from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from inloop.tasks import models
 from inloop.tasks.checker import ResultTuple
-from inloop.tasks.models import Task, TaskCategory
+from inloop.tasks.models import CheckerResult, Task, TaskCategory
 from inloop.tasks.test_base import TasksTestBase
 
 
@@ -31,10 +31,7 @@ class TaskModelTests(TasksTestBase):
         self.assertFalse(self.unpublished_task.is_published())
 
     def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(
-            username=self.user_defaults["username"],
-            password=self.user_defaults["password"]
-        )
+        self.client.login(username="chuck_norris", password="s3cret")
         response = self.client.get("/", follow=True)
         self.assertNotContains(response, self.unpublished_task.title)
 
@@ -87,8 +84,8 @@ class TaskSolutionTests(TasksTestBase):
         self.solutionfile = self.create_solution_file(solution=self.solution)
 
     def create_mock_checker(self, return_value):
-        checker = MagicMock()
-        checker.check_task = MagicMock(return_value=return_value)
+        checker = mock.MagicMock()
+        checker.check_task = mock.MagicMock(return_value=return_value)
         return checker
 
     def test_precondition(self):
@@ -154,6 +151,23 @@ class TaskSolutionTests(TasksTestBase):
             (r"solutions/chuck_norris/published-task/"
              "[\d]{4}/[\d]{2}/[\d]{2}/[\d]{2}_[\d]{1,2}_[\d]+/HelloWorld.java")
         )
+
+    def test_solution_default_status(self):
+        solution = self.create_solution()
+        self.assertFalse(solution.checkerresult_set.exists())
+        self.assertEqual(solution.status(), "pending")
+
+    def test_solution_lost_status(self):
+        solution = self.create_solution()
+        mocked_time = timezone.now() + timezone.timedelta(minutes=6)
+        with mock.patch("django.utils.timezone.now", return_value=mocked_time):
+            self.assertFalse(solution.checkerresult_set.exists())
+            self.assertEqual(solution.status(), "lost")
+
+    def test_solution_failure_status(self):
+        solution = self.create_solution()
+        solution.checkerresult_set.add(CheckerResult())
+        self.assertEqual(solution.status(), "failure")
 
 
 class TaskCategoryManagerTests(TestCase):

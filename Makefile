@@ -6,7 +6,7 @@
 UGLIFY = node_modules/.bin/uglifyjs
 UGLIFYFLAGS =
 LESS = node_modules/.bin/lessc
-LESSFLAGS = --compress
+LESSFLAGS = --autoprefix="last 4 versions" --clean-css
 WATCHY = node_modules/.bin/watchy
 WATCHYFLAGS = --wait 5 --no-init-spawn --silent
 

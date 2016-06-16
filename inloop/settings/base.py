@@ -103,7 +103,8 @@ CHECKER = {
         'container_kill': 5,
         'container_remove': 5,
         'container_build': 180,
-    }
+    },
+    "timeout": 120
 }
 
 # Docker image to be used by the DockerSubProcessChecker
@@ -135,3 +136,6 @@ LOGGING = {
         },
     },
 }
+
+# TODO: investigate a better method to align Bootstrap alerts and contrib.messages
+MESSAGE_TAGS = {10: "info", 40: "danger"}
