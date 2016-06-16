@@ -18,9 +18,9 @@ if DJANGO_VERSION >= (1, 9, 0):
     raise DeprecationWarning("LoginRequiredMixin is provided by Django")
 
 
-def get_active_task_or_404(slug):
+def get_published_task_or_404(slug):
     task = get_object_or_404(Task, slug=slug)
-    if not task.is_active():
+    if not task.is_published():
         raise Http404
     return task
 
@@ -42,7 +42,7 @@ class SolutionStatusView(LoginRequiredMixin, View):
 class TaskDetailView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return render(request, "tasks/detail.html", {
-            'task': get_active_task_or_404(slug=slug),
+            'task': get_published_task_or_404(slug=slug),
             'active_tab': 0
         })
 
@@ -50,12 +50,12 @@ class TaskDetailView(LoginRequiredMixin, View):
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return render(request, "tasks/upload_form.html", {
-            'task': get_active_task_or_404(slug=slug),
+            'task': get_published_task_or_404(slug=slug),
             'active_tab': 1
         })
 
     def post(self, request, slug):
-        task = get_active_task_or_404(slug=slug)
+        task = get_published_task_or_404(slug=slug)
         uploads = request.FILES.getlist('uploads')
 
         if not uploads:
@@ -82,7 +82,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
 class SolutionListView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        task = get_active_task_or_404(slug=slug)
+        task = get_published_task_or_404(slug=slug)
         solutions = TaskSolution.objects \
             .filter(task=task, author=request.user) \
             .order_by("-id")[:5]
