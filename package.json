@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Interactive Learning environment for Object-Oriented Programming",
   "dependencies": {
-    "less": "^2.6.1",
+    "less": "^2.7.1",
     "uglify-js": "^2.6.2",
     "watchy": "^0.6.6"
   },
