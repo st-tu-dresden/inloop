@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils import timezone
 
 from inloop.tasks.models import check_solution, Task, TaskSolution, TaskSolutionFile
+from inloop.tasks.prettyprint import junit
 
 
 # Once we have upgraded to Django 1.9, we can use the shipped contrib.auth Mixins.
@@ -111,7 +112,15 @@ class SolutionDetailView(LoginRequiredMixin, View):
             )
             return redirect("tasks:solutionlist", slug=solution.task.slug)
 
+        # TODO: PrettyPrinters should be configurable (for now, we only have one for JUnit)
+        result = solution.checkerresult_set.last()
+        xml_reports = junit.checkeroutput_filter(result.checkeroutput_set)
+        testsuites = [
+            junit.xml_to_dict(xml) for xml in xml_reports
+        ]
+
         return render(request, "tasks/solutiondetail.html", {
             'solution': solution,
-            'result': solution.checkerresult_set.last()
+            'result': result,
+            'testsuites': testsuites
         })

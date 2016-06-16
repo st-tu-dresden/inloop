@@ -1,0 +1,27 @@
+{% for testsuite in testsuites %}
+
+<h4>Test suite: {{ testsuite.name }}</h3>
+<ul class="list-group">
+{% for testcase in testsuite.testcases %}
+   <li class="list-group-item">
+     <h4 class="{% if testcase.failure %}failure{% else %}success{% endif %}">
+       {{ testcase.name }}
+     </h4>
+     {% if testcase.failure %}
+     {% with failure=testcase.failure %}
+     Failed with {{ failure.type }}: {{ failure.message }}.
+     Stacktrace: <pre class="result_stdout"><code>{{ failure.stacktrace }}</code></pre>
+     {% endwith %}
+     {% endif %}
+   </li>
+{% endfor %}
+{% if testsuite.system_out %}
+  <li class="list-group-item">
+    Output: <pre class="result_stdout"><code>{{testsuite.system_out}}</code></pre>
+  </li>
+{% endif %}
+</ul>
+
+{% empty %}
+<p>Nothing to show here.</p>
+{% endfor %}

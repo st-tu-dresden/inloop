@@ -32,6 +32,9 @@
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
+  <li role="presentation">
+    <a href="#unittests" aria-controls="unittests" role="tab" data-toggle="tab">Unit tests</a>
+  </li>
 </ul>
 
 <div class="tab-content" style="margin: 1em">
@@ -59,7 +62,10 @@
     <p>Nothing to show here.</p>
   {% endif %}
   </div><!-- /#console -->
-</div><!-- /.tab-content -->
 
+  <div role="tabpanel" class="tab-pane" id="unittests">
+  {% include "tasks/includes/testsuites.html" %}
+  </div><!-- /#unittests -->
+</div><!-- /.tab-content -->
 
 {% endblock %}
