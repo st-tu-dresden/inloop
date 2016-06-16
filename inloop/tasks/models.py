@@ -190,7 +190,7 @@ class TaskSolution(models.Model):
 
     def solution_path(self):
         if self.tasksolutionfile_set.count() < 1:
-            raise ValueError("No files associated to TaskSolution(id=%d)" % self.id)
+            raise AssertionError("No files associated to TaskSolution(id=%d)" % self.id)
 
         # derive the directory from the first associated TaskSolutionFile
         solution_file = self.tasksolutionfile_set.first()
