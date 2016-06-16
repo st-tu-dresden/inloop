@@ -183,7 +183,7 @@ class DockerSubProcessChecker:
         LOGGER.debug("Popen args: %s", args)
 
         proc = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
         try:
@@ -195,6 +195,9 @@ class DockerSubProcessChecker:
             rc = signal.SIGKILL
             # kill container *and* the client process (SIGKILL is not proxied)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)])
+
+        stderr = stderr.decode("utf-8", errors="replace")
+        stdout = stdout.decode("utf-8", errors="replace")
 
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
