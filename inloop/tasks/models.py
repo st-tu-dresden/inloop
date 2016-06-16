@@ -230,7 +230,7 @@ class TaskSolution(models.Model):
         return result
 
     def get_absolute_url(self):
-        return reverse("tasks:results", kwargs={'slug': self.task.slug, 'solution_id': self.id})
+        return reverse("tasks:solutiondetail", kwargs={'solution_id': self.id})
 
     def __repr__(self):
         return "<%s: id=%r author=%r task=%r>" % \
