@@ -2,28 +2,6 @@
 
 {% block title %}{{ task.title }} solutions{% endblock %}
 
-{% block extrahead %}
-<style type="text/css">
-.solstatus {
-  display: inline-block;
-  float: right;
-  vertical-align: middle;
-  line-height: 50px;
-  font-size: 20px;
-}
-.spinner {
-  -webkit-animation-name: spin;
-  -webkit-animation-duration: 3s;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
-}
-@-webkit-keyframes spin {
-  from { -webkit-transform: rotate(0deg); }
-  to { -webkit-transform: rotate(360deg); }
-}
-</style>
-{% endblock %}
-
 {% block tab_content %}
 {% if solutions %}
 <div class="list-group">
