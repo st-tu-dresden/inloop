@@ -4,6 +4,7 @@
   "description": "Interactive Learning environment for Object-Oriented Programming",
   "dependencies": {
     "less": "^2.7.1",
+    "less-plugin-autoprefix": "^1.5.1",
     "less-plugin-clean-css": "^1.5.1",
     "uglify-js": "^2.6.2",
     "watchy": "^0.6.6"
