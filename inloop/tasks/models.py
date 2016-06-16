@@ -295,7 +295,7 @@ class CheckerOutput(models.Model):
     intended to be interpreted later by parsers/pretty printers/etc.
     """
     result = models.ForeignKey(CheckerResult)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     output = models.TextField()
 
     def __str__(self):
