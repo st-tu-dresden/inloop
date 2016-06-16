@@ -1,16 +1,5 @@
 {% extends "base_site.html" %}
 
-{% block extrabody %}
-<style class="text/css">
-.result_stdout {
-  font-size: 86%;
-}
-.result_stdout code {
-  white-space: pre;
-}
-</style>
-{% endblock %}
-
 {% block content %}
 
 {# Breadcrumb #}
@@ -57,7 +46,7 @@
 
   <div role="tabpanel" class="tab-pane" id="console">
   {% if result.stdout or result.stderr %}
-    <pre class="result_stdout"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
+    <pre class="console-output"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
   {% else %}
     <p>Nothing to show here.</p>
   {% endif %}

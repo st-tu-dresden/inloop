@@ -10,14 +10,14 @@
      {% if testcase.failure %}
      {% with failure=testcase.failure %}
      Failed with {{ failure.type }}: {{ failure.message }}.
-     Stacktrace: <pre class="result_stdout"><code>{{ failure.stacktrace }}</code></pre>
+     Stacktrace: <pre class="console-output"><code>{{ failure.stacktrace }}</code></pre>
      {% endwith %}
      {% endif %}
    </li>
 {% endfor %}
 {% if testsuite.system_out %}
   <li class="list-group-item">
-    Output: <pre class="result_stdout"><code>{{testsuite.system_out}}</code></pre>
+    Output: <pre class="console-output"><code>{{testsuite.system_out}}</code></pre>
   </li>
 {% endif %}
 </ul>
