@@ -168,8 +168,7 @@ class DockerSubProcessChecker:
             "docker",
             "run",
             "--rm",
-            # TODO: activate this when the Docker image switched to ant
-            # "--read-only",
+            "--read-only",
             "--net=none",
             "--memory=%s" % self.config.get("memory", "256m"),
             "--volume=%s:/checker/input:ro" % input_path,
