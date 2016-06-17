@@ -5,8 +5,6 @@
 # Nodejs commands
 uglifyjs := node_modules/.bin/uglifyjs
 lessc := node_modules/.bin/lessc
-WATCHY = node_modules/.bin/watchy
-WATCHYFLAGS = --wait 5 --no-init-spawn --silent
 
 # Target file for the JS bundle
 js_bundle := inloop/core/static/js/inloop.min.js
@@ -58,7 +56,8 @@ bundlejs:
 
 .PHONY: watch
 watch:
-	$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
+	watchmedo shell-command --patterns="*.less;*.js" \
+		--recursive --command "make assets" less js
 
 
 ##
