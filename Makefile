@@ -2,13 +2,9 @@
 ## MAKEFILE VARIABLES
 ##
 
-# Nodejs commands and flags
-UGLIFY = node_modules/.bin/uglifyjs
-UGLIFYFLAGS =
-LESS = node_modules/.bin/lessc
-LESSFLAGS = --autoprefix="last 4 versions" --clean-css
-WATCHY = node_modules/.bin/watchy
-WATCHYFLAGS = --wait 5 --no-init-spawn --silent
+# Nodejs commands
+uglifyjs := node_modules/.bin/uglifyjs
+lessc := node_modules/.bin/lessc
 
 # Target file for the JS bundle
 js_bundle := inloop/core/static/js/inloop.min.js
@@ -31,9 +27,6 @@ css_bundle := inloop/core/static/css/inloop.min.css
 # Source file for the CSS bundle
 bootstrap_path := vendor/bootstrap/less
 less_source := less/inloop.less
-less_watch := \
-	$(shell find less -name '*.less') \
-	$(shell find $(bootstrap_path) -name '*.less')
 
 # Source and target directories for git hook setup
 hook_source := support/git-hooks
@@ -50,17 +43,21 @@ all:
 ## ASSET MANAGEMENT
 ##
 .PHONY: assets
-assets: $(js_bundle) $(css_bundle)
+assets: bundlecss bundlejs
+
+.PHONY: bundlecss
+bundlecss:
+	$(lessc) --autoprefix="last 4 versions" --clean-css \
+		--include-path=$(bootstrap_path) $(less_source) $(css_bundle)
+
+.PHONY: bundlejs
+bundlejs:
+	$(uglifyjs) $(js_sources) --comment --output $(js_bundle)
 
 .PHONY: watch
 watch:
-	$(WATCHY) $(WATCHYFLAGS) --watch js,less,vendor,Makefile -- make assets
-
-$(js_bundle): $(js_sources)
-	$(UGLIFY) $(UGLIFYFLAGS) $(js_sources) > $@
-
-$(css_bundle): $(less_watch)
-	$(LESS) $(LESSFLAGS) --include-path=$(bootstrap_path) $(less_source) > $@
+	watchmedo shell-command --patterns="*.less;*.js" \
+		--recursive --command "make assets" less js
 
 
 ##
