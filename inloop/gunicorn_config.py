@@ -21,6 +21,3 @@ accesslog = None
 # Error logging
 errorlog = '/var/log/inloop/error.log'
 loglevel = 'info'
-
-# FIXME: remove me later
-timeout = 60
