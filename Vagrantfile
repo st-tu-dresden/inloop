@@ -51,7 +51,7 @@ Vagrant.configure(2) do |config|
     git stash -u
     git reset --hard origin/master
     git pull
-    ~/virtualenv/bin/pip install -r requirements_dev.txt
+    ~/virtualenv/bin/pip install -r requirements/development.txt
   EOF
 
   # Update GRUB / initiate a reboot (if necessary)
