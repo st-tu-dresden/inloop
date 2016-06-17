@@ -65,7 +65,7 @@ watch:
 ##
 .PHONY: test
 test:
-	python manage.py test --verbosity 2
+	python manage.py test
 
 .PHONY: coverage
 coverage:
