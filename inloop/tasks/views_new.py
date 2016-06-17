@@ -69,7 +69,6 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
         with transaction.atomic():
             solution = TaskSolution.objects.create(
-                submission_date=timezone.now(),
                 author=request.user,
                 task=task
             )
