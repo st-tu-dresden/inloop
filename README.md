@@ -123,6 +123,18 @@ to verify you can connect to the Docker daemon.
 * [Building CSS and Javascript bundles](docs/static-assets.md)
 
 
+## Authors and credits
+
+**Project lead**: Martin Morgenstern<br>
+**Junior programmer**: Dominik Muhs
+
+INLOOP borrows its concept from the Praktomat, developed originally at the
+University of Passau and later at the Karlsruhe Institute of Technology:
+
+* http://pp.ipd.kit.edu/projects/praktomat/praktomat.php
+* https://github.com/KITPraktomatTeam/Praktomat
+
+
 ## License
 
 INLOOP is released under GPL version 3.
