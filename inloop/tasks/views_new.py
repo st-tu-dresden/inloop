@@ -3,6 +3,7 @@ Class based views to manage tasks, task categories and submitted solutions.
 """
 from django import VERSION as DJANGO_VERSION
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
@@ -66,14 +67,15 @@ class SolutionUploadView(LoginRequiredMixin, View):
             messages.error(request, "You have uploaded invalid files (allowed: *.java).")
             return redirect("tasks:solutionupload", slug=slug)
 
-        solution = TaskSolution.objects.create(
-            submission_date=timezone.now(),
-            author=request.user,
-            task=task
-        )
-        solution.tasksolutionfile_set = [
-            TaskSolutionFile(filename=f.name, file=f) for f in uploads
-        ]
+        with transaction.atomic():
+            solution = TaskSolution.objects.create(
+                submission_date=timezone.now(),
+                author=request.user,
+                task=task
+            )
+            solution.tasksolutionfile_set = [
+                TaskSolutionFile(filename=f.name, file=f) for f in uploads
+            ]
 
         check_solution(solution.id)
         messages.success(request, "Your solution has been submitted to the checker.")
