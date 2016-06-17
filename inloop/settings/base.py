@@ -13,6 +13,9 @@ from os.path import dirname, join
 if sys.version_info[0] < 3:
     raise RuntimeError("INLOOP must be run with Python 3.x")
 
+if sys.getfilesystemencoding().lower() != "utf-8":
+    raise RuntimeError("Invalid (non UTF-8) locale settings detected.")
+
 PROJECT_ROOT = dirname(dirname(dirname(__file__)))
 INLOOP_ROOT = join(PROJECT_ROOT, 'inloop')
 
