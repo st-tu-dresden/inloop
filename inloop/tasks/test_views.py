@@ -50,4 +50,4 @@ class SolutionStatusViewTest(TasksTestBase):
     def test_only_owner_can_access(self):
         self.client.login(username="bruce_lee", password="s3cret")
         response = self.client.get("/tasks/solution/%d/status" % self.solution.id)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
