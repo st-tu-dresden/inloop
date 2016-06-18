@@ -38,6 +38,13 @@ class JUnitXMLTests(TestCase):
         self.assertIn("allGetOut()", failure["message"])
         self.assertIn("allGetOut()", failure["stacktrace"])
 
+        tc3 = testcases[3]
+        self.assertEqual(tc3["name"], "testTaxiDriverAssigned")
+        error = tc3["error"]
+        self.assertEqual(error["type"], "java.lang.IllegalArgumentException")
+        self.assertEqual("Sample message", error["message"])
+        self.assertIn("Exception: Sample message", error["stacktrace"])
+
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
             junit.xml_to_dict("<invalid-root />")

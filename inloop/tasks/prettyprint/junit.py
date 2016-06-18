@@ -46,9 +46,10 @@ def testsuite_to_dict(testsuite):
 def testcase_to_dict(testcase):
     """Return a dict representation of the given <testcase/> Element."""
     testcase_dict = dict(testcase.attrib)
-    failure = testcase.find("failure")
-    if failure is not None:
-        failure_dict = dict(failure.attrib)
-        failure_dict["stacktrace"] = failure.text
-        testcase_dict["failure"] = failure_dict
+    for tag in ["failure", "error"]:
+        element = testcase.find(tag)
+        if element is not None:
+            element_dict = dict(element.attrib)
+            element_dict["stacktrace"] = element.text
+            testcase_dict[tag] = element_dict
     return testcase_dict
