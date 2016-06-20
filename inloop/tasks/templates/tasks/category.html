@@ -16,8 +16,10 @@
     <thead>
     <tr>
       <th>Title</th>
-      <th>Publication date</th>
+      <th>Published on</th>
+      {% if have_deadlines %}
       <th>Deadline</th>
+      {% endif %}
       <th>Completed</th>
     </tr>
     </thead>
@@ -26,8 +28,10 @@
     {% for task in tasks %}
     <tr>
       <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-      <td>{{ task.publication_date|date:"d/m/y" }}</td>
-      <td>{% firstof task.deadline_date|date:"d/m/y" "-"  %}</td>
+      <td>{% firstof task.publication_date|date:"d-m-Y" "-" %}</td>
+      {% if have_deadlines %}
+      <td>{% firstof task.deadline_date|date:"d-m-Y" "-"  %}</td>
+      {% endif %}
       <td>
         <!-- show a question mark until this gets implemented -->
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>

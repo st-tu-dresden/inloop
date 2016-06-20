@@ -32,20 +32,21 @@ def error(request, message):
 @login_required
 def category(request, slug):
     category = get_object_or_404(TaskCategory, slug=slug)
-    tasks = Task.objects.filter(
-        category=category,
-        publication_date__lt=timezone.now()
-    )
+    tasks = Task.objects \
+        .filter(category=category, publication_date__lt=timezone.now()) \
+        .order_by("publication_date", "title")
+    have_deadlines = any(task.deadline_date for task in tasks)
     return render(request, 'tasks/category.html', {
         'category': category,
-        'tasks': tasks
+        'tasks': tasks,
+        'have_deadlines': have_deadlines
     })
 
 
 def index(request):
     if request.user.is_authenticated():
         progress = lambda a, b: (u_amt / t_amt) * 100 if t_amt != 0 else 0
-        queryset = TaskCategory.objects.all()
+        queryset = TaskCategory.objects.order_by("name")
         categories = []
         for o in queryset:
             t_amt = o.published_tasks().count()
