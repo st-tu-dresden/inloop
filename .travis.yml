@@ -1,0 +1,23 @@
+sudo: required
+
+language: python
+
+python:
+  - 3.4
+  - 3.5
+
+cache: pip
+
+git:
+  submodules: false
+
+services:
+  - docker
+
+install:
+  - pip install -r requirements/development.txt
+  - make docker-image
+
+script:
+  - flake8
+  - make test
