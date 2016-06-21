@@ -25,4 +25,4 @@ install:
 
 script:
   - flake8
-  - make test
+  - ./manage.py test --verbosity 2
