@@ -198,6 +198,8 @@ class DockerSubProcessChecker:
         stderr = stderr.decode("utf-8", errors="replace")
         stdout = stdout.decode("utf-8", errors="replace")
 
+        LOGGER.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
+
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
             LOGGER.error("docker failure (rc=%d): %s", rc, stderr)
