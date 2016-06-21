@@ -8,7 +8,6 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 from django.contrib import messages
-from django.utils import timezone
 
 from inloop.tasks.models import check_solution, Task, TaskSolution, TaskSolutionFile
 from inloop.tasks.prettyprint import junit
