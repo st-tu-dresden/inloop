@@ -6,6 +6,9 @@
       \:\__\     |:/  /   \:\__\    \::/  /   \::/  /     \/__/
        \/__/     \/__/     \/__/     \/__/     \/__/
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
+
 This is INLOOP, the interactive learning center for object-oriented programming.
 
 INLOOP is a web application based on Django to manage programming assignments for
