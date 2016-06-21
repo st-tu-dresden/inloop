@@ -14,6 +14,11 @@ git:
 services:
   - docker
 
+before_install:
+  - sudo apt-get -y --purge remove docker-engine
+  - sudo apt-get -y install docker-engine
+  - docker --version
+
 install:
   - pip install -r requirements/development.txt
   - make docker-image
