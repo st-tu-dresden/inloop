@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from huey.contrib.djhuey import db_task
 
-from inloop.accounts.models import UserProfile, SYSTEM_USER
+from inloop.accounts.models import get_system_user, UserProfile
 from inloop.gh_import.utils import parse_date
 from inloop.tasks.checker import DockerSubProcessChecker
 
@@ -115,7 +115,7 @@ class TaskManager(models.Manager):
         try:
             task = self.get(name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=SYSTEM_USER)
+            task = Task(name=name, author=get_system_user())
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
