@@ -100,6 +100,7 @@ class DockerSubProcessChecker:
                        (default: platform-dependent)
             - memory:  maximum memory a container may use, passed in as string
                        to the Docker CLI as --memory=XXX (defaut: 256m)
+            - fssize:  the size of the mounted scratch file system (default: 32m)
         """
         tmpdir = config.get("tmpdir")
         if tmpdir:
@@ -173,7 +174,7 @@ class DockerSubProcessChecker:
             "--memory=%s" % self.config.get("memory", "256m"),
             "--volume=%s:/checker/input:ro" % input_path,
             "--volume=%s:/checker/output" % output_path,
-            "--tmpfs=/checker/scratch",
+            "--tmpfs=/checker/scratch:size=%s" % self.config.get("fssize", "32m"),
             "--name=%s" % ctr_id,
             self.image_name,
             task_name
