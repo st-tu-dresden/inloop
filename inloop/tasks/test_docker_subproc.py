@@ -139,9 +139,18 @@ class DockerSubProcessCheckerTests(TestCase):
         self.assertEqual(result.stdout.strip(), "nobody")
 
     def test_maximum_file_size(self):
-        """Test file size limits."""
+        """Test limits of the scratch file system."""
         result = self.checker.check_task(
             "dd if=/dev/zero of=/checker/scratch/largefile bs=1M count=100",
             self.input_path
         )
         self.assertNotEqual(result.rc, 0)
+
+    def test_scratch_mount_options(self):
+        """Verify if the tmpfs is mounted correctly."""
+        result = self.checker.check_task(
+            "mount | grep 'tmpfs on /checker/scratch'",
+            self.input_path
+        )
+        # the default size=32m is expanded to kilobytes
+        self.assertIn("size=32768k", result.stdout)
