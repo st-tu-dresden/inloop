@@ -189,7 +189,7 @@ class TaskSolution(models.Model):
     task = models.ForeignKey(Task)
     passed = models.BooleanField(default=False)
 
-    # time after a solution without a CheckerResult is regarded as timed out
+    # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
 
     def solution_path(self):

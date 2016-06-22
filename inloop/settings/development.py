@@ -18,9 +18,10 @@ DOMAIN = 'http://localhost:8000/'
 
 DEBUG = True
 
-INSTALLED_APPS = base.INSTALLED_APPS + (
-    'debug_toolbar',
-)
+# DJDT can be disturbing at times -- load it only when explicitly requested
+if environ.get("DJDT_ENABLED"):
+    base.INSTALLED_APPS += ('debug_toolbar',)
+    DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': ''}
 
 # Storage root for uploaded files
 MEDIA_ROOT = join(base.PROJECT_ROOT, 'media')
