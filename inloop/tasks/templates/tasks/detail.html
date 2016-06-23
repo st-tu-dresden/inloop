@@ -7,11 +7,3 @@
 <h1>{{ task.title }}</h1>
 {{ task.description|markdown }}
 {% endblock %}
-
-{% block extrabody %}
-<script type="text/javascript">
-$(document).ready(function() {
-  anchors.add("h2, h3");
-});
-</script>
-{% endblock %}
