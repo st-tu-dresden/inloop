@@ -18,8 +18,10 @@ js_sources := \
 	vendor/bootstrap/js/tab.js \
 	vendor/prism/prism.js \
 	vendor/prism/components/prism-java.js \
+	vendor/jquery-timeago/jquery.timeago.js \
+	vendor/jquery-refresh/jquery.refresh.js \
 	vendor/anchorjs/anchor.js \
-	$(shell find js -name '*.js')
+	js/inloop.js
 
 # Target file for the CSS bundle
 css_bundle := inloop/core/static/css/inloop.min.css
