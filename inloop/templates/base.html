@@ -15,7 +15,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
   {% block extrahead %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_classes %}{% endblock %}">
 <nav class="navbar navbar-default navbar-static-top">
     <div class="container">
         <div class="navbar-header">
