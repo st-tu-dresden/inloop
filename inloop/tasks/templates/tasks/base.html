@@ -16,9 +16,7 @@
     <a href="{% url 'tasks:solutionupload' task.slug %}">Manual upload</a>
   </li>
   <li role="presentation" {% if active_tab == 2 %}class="active"{% endif %}>
-    <a href="{% url 'tasks:solutionlist' task.slug %}">
-      Your solutions <span class="label label-info">NEW</span>
-    </a>
+    <a href="{% url 'tasks:solutionlist' task.slug %}">Your solutions</a>
   </li>
 </ul>
 
