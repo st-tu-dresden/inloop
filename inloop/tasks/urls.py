@@ -15,8 +15,5 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/$', TaskDetailView.as_view(), name='detail'),
     url(r'^(?P<slug>[-\w]+)/upload$', SolutionUploadView.as_view(), name='solutionupload'),
     url(r'^(?P<slug>[-\w]+)/solutions$', SolutionListView.as_view(), name='solutionlist'),
-    url(r'^(?P<slug>[-\w]+)/results/(?P<solution_id>[\d]+)$', views.results, name='results'),
-    url(r'^(?P<slug>[-\w]+)/download_solution/(?P<solution_id>[\d]+)/$',
-        views.get_solution_as_zip, name='solution_as_zip'),
     url(r'^(?P<slug>[-\w]+)/(?P<path>.*)$', views.serve_attachment, name='serve_attachment'),
 ]
