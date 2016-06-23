@@ -8,16 +8,8 @@
 {% for solution in solutions %}
   <a class="list-group-item" href="{% url 'tasks:solutiondetail' solution.id %}">
 
-    <div class="solstatus">
-    {% if solution.status == "success" %}
-      <span class="glyphicon glyphicon-ok"></span>
-    {% elif solution.status == "pending" %}
-      <span class="spinner glyphicon glyphicon-cog"></span>
-    {% elif solution.status == "failure" %}
-      <span class="glyphicon glyphicon-minus-sign"></span>
-    {% else %}
-      <span class="glyphicon glyphicon-exclamation-sign"></span>
-    {% endif %}
+    <div class="solutionstatus">
+      <span class="glyphicon solution-{{ solution.status }}"></span>
     </div>
 
     <h4 class="list-group-item-heading">#{{ solution.id }}</h4>

@@ -1,12 +1,3 @@
-/* @begin customize bootstrap */
-@font-family-sans-serif:  "Source Sans Pro", sans-serif;
-@font-family-monospace:   "Source Code Pro", monospace;
-@font-size-base:          15px;
-
-@container-desktop: (750px + @grid-gutter-width);
-@container-large-desktop: @container-desktop;
-/* @end */
-
 /* @begin anchor.js styles */
 .anchorjs-link:hover {
     text-decoration: none;
@@ -19,6 +10,9 @@
 /* @end */
 
 /* @begin common container styles */
+.tab-content, .static-tab-content {
+    margin: 1em;
+}
 .center-box-sm {
     max-width: 25em;
     .center-block;
@@ -112,17 +106,31 @@ textarea[id^="content"] {
 /* @end */
 
 /* @begin solution list view styles */
-.solstatus {
+.solutionstatus {
   display: inline-block;
   float: right;
   vertical-align: middle;
   line-height: 50px;
   font-size: 20px;
 }
-/* @end */
 
-/* @begin CSS animations (will be autoprefixed) */
-.spinner {
+.solution-success {
+  .glyphicon-ok;
+}
+
+.solution-failure {
+  .glyphicon-minus-sign;
+}
+
+.solution-error,
+.solution-killed,
+.solution-lost,
+.solution-timeout {
+  .glyphicon-exclamation-sign;
+}
+
+.solution-pending {
+  .glyphicon-cog;
   animation-name: spin;
   animation-duration: 3s;
   animation-iteration-count: infinite;

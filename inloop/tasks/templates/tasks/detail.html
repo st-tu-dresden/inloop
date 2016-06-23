@@ -2,16 +2,8 @@
 {% load markdown %}
 
 {% block title %}{{ task.title }}{% endblock %}
-
+{% block body_classes %}autolink{% endblock %}
 {% block tab_content %}
 <h1>{{ task.title }}</h1>
 {{ task.description|markdown }}
-{% endblock %}
-
-{% block extrabody %}
-<script type="text/javascript">
-$(document).ready(function() {
-  anchors.add("h2, h3");
-});
-</script>
 {% endblock %}
