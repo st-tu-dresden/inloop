@@ -106,17 +106,31 @@ textarea[id^="content"] {
 /* @end */
 
 /* @begin solution list view styles */
-.solstatus {
+.solutionstatus {
   display: inline-block;
   float: right;
   vertical-align: middle;
   line-height: 50px;
   font-size: 20px;
 }
-/* @end */
 
-/* @begin CSS animations (will be autoprefixed) */
-.spinner {
+.solution-success {
+  .glyphicon-ok;
+}
+
+.solution-failure {
+  .glyphicon-minus-sign;
+}
+
+.solution-error,
+.solution-killed,
+.solution-lost,
+.solution-timeout {
+  .glyphicon-exclamation-sign;
+}
+
+.solution-pending {
+  .glyphicon-cog;
   animation-name: spin;
   animation-duration: 3s;
   animation-iteration-count: infinite;
