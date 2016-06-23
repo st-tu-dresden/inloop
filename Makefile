@@ -13,9 +13,9 @@ js_bundle := inloop/core/static/js/inloop.min.js
 # (order is important: jQuery > other 3rd party JS > INLOOP JS)
 js_sources := \
 	vendor/jquery/dist/jquery.min.js \
-	vendor/bootstrap/dist/js/bootstrap.min.js \
-	vendor/ace/src/ace.js \
-	vendor/ace/src/mode-java.js \
+	vendor/bootstrap/js/alert.js \
+	vendor/bootstrap/js/collapse.js \
+	vendor/bootstrap/js/tab.js \
 	vendor/prism/prism.js \
 	vendor/prism/components/prism-java.js \
 	vendor/anchorjs/anchor.js \
