@@ -6,7 +6,7 @@ from django.utils.encoding import force_text
 from django.views.generic import View
 
 from inloop.accounts.models import UserProfile
-from inloop.tasks.views_new import LoginRequiredMixin
+from inloop.tasks.views import LoginRequiredMixin
 from inloop.tasks.test_base import TasksTestBase
 
 
