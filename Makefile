@@ -18,6 +18,7 @@ js_sources := \
 	vendor/bootstrap/js/tab.js \
 	vendor/prism/prism.js \
 	vendor/prism/components/prism-java.js \
+	vendor/jquery-timeago/jquery.timeago.js \
 	vendor/jquery-refresh/jquery.refresh.js \
 	vendor/anchorjs/anchor.js \
 	js/inloop.js
