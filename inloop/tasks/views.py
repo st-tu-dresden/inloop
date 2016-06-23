@@ -42,23 +42,23 @@ class LoginRequiredMixin:
 
 
 def index(request):
-    if request.user.is_authenticated():
-        progress = lambda a, b: (u_amt / t_amt) * 100 if t_amt != 0 else 0
-        queryset = TaskCategory.objects.order_by("name")
-        categories = []
-        for o in queryset:
-            t_amt = o.published_tasks().count()
-            u_amt = o.completed_tasks_for_user(request.user).count()
-            if t_amt > 0:
-                categories.append((o, (t_amt, u_amt, progress(u_amt, t_amt))))
+    if request.user.is_anonymous():
+        return render(request, "registration/login.html", {"hide_login_link": True})
 
-        return render(request, 'tasks/index.html', {
-            'categories': categories
-        })
-    else:
-        return render(request, 'registration/login.html', {
-            'hide_login_link': True
-        })
+    def progress(m, n):
+        return m / n * 100 if n != 0 else 0
+
+    categories = []
+
+    for category in TaskCategory.objects.order_by("name"):
+        num_published = category.published_tasks().count()
+        num_completed = category.completed_tasks_for_user(request.user).count()
+        if num_published > 0:
+            categories.append(
+                (category, (num_published, num_completed, progress(num_completed, num_published)))
+            )
+
+    return render(request, "tasks/index.html", {"categories": categories})
 
 
 @login_required
