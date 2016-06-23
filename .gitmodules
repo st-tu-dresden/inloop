@@ -13,3 +13,6 @@
 [submodule "static/vendor/anchorjs"]
 	path = vendor/anchorjs
 	url = https://github.com/bryanbraun/anchorjs.git
+[submodule "vendor/jquery-refresh"]
+	path = vendor/jquery-refresh
+	url = git@github.com:martinmo/jquery-refresh.git
