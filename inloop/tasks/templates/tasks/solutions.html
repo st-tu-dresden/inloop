@@ -9,7 +9,7 @@
   <a class="list-group-item" href="{% url 'tasks:solutiondetail' solution.id %}">
 
     <div class="solutionstatus">
-      <span class="glyphicon solution-{{ solution.status }}"></span>
+      <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
     </div>
 
     <h4 class="list-group-item-heading">#{{ solution.id }}</h4>
