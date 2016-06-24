@@ -118,15 +118,21 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
     def post(self, request, slug):
         task = get_published_task_or_404(slug=slug)
+        redirect_to_upload = redirect("tasks:solutionupload", slug=slug)
+
+        if task.is_expired():
+            messages.error(request, "The deadline for this task has passed.")
+            return redirect_to_upload
+
         uploads = request.FILES.getlist('uploads')
 
         if not uploads:
             messages.error(request, "You haven't uploaded any files.")
-            return redirect("tasks:solutionupload", slug=slug)
+            return redirect_to_upload
 
         if not all([f.name.endswith(".java") for f in uploads]):
             messages.error(request, "You have uploaded invalid files (allowed: *.java).")
-            return redirect("tasks:solutionupload", slug=slug)
+            return redirect_to_upload
 
         with transaction.atomic():
             solution = TaskSolution.objects.create(

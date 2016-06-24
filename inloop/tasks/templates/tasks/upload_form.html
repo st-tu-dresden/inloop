@@ -3,6 +3,7 @@
 {% block title %}Solution upload - {{ task.title }} {% endblock %}
 
 {% block tab_content %}
+{% if not task.is_expired %}
 <form class="form-inline" action="{% url 'tasks:solutionupload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
@@ -13,4 +14,9 @@
     <input class="btn btn-primary" type="submit" value="Submit">
   </div>
 </form>
+{% else %}
+<p class="alert alert-warning">
+  The deadline for this task has passed. You cannot submit new solutions.
+</p>
+{% endif %}
 {% endblock %}
