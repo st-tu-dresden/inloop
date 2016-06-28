@@ -19,8 +19,10 @@ class JUnitXMLTests(TestCase):
         self.assertEqual(self.ts["system_err"], None)
 
     def test_sample_attributes(self):
+        self.assertEqual(self.ts["total"], 5)
         self.assertEqual(self.ts["errors"], 0)
         self.assertEqual(self.ts["failures"], 1)
+        self.assertEqual(self.ts["passed"], 4)
         self.assertEqual(self.ts["name"], "TaxiTest")
 
     def test_sample_testcases(self):

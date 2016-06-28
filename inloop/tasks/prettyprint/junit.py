@@ -34,15 +34,17 @@ def testsuite_to_dict(testsuite):
     """Return a dict representation of the given <testsuite/> Element."""
     if testsuite.tag != "testsuite":
         raise ValueError("The root tag must be a <testsuite/>.")
-    testsuite_dict = dict(testsuite.attrib)
+    ts = dict(testsuite.attrib)
     for key in ["failures", "errors"]:
-        testsuite_dict[key] = int(testsuite_dict.get(key, 0))
-    testsuite_dict["testcases"] = [
+        ts[key] = int(ts.get(key, 0))
+    ts["testcases"] = [
         testcase_to_dict(testcase) for testcase in testsuite.findall("testcase")
     ]
-    testsuite_dict["system_out"] = testsuite.find("system-out").text
-    testsuite_dict["system_err"] = testsuite.find("system-err").text
-    return testsuite_dict
+    ts["total"] = len(ts["testcases"])
+    ts["passed"] = ts["total"] - ts["failures"] - ts["errors"]
+    ts["system_out"] = testsuite.find("system-out").text
+    ts["system_err"] = testsuite.find("system-err").text
+    return ts
 
 
 def testcase_to_dict(testcase):
