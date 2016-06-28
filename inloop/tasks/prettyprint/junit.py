@@ -35,6 +35,8 @@ def testsuite_to_dict(testsuite):
     if testsuite.tag != "testsuite":
         raise ValueError("The root tag must be a <testsuite/>.")
     testsuite_dict = dict(testsuite.attrib)
+    for key in ["failures", "errors"]:
+        testsuite_dict[key] = int(testsuite_dict.get(key, 0))
     testsuite_dict["testcases"] = [
         testcase_to_dict(testcase) for testcase in testsuite.findall("testcase")
     ]
