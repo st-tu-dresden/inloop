@@ -19,8 +19,10 @@ class JUnitXMLTests(TestCase):
         self.assertEqual(self.ts["system_err"], None)
 
     def test_sample_attributes(self):
-        self.assertEqual(int(self.ts["errors"]), 0)
-        self.assertEqual(int(self.ts["failures"]), 1)
+        self.assertEqual(self.ts["total"], 5)
+        self.assertEqual(self.ts["errors"], 0)
+        self.assertEqual(self.ts["failures"], 1)
+        self.assertEqual(self.ts["passed"], 4)
         self.assertEqual(self.ts["name"], "TaxiTest")
 
     def test_sample_testcases(self):
@@ -37,6 +39,13 @@ class JUnitXMLTests(TestCase):
         self.assertEqual(failure["type"], "junit.framework.AssertionFailedError")
         self.assertIn("allGetOut()", failure["message"])
         self.assertIn("allGetOut()", failure["stacktrace"])
+
+        tc3 = testcases[3]
+        self.assertEqual(tc3["name"], "testTaxiDriverAssigned")
+        error = tc3["error"]
+        self.assertEqual(error["type"], "java.lang.IllegalArgumentException")
+        self.assertEqual("Sample message", error["message"])
+        self.assertIn("Exception: Sample message", error["stacktrace"])
 
     def test_invalid_input(self):
         with self.assertRaises(ValueError):

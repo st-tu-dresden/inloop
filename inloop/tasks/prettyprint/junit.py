@@ -34,21 +34,26 @@ def testsuite_to_dict(testsuite):
     """Return a dict representation of the given <testsuite/> Element."""
     if testsuite.tag != "testsuite":
         raise ValueError("The root tag must be a <testsuite/>.")
-    testsuite_dict = dict(testsuite.attrib)
-    testsuite_dict["testcases"] = [
+    ts = dict(testsuite.attrib)
+    for key in ["failures", "errors"]:
+        ts[key] = int(ts.get(key, 0))
+    ts["testcases"] = [
         testcase_to_dict(testcase) for testcase in testsuite.findall("testcase")
     ]
-    testsuite_dict["system_out"] = testsuite.find("system-out").text
-    testsuite_dict["system_err"] = testsuite.find("system-err").text
-    return testsuite_dict
+    ts["total"] = len(ts["testcases"])
+    ts["passed"] = ts["total"] - ts["failures"] - ts["errors"]
+    ts["system_out"] = testsuite.find("system-out").text
+    ts["system_err"] = testsuite.find("system-err").text
+    return ts
 
 
 def testcase_to_dict(testcase):
     """Return a dict representation of the given <testcase/> Element."""
     testcase_dict = dict(testcase.attrib)
-    failure = testcase.find("failure")
-    if failure is not None:
-        failure_dict = dict(failure.attrib)
-        failure_dict["stacktrace"] = failure.text
-        testcase_dict["failure"] = failure_dict
+    for tag in ["failure", "error"]:
+        element = testcase.find(tag)
+        if element is not None:
+            element_dict = dict(element.attrib)
+            element_dict["stacktrace"] = element.text
+            testcase_dict[tag] = element_dict
     return testcase_dict

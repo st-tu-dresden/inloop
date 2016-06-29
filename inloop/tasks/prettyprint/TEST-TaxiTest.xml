@@ -4,7 +4,12 @@
   <testcase classname="TaxiTest" name="testTaxiAdd" time="0.002" />
   <testcase classname="TaxiTest" name="testHuman" time="0.0" />
   <testcase classname="TaxiTest" name="testTaxiAllGetOutEmptyTaxi" time="0.0" />
-  <testcase classname="TaxiTest" name="testTaxiDriverAssigned" time="0.0" />
+  <testcase classname="TaxiTest" name="testTaxiDriverAssigned" time="0.0">
+    <error message="Sample message" type="java.lang.IllegalArgumentException">java.lang.IllegalArgumentException: Sample message
+  at Taxi.add(Taxi.java)
+  at TaxiTest.testTaxiDriverAssigned(TaxiTest.java)
+</error>
+  </testcase>
   <testcase classname="TaxiTest" name="taxiAllGetOutTaxiNotEmpty" time="0.015">
     <failure message="The method allGetOut() of the class Taxi should return four passengers if the taxi had four passengers! expected:&lt;4&gt; but was:&lt;0&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: The method allGetOut() of the class Taxi should return four passengers if the taxi had four passengers! expected:&lt;4&gt; but was:&lt;0&gt;
 	at TaxiTest.taxiAllGetOutTaxiNotEmpty(TaxiTest.java:102)
