@@ -1,4 +1,4 @@
-Django==1.8.11
+Django==1.8.13
 huey==1.1.1
 -e git+https://github.com/waylan/Python-Markdown.git@4d96f00#egg=Markdown
 Pillow==3.1.1
