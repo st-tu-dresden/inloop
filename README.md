@@ -20,7 +20,7 @@ solutions submitted by students in isolated environments.
 ## Quick start
 
 Assuming you've met the [dependencies listed below](#dependencies), run the following inside
-the shell:
+a shell:
 
     # setup a virtual environment and activate it
     pyvenv venv && source venv/bin/activate
@@ -110,7 +110,7 @@ should print
 
     swapaccount=1
 
-If not, you need update your GRUB config to add the `swapaccount=1` param to your
+If not, you need to update your GRUB config to add the `swapaccount=1` param to your
 kernel command line and reboot (see the linked Docker docs for details).
 
 Finally run

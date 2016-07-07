@@ -27,7 +27,7 @@ and follow our [coding conventions](#coding-conventions).
 ## Rules for contributing code
 
 In general, do one thing at a time and don't bite off more than you can chew. Long living
-branches are usually a signal that a feature needs splitting up. Furthermore, chances are
+branches are usually a sign that a feature needs to be split up. Furthermore, chances are
 high that such a branch will be hard to integrate into `master`. Divide and conquer!
 
 
