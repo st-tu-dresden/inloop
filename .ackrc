@@ -1,7 +1,0 @@
---ignore-dir=venvs
---ignore-dir=venv
---ignore-dir=vendor
---ignore-dir=htmlcov
---ignore-dir=media
---context
---sort-files
