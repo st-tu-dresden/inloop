@@ -23,7 +23,7 @@ def make_slug(value):
     >>> make_slug("Some Task III (winter term 2010/2011)")
     'some-task-iii'
     """
-    return slugify(re.sub(r'\([^\)]+\)', '', value))
+    return slugify(re.sub(r'\(.*?\)', '', value))
 
 
 def get_upload_path(obj, filename):
