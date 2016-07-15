@@ -41,8 +41,8 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
   * Don't use relative imports.
   * Docstrings must follow the [Google Python Style Guide for Comments][google-style]. Don't
     use reStructured Text style comments.
-  * [Install the pre-commit hook](#git-hooks) to automatically reject commits which violate
-    our rules. Alternatively, use `flake8` to check conformance manually.
+  * **Recommended**: use `flake8 --install-hook` to install a command line Git hook which
+    checks this automatically.
 * HTML (Django templates):
   * Indent using 2 spaces.
   * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
@@ -59,23 +59,6 @@ messages][good-commits2]. Put as much effort into your commit messages as into y
 other people will appreciate it.
 
 Pull requests containing [unhelpful commit messages][ugly-commits] won't be accepted.
-
-
-## Tools and helpers
-
-### Git hooks
-
-We provide the following commit hooks:
-
-* `pre-commit` enforces PEP8 coding convention
-* `commit-msg` enforces proper formatting of the Git commit messages
-* `post-checkout` synchronizes your virtualenv with the currently checked
-  out `pip` requirements file
-
-Our `Makefile` includes targets to install the above hooks into your working copy:
-
-* `make hookup` installs `pre-commit` and `commit-msg`
-* `make hookup-all` installs `pre-commit`, `commit-msg` and `post-checkout`
 
 
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/

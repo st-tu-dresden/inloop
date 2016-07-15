@@ -30,10 +30,6 @@ css_bundle := inloop/core/static/css/inloop.min.css
 bootstrap_path := vendor/bootstrap/less
 less_source := less/inloop.less
 
-# Source and target directories for git hook setup
-hook_source := support/git-hooks
-hook_target := .git/hooks
-
 
 # default target as a hint for the user
 .PHONY: all
@@ -73,25 +69,6 @@ test:
 coverage:
 	coverage run manage.py test
 	coverage html
-
-
-##
-## GIT HOOK INSTALLATION
-##
-.PHONY: hookup
-hookup:
-	install -b -m 755 $(hook_source)/commit-msg $(hook_target)
-	install -b -m 755 $(hook_source)/pre-commit $(hook_target)
-
-.PHONY: hookup-all
-hookup-all: hookup
-	install -b -m 755 $(hook_source)/post-checkout $(hook_target)
-
-.PHONY: unhookup
-unhookup:
-	rm -f $(hook_target)/commit-msg
-	rm -f $(hook_target)/pre-commit
-	rm -f $(hook_target)/post-checkout
 
 
 ##
