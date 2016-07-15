@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
+from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.views.generic import View
 
@@ -43,7 +44,7 @@ class LoginRequiredMixin:
 
 def index(request):
     if request.user.is_anonymous():
-        return render(request, "registration/login.html", {"hide_login_link": True})
+        return TemplateResponse(request, "registration/login.html", {"hide_login_link": True})
 
     def progress(m, n):
         return m / n * 100 if n != 0 else 0
@@ -58,7 +59,7 @@ def index(request):
                 (category, (num_published, num_completed, progress(num_completed, num_published)))
             )
 
-    return render(request, "tasks/index.html", {"categories": categories})
+    return TemplateResponse(request, "tasks/index.html", {"categories": categories})
 
 
 @login_required
@@ -68,7 +69,7 @@ def category(request, slug):
         .filter(category=category, publication_date__lt=timezone.now()) \
         .order_by("publication_date", "title")
     have_deadlines = any(task.deadline_date for task in tasks)
-    return render(request, 'tasks/category.html', {
+    return TemplateResponse(request, 'tasks/category.html', {
         'category': category,
         'tasks': tasks,
         'have_deadlines': have_deadlines
@@ -97,7 +98,7 @@ def serve_attachment(request, slug, path):
 
 class TaskDetailView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        return render(request, "tasks/detail.html", {
+        return TemplateResponse(request, "tasks/detail.html", {
             'task': get_published_task_or_404(slug=slug),
             'active_tab': 0
         })
@@ -111,7 +112,7 @@ class SolutionStatusView(LoginRequiredMixin, View):
 
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        return render(request, "tasks/upload_form.html", {
+        return TemplateResponse(request, "tasks/upload_form.html", {
             'task': get_published_task_or_404(slug=slug),
             'active_tab': 1
         })
@@ -154,7 +155,7 @@ class SolutionListView(LoginRequiredMixin, View):
         solutions = TaskSolution.objects \
             .filter(task=task, author=request.user) \
             .order_by("-id")[:5]
-        return render(request, "tasks/solutions.html", {
+        return TemplateResponse(request, "tasks/solutions.html", {
             'task': task,
             'solutions': solutions,
             'active_tab': 2
@@ -187,7 +188,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
             junit.xml_to_dict(xml) for xml in xml_reports
         ]
 
-        return render(request, "tasks/solutiondetail.html", {
+        return TemplateResponse(request, "tasks/solutiondetail.html", {
             'solution': solution,
             'result': result,
             'testsuites': testsuites
