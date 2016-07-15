@@ -196,7 +196,7 @@ class DockerSubProcessChecker:
             rc = signal.SIGKILL
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
-            LOGGER.info("removing timed out container %s", ctr_id)
+            LOGGER.debug("removing timed out container %s", ctr_id)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
 
         stderr = stderr.decode("utf-8", errors="replace")
