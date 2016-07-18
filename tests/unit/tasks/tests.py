@@ -9,7 +9,8 @@ from django.utils import timezone
 from inloop.tasks import models
 from inloop.tasks.checker import ResultTuple
 from inloop.tasks.models import CheckerResult, Task, TaskCategory
-from inloop.tasks.test_base import TasksTestBase
+
+from tests.unit.tasks.test_base import TasksTestBase
 
 
 def load_tests(loader, tests, ignore):
