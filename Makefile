@@ -74,10 +74,6 @@ coverage:
 ##
 ## DOCKER HELPERS
 ##
-.PHONY: docker-image
-docker-image:
-	$(MAKE) -C inloop/tasks/tests/docker
-
 .PHONY: docker-clean
 docker-clean:
 	-docker rm $(shell docker ps -q -f status=exited) >/dev/null 2>&1
