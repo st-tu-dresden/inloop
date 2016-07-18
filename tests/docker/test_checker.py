@@ -1,22 +1,19 @@
-import shutil
 import signal
 import subprocess
-from os.path import abspath, dirname, join
-from unittest import skipUnless
+from pathlib import Path
 
 from django.conf import settings
 from django.test import TestCase
 
 from inloop.tasks.checker import DockerSubProcessChecker, collect_files
 
-TEST_DIR = join(abspath(dirname(__file__)), "tests")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = str(BASE_DIR / "data")
 
 
 class CollectorTest(TestCase):
-    test_harness = join(TEST_DIR, "file_dict")
-
     def test_collected_names(self):
-        filenames = collect_files(self.test_harness).keys()
+        filenames = collect_files(DATA_DIR).keys()
         self.assertEqual(len(filenames), 2)
         self.assertIn("empty1.txt", filenames)
         self.assertIn("README.md", filenames)
@@ -24,12 +21,11 @@ class CollectorTest(TestCase):
         self.assertNotIn("empty2.txt", filenames)
 
     def test_collected_contents(self):
-        file_dict = collect_files(self.test_harness)
+        file_dict = collect_files(DATA_DIR)
         self.assertEqual("", file_dict["empty1.txt"])
         self.assertEqual("This is a test harness for collect_files().\n", file_dict["README.md"])
 
 
-@skipUnless(shutil.which("docker"), "Docker is not installed.")
 class DockerSubProcessCheckerTests(TestCase):
     """
     Each of the the following tests uses a *real* docker container, there is
@@ -45,8 +41,7 @@ class DockerSubProcessCheckerTests(TestCase):
 
     # name of the Docker image we use for this test
     image_name = "inloop-integration-test"
-
-    input_path = TEST_DIR
+    input_path = DATA_DIR
 
     # NOTE: tmpdir=None means using the platform default (e.g., TMPDIR)
     options = {
@@ -93,10 +88,10 @@ class DockerSubProcessCheckerTests(TestCase):
     def test_inbound_mountpoint(self):
         """Test if the input mount point works correctly."""
         result = self.checker.check_task(
-            "cat /checker/input/docker/Dockerfile",
+            "cat /checker/input/README.md",
             self.input_path
         )
-        self.assertIn("FROM alpine", result.stdout)
+        self.assertEqual("This is a test harness for collect_files().\n", result.stdout)
         self.assertEqual(result.rc, 0)
 
     def test_scratch_area(self):
