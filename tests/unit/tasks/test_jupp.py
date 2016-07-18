@@ -7,7 +7,7 @@ from inloop.tasks.prettyprint import junit
 class JUnitXMLTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        path = Path(__file__).parent.joinpath("TEST-TaxiTest.xml")
+        path = Path(__file__).parent / "xml" / "TEST-TaxiTest.xml"
         with path.open(encoding="utf-8") as f:
             cls.SAMPLE_XML = f.read()
 
