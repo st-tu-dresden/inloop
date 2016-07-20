@@ -55,7 +55,6 @@ WSGI_APPLICATION = 'inloop.wsgi.application'
 FILE_UPLOAD_HANDLERS = ("django.core.files.uploadhandler.TemporaryFileUploadHandler", )
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Berlin'
 USE_I18N = True
@@ -95,18 +94,7 @@ HUEY = {
 
 # checker setup
 CHECKER = {
-    'Container': {
-        'container_tag': 'docker-test',
-        'solution_path': '/home/gradle/solution/',
-    },
-    'Timeouts': {
-        # All timeouts in seconds
-        'container_execution': 120,
-        'container_kill': 5,
-        'container_remove': 5,
-        'container_build': 180,
-    },
-    "timeout": 120
+    "timeout": 120,
 }
 
 # Docker image to be used by the DockerSubProcessChecker
