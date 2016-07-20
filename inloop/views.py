@@ -11,8 +11,3 @@ def handler500(request):
     response = render_to_response('500.html')
     response.status_code = 500
     return response
-
-
-def trigger_error(request):
-    "Raise an exception to verify the exception middleware."
-    raise RuntimeError('Intentionally raised exception')
