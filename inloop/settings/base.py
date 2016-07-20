@@ -7,7 +7,7 @@ which both build upon this module and provide sane defaults which should work
 out of the box.
 """
 import sys
-from os import environ, makedirs
+from os import environ
 from os.path import dirname, join
 
 if sys.version_info[0] < 3:
@@ -99,13 +99,6 @@ CHECKER = {
 
 # Docker image to be used by the DockerSubProcessChecker
 DOCKER_IMAGE = "inloop-java-checker"
-
-# Docker on Mac OS X specific:
-#  - docker-machine implements mounted volumes using VirtualBox shared folders
-#  - shared folders must be located below the user's home directory
-if sys.platform == "darwin":
-    CHECKER["tmpdir"] = join(PROJECT_ROOT, ".tmp_docker")
-    makedirs(CHECKER["tmpdir"], exist_ok=True)
 
 # which sendfile() implementation should be used ("django" or "nginx")
 SENDFILE_METHOD = "django"

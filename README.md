@@ -64,6 +64,11 @@ Examples:
     ./manage.py test tests.unit
 
 
+##### Caveats
+
+On Mac OS X, you have to set TMPDIR to a path which can be bind-mounted by Docker for Mac:
+
+    TMPDIR=/tmp ./manage.py test tests.docker
 
 
 ### Dependencies
@@ -97,7 +102,12 @@ Platform specific instructions:
 
 * Mac OS X using Homebrew:
 
-        brew install docker docker-machine node python3 redis
+        brew install node python3 redis
+
+
+#### Docker setup on Mac OS X
+
+Install Docker for Mac as described on https://docs.docker.com/docker-for-mac/.
 
 
 #### Docker setup on Ubuntu/Debian
