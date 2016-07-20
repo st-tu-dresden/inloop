@@ -35,6 +35,7 @@ a shell:
     ./manage.py createsuperuser
 
     # run and monitor all required components in developer mode
+    # (this also executes unit tests if changes are detected)
     honcho start
 
 The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
@@ -42,17 +43,27 @@ The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` wit
 
 ### Test suite
 
-Use one of the following equivalent commands to run the test suite:
+We use Django standard facilities for testing. All tests reside in the `tests` package and
+consist of separate sub-packages for fast unit tests and slower integration tests:
 
-    make test
+    tests
+    ├── docker/
+    └── unit/
 
-or
+Executing tests in the `tests.docker` package requires the Docker image to be built once
+before:
 
+    cd tests/docker && docker build -t inloop-integration-test .
+
+Examples:
+
+    # run all tests (15 sec)
     ./manage.py test
 
-You'll need to build the Docker test image once before with:
+    # run unit tests only (3 sec)
+    ./manage.py test tests.unit
 
-    make docker-image
+
 
 
 ### Dependencies

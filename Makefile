@@ -59,19 +59,6 @@ watch:
 
 
 ##
-## PYTHON/TEST RELATED
-##
-.PHONY: test
-test:
-	python manage.py test
-
-.PHONY: coverage
-coverage:
-	coverage run manage.py test
-	coverage html
-
-
-##
 ## DOCKER HELPERS
 ##
 .PHONY: docker-clean
