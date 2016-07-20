@@ -31,6 +31,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
+    'django_extensions',
     'huey.contrib.djhuey',
     'inloop.core',
     'inloop.accounts',
