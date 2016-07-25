@@ -1,4 +1,5 @@
 Django==1.8.13
+django-environ==0.4.0
 django-extensions==1.6.7
 huey==1.1.2
 -e git+https://github.com/waylan/Python-Markdown.git@4d96f00#egg=Markdown
