@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import os
 import sys
+from environ import Env
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "inloop.settings.development")
+    Env.read_env()
 
     if sys.argv[1] == "shell":
         sys.argv[1] = "shell_plus"
