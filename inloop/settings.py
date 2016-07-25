@@ -101,14 +101,14 @@ DATABASES = {
     "default": env.db()
 }
 
-# CACHES = {
-#    "default": env.cache()
-# }
+CACHES = {
+    "default": env.cache()
+}
 
 # TODO: LOGGING = { ... }
 
-# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-# SESSION_COOKIE_AGE = 7 * 24 * 3600
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_COOKIE_AGE = 7 * 24 * 3600
 
 if not DEBUG:
     STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
