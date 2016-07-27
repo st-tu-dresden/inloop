@@ -137,7 +137,7 @@ if env.bool("USE_X_FORWARDED", default=False):
 
 HUEY = {
     "always_eager": False,
-    "url": ConnectionPool.from_url(env("REDIS_URL")),
+    "connection_pool": ConnectionPool.from_url(env("REDIS_URL")),
 }
 
 SENDFILE_METHOD = "django"
