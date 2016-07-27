@@ -33,8 +33,8 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
 
 ### Coding conventions
 
-* Indent using spaces instead of tabs (except for the `Makefile`).
-* Use UNIX line endings.
+* Use an editor that understands our `.editorconfig` file. This ensures all contributions
+  conform to the same indentation style, maximum line length, encoding etc.
 * Python:
   * Use Python 3.
   * Code must be formatted according to [PEP8][pep8] and a maximum line length of 99 characters.
@@ -44,7 +44,6 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
   * **Recommended**: use `flake8 --install-hook` to install a command line Git hook which
     checks this automatically.
 * HTML (Django templates):
-  * Indent using 2 spaces.
   * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
   * Use the [W3C Validator][w3c-validator] to verify that the output of processed templates is
     valid HTML5.
