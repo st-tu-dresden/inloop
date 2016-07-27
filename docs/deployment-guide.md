@@ -1,105 +1,90 @@
-## Deployment HOWTO
+## Deployment guide
 
-This document describes the steps needed for a production setup of INLOOP on
-Ubuntu 12.04. It should work out-of-the-box for any Debian-based Linux that
-uses upstart as its init system.
-
+**Note**: This document is not 100% complete and still being worked on.
 
 ### Overview
 
-The setup follows current best practices and builds upon the following
-components:
+INLOOP is a standard Django project and as such, the [official Django
+deployment docs][1] apply.
 
-* Nginx, acting as a reverse proxy. This is the only service accessible
-  from outside. It terminates HTTP and HTTPS connections, handles serving
-  static files and routes dynamic requests to the backend.
-* Gunicorn, a Python-based application server running the Django application.
-* PostgreSQL, an awesome SQL database server.
-* Redis, a fast persistent key-value store.
-
-Why? The Django built-in server and SQLite are of course sufficient during
-development. But they are not designed for larger scale and/or production
-use. Using the mentioned components offers several advantages, among others
-improved security through separation/isolation (each component runs in its
-own process with its own user id).
+This document outlines our recommended approach of running INLOOP on
+Gunicorn behind NGINX configured as a TLS-terminating reverse proxy.
 
 
-### Before installing
+### Twelve factor style configuration
 
-**NOTE**: if you are testing this on the Vagrant box just use
+INLOOP settings are completely controlled with environment variables.
 
-    sudo python3.4 /vagrant/setup_tools/provision.py /srv/apps
-    su - inloop
+##### Required envvars
 
-and proceed with [Installation steps](#installation-steps).
-
-Please ensure that you have installed all packages that are defined in the
-`Vagrantfile`. Especially, make sure you have Python 3.4!
-
-Next, use the provisioning script to setup the recommended deployment
-structure with `/srv/apps` as the base directory:
-
-    scp setup_tools/provision.py user@your_host
-    ssh user@your_host
-    sudo python3 provision.py /srv/apps
-
-When called with `/srv/apps`, it will set up:
-
-- two users (`inloop` for developers/admins, `inloop-run` for the daemons), each
-  having their home directory under `/srv/apps`,
-- passwordless SSH deploy keys for both users for read-only access to protected
-  GitHub repositories,
-- the ability for `inloop` to become `inloop-run` without a password
-
-To make the `inloop` account a little bit more usable, you can opt to give it a
-password (`sudo passwd inloop`) and enable password-authenticated sudo (with
-`sudo usermod -aG sudo inloop`). Add your (and other developers') public SSH keys
-to `.ssh/authorized_keys` if you want.
-
-The bundled `nginx` config requires SSL certificates to be installed for your
-`server_name` (see `local_conf.py`).
+Name                        | Description
+--------------------------- | -------------
+`ALLOWED_HOSTS`             | Comma-separated list of [allowed hosts](#1)
+`CACHE_URL`                 | 12factor style cache URL, e.g. `redis://localhost:1234/0`
+`DATABASE_URL`              | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
+`DJANGO_SETTINGS_MODULE`    | Set to `inloop.settings` unless you know what you are doing
+`FROM_EMAIL`                | Address used for outgoing mail, e.g. `INLOOP <inloop@example.com>`
+`GITHUB_SECRET`             | Github webhook endpoint secret
+`LANG`                      | Set to `en_US.UTF-8` unless you know what you are doing
+`REDIS_URL`                 | Redis URL used for the queue, e.g. `redis://localhost:1234/1`
+`SECRET_KEY`                | Set to a long random string
 
 
-### Installation steps
-
-For a fresh install:
-
-1. Login as `inloop`. You should be automatically running in a virtualenv. If not,
-   you have failed to follow the steps in the last section :(
-2. Clone the INLOOP repo with `git clone <inloop-repo-url> inloop`.
-3. Change to the clone with `cd inloop` and *keep it like this for the next steps*.
-4. Create the local config with `python setup_tools/make_conf.py > local_conf.py`.
-   Review and edit `local_conf.py` as necessary.
-5. Install the support files to `/etc` with `sudo python3 setup_tools/install.py`.
-6. Initialize PostgreSQL with `python3 setup_tools/pq_init.py | sudo -u postgres -i psql`.
-   Try `psql --list` to see if that worked.
-7. Reload nginx with `sudo service nginx reload`.
-8. Initialize and load the application with `python deploy.py`. This can take a while.
-9. As a convenience, run `eval $(bash setup_tools/update_profile.sh)` to include the
-   correct `DJANGO_SETTINGS_MODULE` in your current environment and your `~/.profile`.
-10. Create a Django admin account with `python manage.py createsuperuser`.
-
-Updates are easy: `git pull && python deploy.py`. Service reloading is handled by
-the deploy tool, but you can do it manually with `sudo service inloop-web restart`
-(this also restarts `inloop-queue`).
-
-The deploy tool also saves DB dumps in `~/db_snapshots` before applying migrations.
+[1]: https://docs.djangoproject.com/en/stable/ref/settings/#allowed-hosts
 
 
-### Push deploy
-
-It is also possible to trigger deployment with a `git push` (requires a working SSH
-login for the `inloop` user). Use the bundled tool
-
-    python setup_tools/push_deploy.py inloop@<your-host> production
-
-to trigger deployment on `<your-host>` with a simple `git push production master`.
+*TBD: list optional variables, too.*
 
 
-### Debugging
+### Installation
 
-Check the log files:
+1. Ensure you've installed all requirements mentioned in the README.
 
-- `/var/log/nginx/*`
-- `/var/log/inloop/error.log`
-- `/var/log/upstart/inloop-*.log`
+2. Run `pip install -r requirements/production.txt` in your virtualenv.
+
+3. Set and `export` all required [environment variables](#required-envvars).
+
+4. Unless you are using SQLite, you have to create the user and database you
+   specified in `DATABASE_URL` using `createdb`/`createuser` (PostgreSQL) or
+   `mysqladmin` (MySQL/MariaDB).
+
+4. Run `./manage.py migrate` and `./manage.py createsuperuser`.
+
+
+### Process management
+
+The following jobs must be run using a process manager such as `systemd` or
+`supervisord`:
+
+* **web app**: `gunicorn --workers=5 inloop.wsgi:application`
+* **task queue**: `python manage.py run_huey --workers=2`
+
+Be sure to run each job under a unique, job-specific uid with the least
+privileges possible. The **task queue** needs to be able to speak to the docker
+daemon and should run under in the supplementary `docker` group.
+
+We plan to ship suitable `systemd` service units as part of INLOOP very soon.
+
+
+##### Docker cgroup limits
+
+*TBD: DoS mitigation with cgroup cpu.shares etc.*
+
+
+### Reverse proxy configuration
+
+NGINX needs to be configured as follows:
+
+1. Terminate TLS connections and redirect plain text HTTP to HTTPS.
+
+2. All requests must be proxied to Gunicorn `127.0.0.1:8000`.
+
+3. The proxy (and **only** the proxy) must set the following request headers:
+   `X-Forwarded-For`, `X-Forwarded-Port` and `X-Forwarded-Proto`.
+
+4. The proxy should set response headers as outlined in the [Django security
+   middleware docs](#2).
+
+
+[1]: https://docs.djangoproject.com/en/stable/howto/deployment/
+[2]: https://docs.djangoproject.com/en/stable/ref/middleware/#module-django.middleware.security
