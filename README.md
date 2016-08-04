@@ -76,7 +76,7 @@ On Mac OS X, you have to set TMPDIR to a path which can be bind-mounted by Docke
 In general you'll need:
 
 * Git >= 2.3
-* Python >= 3.3
+* Python >= 3.4
 * Docker >= 1.10
 * Redis >= 2.6
 * Tools and libraries to build Python extensions (for Pillow and optionally psycopg2)
