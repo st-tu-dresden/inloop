@@ -23,7 +23,7 @@ Assuming you've met the [dependencies listed below](#dependencies), run the foll
 a shell:
 
     # setup a virtual environment and activate it
-    pyvenv venv && source venv/bin/activate
+    python3 -m venv .state/venv && source .state/venv/bin/activate
 
     # install required Python libraries
     pip install -r requirements/development.txt
@@ -95,11 +95,6 @@ Platform specific instructions:
 
         sudo ln -s /usr/bin/nodejs /usr/local/bin/node
 
-  The same is true for `pyvenv`, which on Ubuntu 14.04 is called `pyvenv-3.4`. I recommend to
-  symlink it as well:
-
-        sudo ln -s /usr/bin/pyvenv-3.4 /usr/local/bin/pyvenv
-
 * Mac OS X using Homebrew:
 
         brew install node python3 redis
@@ -144,7 +139,7 @@ to verify you can connect to the Docker daemon.
 ## Further documentation
 
 * [Contributor's guide](CONTRIBUTING.md)
-* [Deployment HOWTO](docs/deployment-guide.md)
+* [Deployment guide](docs/deployment-guide.md)
 * [Building CSS and Javascript bundles](docs/static-assets.md)
 
 

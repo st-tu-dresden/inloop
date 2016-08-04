@@ -1,8 +1,8 @@
 """
-INLOOP settings module inspired by 12factor.
+INLOOP settings module, inspired by 12factor.
 
-Configuration is entirely controlled by environment vars. See
-the shipped README.md for a list of available options.
+Configuration is entirely controlled by environment vars. See docs/deployment-guide.md
+for a list and description of available options.
 """
 import sys
 from pathlib import Path

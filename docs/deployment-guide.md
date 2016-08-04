@@ -7,7 +7,7 @@
 INLOOP is a standard Django project and as such, the [official Django
 deployment docs][1] apply.
 
-This document outlines our recommended approach of running INLOOP on
+This document outlines the recommended approach of running INLOOP on
 Gunicorn behind NGINX configured as a TLS-terminating reverse proxy.
 
 
@@ -49,7 +49,7 @@ Name                        | Description
 4. Run `./manage.py migrate` and `./manage.py createsuperuser`.
 
 
-### Process management
+### Startup
 
 The following jobs must be run using a process manager such as `systemd` or
 `supervisord`:
@@ -59,7 +59,7 @@ The following jobs must be run using a process manager such as `systemd` or
 
 Be sure to run each job under a unique, job-specific uid with the least
 privileges possible. The **task queue** needs to be able to speak to the docker
-daemon and should run under in the supplementary `docker` group.
+daemon and should run in the supplementary `docker` group.
 
 We plan to ship suitable `systemd` service units as part of INLOOP very soon.
 
@@ -69,7 +69,7 @@ We plan to ship suitable `systemd` service units as part of INLOOP very soon.
 *TBD: DoS mitigation with cgroup cpu.shares etc.*
 
 
-### Reverse proxy configuration
+### NGINX configuration
 
 NGINX needs to be configured as follows:
 
