@@ -19,7 +19,7 @@ INLOOP settings are completely controlled with environment variables.
 
 Name                        | Description
 --------------------------- | -------------
-`ALLOWED_HOSTS`             | Comma-separated list of [allowed hosts](#1)
+`ALLOWED_HOSTS`             | Comma-separated list of [allowed hosts][2]
 `CACHE_URL`                 | 12factor style cache URL, e.g. `redis://localhost:1234/0`
 `DATABASE_URL`              | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
 `DJANGO_SETTINGS_MODULE`    | Set to `inloop.settings` unless you know what you are doing
@@ -30,15 +30,13 @@ Name                        | Description
 `SECRET_KEY`                | Set to a long random string
 
 
-[1]: https://docs.djangoproject.com/en/stable/ref/settings/#allowed-hosts
-
-
 *TBD: list optional variables, too.*
 
 
 ### Installation
 
-1. Ensure you've installed all requirements mentioned in the README.
+1. Ensure you've installed all requirements mentioned in the [README]
+   (../README.md).
 
 2. Run `pip install -r requirements/production.txt` in your virtualenv.
 
@@ -66,7 +64,7 @@ daemon and should run under in the supplementary `docker` group.
 We plan to ship suitable `systemd` service units as part of INLOOP very soon.
 
 
-##### Docker cgroup limits
+#### Docker cgroup limits
 
 *TBD: DoS mitigation with cgroup cpu.shares etc.*
 
@@ -83,8 +81,9 @@ NGINX needs to be configured as follows:
    `X-Forwarded-For`, `X-Forwarded-Port` and `X-Forwarded-Proto`.
 
 4. The proxy should set response headers as outlined in the [Django security
-   middleware docs](#2).
+   middleware docs][3].
 
 
 [1]: https://docs.djangoproject.com/en/stable/howto/deployment/
-[2]: https://docs.djangoproject.com/en/stable/ref/middleware/#module-django.middleware.security
+[2]: https://docs.djangoproject.com/en/stable/ref/settings/#allowed-hosts
+[3]: https://docs.djangoproject.com/en/stable/ref/middleware/#module-django.middleware.security
