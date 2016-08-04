@@ -20,9 +20,11 @@ before_install:
   - docker --version
 
 install:
-  - pip install -r requirements/development.txt
-  - make docker-image
+  - pip install -r requirements/test.txt
+  - pip install flake8 flake8-docstrings
+  - cd tests/docker && docker build -t inloop-integration-test .
 
 script:
-  - flake8
-  - ./manage.py test --verbosity 2
+  - flake8 --exit-zero
+  - coverage run manage.py test --verbosity 2
+  - coverage report
