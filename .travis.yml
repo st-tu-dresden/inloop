@@ -26,5 +26,6 @@ install:
 
 script:
   - flake8 --exit-zero
+  - mkdir -p .state
   - coverage run manage.py test --verbosity 2
   - coverage report
