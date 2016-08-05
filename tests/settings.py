@@ -1,7 +1,7 @@
 import warnings
 warnings.simplefilter("always")
 
-from inloop.settings import *   # noqa
+from inloop.settings import *   # noqa isort:skip
 
 HUEY = {
     "always_eager": True,

@@ -21,11 +21,12 @@ before_install:
 
 install:
   - pip install -r requirements/test.txt
-  - pip install flake8 flake8-docstrings
+  - pip install flake8 flake8-docstrings isort
   - (cd tests/docker && docker build -t inloop-integration-test .)
+  - mkdir -p .state
 
 script:
-  - flake8 --exit-zero
-  - mkdir -p .state
+  - flake8
+  - isort --check-only
   - coverage run manage.py test --verbosity 2
   - coverage report
