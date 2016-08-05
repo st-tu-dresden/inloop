@@ -9,6 +9,7 @@ from django.db import models
 from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.text import slugify
+
 from huey.contrib.djhuey import db_task
 
 from inloop.accounts.models import UserProfile, get_system_user

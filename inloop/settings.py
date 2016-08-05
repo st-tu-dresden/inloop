@@ -9,6 +9,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse_lazy
+
 from environ import Env
 from redis.connection import ConnectionPool
 

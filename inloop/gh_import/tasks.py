@@ -6,6 +6,7 @@ from subprocess import CalledProcessError, check_call
 
 from django.conf import settings
 from django.db.transaction import atomic
+
 from huey.contrib.djhuey import db_task
 
 from inloop.gh_import.git import GitRepository
