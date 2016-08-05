@@ -16,6 +16,7 @@ INLOOP is a web application based on Django to manage programming assignments fo
 computer science courses. It uses Docker containers to execute programming task
 solutions submitted by students in isolated environments.
 
+TEST.
 
 ## Quick start
 
