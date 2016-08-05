@@ -17,7 +17,7 @@ def validate_mat_num(value):
 
 def validate_zih_mail(value):
     patterns = [
-        '^s[0-9]{7}@mail.zih.tu-dresden.de$',
+        '^[0-9]{7}@mail.zih.tu-dresden.de$',
         '^[^@]+@mailbox.tu-dresden.de$',
         '^[^@]+@tu-dresden.de$',
     ]
