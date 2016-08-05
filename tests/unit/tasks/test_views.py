@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 from django.utils.encoding import force_text
-
 from django.views.generic import View
 
 from inloop.accounts.models import UserProfile

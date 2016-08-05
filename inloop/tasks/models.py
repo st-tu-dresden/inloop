@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from huey.contrib.djhuey import db_task
 
-from inloop.accounts.models import get_system_user, UserProfile
+from inloop.accounts.models import UserProfile, get_system_user
 from inloop.gh_import.utils import parse_date
 from inloop.tasks.checker import DockerSubProcessChecker
 

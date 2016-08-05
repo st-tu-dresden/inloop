@@ -8,7 +8,6 @@ import uuid
 from collections import namedtuple
 from os.path import isabs, isdir, isfile, join, normpath
 
-
 LOGGER = logging.getLogger(__name__)
 
 

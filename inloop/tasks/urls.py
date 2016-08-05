@@ -2,8 +2,8 @@ from django.conf.urls import url
 
 from inloop.tasks import views
 from inloop.tasks.views import (SolutionDetailView, SolutionListView,
-                                SolutionStatusView, SolutionUploadView,
-                                TaskDetailView)
+                                SolutionStatusView,
+                                SolutionUploadView, TaskDetailView)
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),

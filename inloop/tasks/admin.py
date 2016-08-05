@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from inloop.tasks.models import (CheckerResult, CheckerOutput, Task,
+from inloop.tasks.models import (CheckerOutput, CheckerResult, Task,
                                  TaskCategory, TaskSolution, TaskSolutionFile)
 
 

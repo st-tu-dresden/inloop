@@ -9,8 +9,8 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from inloop.accounts.models import UserProfile
-from inloop.tasks.models import Task, TaskCategory, TaskSolution, TaskSolutionFile
-
+from inloop.tasks.models import (Task, TaskCategory,
+                                 TaskSolution, TaskSolutionFile)
 
 TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")

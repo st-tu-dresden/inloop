@@ -7,11 +7,10 @@ from django.core.urlresolvers import resolve
 from django.test.client import RequestFactory
 from django.utils import timezone
 
-from inloop.gh_import import __name__ as PACKAGE
-from inloop.gh_import import views
+from inloop.gh_import import __name__ as PACKAGE, views
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import.utils import (HOSTS_FILE, compute_signature, parse_date,
-                                    parse_ssh_url, ssh_options)
+from inloop.gh_import.utils import (HOSTS_FILE, compute_signature,
+                                    parse_date, parse_ssh_url, ssh_options)
 
 
 class UtilsTest(TestCase):

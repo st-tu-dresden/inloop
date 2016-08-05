@@ -9,10 +9,8 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse_lazy
-
 from environ import Env
 from redis.connection import ConnectionPool
-
 
 if sys.getfilesystemencoding() != "utf-8":
     raise ImproperlyConfigured("LANG must be a utf-8 locale")
