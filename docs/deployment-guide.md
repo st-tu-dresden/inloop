@@ -78,7 +78,7 @@ NGINX needs to be configured as follows:
 2. All requests must be proxied to Gunicorn `127.0.0.1:8000`.
 
 3. The proxy (and **only** the proxy) must set the following request headers:
-   `X-Forwarded-For`, `X-Forwarded-Port` and `X-Forwarded-Proto`.
+   `X-Forwarded-Host`, `X-Forwarded-Port` and `X-Forwarded-Proto`.
 
 4. The proxy should set response headers as outlined in the [Django security
    middleware docs][3].
