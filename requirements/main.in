@@ -2,6 +2,6 @@
 django-environ
 django-extensions
 django-redis
-Django>=1.8,<=1.8.99
+Django>=1.10,<=1.10.99
 huey>=1.2.0
 redis
