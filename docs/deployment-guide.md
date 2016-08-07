@@ -38,7 +38,7 @@ Name                        | Description
 1. Ensure you've installed all requirements mentioned in the [README]
    (../README.md).
 
-2. Run `pip install -r requirements/production.txt` in your virtualenv.
+2. Additionally run `pip install -r requirements/prod.txt` in your virtualenv.
 
 3. Set and `export` all required [environment variables](#required-envvars).
 

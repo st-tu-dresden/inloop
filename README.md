@@ -26,7 +26,7 @@ a shell:
     python3 -m venv .state/venv && source .state/venv/bin/activate
 
     # install required Python libraries
-    pip install -r requirements/development.txt
+    pip install -r requirements/main.txt -r requirements/dev.txt
 
     # initialize the database (uses SQLite locally)
     ./manage.py migrate
