@@ -225,9 +225,11 @@ class TaskSolution(models.Model):
                 return_code=result_tuple.rc,
                 time_taken=result_tuple.duration
             )
-            result.checkeroutput_set = [
-                CheckerOutput(name=k, output=v) for k, v in result_tuple.file_dict.items()
-            ]
+            result.checkeroutput_set.set([
+                CheckerOutput(name=name, output=output)
+                for name, output
+                in result_tuple.file_dict.items()
+            ], bulk=False, clear=True)
             self.passed = result.is_success()
             self.save()
 
