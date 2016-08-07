@@ -1,9 +1,4 @@
 django-debug-toolbar
-flake8==2.5.4
-flake8-docstrings==0.2.5
 honcho==0.7.1
 ipython==5.0.0
-mccabe==0.4.0
-pep8==1.7.0
-pyflakes==1.1.0
 watchdog
