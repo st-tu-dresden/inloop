@@ -1,14 +1,16 @@
 """
 Views to manage tasks, task categories and submitted solutions.
+
 """
+
 import re
 from os.path import join
 from urllib.parse import unquote
 
-from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, JsonResponse
@@ -22,24 +24,12 @@ from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile, check_solution)
 from inloop.tasks.prettyprint import junit
 
-# Once we have upgraded to Django 1.9, we can use the shipped contrib.auth Mixins.
-if DJANGO_VERSION >= (1, 9, 0):
-    raise DeprecationWarning("LoginRequiredMixin is provided by Django")
-
 
 def get_published_task_or_404(slug):
     task = get_object_or_404(Task, slug=slug)
     if not task.is_published():
         raise Http404
     return task
-
-
-class LoginRequiredMixin:
-    """Class based view mixin similar to login_required() for ordinary views."""
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super().as_view(**initkwargs)
-        return login_required(view)
 
 
 def index(request):
