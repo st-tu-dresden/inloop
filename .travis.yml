@@ -29,4 +29,6 @@ script:
   - flake8
   - isort --check-only
   - coverage run manage.py test --verbosity 2
+
+after_success:
   - coverage report
