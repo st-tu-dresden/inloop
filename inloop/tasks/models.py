@@ -87,7 +87,6 @@ class TaskCategory(models.Model):
         max_length=50,
         help_text='Category Name'
     )
-    image = models.ImageField(null=True, upload_to='images/category_thumbs/')
     objects = TaskCategoryManager()
 
     def save(self, *args, **kwargs):

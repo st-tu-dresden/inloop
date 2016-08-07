@@ -12,9 +12,7 @@ from inloop.accounts.models import UserProfile
 from inloop.tasks.models import (Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
 
-TEST_IMAGE_PATH = path.join(settings.INLOOP_ROOT, "tests", "test.jpg")
 TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
-MEDIA_IMAGE_PATH = path.join(settings.MEDIA_ROOT, "test.jpg")
 MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "HelloWorld.java")
 
 
@@ -38,12 +36,10 @@ class TasksTestBase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
-        shutil.copy(TEST_IMAGE_PATH, MEDIA_IMAGE_PATH)
         shutil.copy(TEST_CLASS_PATH, MEDIA_CLASS_PATH)
 
     @classmethod
     def tearDownClass(cls):
-        os.remove(MEDIA_IMAGE_PATH)
         os.remove(MEDIA_CLASS_PATH)
         super().tearDownClass()
 

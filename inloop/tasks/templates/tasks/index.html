@@ -10,9 +10,6 @@
   {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
     <div class="col-md-6">
       <div class="thumbnail">
-        {% if cat.image %}
-        <img src="{{ cat.image.url }}" alt="category image for {{ cat.name }}">
-        {% endif %}
         <div class="caption">
           <a href="{% url 'tasks:category' cat.slug %}">
             <h3>{{ cat.name }}</h3>
