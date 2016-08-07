@@ -1,0 +1,8 @@
+-e git+https://github.com/waylan/Python-Markdown.git@4d96f00#egg=Markdown
+django-environ
+django-extensions
+django-redis
+Django>=1.8,<=1.8.99
+huey>=1.2.0
+Pillow
+redis

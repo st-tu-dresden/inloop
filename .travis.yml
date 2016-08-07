@@ -20,8 +20,8 @@ before_install:
   - docker --version
 
 install:
-  - pip install -r requirements/test.txt
-  - pip install flake8 flake8-docstrings isort
+  - pip install -r requirements/main.txt
+  - pip install -r requirements/test.txt -r requirements/lint.txt
   - (cd tests/docker && docker build -t inloop-integration-test .)
   - mkdir -p .state
 
@@ -29,4 +29,6 @@ script:
   - flake8
   - isort --check-only
   - coverage run manage.py test --verbosity 2
+
+after_success:
   - coverage report

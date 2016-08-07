@@ -37,6 +37,11 @@ all:
 	@echo Nothing to do -- please specify a target.
 
 
+deps:
+	pip-compile --no-annotate --no-header --upgrade requirements/main.in > /dev/null
+	pip-compile --no-annotate --no-header --upgrade requirements/prod.in > /dev/null
+
+
 ##
 ## ASSET MANAGEMENT
 ##
