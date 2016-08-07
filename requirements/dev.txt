@@ -1,5 +1,4 @@
 django-debug-toolbar
-hashin
 honcho
 ipython
 pip-tools
