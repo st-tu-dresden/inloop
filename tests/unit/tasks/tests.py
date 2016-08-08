@@ -167,7 +167,7 @@ class TaskSolutionTests(TasksTestBase):
 
     def test_solution_failure_status(self):
         solution = self.create_solution()
-        solution.checkerresult_set.add(CheckerResult())
+        solution.checkerresult_set.add(CheckerResult(), bulk=False)
         self.assertEqual(solution.status(), "failure")
 
 
