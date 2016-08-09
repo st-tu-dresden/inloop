@@ -130,9 +130,9 @@ class SolutionUploadView(LoginRequiredMixin, View):
                 author=request.user,
                 task=task
             )
-            solution.tasksolutionfile_set = [
+            solution.tasksolutionfile_set.set([
                 TaskSolutionFile(filename=f.name, file=f) for f in uploads
-            ]
+            ], bulk=False, clean=True)
 
         check_solution(solution.id)
         messages.success(request, "Your solution has been submitted to the checker.")
