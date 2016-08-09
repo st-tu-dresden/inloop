@@ -70,7 +70,7 @@ class UserProfile(auth_models.AbstractUser):
         null=True,
         validators=[validate_mat_num]
     )
-    course = models.ForeignKey(CourseOfStudy, null=True)
+    course = models.ForeignKey(CourseOfStudy, null=True, on_delete=models.CASCADE)
 
     def generate_activation_key(self):
         """Generate a secure random key with length and charset specified above."""

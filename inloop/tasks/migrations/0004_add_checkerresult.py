@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('result', models.TextField()),
                 ('time_taken', models.FloatField()),
                 ('passed', models.BooleanField(default=False)),
-                ('solution', models.ForeignKey(to='tasks.TaskSolution')),
+                ('solution', models.ForeignKey(to='tasks.TaskSolution', on_delete=models.CASCADE)),
             ],
             options={
             },

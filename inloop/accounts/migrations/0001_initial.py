@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='course',
-            field=models.ForeignKey(null=True, to='accounts.CourseOfStudy'),
+            field=models.ForeignKey(null=True, to='accounts.CourseOfStudy', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(

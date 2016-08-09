@@ -159,8 +159,8 @@ class Task(models.Model):
     )
 
     # Foreign keys:
-    author = models.ForeignKey(UserProfile)
-    category = models.ForeignKey(TaskCategory)
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    category = models.ForeignKey(TaskCategory, on_delete=models.CASCADE)
 
     objects = TaskManager()
 
@@ -189,8 +189,8 @@ class TaskSolution(models.Model):
         help_text="When was the solution submitted?",
         auto_now_add=True
     )
-    author = models.ForeignKey(UserProfile)
-    task = models.ForeignKey(Task)
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
 
     # time after a solution without a CheckerResult is regarded as lost
@@ -268,7 +268,7 @@ class TaskSolution(models.Model):
 class TaskSolutionFile(models.Model):
     '''Represents a single file as part of a solution'''
 
-    solution = models.ForeignKey(TaskSolution)
+    solution = models.ForeignKey(TaskSolution, on_delete=models.CASCADE)
     filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
 
@@ -285,7 +285,7 @@ class CheckerResult(models.Model):
 
     This currently includes the process' stdout, stderr, return code and wall time.
     """
-    solution = models.ForeignKey(TaskSolution)
+    solution = models.ForeignKey(TaskSolution, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     stdout = models.TextField(default="")
     stderr = models.TextField(default="")
@@ -332,7 +332,7 @@ class CheckerOutput(models.Model):
     execution (for instance: compiler output, JUnit logs). This output is
     intended to be interpreted later by parsers/pretty printers/etc.
     """
-    result = models.ForeignKey(CheckerResult)
+    result = models.ForeignKey(CheckerResult, on_delete=models.CASCADE)
     name = models.CharField(max_length=60)
     output = models.TextField()
 

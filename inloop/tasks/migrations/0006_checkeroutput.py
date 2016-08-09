@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
                 ('name', models.CharField(max_length=30)),
                 ('output', models.TextField()),
-                ('result', models.ForeignKey(to='tasks.CheckerResult')),
+                ('result', models.ForeignKey(to='tasks.CheckerResult', on_delete=models.CASCADE)),
             ],
         ),
     ]

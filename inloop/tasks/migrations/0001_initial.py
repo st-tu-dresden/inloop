@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('publication_date', models.DateTimeField(help_text='When should the task be published?')),
                 ('deadline_date', models.DateTimeField(help_text='Date the task is due to')),
                 ('slug', models.SlugField(help_text='URL name', unique=True)),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('submission_date', models.DateTimeField(help_text='When was the solution submitted?')),
                 ('is_correct', models.BooleanField(help_text='Did the checker accept the solution?', default=False)),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('task', models.ForeignKey(to='tasks.Task')),
+                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('task', models.ForeignKey(to='tasks.Task', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('filename', models.CharField(max_length=50)),
                 ('file', models.FileField(upload_to=inloop.tasks.models.get_upload_path)),
-                ('solution', models.ForeignKey(to='tasks.TaskSolution')),
+                ('solution', models.ForeignKey(to='tasks.TaskSolution', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='category',
-            field=models.ForeignKey(to='tasks.TaskCategory'),
+            field=models.ForeignKey(to='tasks.TaskCategory', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]
