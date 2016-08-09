@@ -3,6 +3,8 @@ from django.conf.urls import url
 
 import inloop.accounts.views as account_views
 
+app_name = "accounts"
+
 # views for inloop.accounts
 urlpatterns = [
     url(r'^profile/$', account_views.user_profile, name='user_profile'),

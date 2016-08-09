@@ -9,10 +9,10 @@ from inloop.tasks.views import index
 
 urlpatterns = [
     url(r'^$', index, name='index'),
-    url(r'^tasks/', include(task_urls, namespace='tasks')),
-    url(r'^accounts/', include(account_urls, namespace='accounts')),
-    url(r'^github/', include(github_urls, namespace='github')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^tasks/', include(task_urls)),
+    url(r'^accounts/', include(account_urls)),
+    url(r'^github/', include(github_urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 # flatpages catchall pattern

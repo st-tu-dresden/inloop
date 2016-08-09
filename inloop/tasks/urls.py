@@ -5,6 +5,7 @@ from inloop.tasks.views import (SolutionDetailView, SolutionListView,
                                 SolutionStatusView,
                                 SolutionUploadView, TaskDetailView)
 
+app_name = "tasks"
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^category/(?P<slug>[-\w]+)/$', views.category, name='category'),
