@@ -28,7 +28,7 @@ def failure(request, message):
 
 
 def register(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('/')
     if request.method == 'POST':
         user_form = forms.UserForm(data=request.POST)
@@ -65,7 +65,7 @@ def activate_user(request, key):
 
 
 def user_login(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('/')
 
     if request.method == 'POST':

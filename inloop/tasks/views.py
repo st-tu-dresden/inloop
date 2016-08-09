@@ -33,7 +33,7 @@ def get_published_task_or_404(slug):
 
 
 def index(request):
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return TemplateResponse(request, "registration/login.html", {"hide_login_link": True})
 
     def progress(m, n):

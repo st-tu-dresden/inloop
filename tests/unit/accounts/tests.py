@@ -37,7 +37,7 @@ class RegistrationTests(TestCase):
 
     def try_default_user_login(self):
         resp = self.client.post('/accounts/login/', data=self.data, follow=True)
-        self.assertTrue(resp.context['user'].is_authenticated())
+        self.assertTrue(resp.context['user'].is_authenticated)
         self.assertEqual(resp.context['user'].get_username(), self.data['username'])
 
     def test_registration_password_consistency(self):
@@ -239,7 +239,7 @@ class ProfileTests(TestCase):
         self.client.logout()
         resp = self.client.post('/accounts/login/', data=login_data, follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.context['user'].is_authenticated())
+        self.assertTrue(resp.context['user'].is_authenticated)
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
 
     def test_change_password_mismatch(self):
@@ -326,7 +326,7 @@ class LoginSystemTests(TestCase):
             'password': self.password
         }
         resp = self.client.post('/accounts/login/', data=credentials, follow=True)
-        self.assertTrue(resp.context['user'].is_authenticated())
+        self.assertTrue(resp.context['user'].is_authenticated)
         self.assertEqual(resp.context['user'].get_username(), self.user.username)
 
     def test_unsuccessful_system_login(self):
@@ -341,4 +341,4 @@ class LoginSystemTests(TestCase):
             content='>Login<',
         )
         self.assertNotContains(resp, '>test_user<')
-        self.assertFalse(resp.context['user'].is_authenticated())
+        self.assertFalse(resp.context['user'].is_authenticated)
