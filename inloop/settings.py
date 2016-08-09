@@ -84,8 +84,11 @@ TEMPLATES = [{
         str(PACKAGE_DIR / "templates"),
         str(PACKAGE_DIR / "accounts" / "templates"),
     ],
-    "APP_DIRS": True,
     "OPTIONS": {
+        "loaders": [
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        ],
         "context_processors": [
             "django.template.context_processors.debug",
             "django.template.context_processors.request",
@@ -94,6 +97,11 @@ TEMPLATES = [{
         ],
     },
 }]
+
+if not DEBUG:
+    TEMPLATES[0]["OPTIONS"]["loaders"] = [
+        ("django.template.loaders.cached.Loader", TEMPLATES[0]["OPTIONS"]["loaders"]),
+    ]
 
 # TODO: investigate a better method to align Bootstrap alerts and contrib.messages
 MESSAGE_TAGS = {10: "info", 40: "danger"}
