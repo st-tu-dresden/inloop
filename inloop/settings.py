@@ -3,12 +3,14 @@ INLOOP settings module, inspired by 12factor.
 
 Configuration is entirely controlled by environment vars. See docs/deployment-guide.md
 for a list and description of available options.
+
 """
+
 import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from environ import Env
 from redis.connection import ConnectionPool

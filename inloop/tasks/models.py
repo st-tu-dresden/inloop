@@ -4,9 +4,9 @@ from os.path import dirname, join
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.transaction import atomic
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
