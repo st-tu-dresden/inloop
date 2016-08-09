@@ -54,7 +54,7 @@ if DEBUG and env.bool("DJDT", default=False):
     INSTALLED_APPS.append("debug_toolbar")
     DEBUG_TOOLBAR_CONFIG = {"JQUERY_URL": ""}
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
