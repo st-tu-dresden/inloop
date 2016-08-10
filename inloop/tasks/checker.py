@@ -6,7 +6,7 @@ import tempfile
 import time
 import uuid
 from collections import namedtuple
-from os.path import isabs, isdir, isfile, join, normpath
+from os.path import isabs, isdir, isfile, join, normpath, realpath
 
 LOGGER = logging.getLogger(__name__)
 
@@ -135,6 +135,11 @@ class DockerSubProcessChecker:
         # a world-writable subdirectory called "storage" (because a world-writable mount
         # point would have security implications).
         with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
+            # Resolve symbolic links:
+            # On OS X, TMPDIR is set to some random subdir of /var/folders, which
+            # resolves to /private/var/folders. Docker for Mac only accepts the
+            # resolved path for bind mounts (because it whitelists /private).
+            output_path = realpath(output_path)
             self.ensure_absolute_dir(output_path)
 
             os.chmod(output_path, mode=0o755)

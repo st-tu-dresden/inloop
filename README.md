@@ -64,13 +64,6 @@ Examples:
     ./manage.py test tests.unit
 
 
-##### Caveats
-
-On Mac OS X, you have to set TMPDIR to a path which can be bind-mounted by Docker for Mac:
-
-    TMPDIR=/tmp ./manage.py test tests.docker
-
-
 ### Dependencies
 
 In general you'll need:
