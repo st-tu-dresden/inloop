@@ -1,12 +1,10 @@
-import string
-from random import SystemRandom
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 from inloop.accounts.validators import validate_mat_num
 
@@ -30,9 +28,6 @@ class CourseOfStudy(models.Model):
 
 class UserProfile(auth_models.AbstractUser):
     """Extended user model with support for course of studies."""
-
-    # Characters to be used in the activation key
-    CHARS = string.ascii_letters + string.digits
 
     # Length of the random key
     KEY_LENGTH = 40
@@ -59,9 +54,7 @@ class UserProfile(auth_models.AbstractUser):
     course = models.ForeignKey(CourseOfStudy, null=True, on_delete=models.CASCADE)
 
     def generate_activation_key(self):
-        """Generate a secure random key with length and charset specified above."""
-        random = SystemRandom()
-        self.activation_key = "".join(random.sample(self.CHARS, self.KEY_LENGTH))
+        self.activation_key = get_random_string(length=self.KEY_LENGTH)
 
     def activate(self):
         success = False
