@@ -3,26 +3,12 @@ from random import SystemRandom
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
-from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from inloop.accounts.validators import validate_mat_num
-
-
-# Activation email text template
-ACTIVATION_EMAIL_TEXT = """\
-Hello {username},
-
-please click the following link within the next week to activate your INLOOP account:
-
-  {link}
-
-We're looking forward to seeing you on the site!
-
-Cheers,
-Your INLOOP team
-"""
 
 
 def next_week():
@@ -87,11 +73,15 @@ class UserProfile(auth_models.AbstractUser):
         self.save()
         return success
 
-    def send_activation_mail(self):
-        link = "{0}accounts/activate/{1}".format(settings.DOMAIN, self.activation_key)
-        subject = "INLOOP account activation"
-        message = ACTIVATION_EMAIL_TEXT.format(username=self.username, link=link)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
+    def send_activation_mail(self, request):
+        context = {
+            "request": request,
+            "site": get_current_site(request),
+            "user": self
+        }
+        subject = render_to_string("registration/activation_email_subject.txt", context=context)
+        message = render_to_string("registration/activation_email.txt", context=context)
+        self.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
 
 def get_system_user():

@@ -40,7 +40,7 @@ def register(request):
             user.is_active = False
             user.save()
             try:
-                user.send_activation_mail()
+                user.send_activation_mail(request)
                 return success(
                     request,
                     "Thanks for signing up. Your activation mail has been sent."
