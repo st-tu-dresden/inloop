@@ -32,9 +32,6 @@ class UserProfile(auth_models.AbstractUser):
     # Length of the random key
     KEY_LENGTH = 40
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     # FIXME: use activation key which encodes expiration
     activation_key = models.CharField(
         max_length=KEY_LENGTH,
@@ -47,7 +44,7 @@ class UserProfile(auth_models.AbstractUser):
         help_text="The key's deprecation time"
     )
     mat_num = models.IntegerField(
-        help_text="Matriculation Number",
+        help_text="Matriculation number",
         null=True,
         validators=[validate_mat_num]
     )
