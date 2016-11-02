@@ -13,7 +13,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 
 from environ import Env
-from redis.connection import ConnectionPool
 
 if sys.getfilesystemencoding() != "utf-8":
     raise ImproperlyConfigured("LANG must be a utf-8 locale")
@@ -145,7 +144,7 @@ if env.bool("USE_X_FORWARDED", default=False):
 
 HUEY = {
     "always_eager": False,
-    "connection_pool": ConnectionPool.from_url(env("REDIS_URL")),
+    "url": env("REDIS_URL"),
 }
 
 SENDFILE_METHOD = "django"
