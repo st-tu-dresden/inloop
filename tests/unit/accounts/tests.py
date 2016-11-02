@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase
 
@@ -85,14 +85,6 @@ class RegistrationTests(TestCase):
         self.assertTemplateUsed(resp, 'tasks/index.html')
         self.assertRedirects(resp, '/')
 
-    def test_registration_notification_redirect(self):
-        resp = self.client.post('/accounts/register/', data=self.data, follow=True)
-        self.assert_response_template_contains(
-            resp=resp,
-            template='accounts/message.html',
-            content='Your activation mail has been sent.'
-        )
-
     def test_activation_process_client(self):
         self.client.post('/accounts/register/', data=self.data, follow=True)
         user = UserProfile.objects.get(username='john')
@@ -107,20 +99,16 @@ class RegistrationTests(TestCase):
         # Try to login
         self.try_default_user_login()
 
-    def test_activation_mail_send(self):
-        uf = UserForm(self.data)
-        self.assertTrue(uf.is_valid())
-        user = uf.save(commit=False)
-        user.set_password(uf.cleaned_data['password'])
-        user.is_active = False
-        user.save()
-        user.send_activation_mail()
-        link = "{0}accounts/activate/{1}".format(settings.DOMAIN, user.activation_key)
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'INLOOP account activation')
-        self.assertTrue(user.username in mail.outbox[0].body)
-        self.assertTrue(link in mail.outbox[0].body)
+    def test_registration(self):
+        """Test if a complete activation email is sent after a successful registration."""
+        self.assertEqual(Site.objects.get_current().domain, "example.com")
+        response = self.client.post("/accounts/register/", data=self.data, follow=True)
+        activation_mail = mail.outbox[0]
+        link_pattern = r"\bhttp://example\.com/accounts/activate/[0-9a-zA-Z]{40}\b"
+        self.assertContains(response, "Your activation mail has been sent.")
+        self.assertEqual(activation_mail.subject, "Activate your account on example.com")
+        self.assertIn("Hello John,", activation_mail.body)
+        self.assertRegex(activation_mail.body, link_pattern)
 
 
 class ProfileTests(TestCase):

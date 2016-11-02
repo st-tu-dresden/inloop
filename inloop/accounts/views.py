@@ -1,4 +1,5 @@
 import logging
+from smtplib import SMTPException
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -39,12 +40,12 @@ def register(request):
             user.is_active = False
             user.save()
             try:
-                user.send_activation_mail()
+                user.send_activation_mail(request)
                 return success(
                     request,
                     "Thanks for signing up. Your activation mail has been sent."
                 )
-            except Exception as e:
+            except SMTPException as e:
                 logger.error("Could not send activation mail, stack trace follows.")
                 logger.exception(e)
                 return failure(request, "We are having trouble sending your activation mail.")

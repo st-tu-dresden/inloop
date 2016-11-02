@@ -1,28 +1,12 @@
-import string
-from random import SystemRandom
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
-from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 from inloop.accounts.validators import validate_mat_num
-
-
-# Activation email text template
-ACTIVATION_EMAIL_TEXT = """\
-Hello {username},
-
-please click the following link within the next week to activate your INLOOP account:
-
-  {link}
-
-We're looking forward to seeing you on the site!
-
-Cheers,
-Your INLOOP team
-"""
 
 
 def next_week():
@@ -45,14 +29,8 @@ class CourseOfStudy(models.Model):
 class UserProfile(auth_models.AbstractUser):
     """Extended user model with support for course of studies."""
 
-    # Characters to be used in the activation key
-    CHARS = string.ascii_letters + string.digits
-
     # Length of the random key
     KEY_LENGTH = 40
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     # FIXME: use activation key which encodes expiration
     activation_key = models.CharField(
@@ -66,16 +44,14 @@ class UserProfile(auth_models.AbstractUser):
         help_text="The key's deprecation time"
     )
     mat_num = models.IntegerField(
-        help_text="Matriculation Number",
+        help_text="Matriculation number",
         null=True,
         validators=[validate_mat_num]
     )
     course = models.ForeignKey(CourseOfStudy, null=True, on_delete=models.CASCADE)
 
     def generate_activation_key(self):
-        """Generate a secure random key with length and charset specified above."""
-        random = SystemRandom()
-        self.activation_key = "".join(random.sample(self.CHARS, self.KEY_LENGTH))
+        self.activation_key = get_random_string(length=self.KEY_LENGTH)
 
     def activate(self):
         success = False
@@ -87,11 +63,17 @@ class UserProfile(auth_models.AbstractUser):
         self.save()
         return success
 
-    def send_activation_mail(self):
-        link = "{0}accounts/activate/{1}".format(settings.DOMAIN, self.activation_key)
-        subject = "INLOOP account activation"
-        message = ACTIVATION_EMAIL_TEXT.format(username=self.username, link=link)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
+    def send_activation_mail(self, request):
+        context = {
+            "request": request,
+            "site": get_current_site(request),
+            "user": self
+        }
+        subject = render_to_string("registration/activation_email_subject.txt", context=context)
+        # force the subject to a single line
+        subject = "".join(subject.splitlines())
+        message = render_to_string("registration/activation_email.txt", context=context)
+        self.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
 
 def get_system_user():

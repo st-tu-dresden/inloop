@@ -29,7 +29,6 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = [host.strip() for host in env.list("ALLOWED_HOSTS")]
 
 SITE_ID = 1
-DOMAIN = env("SERVER_NAME", default="localhost:8000")   # XXX: use contrib.sites
 
 AUTH_USER_MODEL = "accounts.UserProfile"
 

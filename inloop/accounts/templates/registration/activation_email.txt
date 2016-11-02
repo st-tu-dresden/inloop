@@ -1,0 +1,10 @@
+Hello {% firstof user.first_name user.username %},
+
+please click the following link within the next week to activate your account:
+
+  {{ request.scheme }}://{{ site.domain }}{% url 'accounts:user_activation' user.activation_key %}
+
+We're looking forward to seeing you on the site!
+
+With kind regards,
+The {{ site.name }} team
