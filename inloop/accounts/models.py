@@ -73,6 +73,8 @@ class UserProfile(auth_models.AbstractUser):
             "user": self
         }
         subject = render_to_string("registration/activation_email_subject.txt", context=context)
+        # force the subject to a single line
+        subject = "".join(subject.splitlines())
         message = render_to_string("registration/activation_email.txt", context=context)
         self.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
