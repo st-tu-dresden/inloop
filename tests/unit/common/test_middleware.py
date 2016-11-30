@@ -1,11 +1,9 @@
-from unittest import TestCase
-
-from django.test import RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 
 from inloop.common.middleware import SetRemoteAddrFromForwardedFor
 
 
-class SetRemoteAddrFromForwardedForTestCase(TestCase):
+class SetRemoteAddrFromForwardedForTestCase(SimpleTestCase):
     def test_x_forwarded_for(self):
         rf = RequestFactory()
         middleware = SetRemoteAddrFromForwardedFor()

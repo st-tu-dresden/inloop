@@ -1,10 +1,10 @@
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from inloop.accounts.validators import validate_zih_mail
 
 
-class ZIHMailValidatorTests(TestCase):
+class ZIHMailValidatorTests(SimpleTestCase):
     def test_valid_mails(self):
         validate_zih_mail("s4810525@mail.zih.tu-dresden.de")
         validate_zih_mail("martin.morgenstern1@mailbox.tu-dresden.de")

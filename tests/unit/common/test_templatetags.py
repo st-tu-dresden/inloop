@@ -1,4 +1,4 @@
-from django.test import TestCase
+from unittest import TestCase
 
 from inloop.common.templatetags.markdown import markdown
 

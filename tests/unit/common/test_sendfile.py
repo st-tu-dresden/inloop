@@ -2,14 +2,14 @@ from os import path
 
 from django.conf import settings
 from django.http import Http404
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 
 from inloop.common.sendfile import sendfile_nginx
 
 
 @override_settings(MEDIA_ROOT=settings.INLOOP_ROOT, SENDFILE_NGINX_URL="/sendfile")
-class NginxSendfileTests(TestCase):
+class NginxSendfileTests(SimpleTestCase):
     def setUp(self):
         # we don't need a valid GET request, but it doesn't hurt either
         factory = RequestFactory()

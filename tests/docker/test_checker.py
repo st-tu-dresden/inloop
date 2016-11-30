@@ -1,9 +1,7 @@
 import signal
 import subprocess
 from pathlib import Path
-
-from django.conf import settings
-from django.test import TestCase
+from unittest import TestCase
 
 from inloop.tasks.checker import DockerSubProcessChecker, collect_files
 
@@ -43,10 +41,8 @@ class DockerSubProcessCheckerTests(TestCase):
     image_name = "inloop-integration-test"
     input_path = DATA_DIR
 
-    # NOTE: tmpdir=None means using the platform default (e.g., TMPDIR)
     options = {
-        "timeout": 1.5,
-        "tmpdir": settings.CHECKER.get("tmpdir")
+        "timeout": 1.5
     }
 
     def setUp(self):
