@@ -52,9 +52,9 @@ def index(request):
 def category(request, slug):
     category = get_object_or_404(Category, slug=slug)
     tasks = Task.objects \
-        .filter(category=category, publication_date__lt=timezone.now()) \
-        .order_by("publication_date", "title")
-    have_deadlines = any(task.deadline_date for task in tasks)
+        .filter(category=category, pubdate__lt=timezone.now()) \
+        .order_by("pubdate", "title")
+    have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(request, 'tasks/category.html', {
         'category': category,
         'tasks': tasks,
@@ -77,7 +77,7 @@ def serve_attachment(request, slug, path):
 
     # translate the slug into the internal task name
     task = get_object_or_404(Task, slug=slug)
-    filesystem_path = join(task.name, path)
+    filesystem_path = join(task.system_name, path)
 
     return sendfile(request, filesystem_path, settings.GIT_ROOT)
 

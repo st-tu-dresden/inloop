@@ -62,7 +62,7 @@ class Solution(models.Model):
         # XXX: have circular imports -> needs decoupling
         from inloop.testrunner.models import TestOutput, TestResult
 
-        result_tuple = checker.check_task(self.task.name, self.solution_path())
+        result_tuple = checker.check_task(self.task.system_name, self.solution_path())
 
         with atomic():
             result = TestResult.objects.create(

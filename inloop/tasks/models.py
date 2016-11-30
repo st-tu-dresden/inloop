@@ -35,16 +35,8 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Task categories"
 
-    slug = models.CharField(
-        unique=True,
-        max_length=50,
-        help_text='Short ID for URLs'
-    )
-    name = models.CharField(
-        unique=True,
-        max_length=50,
-        help_text='Category Name'
-    )
+    slug = models.SlugField(max_length=50, unique=True, help_text="URL name")
+    name = models.CharField(unique=True, max_length=50, help_text="Category name")
     objects = CategoryManager()
 
     def save(self, *args, **kwargs):
@@ -60,7 +52,7 @@ class Category(models.Model):
 
     def published_tasks(self):
         """Return tasks of this category that have already been published."""
-        return self.task_set.filter(publication_date__lt=timezone.now())
+        return self.task_set.filter(pubdate__lt=timezone.now())
 
     def __str__(self):
         return self.name
@@ -71,9 +63,9 @@ class TaskManager(models.Manager):
 
     def get_or_create_json(self, json, name):
         try:
-            task = self.get(name=name)
+            task = self.get(system_name=name)
         except ObjectDoesNotExist:
-            task = Task(name=name, author=get_system_user())
+            task = Task(system_name=name, author=get_system_user())
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
@@ -81,11 +73,11 @@ class TaskManager(models.Manager):
         task.title = json['title']
         task.slug = make_slug(task.title)
         task.category = Category.objects.get_or_create(json['category'])
-        task.publication_date = parse_date(json['pubdate'])
+        task.pubdate = parse_date(json['pubdate'])
         try:
-            task.deadline_date = parse_date(json['deadline'])
+            task.deadline = parse_date(json['deadline'])
         except KeyError:
-            task.deadline_date = None
+            task.deadline = None
         return task
 
     def _validate(self, json):
@@ -103,15 +95,15 @@ class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
     # Mandatory fields:
-    title = models.CharField(max_length=100, help_text='Task title')
-    name = models.CharField(max_length=100, help_text='Internal task name')
-    slug = models.SlugField(max_length=50, unique=True, help_text='URL name')
-    description = models.TextField(help_text='Task description')
-    publication_date = models.DateTimeField(help_text='When should the task be published?')
+    title = models.CharField(max_length=100, help_text="Task title")
+    system_name = models.CharField(max_length=100, help_text="Internally used name")
+    slug = models.SlugField(max_length=50, unique=True, help_text="URL name")
+    description = models.TextField(help_text="Task description")
+    pubdate = models.DateTimeField(help_text="When should the task be published?")
 
     # Optional fields:
-    deadline_date = models.DateTimeField(
-        help_text="Optional Date the task is due to",
+    deadline = models.DateTimeField(
+        help_text="Optional date the task is due to",
         null=True,
         blank=True
     )
@@ -124,11 +116,11 @@ class Task(models.Model):
 
     def is_published(self):
         """Return True if the task is already visible to the users."""
-        return timezone.now() > self.publication_date
+        return timezone.now() > self.pubdate
 
     def is_expired(self):
         """Return True if the task has passed its optional deadline."""
-        return self.deadline_date and timezone.now() > self.deadline_date
+        return self.deadline and timezone.now() > self.deadline
 
     def __str__(self):
-        return self.name
+        return self.title
