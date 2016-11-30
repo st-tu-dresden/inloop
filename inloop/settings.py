@@ -144,6 +144,7 @@ if env.bool("USE_X_FORWARDED", default=False):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
     USE_X_FORWARDED_PORT = True
+    MIDDLEWARE.insert(0, "inloop.common.middleware.SetRemoteAddrFromForwardedFor")
 
 HUEY = {
     "always_eager": False,
