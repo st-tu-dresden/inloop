@@ -23,7 +23,7 @@ Name                        | Description
 `CACHE_URL`                 | 12factor style cache URL, e.g. `redis://localhost:1234/0`
 `DATABASE_URL`              | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
 `DJANGO_SETTINGS_MODULE`    | Set to `inloop.settings` unless you know what you are doing
-`FROM_EMAIL`                | Address used for outgoing mail, e.g. `INLOOP <inloop@example.com>`
+`FROM_EMAIL`                | Address used for outgoing mail, e.g. `inloop@example.com`
 `GITHUB_SECRET`             | Github webhook endpoint secret
 `LANG`                      | Set to `en_US.UTF-8` unless you know what you are doing
 `REDIS_URL`                 | Redis URL used for the queue, e.g. `redis://localhost:1234/1`
