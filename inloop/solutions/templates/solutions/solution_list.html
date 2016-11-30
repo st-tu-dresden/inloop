@@ -6,7 +6,7 @@
 {% if solutions %}
 <div class="list-group">
 {% for solution in solutions %}
-  <a class="list-group-item" href="{% url 'tasks:solutiondetail' solution.id %}">
+  <a class="list-group-item" href="{% url 'solutions:detail' solution.id %}">
 
     <div class="solutionstatus">
       <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
