@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "huey.contrib.djhuey",
 
-    "inloop.core",
+    "inloop.common",
     "inloop.accounts",
     "inloop.tasks",
     "inloop.gh_import",

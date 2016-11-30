@@ -19,7 +19,7 @@ from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.views.generic import View
 
-from inloop.core.sendfile import sendfile
+from inloop.common.sendfile import sendfile
 from inloop.tasks.models import (Task, TaskCategory, TaskSolution,
                                  TaskSolutionFile, check_solution)
 from inloop.tasks.prettyprint import junit

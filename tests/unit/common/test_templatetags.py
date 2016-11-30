@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from inloop.core.templatetags.markdown import markdown
+from inloop.common.templatetags.markdown import markdown
 
 
 FENCED_CODE = """

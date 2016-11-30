@@ -5,7 +5,7 @@ from django.http import Http404
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
-from inloop.core.sendfile import sendfile_nginx
+from inloop.common.sendfile import sendfile_nginx
 
 
 @override_settings(MEDIA_ROOT=settings.INLOOP_ROOT, SENDFILE_NGINX_URL="/sendfile")
