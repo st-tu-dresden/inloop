@@ -14,7 +14,7 @@ from huey.contrib.djhuey import db_task
 
 from inloop.accounts.models import UserProfile, get_system_user
 from inloop.gh_import.utils import parse_date
-from inloop.tasks.checker import DockerSubProcessChecker
+from inloop.testrunner.runner import DockerTestRunner
 
 
 def make_slug(value):
@@ -57,7 +57,7 @@ def check_solution(solution_id):
     # jobs have to be simple types (e.g., int)
     #
     solution = TaskSolution.objects.get(pk=solution_id)
-    checker = DockerSubProcessChecker(settings.CHECKER, settings.DOCKER_IMAGE)
+    checker = DockerTestRunner(settings.CHECKER, settings.DOCKER_IMAGE)
     result = solution.do_check(checker)
     return result.id
 
