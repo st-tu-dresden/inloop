@@ -1,7 +1,7 @@
--e git+https://github.com/waylan/Python-Markdown.git@4d96f00#egg=Markdown
 django-environ
 django-extensions
 django-redis
 Django>=1.10,<=1.10.99
 huey>=1.2.0
+Markdown>=2.6.7
 redis
