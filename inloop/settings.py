@@ -26,6 +26,7 @@ env = Env()
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = [host.strip() for host in env.list("ALLOWED_HOSTS")]
+INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS")]
 
 SITE_ID = 1
 
@@ -50,10 +51,6 @@ INSTALLED_APPS = [
     "inloop.gh_import",
 ]
 
-if DEBUG and env.bool("DJDT", default=False):
-    INSTALLED_APPS.append("debug_toolbar")
-    DEBUG_TOOLBAR_CONFIG = {"JQUERY_URL": ""}
-
 MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -68,6 +65,12 @@ LOGIN_URL = reverse_lazy("index")
 
 ROOT_URLCONF = "inloop.urls"
 WSGI_APPLICATION = "inloop.wsgi.application"
+
+if DEBUG and env.bool("DJDT", default=False):
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    ROOT_URLCONF = "inloop.debug_urls"
+    DEBUG_TOOLBAR_CONFIG = {"JQUERY_URL": ""}
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Europe/Berlin"
