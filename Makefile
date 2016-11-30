@@ -7,7 +7,7 @@ uglifyjs := node_modules/.bin/uglifyjs
 lessc := node_modules/.bin/lessc
 
 # Target file for the JS bundle
-js_bundle := inloop/core/static/js/inloop.min.js
+js_bundle := inloop/common/static/js/inloop.min.js
 
 # Javascript source files to be combined
 # (order is important: jQuery > other 3rd party JS > INLOOP JS)
@@ -24,7 +24,7 @@ js_sources := \
 	js/inloop.js
 
 # Target file for the CSS bundle
-css_bundle := inloop/core/static/css/inloop.min.css
+css_bundle := inloop/common/static/css/inloop.min.css
 
 # Source file for the CSS bundle
 bootstrap_path := vendor/bootstrap/less
