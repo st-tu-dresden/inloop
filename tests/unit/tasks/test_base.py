@@ -12,7 +12,7 @@ from inloop.accounts.models import UserProfile
 from inloop.tasks.models import (Task, TaskCategory,
                                  TaskSolution, TaskSolutionFile)
 
-TEST_CLASS_PATH = path.join(settings.INLOOP_ROOT, "tests", "HelloWorld.java")
+TEST_CLASS_PATH = str(settings.BASE_DIR / "tests" / "HelloWorld.java")
 MEDIA_CLASS_PATH = path.join(settings.MEDIA_ROOT, "HelloWorld.java")
 
 
