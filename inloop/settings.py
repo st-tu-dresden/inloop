@@ -19,7 +19,6 @@ if sys.getfilesystemencoding() != "utf-8":
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 BASE_DIR = PACKAGE_DIR.parent
-INLOOP_ROOT = str(PACKAGE_DIR)  # XXX: deprecated in favor of PACKAGE_DIR
 
 env = Env()
 
