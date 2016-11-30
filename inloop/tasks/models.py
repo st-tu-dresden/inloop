@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
-from inloop.accounts.models import UserProfile, get_system_user
 # XXX: dependency should be the other way around
 from inloop.gh_import.utils import parse_date
 
@@ -65,7 +64,7 @@ class TaskManager(models.Manager):
         try:
             task = self.get(system_name=name)
         except ObjectDoesNotExist:
-            task = Task(system_name=name, author=get_system_user())
+            task = Task(system_name=name)
         return self._update_task(task, json)
 
     def _update_task(self, task, json):
@@ -108,10 +107,7 @@ class Task(models.Model):
         blank=True
     )
 
-    # Foreign keys:
-    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-
     objects = TaskManager()
 
     def is_published(self):

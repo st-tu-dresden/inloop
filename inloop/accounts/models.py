@@ -74,8 +74,3 @@ class UserProfile(auth_models.AbstractUser):
         subject = "".join(subject.splitlines())
         message = render_to_string("registration/activation_email.txt", context=context)
         self.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-
-
-def get_system_user():
-    """Return a UserProfile to be used for system tasks (e.g., imports)."""
-    return UserProfile.objects.get_or_create(username="system")[0]

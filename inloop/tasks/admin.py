@@ -6,7 +6,7 @@ from inloop.tasks.models import Category, Task
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['title', 'author', 'category']}),
+        (None, {'fields': ['title', 'category']}),
         ('Date Information', {'fields': ['pubdate', 'deadline']}),
         ('Content', {'fields': ['description', 'slug']})
     ]
