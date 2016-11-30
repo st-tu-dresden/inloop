@@ -18,3 +18,7 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
+
+INSTALLED_APPS += [     # noqa
+    "tests.unit.context_processors",
+]
