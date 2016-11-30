@@ -10,7 +10,7 @@ from django.utils import timezone
 from inloop.gh_import import __name__ as PACKAGE, views
 from inloop.gh_import.git import GitRepository
 from inloop.gh_import.utils import (HOSTS_FILE, compute_signature,
-                                    parse_date, parse_ssh_url, ssh_options)
+                                    parse_date, ssh_options)
 
 
 class UtilsTest(TestCase):
@@ -19,18 +19,6 @@ class UtilsTest(TestCase):
             compute_signature(b'secret', BytesIO(b'foo')),
             'sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2'
         )
-
-    def test_parse_git_ssh_url_with_user(self):
-        parts = parse_ssh_url('git@github.com:user/repo.git')
-        self.assertEqual(parts['user'], 'git')
-        self.assertEqual(parts['host'], 'github.com')
-        self.assertEqual(parts['path'], 'user/repo.git')
-
-    def test_parse_git_ssh_url_without_user(self):
-        parts = parse_ssh_url('github.com:user/repo.git')
-        self.assertEqual(parts['user'], None)
-        self.assertEqual(parts['host'], 'github.com')
-        self.assertEqual(parts['path'], 'user/repo.git')
 
     def test_hosts_file_exists(self):
         self.assertTrue(path.exists(HOSTS_FILE))

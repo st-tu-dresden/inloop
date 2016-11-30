@@ -16,16 +16,6 @@ def parse_date(datestr, format='%Y-%m-%d %H:%M:%S'):
     return timezone.make_aware(parsed, timezone.get_current_timezone())
 
 
-def parse_ssh_url(url):
-    parts = {}
-    remainder, parts['path'] = url.rsplit(':', 1)
-    if '@' in remainder:
-        parts['user'], parts['host'] = remainder.split('@')
-    else:
-        parts['user'], parts['host'] = None, remainder
-    return parts
-
-
 def ssh_options(id_rsa, shell=False, verbose=False):
     opts = [
         '-F/dev/null',
