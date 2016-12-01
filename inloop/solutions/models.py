@@ -1,11 +1,11 @@
 from os.path import dirname, join
 
+from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
 from django.urls import reverse
 from django.utils import timezone
 
-from inloop.accounts.models import UserProfile
 from inloop.tasks.models import Task
 
 
@@ -33,7 +33,7 @@ class Solution(models.Model):
         help_text="When was the solution submitted?",
         auto_now_add=True
     )
-    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
 
