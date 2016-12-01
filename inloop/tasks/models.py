@@ -95,7 +95,7 @@ class Task(models.Model):
 
     # Mandatory fields:
     title = models.CharField(max_length=100, help_text="Task title")
-    system_name = models.CharField(max_length=100, help_text="Internally used name")
+    system_name = models.CharField(max_length=100, unique=True, help_text="Internally used name")
     slug = models.SlugField(max_length=50, unique=True, help_text="URL name")
     description = models.TextField(help_text="Task description")
     pubdate = models.DateTimeField(help_text="When should the task be published?")
