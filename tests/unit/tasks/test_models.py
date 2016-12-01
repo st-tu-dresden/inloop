@@ -2,12 +2,11 @@ from doctest import DocTestSuite
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import timezone
 
 from inloop.tasks import models
-from inloop.tasks.models import Task, TaskCategory
+from inloop.tasks.models import Category, Task
 
-from tests.unit.tasks.test_base import TasksTestBase
+from tests.unit.tasks.mixins import TaskData
 
 
 def load_tests(loader, tests, ignore):
@@ -16,32 +15,20 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class TaskModelTests(TasksTestBase):
-    def setUp(self):
-        super().setUp()
-        self.unpublished_task = self.create_task(
-            title="Unpublished task",
-            publication_date=timezone.now() + timezone.timedelta(days=2)
-        )
-
+class TaskTests(TaskData, TestCase):
     def test_task_is_published(self):
-        self.assertTrue(self.task.is_published())
-        self.assertFalse(self.unpublished_task.is_published())
-
-    def test_disabled_task_not_displayed_in_index(self):
-        self.client.login(username="chuck_norris", password="s3cret")
-        response = self.client.get("/", follow=True)
-        self.assertNotContains(response, self.unpublished_task.title)
+        self.assertTrue(self.published_task1.is_published())
+        self.assertFalse(self.unpublished_task1.is_published())
 
     def test_invalid_inputs(self):
         with self.assertRaises(ValidationError):
-            Task.objects.create(publication_date="abc")
+            Task.objects.create(pubdate="abc")
 
         with self.assertRaises(ValidationError):
-            Task.objects.create(deadline_date="abc")
+            Task.objects.create(deadline="abc")
 
 
-class TaskCategoryTests(TasksTestBase):
+class TaskCategoryTests(TestCase):
     def test_slugify_on_save(self):
         cat_name = "Whitespace here and 123 some! TABS \t - \"abc\" (things)\n"
         slug = "whitespace-here-and-123-some-tabs-abc-things"
@@ -77,19 +64,19 @@ class TaskCategoryTests(TasksTestBase):
 
 class TaskCategoryManagerTests(TestCase):
     def setUp(self):
-        TaskCategory.objects.create(name="Test category")
+        Category.objects.create(name="Test category")
 
     def test_returns_existing_category(self):
-        self.assertEqual(TaskCategory.objects.count(), 1)
-        category = TaskCategory.objects.get_or_create("Test category")
+        self.assertEqual(Category.objects.count(), 1)
+        category = Category.objects.get_or_create("Test category")
         self.assertEqual(category.name, "Test category")
-        self.assertEqual(TaskCategory.objects.count(), 1)
+        self.assertEqual(Category.objects.count(), 1)
 
     def test_returns_new_category(self):
-        self.assertEqual(TaskCategory.objects.count(), 1)
-        category = TaskCategory.objects.get_or_create("Another category")
+        self.assertEqual(Category.objects.count(), 1)
+        category = Category.objects.get_or_create("Another category")
         self.assertEqual(category.name, "Another category")
-        self.assertEqual(TaskCategory.objects.count(), 2)
+        self.assertEqual(Category.objects.count(), 2)
 
 
 class TaskManagerTests(TestCase):
