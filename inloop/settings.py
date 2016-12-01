@@ -29,8 +29,6 @@ INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS")]
 
 SITE_ID = 1
 
-AUTH_USER_MODEL = "accounts.UserProfile"
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
