@@ -7,12 +7,8 @@ app_name = "accounts"
 
 # views for inloop.accounts
 urlpatterns = [
-    url(r'^profile/$', account_views.user_profile, name='user_profile'),
-    url(r'^register/$', account_views.register, name='register'),
     url(r'^login/$', account_views.user_login, name='user_login'),
     url(r'^logout/$', account_views.user_logout, name='user_logout'),
-    url(r'^activate/(?P<key>[0-9a-zA-Z]{40})$', account_views.activate_user,
-        name='user_activation'),
 ]
 
 # views for contrib.auth
