@@ -47,13 +47,13 @@ We use Django standard facilities for testing. All tests reside in the `tests` p
 consist of separate sub-packages for fast unit tests and slower integration tests:
 
     tests
-    ├── docker/
+    ├── functional/
     └── unit/
 
-Executing tests in the `tests.docker` package requires the Docker image to be built once
-before:
+Executing tests in the `tests.functional.testrunner` package requires the Docker image to
+be built once before:
 
-    cd tests/docker && docker build -t inloop-integration-test .
+    cd tests/functional/testrunner && docker build -t inloop-integration-test .
 
 Examples:
 

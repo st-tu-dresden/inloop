@@ -1,7 +1,7 @@
 from pathlib import Path
 from unittest import TestCase
 
-from inloop.tasks.prettyprint import junit
+from inloop.solutions.prettyprint import junit
 
 
 class JUnitXMLTests(TestCase):

@@ -22,7 +22,7 @@ before_install:
 install:
   - pip install -r requirements/main.txt
   - pip install -r requirements/test.txt -r requirements/lint.txt
-  - (cd tests/docker && docker build -t inloop-integration-test .)
+  - (cd tests/functional/testrunner && docker build -t inloop-integration-test .)
   - mkdir -p .state
 
 script:

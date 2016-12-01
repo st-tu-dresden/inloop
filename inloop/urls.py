@@ -4,11 +4,13 @@ from django.contrib.flatpages.views import flatpage
 
 from inloop.accounts import urls as account_urls
 from inloop.gh_import import urls as github_urls
+from inloop.solutions import urls as solution_urls
 from inloop.tasks import urls as task_urls
 from inloop.tasks.views import index
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^solutions/', include(solution_urls)),
     url(r'^tasks/', include(task_urls)),
     url(r'^accounts/', include(account_urls)),
     url(r'^github/', include(github_urls)),

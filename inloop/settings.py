@@ -29,8 +29,6 @@ INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS")]
 
 SITE_ID = 1
 
-AUTH_USER_MODEL = "accounts.UserProfile"
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -44,9 +42,11 @@ INSTALLED_APPS = [
     "django_extensions",
     "huey.contrib.djhuey",
 
-    "inloop.common",
     "inloop.accounts",
+    "inloop.common",
+    "inloop.solutions",
     "inloop.tasks",
+    "inloop.testrunner",
     "inloop.gh_import",
 ]
 

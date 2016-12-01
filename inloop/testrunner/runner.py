@@ -8,7 +8,7 @@ import uuid
 from collections import namedtuple
 from os.path import isabs, isdir, isfile, join, normpath, realpath
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def collect_files(path):
@@ -24,17 +24,17 @@ def collect_files(path):
     return retval
 
 
-class ResultTuple(namedtuple("_ResultTuple", "rc stdout stderr duration file_dict")):
+class TestOutput(namedtuple("_TestOutput", "rc stdout stderr duration file_dict")):
     """
-    Container type wrapping the outputs of a checker run.
+    Container type wrapping the outputs of a test run.
     """
 
 
-class DockerSubProcessChecker:
+class DockerTestRunner:
     """
-    Checker implementation using a local `docker` binary.
+    Tester implementation using a local `docker` binary.
 
-    The checker is only responsible for executing the specified image using
+    The tester is only responsible for executing the specified image using
     the provided inputs and for collecting the outputs. Interpretation of the
     output must be handled in a separate stage.
 
@@ -90,7 +90,7 @@ class DockerSubProcessChecker:
 
     def __init__(self, config, image_name):
         """
-        Initialize the checker with a dict-like config and the name of the Docker image.
+        Initialize the tester with a dict-like config and the name of the Docker image.
 
         The following config keywords are supported:
 
@@ -126,7 +126,7 @@ class DockerSubProcessChecker:
         may be force-killed after certain resource limits (time, memory, etc.) have been
         reached.
 
-        Returns a Result tuple.
+        Returns a TestOutput tuple.
         """
         self.ensure_absolute_dir(input_path)
 
@@ -152,7 +152,7 @@ class DockerSubProcessChecker:
             duration = time.perf_counter() - start_time
             file_dict = collect_files(storage_dir)
 
-        return ResultTuple(rc, stdout, stderr, duration, file_dict)
+        return TestOutput(rc, stdout, stderr, duration, file_dict)
 
     def subpath_check(self, path1, path2):
         """
@@ -184,7 +184,7 @@ class DockerSubProcessChecker:
             task_name
         ]
 
-        LOGGER.debug("Popen args: %s", args)
+        logger.debug("Popen args: %s", args)
 
         proc = subprocess.Popen(
             args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -200,16 +200,16 @@ class DockerSubProcessChecker:
             rc = signal.SIGKILL
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
-            LOGGER.debug("removing timed out container %s", ctr_id)
+            logger.debug("removing timed out container %s", ctr_id)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
 
         stderr = stderr.decode("utf-8", errors="replace")
         stdout = stdout.decode("utf-8", errors="replace")
 
-        LOGGER.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
+        logger.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
 
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
-            LOGGER.error("docker failure (rc=%d): %s", rc, stderr)
+            logger.error("docker failure (rc=%d): %s", rc, stderr)
 
         return (rc, stdout, stderr)

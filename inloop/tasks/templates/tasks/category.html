@@ -28,9 +28,9 @@
     {% for task in tasks %}
     <tr>
       <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
-      <td>{% firstof task.publication_date|date:"d-m-Y" "-" %}</td>
+      <td>{% firstof task.pubdate|date:"d-m-Y" "-" %}</td>
       {% if have_deadlines %}
-      <td>{% firstof task.deadline_date|date:"d-m-Y" "-"  %}</td>
+      <td>{% firstof task.deadline|date:"d-m-Y" "-"  %}</td>
       {% endif %}
       <td>
         <!-- show a question mark until this gets implemented -->
