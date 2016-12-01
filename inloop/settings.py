@@ -96,6 +96,7 @@ TEMPLATES = [{
             "django.contrib.messages.context_processors.messages",
             "inloop.common.context_processors.current_site",
         ],
+        "debug": DEBUG
     },
 }]
 
