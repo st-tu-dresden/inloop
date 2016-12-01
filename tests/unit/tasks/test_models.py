@@ -1,23 +1,23 @@
-from doctest import DocTestSuite
-
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
 
 from inloop.solutions.models import Solution
-from inloop.tasks import models
 from inloop.tasks.models import Category, Task
 
 from tests.unit.accounts.mixins import SimpleAccountsData
 from tests.unit.tasks.mixins import TaskData
 
 
-def load_tests(loader, tests, ignore):
-    """Initialize doctests for this module."""
-    tests.addTests(DocTestSuite(models))
-    return tests
-
-
 class TaskTests(TaskData, TestCase):
+    def test_slugify_on_save(self):
+        task = Task.objects.create(
+            title="Some Task III (winter term 2010/2011)",
+            category=self.category1,
+            pubdate=timezone.now()
+        )
+        self.assertEqual(task.slug, "some-task-iii")
+
     def test_task_is_published(self):
         self.assertTrue(self.published_task1.is_published())
         self.assertFalse(self.unpublished_task1.is_published())

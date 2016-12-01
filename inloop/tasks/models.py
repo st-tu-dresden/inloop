@@ -9,16 +9,6 @@ from django.utils.text import slugify
 from inloop.gh_import.utils import parse_date
 
 
-def make_slug(value):
-    """Extended slugify() that also removes '(...)' from strings.
-
-    Example:
-    >>> make_slug("Some Task III (winter term 2010/2011)")
-    'some-task-iii'
-    """
-    return slugify(re.sub(r'\(.*?\)', '', value))
-
-
 class CategoryManager(models.Manager):
     def get_or_create(self, name):
         """Retrieve Category if it exists, create it otherwise."""
@@ -70,13 +60,13 @@ class TaskManager(models.Manager):
     def _update_task(self, task, json):
         self._validate(json)
         task.title = json['title']
-        task.slug = make_slug(task.title)
         task.category = Category.objects.get_or_create(json['category'])
         task.pubdate = parse_date(json['pubdate'])
         try:
             task.deadline = parse_date(json['deadline'])
         except KeyError:
             task.deadline = None
+        task.save()
         return task
 
     def _validate(self, json):
@@ -88,7 +78,6 @@ class TaskManager(models.Manager):
             raise ValueError("Missing metadata keys: %s" % ", ".join(missing))
 
 
-# FIXME: auto slugify
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
@@ -121,5 +110,14 @@ class Task(models.Model):
         """Return True if the task has passed its optional deadline."""
         return self.deadline and timezone.now() > self.deadline
 
+    @property
+    def sluggable_title(self):
+        """Return the title with anything between parentheses removed."""
+        return re.sub(r'\(.*?\)', '', self.title)
+
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.sluggable_title)
+        super().save(*args, **kwargs)
