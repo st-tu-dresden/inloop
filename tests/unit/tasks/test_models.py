@@ -62,25 +62,6 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
         self.assertSequenceEqual(completed, [self.published_task1, self.published_task2])
 
 
-class GetOrCreateTests(TestCase):
-    def setUp(self):
-        Category.objects.create(name="Test category")
-
-    def test_returns_existing_category(self):
-        before = Category.objects.count()
-        category = Category.objects.get_or_create("Test category")
-        after = Category.objects.count()
-        self.assertEqual(category.name, "Test category")
-        self.assertEqual(before, after)
-
-    def test_returns_new_category(self):
-        before = Category.objects.count()
-        category = Category.objects.get_or_create("Another category")
-        after = Category.objects.count()
-        self.assertEqual(category.name, "Another category")
-        self.assertEqual(before, after - 1)
-
-
 class TaskManagerTests(TestCase):
     def setUp(self):
         self.manager = Task.objects

@@ -9,15 +9,6 @@ from django.utils.text import slugify
 from inloop.gh_import.utils import parse_date
 
 
-class CategoryManager(models.Manager):
-    def get_or_create(self, name):
-        """Retrieve Category if it exists, create it otherwise."""
-        try:
-            return self.get(name=name)
-        except ObjectDoesNotExist:
-            return self.create(name=name, slug=slugify(name))
-
-
 class Category(models.Model):
     """Task categories may be used to arbitrarily group tasks."""
 
@@ -26,7 +17,6 @@ class Category(models.Model):
 
     slug = models.SlugField(max_length=50, unique=True, help_text="URL name")
     name = models.CharField(unique=True, max_length=50, help_text="Category name")
-    objects = CategoryManager()
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -60,7 +50,7 @@ class TaskManager(models.Manager):
     def _update_task(self, task, json):
         self._validate(json)
         task.title = json['title']
-        task.category = Category.objects.get_or_create(json['category'])
+        task.category, _ = Category.objects.get_or_create(name=json['category'])
         task.pubdate = parse_date(json['pubdate'])
         try:
             task.deadline = parse_date(json['deadline'])
