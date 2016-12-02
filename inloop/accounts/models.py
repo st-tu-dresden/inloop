@@ -27,4 +27,4 @@ class StudentDetails(models.Model):
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.user.username
+        return str(self.user)
