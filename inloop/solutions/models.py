@@ -1,4 +1,5 @@
 from os.path import dirname, join
+from pathlib import Path
 
 from django.conf import settings
 from django.db import models
@@ -40,13 +41,13 @@ class Solution(models.Model):
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
 
-    def solution_path(self):
-        if self.solutionfile_set.count() < 1:
-            raise AssertionError("No files associated to Solution(id=%d)" % self.id)
-
+    @property
+    def path(self):
         # derive the directory from the first associated SolutionFile
         solution_file = self.solutionfile_set.first()
-        return join(dirname(solution_file.file_path()))
+        if not solution_file:
+            raise AssertionError("Empty solution: %r" % self)
+        return solution_file.absolute_path.parent
 
     def do_check(self, checker):
         """
@@ -62,7 +63,7 @@ class Solution(models.Model):
         # XXX: have circular imports -> needs decoupling
         from inloop.testrunner.models import TestOutput, TestResult
 
-        result_tuple = checker.check_task(self.task.system_name, self.solution_path())
+        result_tuple = checker.check_task(self.task.system_name, str(self.path))
 
         with atomic():
             result = TestResult.objects.create(
@@ -113,14 +114,25 @@ class Solution(models.Model):
 
 
 class SolutionFile(models.Model):
-    '''Represents a single file as part of a solution'''
+    """Represents a single file as part of a solution."""
 
     solution = models.ForeignKey(Solution, on_delete=models.CASCADE)
-    filename = models.CharField(max_length=50)
     file = models.FileField(upload_to=get_upload_path)
 
-    def file_path(self):
-        return self.file.path
+    @property
+    def name(self):
+        """Return the basename of the file."""
+        return self.relative_path.name
+
+    @property
+    def relative_path(self):
+        """Return the file path relative to settings.MEDIA_ROOT."""
+        return Path(self.file.name)
+
+    @property
+    def absolute_path(self):
+        """Return the absolute file path as seen on the file system."""
+        return Path(self.file.path)
 
     def __str__(self):
-        return str(self.file)
+        return self.name

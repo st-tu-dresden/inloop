@@ -57,7 +57,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
                 task=task
             )
             solution.solutionfile_set.set([
-                SolutionFile(filename=f.name, file=f) for f in uploads
+                SolutionFile(file=f) for f in uploads
             ], bulk=False, clean=True)
 
         check_solution(solution.id)
