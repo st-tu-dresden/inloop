@@ -5,12 +5,10 @@ from unittest.mock import patch
 
 from django.test.client import RequestFactory
 from django.urls import resolve
-from django.utils import timezone
 
 from inloop.gh_import import __name__ as PACKAGE, views
 from inloop.gh_import.git import GitRepository
-from inloop.gh_import.utils import (HOSTS_FILE, compute_signature,
-                                    parse_date, ssh_options)
+from inloop.gh_import.utils import HOSTS_FILE, compute_signature, ssh_options
 
 
 class UtilsTest(TestCase):
@@ -22,18 +20,6 @@ class UtilsTest(TestCase):
 
     def test_hosts_file_exists(self):
         self.assertTrue(path.exists(HOSTS_FILE))
-
-    def test_parse_date(self):
-        with timezone.override(timezone.UTC()):
-            d = parse_date('2015-07-22 14:12:59')
-        self.assertTrue(timezone.is_aware(d))
-        self.assertEqual(d.tzname(), 'UTC')
-        self.assertEqual(d.year, 2015)
-        self.assertEqual(d.month, 7)
-        self.assertEqual(d.day, 22)
-        self.assertEqual(d.hour, 14)
-        self.assertEqual(d.minute, 12)
-        self.assertEqual(d.second, 59)
 
     def test_ssh_options_shell_quoting(self):
         opts_space = ssh_options('path with spaces', shell=True)
