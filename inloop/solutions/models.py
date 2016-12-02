@@ -1,4 +1,3 @@
-from os.path import dirname, join
 from pathlib import Path
 
 from django.conf import settings
@@ -11,14 +10,18 @@ from inloop.tasks.models import Task
 
 
 def get_upload_path(obj, filename):
-    solution = obj.solution
-    return join(
-        'solutions',
-        solution.author.username,
-        solution.task.slug,
-        "%s_%s" % (solution.submission_date.strftime("%Y/%m/%d/%H_%M"), solution.id),
-        filename
-    )
+    """
+    Return an upload file path.
+
+    All files related to a specific solution will share a common base directory.
+    """
+    s = obj.solution
+    return "solutions/{year}/{slug}/{id}/{filename}".format_map({
+        "year": s.submission_date.year,
+        "slug": s.task.slug,
+        "id": s.id,
+        "filename": filename
+    })
 
 
 class Solution(models.Model):
