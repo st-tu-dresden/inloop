@@ -15,7 +15,7 @@ from inloop.testrunner.tasks import check_solution
 # XXX: duplicated code
 def get_published_task_or_404(slug):
     task = get_object_or_404(Task, slug=slug)
-    if not task.is_published():
+    if not task.is_published:
         raise Http404
     return task
 
@@ -37,7 +37,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
         task = get_published_task_or_404(slug=slug)
         redirect_to_upload = redirect("solutions:upload", slug=slug)
 
-        if task.is_expired():
+        if task.is_expired:
             messages.error(request, "The deadline for this task has passed.")
             return redirect_to_upload
 

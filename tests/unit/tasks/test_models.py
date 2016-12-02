@@ -19,8 +19,8 @@ class TaskTests(TaskData, TestCase):
         self.assertEqual(task.slug, "some-task-iii")
 
     def test_task_is_published(self):
-        self.assertTrue(self.published_task1.is_published())
-        self.assertFalse(self.unpublished_task1.is_published())
+        self.assertTrue(self.published_task1.is_published)
+        self.assertFalse(self.unpublished_task1.is_published)
 
     def test_required_fields(self):
         self.assertSetEqual(Task.objects.required_fields, {

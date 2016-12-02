@@ -76,10 +76,12 @@ class Task(models.Model):
 
     objects = TaskManager()
 
+    @property
     def is_published(self):
         """Return True if the task is already visible to the users."""
         return timezone.now() > self.pubdate
 
+    @property
     def is_expired(self):
         """Return True if the task has passed its optional deadline."""
         return self.deadline and timezone.now() > self.deadline

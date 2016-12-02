@@ -23,7 +23,7 @@ from inloop.tasks.models import Category, Task
 
 def get_published_task_or_404(slug):
     task = get_object_or_404(Task, slug=slug)
-    if not task.is_published():
+    if not task.is_published:
         raise Http404
     return task
 
