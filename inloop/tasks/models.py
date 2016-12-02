@@ -19,17 +19,6 @@ class Category(models.Model):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def completed_tasks_for_user(self, user):
-        """Return tasks of this category a user has already solved."""
-        return self.task_set.filter(
-            solution__author=user,
-            solution__passed=True
-        ).distinct()
-
-    def published_tasks(self):
-        """Return tasks of this category that have already been published."""
-        return self.task_set.filter(pubdate__lt=timezone.now())
-
     def completion_info(self, user):
         return self.task_set.completion_info(user)
 

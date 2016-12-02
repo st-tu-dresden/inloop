@@ -15,10 +15,10 @@
             <h3>{{ cat.name }}</h3>
             <hr>
             <div class="progress">
-              <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.1 }}"
-                  aria-valuemin="0" aria-valuemax="{{ data.0 }}" style="width: {{ data.2 }}%;">
-                {% if data.1 > 0 %}
-                {{ data.1 }} / {{ data.0 }}
+              <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.num_completed }}"
+                  aria-valuemin="0" aria-valuemax="{{ data.num_published }}" style="width: {{ data.progress }}%;">
+                {% if data.num_completed > 0 %}
+                {{ data.num_completed }} / {{ data.num_published }}
                 {% else %}
                 <span class="sr-only">No completed tasks</span>
                 {% endif %}

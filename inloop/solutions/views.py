@@ -12,14 +12,6 @@ from inloop.tasks.models import Task
 from inloop.testrunner.tasks import check_solution
 
 
-# XXX: duplicated code
-def get_published_task_or_404(slug):
-    task = get_object_or_404(Task, slug=slug)
-    if not task.is_published:
-        raise Http404
-    return task
-
-
 class SolutionStatusView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
@@ -29,12 +21,12 @@ class SolutionStatusView(LoginRequiredMixin, View):
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, "solutions/upload_form.html", {
-            'task': get_published_task_or_404(slug=slug),
+            'task': get_object_or_404(Task.objects.published(), slug=slug),
             'active_tab': 1
         })
 
     def post(self, request, slug):
-        task = get_published_task_or_404(slug=slug)
+        task = get_object_or_404(Task.objects.published(), slug=slug)
         redirect_to_upload = redirect("solutions:upload", slug=slug)
 
         if task.is_expired:
@@ -67,7 +59,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
 class SolutionListView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        task = get_published_task_or_404(slug=slug)
+        task = get_object_or_404(Task.objects.published(), slug=slug)
         solutions = Solution.objects \
             .filter(task=task, author=request.user) \
             .order_by("-id")[:5]
