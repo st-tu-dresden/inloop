@@ -1,3 +1,4 @@
+import string
 from pathlib import Path
 
 from django.conf import settings
@@ -8,6 +9,14 @@ from django.utils import timezone
 
 from inloop.tasks.models import Task
 
+hash_chars = string.digits + string.ascii_lowercase[:22]
+
+
+def hash32(obj):
+    """Map the given object to one of 32 possible characters."""
+    # take advantage of Python's string hashing
+    return hash_chars[hash(str(obj)) % 32]
+
 
 def get_upload_path(obj, filename):
     """
@@ -16,9 +25,11 @@ def get_upload_path(obj, filename):
     All files related to a specific solution will share a common base directory.
     """
     s = obj.solution
-    return "solutions/{year}/{slug}/{id}/{filename}".format_map({
+    return "solutions/{year}/{slug}/{hash}/{id}/{filename}".format_map({
         "year": s.submission_date.year,
         "slug": s.task.slug,
+        # another "random" level to avoid too many files per slug directory
+        "hash": hash32(s.author),
         "id": s.id,
         "filename": filename
     })
