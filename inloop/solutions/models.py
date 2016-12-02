@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Max
 from django.db.transaction import atomic
 from django.urls import reverse
 from django.utils import timezone
@@ -44,6 +45,10 @@ class Solution(models.Model):
     checker job.
     """
 
+    scoped_id = models.PositiveIntegerField(
+        help_text="Solution id unique for task and author",
+        editable=False
+    )
     submission_date = models.DateTimeField(
         help_text="When was the solution submitted?",
         auto_now_add=True
@@ -54,6 +59,10 @@ class Solution(models.Model):
 
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
+
+    class Meta:
+        unique_together = ("author", "scoped_id", "task")
+        index_together = ["author", "scoped_id", "task"]
 
     @property
     def path(self):
@@ -122,6 +131,15 @@ class Solution(models.Model):
         if self.submission_date + self.TIMEOUT < timezone.now():
             return "lost"
         return "pending"
+
+    @atomic
+    def save(self, *args, **kwargs):
+        if not self.scoped_id:
+            current_max = Solution.objects.filter(
+                author=self.author, task=self.task
+            ).aggregate(Max("scoped_id"))["scoped_id__max"]
+            self.scoped_id = (current_max or 0) + 1
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return "Solution #%d" % self.id
