@@ -42,8 +42,7 @@ def sendfile_nginx(request, path, document_root=None):
     response["X-Accel-Redirect"] = join(settings.SENDFILE_NGINX_URL, filename_rel)
 
     # we rely on nginx to set all approprioate headers (mime type, length, mod time etc.)
-    if 'Content-Type' in response:
-        del response['Content-Type']
+    del response['Content-Type']
 
     return response
 
