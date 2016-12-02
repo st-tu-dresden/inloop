@@ -20,19 +20,36 @@ class Category(models.Model):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def completed_tasks_for_user(self, user):
-        """Return tasks of this category a user has already solved."""
-        return self.task_set.filter(
-            solution__author=user,
-            solution__passed=True
-        ).distinct()
-
-    def published_tasks(self):
-        """Return tasks of this category that have already been published."""
-        return self.task_set.filter(pubdate__lt=timezone.now())
+    def completion_info(self, user):
+        return self.task_set.completion_info(user)
 
     def __str__(self):
         return self.name
+
+
+class TaskQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(pubdate__lt=timezone.now())
+
+    def completed_by(self, user):
+        return self.filter(solution__passed=True, solution__author=user).distinct()
+
+    def not_completed_by(self, user):
+        return self.exclude(solution__passed=True, solution__author=user).distinct()
+
+    def completion_info(self, user):
+        qs = self.published()
+        num_published = len(qs)
+        if num_published > 0:
+            num_completed = len(qs.completed_by(user))
+            progress = round(num_completed / num_published * 100)
+        else:
+            num_completed = progress = 0
+        return {
+            "num_completed": num_completed,
+            "num_published": num_published,
+            "progress": progress
+        }
 
 
 class TaskManager(models.Manager):
@@ -76,24 +93,29 @@ class Task(models.Model):
         blank=True
     )
 
-    objects = TaskManager()
+    objects = TaskManager.from_queryset(TaskQuerySet)()
 
+    @property
     def is_published(self):
         """Return True if the task is already visible to the users."""
         return timezone.now() > self.pubdate
 
+    @property
     def is_expired(self):
         """Return True if the task has passed its optional deadline."""
         return self.deadline and timezone.now() > self.deadline
+
+    def is_completed_by(self, user):
+        return self.id in Task.objects.completed_by(user).values_list("id", flat=True)
 
     @property
     def sluggable_title(self):
         """Return the title with anything between parentheses removed."""
         return re.sub(r'\(.*?\)', '', self.title)
 
-    def __str__(self):
-        return self.title
-
     def save(self, *args, **kwargs):
         self.slug = slugify(self.sluggable_title)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title

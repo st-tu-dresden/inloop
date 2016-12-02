@@ -5,7 +5,7 @@ from inloop.solutions.models import Solution, SolutionFile
 
 class SolutionFileInline(admin.StackedInline):
     model = SolutionFile
-    readonly_fields = ('filename', 'file')
+    readonly_fields = ('file',)
     max_num = 0
 
 

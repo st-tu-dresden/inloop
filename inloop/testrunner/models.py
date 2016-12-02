@@ -33,10 +33,6 @@ class TestResult(models.Model):
     runtime.admin_order_field = "time_taken"
     runtime.short_description = "Runtime (seconds)"
 
-    def __repr__(self):
-        return "<%s: solution_id=%r return_code=%r>" % \
-            (self.__class__.__name__, self.solution_id, self.return_code)
-
     def status(self):
         if self.return_code == 0:
             return "success"
@@ -45,6 +41,10 @@ class TestResult(models.Model):
         if self.return_code in (125, 126, 127):
             return "error"
         return "failure"
+
+    def __repr__(self):
+        return "<%s: solution_id=%r return_code=%r>" % \
+            (self.__class__.__name__, self.solution_id, self.return_code)
 
     def __str__(self):
         return "Result #%s" % self.id
