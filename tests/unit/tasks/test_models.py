@@ -22,12 +22,10 @@ class TaskTests(TaskData, TestCase):
         self.assertTrue(self.published_task1.is_published())
         self.assertFalse(self.unpublished_task1.is_published())
 
-    def test_invalid_inputs(self):
-        with self.assertRaises(ValidationError):
-            Task.objects.create(pubdate="abc")
-
-        with self.assertRaises(ValidationError):
-            Task.objects.create(deadline="abc")
+    def test_required_fields(self):
+        self.assertSetEqual(Task.objects.required_fields, {
+            "title", "description", "category", "pubdate", "system_name"
+        })
 
 
 class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
@@ -62,31 +60,40 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
         self.assertSequenceEqual(completed, [self.published_task1, self.published_task2])
 
 
-class TaskManagerTests(TestCase):
+class UpdateOrCreateRelatedTest(TestCase):
     def setUp(self):
-        self.manager = Task.objects
-        self.valid_json = {"title": "Test title", "category": "Lesson",
-                           "pubdate": "2015-05-01 13:37:00"}
+        self.data = {
+            "title": "Test title",
+            "category": "Beginner",
+            "pubdate": "2016-12-01 13:37:00+0100",
+            "description": "Task description"
+        }
 
-    def test_validate_empty(self):
-        with self.assertRaises(ValueError):
-            self.manager._validate(dict())
-
-    def test_validate_valid(self):
-        self.manager._validate(self.valid_json)
+    def test_create(self):
+        task = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
+        self.assertEqual(task.title, "Test title")
+        self.assertEqual(task.system_name, "TestTask")
+        self.assertEqual(task.category.name, "Beginner")
+        self.assertTrue(Category.objects.get(name="Beginner"))
 
     def test_update(self):
-        input = Task()
-        task = self.manager._update_task(input, self.valid_json)
+        task1 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
+        self.data["title"] = "Another title"
+        self.data["category"] = "Advanced"
+        task2 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
+        task1.refresh_from_db()
+        self.assertEqual(task1.id, task2.id)
+        self.assertEqual(task1.title, "Another title")
+        self.assertEqual(task1.category.name, "Advanced")
+        self.assertTrue(Category.objects.get(name="Beginner"))
+        self.assertTrue(Category.objects.get(name="Advanced"))
 
-        self.assertIs(task, input)
-        self.assertEqual(task.title, "Test title")
-        self.assertEqual(task.slug, "test-title")
-        self.assertEqual(task.category.name, "Lesson")
+    def test_invalid_date(self):
+        self.data["pubdate"] = "invalid"
+        with self.assertRaises(ValidationError):
+            Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
 
-        pubdate = task.pubdate.strftime("%Y-%m-%d %H:%M:%S")
-        self.assertEqual(pubdate, self.valid_json["pubdate"])
-
-    def test_save_task_with_valid_json(self):
-        task = Task.objects.get_or_create_json(self.valid_json, "Test title")
-        task.save()
+    def test_missing_data(self):
+        self.data.pop("title")
+        with self.assertRaises(ValidationError):
+            Task.objects.update_or_create_related(system_name="TestTask", data=self.data)

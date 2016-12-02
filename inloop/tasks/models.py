@@ -1,12 +1,9 @@
 import re
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-
-# XXX: dependency should be the other way around
-from inloop.gh_import.utils import parse_date
 
 
 class Category(models.Model):
@@ -38,34 +35,21 @@ class Category(models.Model):
 
 
 class TaskManager(models.Manager):
-    meta_required = ['title', 'category', 'pubdate']
+    @property
+    def required_fields(self):
+        def exclude_field(f):
+            return f.auto_created or f.blank or isinstance(f, models.SlugField)
+        return {x.name for x in Task._meta.get_fields() if not exclude_field(x)}
 
-    def get_or_create_json(self, json, name):
-        try:
-            task = self.get(system_name=name)
-        except ObjectDoesNotExist:
-            task = Task(system_name=name)
-        return self._update_task(task, json)
-
-    def _update_task(self, task, json):
-        self._validate(json)
-        task.title = json['title']
-        task.category, _ = Category.objects.get_or_create(name=json['category'])
-        task.pubdate = parse_date(json['pubdate'])
-        try:
-            task.deadline = parse_date(json['deadline'])
-        except KeyError:
-            task.deadline = None
-        task.save()
-        return task
-
-    def _validate(self, json):
-        missing = []
-        for meta_key in self.meta_required:
-            if meta_key not in json.keys():
-                missing.append(meta_key)
+    def update_or_create_related(self, data=None, **kwargs):
+        if not isinstance(data, dict):
+            raise ValueError("data must be a dict")
+        missing = self.required_fields - set(data) - set(kwargs)
         if missing:
-            raise ValueError("Missing metadata keys: %s" % ", ".join(missing))
+            raise ValidationError("Missing required fields: %s" % ", ".join(missing))
+        data["category"], _ = Category.objects.get_or_create(name=data["category"])
+        task, _ = self.update_or_create(defaults=data, **kwargs)
+        return task
 
 
 class Task(models.Model):
