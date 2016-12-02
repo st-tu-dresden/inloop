@@ -17,7 +17,7 @@
       <h2 class="panel-title">Login</h2>
     </div>
     <div class="panel-body">
-      <form method="post" action="{% url 'accounts:user_login' %}" accept-charset="utf-8">
+      <form method="post" action="{% url 'login' %}" accept-charset="utf-8">
         {% csrf_token %}
         <div class="form-group">
           <label for="username">Username</label>
@@ -26,7 +26,7 @@
         <div class="form-group">
           <label for="password">
             Password
-            <a href="{% url 'accounts:password_reset' %}" tabindex="4">(forgot your password?)</a>
+            {# <a href="{% url 'accounts:password_reset' %}" tabindex="4">(forgot your password?)</a> #}
           </label>
           <input class="form-control" type="password" id="password" name="password" tabindex="2">
         </div>
