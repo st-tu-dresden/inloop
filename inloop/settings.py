@@ -82,7 +82,6 @@ TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",
     "DIRS": [
         str(PACKAGE_DIR / "templates"),
-        str(PACKAGE_DIR / "accounts" / "templates"),
     ],
     "OPTIONS": {
         "loaders": [
