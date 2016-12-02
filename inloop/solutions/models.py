@@ -109,10 +109,6 @@ class Solution(models.Model):
     def get_absolute_url(self):
         return reverse("solutions:detail", kwargs={'solution_id': self.id})
 
-    def __repr__(self):
-        return "<%s: id=%r author=%r task=%r>" % \
-            (self.__class__.__name__, self.id, str(self.author), str(self.task))
-
     def status(self):
         """
         Query the status of this Solution.
@@ -140,6 +136,10 @@ class Solution(models.Model):
             ).aggregate(Max("scoped_id"))["scoped_id__max"]
             self.scoped_id = (current_max or 0) + 1
         return super().save(*args, **kwargs)
+
+    def __repr__(self):
+        return "<%s: id=%r author=%r task=%r>" % \
+            (self.__class__.__name__, self.id, str(self.author), str(self.task))
 
     def __str__(self):
         return "Solution #%d" % self.id

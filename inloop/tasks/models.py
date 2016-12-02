@@ -89,9 +89,9 @@ class Task(models.Model):
         """Return the title with anything between parentheses removed."""
         return re.sub(r'\(.*?\)', '', self.title)
 
-    def __str__(self):
-        return self.title
-
     def save(self, *args, **kwargs):
         self.slug = slugify(self.sluggable_title)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
