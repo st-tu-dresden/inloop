@@ -30,8 +30,36 @@ class Category(models.Model):
         """Return tasks of this category that have already been published."""
         return self.task_set.filter(pubdate__lt=timezone.now())
 
+    def completion_info(self, user):
+        return self.task_set.completion_info(user)
+
     def __str__(self):
         return self.name
+
+
+class TaskQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(pubdate__lt=timezone.now())
+
+    def completed_by(self, user):
+        return self.filter(solution__passed=True, solution__author=user).distinct()
+
+    def not_completed_by(self, user):
+        return self.exclude(solution__passed=True, solution__author=user).distinct()
+
+    def completion_info(self, user):
+        qs = self.published()
+        num_published = len(qs)
+        if num_published > 0:
+            num_completed = len(qs.completed_by(user))
+            progress = round(num_completed / num_published * 100)
+        else:
+            num_completed = progress = 0
+        return {
+            "num_completed": num_completed,
+            "num_published": num_published,
+            "progress": progress
+        }
 
 
 class TaskManager(models.Manager):
@@ -74,7 +102,7 @@ class Task(models.Model):
         blank=True
     )
 
-    objects = TaskManager()
+    objects = TaskManager.from_queryset(TaskQuerySet)()
 
     @property
     def is_published(self):
@@ -85,6 +113,9 @@ class Task(models.Model):
     def is_expired(self):
         """Return True if the task has passed its optional deadline."""
         return self.deadline and timezone.now() > self.deadline
+
+    def is_completed_by(self, user):
+        return self.id in Task.objects.completed_by(user).values_list("id", flat=True)
 
     @property
     def sluggable_title(self):
