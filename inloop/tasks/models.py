@@ -3,6 +3,7 @@ import re
 from django.core.validators import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 
 
@@ -35,7 +36,7 @@ class Category(models.Model):
 
 
 class TaskManager(models.Manager):
-    @property
+    @cached_property
     def required_fields(self):
         def exclude_field(f):
             return f.auto_created or f.blank or isinstance(f, models.SlugField)
@@ -47,8 +48,9 @@ class TaskManager(models.Manager):
         missing = self.required_fields - set(data) - set(kwargs)
         if missing:
             raise ValidationError("Missing required fields: %s" % ", ".join(missing))
-        data["category"], _ = Category.objects.get_or_create(name=data["category"])
-        task, _ = self.update_or_create(defaults=data, **kwargs)
+        clean_data = {k: v for k, v in data.items() if k in self.required_fields}
+        clean_data["category"], _ = Category.objects.get_or_create(name=clean_data["category"])
+        task, _ = self.update_or_create(defaults=clean_data, **kwargs)
         return task
 
 

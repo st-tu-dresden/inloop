@@ -97,3 +97,7 @@ class UpdateOrCreateRelatedTest(TestCase):
         self.data.pop("title")
         with self.assertRaises(ValidationError):
             Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
+
+    def test_invalid_key(self):
+        self.data["invalid_key"] = "invalid"
+        Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
