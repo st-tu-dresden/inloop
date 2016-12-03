@@ -4,6 +4,29 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase
 
+from inloop.accounts.forms import StudentDetailsForm
+from inloop.accounts.models import Course, StudentDetails
+
+from tests.unit.accounts.mixins import SimpleAccountsData
+
+
+class AccountModelsTest(SimpleAccountsData, TestCase):
+    def test_default_callable(self):
+        details = StudentDetails.objects.create(user=self.bob)
+        self.assertEqual(str(details), "bob")
+        self.assertEqual(str(details.course), "Other")
+        self.assertTrue(Course.objects.get(name="Other"))
+
+
+class StudentDetailsFormTest(TestCase):
+    def test_matnum_validation(self):
+        form1 = StudentDetailsForm(data={"matnum": "invalid"})
+        form2 = StudentDetailsForm(data={"matnum": ""})
+        form3 = StudentDetailsForm(data={"matnum": "1234567"})
+        self.assertIn("matnum", form1.errors)
+        self.assertNotIn("matnum", form2.errors)
+        self.assertNotIn("matnum", form3.errors)
+
 
 class RegistrationTests(TestCase):
     FORM_DATA = {
