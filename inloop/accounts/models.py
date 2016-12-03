@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -23,8 +24,10 @@ class StudentDetails(models.Model):
         verbose_name_plural = "Student details"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    matnum = models.CharField(blank=True, max_length=20)
+    matnum = models.CharField(blank=True, max_length=20, validators=[
+        RegexValidator(r'^[0-9]*$', "Please enter a numeric value or leave the field blank.")
+    ])
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.user.username
+        return str(self.user)

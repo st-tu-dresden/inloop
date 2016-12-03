@@ -1,51 +1,40 @@
-from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.urlresolvers import reverse_lazy
+from django.views import generic
 
 
-def success(request, message):
-    """Shortcut for displaying a success message to the user."""
-    return render(request, "accounts/message.html", {
-        "type": "success",
-        "message": message
-    })
+class PasswordChangeView(generic.FormView):
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy("accounts:profile")
+    template_name = "accounts/password_change_form.html"
+
+    def get_object(self):
+        return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Your password has been updated successfully.")
+        return super().form_valid(form)
 
 
-def failure(request, message):
-    """Shortcut for displaying a failure message to the user."""
-    return render(request, "accounts/message.html", {
-        "type": "danger",
-        "message": message
-    })
+class ProfileView(generic.View):
+    pass
 
 
-def user_login(request):
-    if request.user.is_authenticated:
-        return redirect('/')
-
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-
-        # returns user object if credentials are valid
-        user = authenticate(username=username, password=password)
-
-        if user:
-            if user.is_active:
-                login(request, user)
-                return redirect(settings.LOGIN_REDIRECT_URL)
-            else:
-                return failure(request, "Login not possible, your account is disabled.")
-        else:
-            return render(request, 'registration/login.html', {
-                'login_failed': True
-            })
-    else:
-        return render(request, 'registration/login.html')
+password_change = login_required(PasswordChangeView.as_view())
+profile = login_required(ProfileView.as_view())
 
 
-@login_required
-def user_logout(request):
-    logout(request)
-    return success(request, "You have been logged out. Bye!")
+def register(request):
+    pass
+
+
+def activate(request):
+    pass

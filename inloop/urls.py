@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
 from django.contrib.flatpages.views import flatpage
 
 from inloop.accounts import urls as account_urls
@@ -10,6 +11,8 @@ from inloop.tasks.views import index
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^login/$', login, name="login"),
+    url(r'^logout/$', logout, name="logout"),
     url(r'^solutions/', include(solution_urls)),
     url(r'^tasks/', include(task_urls)),
     url(r'^accounts/', include(account_urls)),

@@ -4,7 +4,7 @@
 <div class="center-box-sm">
   <h2>Hello, {% firstof user.first_name user.username %}!</h2>
   <p>You can view and update your profile information here.</p>
-  <form action="{% url 'accounts:user_profile' %}" method="post" accept-charset="utf-8">
+  <form action="{% url 'accounts:profile' %}" method="post" accept-charset="utf-8">
     {% csrf_token %}
 
     <!-- readonly fields -->
