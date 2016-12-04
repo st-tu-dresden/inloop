@@ -59,8 +59,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-LOGIN_REDIRECT_URL = reverse_lazy("index")
-LOGIN_URL = reverse_lazy("index")
+LOGIN_REDIRECT_URL = reverse_lazy("home")
+LOGIN_URL = reverse_lazy("home")
 
 ROOT_URLCONF = "inloop.urls"
 WSGI_APPLICATION = "inloop.wsgi.application"

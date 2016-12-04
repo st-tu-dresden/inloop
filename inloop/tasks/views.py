@@ -19,15 +19,12 @@ from inloop.common.sendfile import sendfile
 from inloop.tasks.models import Category, Task
 
 
+@login_required
 def index(request):
-    if request.user.is_anonymous:
-        return TemplateResponse(request, "registration/login.html", {"hide_login_link": True})
-
     categories = [
         (category, category.completion_info(request.user))
         for category in Category.objects.order_by("name")
     ]
-
     return TemplateResponse(request, "tasks/index.html", {"categories": categories})
 
 

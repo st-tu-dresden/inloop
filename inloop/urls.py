@@ -7,10 +7,10 @@ from inloop.accounts import urls as account_urls
 from inloop.gh_import import urls as github_urls
 from inloop.solutions import urls as solution_urls
 from inloop.tasks import urls as task_urls
-from inloop.tasks.views import index
+from inloop.views import home
 
 urlpatterns = [
-    url(r'^$', index, name='index'),
+    url(r'^$', home, name='home'),
     url(r'^login/$', login, name="login"),
     url(r'^logout/$', logout, name="logout"),
     url(r'^solutions/', include(solution_urls)),
