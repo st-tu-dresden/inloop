@@ -10,12 +10,9 @@ class PasswordChangeView(generic.FormView):
     success_url = reverse_lazy("accounts:profile")
     template_name = "accounts/password_change_form.html"
 
-    def get_object(self):
-        return self.request.user
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update(user=self.request.user)
+        kwargs["user"] = self.request.user
         return kwargs
 
     def form_valid(self, form):
