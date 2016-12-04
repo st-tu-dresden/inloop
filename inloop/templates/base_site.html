@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
 
 {% block navigation %}
 {% if user.is_authenticated %}
-  <li><a href="{% url 'index' %}">Home</a></li>
+  <li><a href="{% url 'home' %}">Home</a></li>
   <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
   {% for page in fpages %}
     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
@@ -11,10 +10,19 @@
   {% if user.is_superuser or user.is_staff %}
     <li><a href="{% url 'admin:index' %}">Management</a></li>
   {% endif %}
-  <li><a href="{% url 'logout' %}">Logout</a></li>
+  <li><a id="logout-link" href="{% url 'logout'}">Logout</a></li>
+  <form id="logout-form" method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+   </form>
+  <script>
+  document.getElementById("logout-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    document.getElementById("logout-form").submit();
+  });
+  </script>
 {% else %}
   {% if not hide_login_link %}
-  <li><a href="{% url 'index' %}">Login</a></li>
+  <li><a href="{% url 'login' %}">Login</a></li>
   {% endif %}
   <li><a href="{% url 'accounts:register' %}">Register</a></li>
   {% for page in fpages %}
