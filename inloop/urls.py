@@ -1,13 +1,13 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.views import login
 from django.contrib.flatpages.views import flatpage
 
 from inloop.accounts import urls as account_urls
 from inloop.gh_import import urls as github_urls
 from inloop.solutions import urls as solution_urls
 from inloop.tasks import urls as task_urls
-from inloop.views import home
+from inloop.views import home, logout
 
 urlpatterns = [
     url(r'^$', home, name='home'),
@@ -19,6 +19,8 @@ urlpatterns = [
     url(r'^solutions/', include(solution_urls)),
     url(r'^tasks/', include(task_urls)),
 
+    # explicitly override the admin logout url
+    url(r'^admin/logout/$', logout),
     url(r'^admin/', admin.site.urls),
 ]
 

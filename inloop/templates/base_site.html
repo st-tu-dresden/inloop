@@ -10,7 +10,16 @@
   {% if user.is_superuser or user.is_staff %}
     <li><a href="{% url 'admin:index' %}">Management</a></li>
   {% endif %}
-  <li><a href="{% url 'logout' %}">Logout</a></li>
+  <li><a id="logout-link" href="{% url 'logout'}">Logout</a></li>
+  <form id="logout-form" method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+   </form>
+  <script>
+  document.getElementById("logout-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    document.getElementById("logout-form").submit();
+  });
+  </script>
 {% else %}
   {% if not hide_login_link %}
   <li><a href="{% url 'login' %}">Login</a></li>
