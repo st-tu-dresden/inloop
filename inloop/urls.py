@@ -13,10 +13,12 @@ urlpatterns = [
     url(r'^$', home, name='home'),
     url(r'^login/$', login, name="login"),
     url(r'^logout/$', logout, name="logout"),
-    url(r'^solutions/', include(solution_urls)),
-    url(r'^tasks/', include(task_urls)),
+
     url(r'^accounts/', include(account_urls)),
     url(r'^github/', include(github_urls)),
+    url(r'^solutions/', include(solution_urls)),
+    url(r'^tasks/', include(task_urls)),
+
     url(r'^admin/', admin.site.urls),
 ]
 
