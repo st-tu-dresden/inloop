@@ -10,7 +10,7 @@
   {% if user.is_superuser or user.is_staff %}
     <li><a href="{% url 'admin:index' %}">Management</a></li>
   {% endif %}
-  <li><a id="logout-link" href="{% url 'logout'}">Logout</a></li>
+  <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
   <form id="logout-form" method="post" action="{% url 'logout' %}">
     {% csrf_token %}
    </form>
