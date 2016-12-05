@@ -1,6 +1,7 @@
 django-environ
 django-extensions
 django-redis
+django-widget-tweaks
 Django>=1.10,<=1.10.99
 huey>=1.2.0
 Markdown>=2.6.7
