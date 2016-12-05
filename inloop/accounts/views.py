@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse_lazy
@@ -23,6 +24,7 @@ class PasswordChangeView(generic.FormView):
     def form_valid(self, form):
         form.save()
         messages.success(self.request, "Your password has been updated successfully.")
+        update_session_auth_hash(self.request, form.user)
         return super().form_valid(form)
 
 
