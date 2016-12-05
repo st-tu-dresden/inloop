@@ -1,33 +1,12 @@
 {% extends 'base_site.html' %}
-{% block content %}
 
+{% block content %}
 <div class="center-box-sm">
   <h2>Hello, {% firstof user.first_name user.username %}!</h2>
   <p>You can view and update your profile information here.</p>
   <form action="{% url 'accounts:profile' %}" method="post" accept-charset="utf-8">
-    {% csrf_token %}
-
-    <!-- readonly fields -->
-    <div class="form-group">
-      <label for="username">Username:</label>
-      <input class="form-control" type="text" id="username"
-             placeholder="{{ user.username }}" readonly>
-    </div>
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input class="form-control" type="email" id="email"
-             placeholder="{{ user.email }}" readonly>
-    </div>
-    <!-- /readonly fields -->
-
-    {% for field in user_profile %}
-    <div class="form-group{% if field.errors %} has-error{% endif %}">
-      {{ field.label_tag }}
-      {{ field }}
-      {% if field.errors %}
-      <span class="help-block">{{ field.errors|first }}</span>
-      {% endif %}
-    </div>
+    {% for form in forms %}
+      {% include "includes/form.html" %}
     {% endfor %}
     <div class="form-group">
       <button type="submit" class="btn btn-primary" value="submit">
@@ -39,5 +18,4 @@
     </div>
   </form>
 </div>
-
 {% endblock %}
