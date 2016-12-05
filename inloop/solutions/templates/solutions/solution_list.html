@@ -6,13 +6,13 @@
 {% if solutions %}
 <div class="list-group">
 {% for solution in solutions %}
-  <a class="list-group-item" href="{% url 'solutions:detail' solution.id %}">
+  <a class="list-group-item" href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">
 
     <div class="solutionstatus">
       <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
     </div>
 
-    <h4 class="list-group-item-heading">#{{ solution.id }}</h4>
+    <h4 class="list-group-item-heading">#{{ solution.scoped_id }}</h4>
     <p class="list-group-item-text">
       Submitted
       <time class="timeago" datetime="{{ solution.submission_date.isoformat }}">

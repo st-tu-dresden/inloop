@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import View
@@ -13,8 +13,8 @@ from inloop.testrunner.tasks import check_solution
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
-    def get(self, request, solution_id):
-        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+    def get(self, request, id):
+        solution = get_object_or_404(Solution, pk=id, author=request.user)
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
 
 
@@ -61,6 +61,7 @@ class SolutionListView(LoginRequiredMixin, View):
     def get(self, request, slug):
         task = get_object_or_404(Task.objects.published(), slug=slug)
         solutions = Solution.objects \
+            .select_related("task") \
             .filter(task=task, author=request.user) \
             .order_by("-id")[:5]
         return TemplateResponse(request, "solutions/solution_list.html", {
@@ -71,11 +72,18 @@ class SolutionListView(LoginRequiredMixin, View):
 
 
 class SolutionDetailView(LoginRequiredMixin, View):
-    def get(self, request, solution_id):
-        solution = get_object_or_404(Solution, pk=solution_id)
+    def get_context_data(self):
+        return {}
 
-        if not (solution.author == request.user or request.user.is_staff):
-            raise Http404()
+    def get_object(self, **kwargs):
+        task = Task.objects.published().filter(slug=kwargs["slug"])
+        self.solution = get_object_or_404(
+            Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
+        )
+        return self.solution
+
+    def get(self, request, **kwargs):
+        solution = self.get_object(**kwargs)
 
         if solution.status() == "pending":
             messages.info(request, "This solution is still being checked. Please try again later.")
@@ -96,8 +104,11 @@ class SolutionDetailView(LoginRequiredMixin, View):
             junit.xml_to_dict(xml) for xml in xml_reports
         ]
 
-        return TemplateResponse(request, "solutions/solution_detail.html", {
+        context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites
-        })
+        }
+        context.update(self.get_context_data())
+
+        return TemplateResponse(request, "solutions/solution_detail.html", context)
