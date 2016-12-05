@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -112,3 +112,17 @@ class SolutionDetailView(LoginRequiredMixin, View):
         context.update(self.get_context_data())
 
         return TemplateResponse(request, "solutions/solution_detail.html", context)
+
+
+class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self):
+        return {
+            "impersonate": self.request.user != self.solution.author
+        }
+
+    def get_object(self, **kwargs):
+        self.solution = get_object_or_404(Solution, pk=kwargs["id"])
+        return self.solution

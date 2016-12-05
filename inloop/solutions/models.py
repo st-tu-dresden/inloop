@@ -107,7 +107,7 @@ class Solution(models.Model):
         return result
 
     def get_absolute_url(self):
-        return reverse("solutions:detail", kwargs={'solution_id': self.id})
+        return reverse("solutions:staffdetail", kwargs={'id': self.id})
 
     def status(self):
         """

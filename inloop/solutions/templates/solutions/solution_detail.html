@@ -13,6 +13,14 @@
 {% endwith %}
 {# /Breadcrumb #}
 
+{% if impersonate %}
+<div class="alert alert-info }}" role="alert">
+  {% with author=solution.author %}
+  You are viewing a solution authored by
+  <a href="mailto:{{ author.email }}">{% firstof author.get_full_name author.get_username %}</a>.
+  {% endwith %}
+</div>
+{% endif %}
 
 <ul class="nav nav-tabs" role="tablist">
   <li role="presentation" class="active">
