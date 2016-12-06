@@ -1,7 +1,10 @@
+import heapq
 import re
 
 from django.core.validators import ValidationError
 from django.db import models
+from django.db.models.expressions import Value
+from django.db.models.fields import BooleanField
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -36,6 +39,19 @@ class TaskQuerySet(models.QuerySet):
 
     def not_completed_by(self, user):
         return self.exclude(solution__passed=True, solution__author=user).distinct()
+
+    def completed_by_values(self, user, sort_field):
+        qs = self.order_by(sort_field)
+        qs1 = qs.completed_by(user).annotate(completed=Value(True, BooleanField()))
+        qs2 = qs.not_completed_by(user).annotate(completed=Value(False, BooleanField()))
+
+        reverse = sort_field.startswith('-')
+        sort_field = sort_field.lstrip('-')
+
+        def keyfunc(task):
+            return getattr(task, sort_field)
+
+        return list(heapq.merge(qs1, qs2, key=keyfunc, reverse=reverse))
 
     def completion_info(self, user):
         qs = self.published()

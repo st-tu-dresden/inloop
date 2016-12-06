@@ -31,7 +31,7 @@ def index(request):
 @login_required
 def category(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    tasks = category.task_set.published().order_by("pubdate", "title")
+    tasks = category.task_set.published().completed_by_values(request.user, "title")
     have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(request, 'tasks/category.html', {
         'category': category,
