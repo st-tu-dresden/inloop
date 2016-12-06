@@ -1,0 +1,32 @@
+{% extends "base_site.html" %}
+
+{% block title %}Set a new password{% endblock %}
+
+{% block messages %}
+{{ block.super }}
+{% include "includes/form_message.html" %}
+{% endblock %}
+
+{% block content %}
+{% if invalid %}
+<div class="center-box-md">
+  <p>
+    Sorry, this recovery link is invalid. You have to
+    <a href="{% url 'accounts:recover' %}">request a new one</a>.
+  </p>
+</div>
+{% else %}
+<div class="center-box-md panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Set a new password</h2>
+  </div>
+  <div class="panel-body">
+    <p>Enter your new password twice to complete recovery.</p>
+    <form action="{{ url }}" method="post" accept-charset="utf-8">
+      {% include "includes/form.html" %}
+      <button type="submit" class="btn btn-success">Save</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

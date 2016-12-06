@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, TemplateView, View
 
+from password_reset.views import Recover, RecoverDone, Reset, ResetDone
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
                                               RegistrationView as HmacRegistrationView)
 from registration.forms import RegistrationFormUniqueEmail
@@ -101,3 +102,10 @@ activation_complete = TemplateView.as_view(template_name="accounts/activation_co
 signup = SignupView.as_view()
 signup_closed = TemplateView.as_view(template_name="accounts/signup_closed.html")
 signup_complete = TemplateView.as_view(template_name="accounts/signup_complete.html")
+
+recover = Recover.as_view(success_url_name="accounts:recover_done")
+recover_done = RecoverDone.as_view()
+
+# use the contrib.auth form, since it supports the new PASSWORD_VALIDATORS setting
+reset = Reset.as_view(form_class=SetPasswordForm, success_url=reverse_lazy("accounts:reset_done"))
+reset_done = ResetDone.as_view()

@@ -1,5 +1,6 @@
 django-environ
 django-extensions
+django-password-reset
 django-redis
 django-registration
 django-widget-tweaks

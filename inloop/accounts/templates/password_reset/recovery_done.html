@@ -1,0 +1,11 @@
+{% extends "base_site.html" %}
+
+{% block title %}Recovery completed{% endblock %}
+
+{% block content %}
+<div class="center-box-md">
+  <p>
+    Your new password has been saved. You can now <a href="{% url 'login' %}">login</a>.
+  </p>
+</div>
+{% endblock %}
