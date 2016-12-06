@@ -167,3 +167,5 @@ GIT_ROOT = str(env("GIT_ROOT", cast=Path, default=BASE_DIR.parent / "inloop-task
 GIT_SSH_URL = env("GIT_URL", default="")
 GIT_SSH_KEY = None
 GIT_BRANCH = env("GIT_BRANCH", default="master")
+
+ACCOUNT_ACTIVATION_DAYS = 7

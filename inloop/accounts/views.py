@@ -4,8 +4,12 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
-from django.views.generic import FormView, View
+from django.urls import reverse, reverse_lazy
+from django.views.generic import FormView, TemplateView, View
+
+from registration.backends.hmac.views import (ActivationView as HmacActivationView,
+                                              RegistrationView as HmacRegistrationView)
+from registration.forms import RegistrationFormUniqueEmail
 
 from inloop.accounts.forms import StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
@@ -69,9 +73,31 @@ password_change = PasswordChangeView.as_view()
 profile = ProfileView.as_view()
 
 
-def register(request):
-    pass
+class SignupView(HmacRegistrationView):
+    template_name = "accounts/signup_form.html"
+    form_class = RegistrationFormUniqueEmail
+    email_body_template = "accounts/activation_email.txt"
+    email_subject_template = "accounts/activation_email_subject.txt"
+    disallowed_url = reverse_lazy("accounts:signup_closed")
+
+    def get_email_context(self, activation_key):
+        context = super().get_email_context(activation_key)
+        context["request"] = self.request
+        return context
+
+    def get_success_url(self, user):
+        return reverse("accounts:signup_complete")
 
 
-def activate(request):
-    pass
+class ActivationView(HmacActivationView):
+    template_name = "accounts/activation_failed.html"
+
+    def get_success_url(self, user):
+        return reverse("accounts:activation_complete")
+
+
+activate = ActivationView.as_view()
+activation_complete = TemplateView.as_view(template_name="accounts/activation_complete.html")
+signup = SignupView.as_view()
+signup_closed = TemplateView.as_view(template_name="accounts/signup_closed.html")
+signup_complete = TemplateView.as_view(template_name="accounts/signup_complete.html")

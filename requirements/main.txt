@@ -1,6 +1,7 @@
 django-environ==0.4.1
 django-extensions==1.7.5
 django-redis==4.6.0
+django-registration==2.2
 django-widget-tweaks==1.4.1
 Django==1.10.3
 huey==1.2.2
