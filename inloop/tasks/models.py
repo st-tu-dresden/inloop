@@ -1,4 +1,4 @@
-import heapq
+import itertools
 import re
 
 from django.core.validators import ValidationError
@@ -51,7 +51,7 @@ class TaskQuerySet(models.QuerySet):
         def keyfunc(task):
             return getattr(task, sort_field)
 
-        return list(heapq.merge(qs1, qs2, key=keyfunc, reverse=reverse))
+        return sorted(itertools.chain(qs1, qs2), key=keyfunc, reverse=reverse)
 
     def completion_info(self, user):
         qs = self.published()
