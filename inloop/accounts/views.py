@@ -1,17 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.views import generic
+from django.urls import reverse_lazy
+from django.views.generic import FormView, View
 
 from inloop.accounts.forms import StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
 
 
-class PasswordChangeView(generic.FormView):
+class PasswordChangeView(LoginRequiredMixin, FormView):
     form_class = PasswordChangeForm
     success_url = reverse_lazy("accounts:profile")
     template_name = "accounts/password_change_form.html"
@@ -28,7 +28,7 @@ class PasswordChangeView(generic.FormView):
         return super().form_valid(form)
 
 
-class ProfileView(generic.View):
+class ProfileView(LoginRequiredMixin, View):
     template_name = "accounts/profile_form.html"
     success_url = reverse_lazy("accounts:profile")
 
@@ -65,8 +65,8 @@ class ProfileView(generic.View):
         return HttpResponseRedirect(self.success_url)
 
 
-password_change = login_required(PasswordChangeView.as_view())
-profile = login_required(ProfileView.as_view())
+password_change = PasswordChangeView.as_view()
+profile = ProfileView.as_view()
 
 
 def register(request):
