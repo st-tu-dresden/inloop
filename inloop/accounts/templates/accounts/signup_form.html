@@ -1,0 +1,23 @@
+{% extends "base_site.html" %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block messages %}
+{{ block.super }}
+{% include "includes/form_message.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="center-box-md panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Sign up</h2>
+  </div>
+  <div class="panel-body">
+    <p>Please complete the following form to create your account. All fields are required.</p>
+    <form action="{% url 'accounts:signup' %}" method="post" accept-charset="utf-8">
+      {% include "includes/form.html" %}
+      <button type="submit" class="btn btn-success">Create account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

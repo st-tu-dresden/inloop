@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.views import login
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
-from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
 
@@ -10,7 +10,7 @@ from inloop.tasks.views import index as task_index
 
 def home(request):
     if request.user.is_anonymous:
-        return TemplateResponse(request, "registration/login.html", {"hide_login_link": True})
+        return login(request, extra_context={"hide_login_link": True})
     return task_index(request)
 
 

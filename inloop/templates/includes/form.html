@@ -1,0 +1,17 @@
+{% load widget_tweaks %}
+{% csrf_token %}
+{% for field in form %}
+{% spaceless %}
+<div class="form-group{% if field.errors %} has-error{% endif %}">
+  {{ field.label_tag }}
+  {% if forloop.first %}
+    {% render_field field class="form-control" autofocus="" %}
+  {% else %}
+    {% render_field field class="form-control" %}
+  {% endif %}
+  {% if field.errors %}
+    <span class="help-block">{{ field.errors|first }}</span>
+  {% endif %}
+</div>
+{% endspaceless %}
+{% endfor %}

@@ -11,7 +11,9 @@ from inloop.views import home, logout
 
 urlpatterns = [
     url(r'^$', home, name='home'),
-    url(r'^login/$', login, name="login"),
+    url(r'^login/$', login, name="login", kwargs={
+        "extra_context": {"hide_login_link": True}
+    }),
     url(r'^logout/$', logout, name="logout"),
 
     url(r'^account/', include(account_urls)),

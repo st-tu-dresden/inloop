@@ -10,7 +10,7 @@
   {% if user.is_superuser or user.is_staff %}
     <li><a href="{% url 'admin:index' %}">Management</a></li>
   {% endif %}
-  <li><a id="logout-link" href="{% url 'logout'}">Logout</a></li>
+  <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
   <form id="logout-form" method="post" action="{% url 'logout' %}">
     {% csrf_token %}
    </form>
@@ -24,7 +24,7 @@
   {% if not hide_login_link %}
   <li><a href="{% url 'login' %}">Login</a></li>
   {% endif %}
-  <li><a href="{% url 'accounts:register' %}">Register</a></li>
+  <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
   {% for page in fpages %}
     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
   {% endfor %}

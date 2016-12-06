@@ -1,4 +1,4 @@
-from unittest import skip
+import re
 
 from django.contrib.sites.models import Site
 from django.core import mail
@@ -28,22 +28,37 @@ class StudentDetailsFormTest(TestCase):
         self.assertNotIn("matnum", form3.errors)
 
 
-class RegistrationTests(TestCase):
-    FORM_DATA = {
+class SignupTest(TestCase):
+    form_data = {
         "username": "bob",
         "email": "bob@example.org",
-        "password1": "Passw0rd!",
-        "password2": "Passw0rd!",
+        "password1": "secret",
+        "password2": "secret",
     }
 
-    @skip
-    def test_registration(self):
-        """Test if a complete activation email is sent after a successful registration."""
-        self.assertEqual(Site.objects.get_current().domain, "example.com")
-        response = self.client.post("/accounts/register/", data=self.FORM_DATA, follow=True)
-        activation_mail = mail.outbox[0]
-        link_pattern = r"\bhttp://example\.com/accounts/activate/[0-9a-zA-Z]{40}\b"
-        self.assertContains(response, "Your activation mail has been sent.")
-        self.assertEqual(activation_mail.subject, "Activate your account on example.com")
-        self.assertIn("Hello John,", activation_mail.body)
-        self.assertRegex(activation_mail.body, link_pattern)
+    @classmethod
+    def setUpTestData(cls):
+        site = Site.objects.get_current()
+        site.name = "INLOOP"
+        site.domain = "example.com"
+        site.save()
+
+    def test_signup_workflow(self):
+        response = self.client.post("/account/signup/", data=self.form_data, follow=True)
+        self.assertContains(response, "Please check your mailbox.")
+
+        # login should not be possible at this point
+        self.assertFalse(self.client.login(username="bob", password="secret"))
+
+        subject, body = mail.outbox[0].subject, mail.outbox[0].body
+        self.assertEqual(subject, "Activate your account on example.com")
+        self.assertIn("Hello bob,", body)
+        self.assertIn("The INLOOP team", body)
+
+        link = re.search(r"https?://example\.com/account/activate/[-:\w]+/", body)
+        self.assertIsNotNone(link)
+
+        url = re.sub(r"https?://example\.com", "", link.group())
+        response = self.client.get(url, follow=True)
+        self.assertContains(response, "Your account has been activated.")
+        self.assertTrue(self.client.login(username="bob", password="secret"))

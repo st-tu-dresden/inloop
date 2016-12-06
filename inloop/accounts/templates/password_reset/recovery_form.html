@@ -1,0 +1,23 @@
+{% extends "base_site.html" %}
+
+{% block title %}Account recovery{% endblock %}
+
+{% block messages %}
+{{ block.super }}
+{% include "includes/form_message.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="center-box-md panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Account recovery</h2>
+  </div>
+  <div class="panel-body">
+    <p>Please enter your username or email.</p>
+    <form action="{% url 'accounts:recover' %}" method="post" accept-charset="utf-8">
+      {% include "includes/form.html" %}
+      <button type="submit" class="btn btn-success">Recover my account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
