@@ -1,0 +1,11 @@
+{% extends "base_site.html" %}
+
+{% block title %}Account activated{% endblock %}
+
+{% block content %}
+<div class="center-box-md">
+  <p>
+    Your account has been activated. You can now <a href="{% url 'login' %}">login</a>.
+  </p>
+</div>
+{% endblock %}

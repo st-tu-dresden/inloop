@@ -1,8 +1,8 @@
-Hello {% firstof user.first_name user.username %},
+Hello {{ user }},
 
-please click the following link within the next week to activate your account:
+please click the following link within the next {{ expiration_days }} days to activate your account:
 
-  {{ request.scheme }}://{{ site.domain }}{% url 'accounts:user_activation' user.activation_key %}
+  {{ request.scheme }}://{{ site.domain }}{% url 'accounts:activate' activation_key %}
 
 We're looking forward to seeing you on the site!
 
