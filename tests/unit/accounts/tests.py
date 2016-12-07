@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from constance.test import override_config
 
-from inloop.accounts.forms import StudentDetailsForm, SignupForm
+from inloop.accounts.forms import SignupForm, StudentDetailsForm
 from inloop.accounts.models import Course, StudentDetails
 
 from tests.unit.accounts.mixins import SimpleAccountsData
