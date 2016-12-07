@@ -7,12 +7,15 @@ for a list and description of available options.
 """
 
 import sys
+from collections import OrderedDict
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 
 from environ import Env
+
+from inloop.accounts import constance as accounts_constance
 
 if sys.getfilesystemencoding() != "utf-8":
     raise ImproperlyConfigured("LANG must be a utf-8 locale")
@@ -181,4 +184,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CONSTANCE_REDIS_CONNECTION = env("REDIS_URL")
 
-CONSTANCE_CONFIG = {}
+CONSTANCE_CONFIG = OrderedDict()
+CONSTANCE_CONFIG_FIELDSETS = {}
+CONSTANCE_ADDITIONAL_FIELDS = {}
+
+CONSTANCE_CONFIG.update(accounts_constance.config)
+CONSTANCE_CONFIG_FIELDSETS.update(accounts_constance.fieldsets)
+CONSTANCE_ADDITIONAL_FIELDS.update(accounts_constance.fields)

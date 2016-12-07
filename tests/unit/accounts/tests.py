@@ -4,7 +4,9 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase
 
-from inloop.accounts.forms import StudentDetailsForm
+from constance.test import override_config
+
+from inloop.accounts.forms import StudentDetailsForm, SignupForm
 from inloop.accounts.models import Course, StudentDetails
 
 from tests.unit.accounts.mixins import SimpleAccountsData
@@ -26,6 +28,23 @@ class StudentDetailsFormTest(TestCase):
         self.assertIn("matnum", form1.errors)
         self.assertNotIn("matnum", form2.errors)
         self.assertNotIn("matnum", form3.errors)
+
+
+@override_config(
+    EMAIL_PATTERN=r"@example\.org\Z",
+    EMAIL_ERROR_MESSAGE="This address does not end in `@example.org`."
+)
+class SignupFormTest(TestCase):
+    def test_submit_invalid_email(self):
+        form = SignupForm(data={"email": "bob@example.com"})
+        self.assertIn("email", form.errors)
+        self.assertSequenceEqual(form.errors["email"], [
+            "<p>This address does not end in <code>@example.org</code>.</p>"
+        ])
+
+    def test_submit_valid_email(self):
+        form = SignupForm(data={"email": "bob@example.org"})
+        self.assertNotIn("email", form.errors)
 
 
 class SignupTest(TestCase):
