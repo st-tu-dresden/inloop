@@ -9,7 +9,9 @@
   {% else %}
     {% render_field field class="form-control" %}
   {% endif %}
-  {% if field.errors %}
+  {% if field.errors|length > 1 %}
+    <span class="help-block">{{ field.errors }}</span>
+  {% elif field.errors %}
     <span class="help-block">{{ field.errors|first }}</span>
   {% endif %}
 </div>
