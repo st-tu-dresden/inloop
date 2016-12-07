@@ -13,6 +13,8 @@
     <span class="help-block">{{ field.errors }}</span>
   {% elif field.errors %}
     <span class="help-block">{{ field.errors|first }}</span>
+  {% elif field.help_text %}
+    <span class="help-block">{{ field.help_text|safe }}</span>
   {% endif %}
 </div>
 {% endspaceless %}
