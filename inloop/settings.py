@@ -169,3 +169,11 @@ GIT_SSH_KEY = None
 GIT_BRANCH = env("GIT_BRANCH", default="master")
 
 ACCOUNT_ACTIVATION_DAYS = 7
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+     "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    # NumericPasswordValidator skipped (see OWASP presentation https://youtu.be/zUM7i8fsf0g)
+]
