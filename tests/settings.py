@@ -24,3 +24,5 @@ CACHES = {
 INSTALLED_APPS += [     # noqa
     "tests.unit.context_processors",
 ]
+
+CONSTANCE_BACKEND = "tests.backends.ConstanceDictBackend"
