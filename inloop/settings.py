@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
 
+    "constance",
     "django_extensions",
     "huey.contrib.djhuey",
     "widget_tweaks",
@@ -177,3 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     # NumericPasswordValidator skipped (see OWASP presentation https://youtu.be/zUM7i8fsf0g)
 ]
+
+CONSTANCE_REDIS_CONNECTION = env("REDIS_URL")
+
+CONSTANCE_CONFIG = {}
