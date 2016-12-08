@@ -28,6 +28,9 @@ a shell:
     # install required Python libraries
     pip install -r requirements/main.txt -r requirements/dev.txt
 
+    # use the bundled .env file suitable for test and development
+    cp .env_develop .env
+
     # initialize the database (uses SQLite locally)
     ./manage.py migrate
 
@@ -35,7 +38,6 @@ a shell:
     ./manage.py createsuperuser
 
     # run and monitor all required components in developer mode
-    # (this also executes unit tests if changes are detected)
     honcho start
 
 The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.

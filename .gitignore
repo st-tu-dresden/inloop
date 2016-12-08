@@ -23,4 +23,6 @@ node_modules/
 htmlcov/
 media/
 .ssh_deploy_key_*
-local_conf.py
+
+# top-level .env file
+/.env
