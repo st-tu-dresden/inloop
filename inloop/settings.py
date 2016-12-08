@@ -64,6 +64,7 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGIN_URL = reverse_lazy("home")
 
 ROOT_URLCONF = "inloop.urls"
+APPEND_SLASH = False
 WSGI_APPLICATION = "inloop.wsgi.application"
 
 if DEBUG and env.bool("DJDT", default=False):
