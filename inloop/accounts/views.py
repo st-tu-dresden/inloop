@@ -7,6 +7,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, TemplateView, View
 
+from constance import config
 from password_reset.views import Recover, RecoverDone, Reset, ResetDone
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
                                               RegistrationView as HmacRegistrationView)
@@ -93,6 +94,9 @@ class SignupView(HmacRegistrationView):
 
     def get_success_url(self, user):
         return reverse("accounts:signup_complete")
+
+    def registration_allowed(self):
+        return config.SIGNUP_ALLOWED
 
 
 class ActivationView(HmacActivationView):

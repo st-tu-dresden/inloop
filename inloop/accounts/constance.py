@@ -6,6 +6,7 @@ from django.utils.text import mark_safe
 from inloop.common.validators import RegexSyntaxValidator
 
 config = OrderedDict()
+config["SIGNUP_ALLOWED"] = (False, mark_safe("Allow or disallow new users to sign up."))
 config["EMAIL_PATTERN"] = ("", mark_safe(
     "A Python regular expression used to test email addresses during sign up. The "
     "regex is compiled using <code>re.VERBOSE</code>, which means you can use "
@@ -19,7 +20,8 @@ config["EMAIL_ERROR_MESSAGE"] = ("", mark_safe(
 ))
 
 fieldsets = {
-    "Signup form email validation": ("EMAIL_PATTERN", "EMAIL_HELP_TEXT", "EMAIL_ERROR_MESSAGE")
+    "Signup form settings": ("SIGNUP_ALLOWED", "EMAIL_PATTERN",
+                             "EMAIL_HELP_TEXT", "EMAIL_ERROR_MESSAGE")
 }
 
 fields = {
