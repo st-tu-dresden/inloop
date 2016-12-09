@@ -81,6 +81,11 @@ class SignupView(HmacRegistrationView):
     email_subject_template = "accounts/activation_email_subject.txt"
     disallowed_url = reverse_lazy("accounts:signup_closed")
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("home"))
+        return super().dispatch(request, *args, **kwargs)
+
     def get_email_context(self, activation_key):
         context = super().get_email_context(activation_key)
         context["request"] = self.request
