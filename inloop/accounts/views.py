@@ -10,9 +10,9 @@ from django.views.generic import FormView, TemplateView, View
 from password_reset.views import Recover, RecoverDone, Reset, ResetDone
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
                                               RegistrationView as HmacRegistrationView)
-from registration.forms import RegistrationFormUniqueEmail
 
-from inloop.accounts.forms import StudentDetailsForm, UserChangeForm
+from inloop.accounts.forms import (SignupForm, StudentDetailsForm,
+                                   UserChangeForm)
 from inloop.accounts.models import StudentDetails
 
 
@@ -76,7 +76,7 @@ profile = ProfileView.as_view()
 
 class SignupView(HmacRegistrationView):
     template_name = "accounts/signup_form.html"
-    form_class = RegistrationFormUniqueEmail
+    form_class = SignupForm
     email_body_template = "accounts/activation_email.txt"
     email_subject_template = "accounts/activation_email_subject.txt"
     disallowed_url = reverse_lazy("accounts:signup_closed")

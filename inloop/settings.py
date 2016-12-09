@@ -7,12 +7,15 @@ for a list and description of available options.
 """
 
 import sys
+from collections import OrderedDict
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 
 from environ import Env
+
+from inloop.accounts import constance as accounts_constance
 
 if sys.getfilesystemencoding() != "utf-8":
     raise ImproperlyConfigured("LANG must be a utf-8 locale")
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
 
+    "constance",
     "django_extensions",
     "huey.contrib.djhuey",
     "widget_tweaks",
@@ -170,3 +174,21 @@ GIT_SSH_KEY = None
 GIT_BRANCH = env("GIT_BRANCH", default="master")
 
 ACCOUNT_ACTIVATION_DAYS = 7
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+     "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    # NumericPasswordValidator skipped (see OWASP presentation https://youtu.be/zUM7i8fsf0g)
+]
+
+CONSTANCE_REDIS_CONNECTION = env("REDIS_URL")
+
+CONSTANCE_CONFIG = OrderedDict()
+CONSTANCE_CONFIG_FIELDSETS = {}
+CONSTANCE_ADDITIONAL_FIELDS = {}
+
+CONSTANCE_CONFIG.update(accounts_constance.config)
+CONSTANCE_CONFIG_FIELDSETS.update(accounts_constance.fieldsets)
+CONSTANCE_ADDITIONAL_FIELDS.update(accounts_constance.fields)

@@ -13,6 +13,10 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.SHA1PasswordHasher",
 ]
 
+AUTH_PASSWORD_VALIDATORS = []
+
+CONSTANCE_BACKEND = "tests.backends.ConstanceDictBackend"
+
 INSTALLED_APPS += [     # noqa
     "tests.unit.context_processors",
 ]
