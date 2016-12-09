@@ -13,12 +13,6 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.SHA1PasswordHasher",
 ]
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-    }
-}
-
 INSTALLED_APPS += [     # noqa
     "tests.unit.context_processors",
 ]
