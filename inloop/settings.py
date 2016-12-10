@@ -28,7 +28,7 @@ env = Env()
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = [host.strip() for host in env.list("ALLOWED_HOSTS")]
-INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS")]
+INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS", default="")]
 
 SITE_ID = 1
 
