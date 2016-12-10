@@ -10,13 +10,18 @@ class SetRemoteAddrFromForwardedFor:
     latter is set. This is useful if you're sitting behind a reverse proxy that
     causes each request's REMOTE_ADDR to be set to 127.0.0.1.
     """
-    def process_request(self, request):
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         try:
-            forwarded_for = request.META["HTTP_X_FORWARDED_FOR"]
-        except KeyError:
-            pass
-        else:
             # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
             # The client's IP will be the first one.
+            forwarded_for = request.META["HTTP_X_FORWARDED_FOR"]
             forwarded_for = forwarded_for.split(",")[0].strip()
             request.META["REMOTE_ADDR"] = forwarded_for
+        except KeyError:
+            pass
+
+        return self.get_response(request)
