@@ -16,12 +16,13 @@ class SetRemoteAddrFromForwardedFor:
 
     def __call__(self, request):
         try:
-            # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
-            # The client's IP will be the first one.
             forwarded_for = request.META["HTTP_X_FORWARDED_FOR"]
-            forwarded_for = forwarded_for.split(",")[0].strip()
-            request.META["REMOTE_ADDR"] = forwarded_for
         except KeyError:
             pass
+        else:
+            # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
+            # The client's IP will be the first one.
+            forwarded_for = forwarded_for.split(",")[0].strip()
+            request.META["REMOTE_ADDR"] = forwarded_for
 
         return self.get_response(request)
