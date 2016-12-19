@@ -66,6 +66,19 @@ Examples:
     ./manage.py test tests.unit
 
 
+### Tips and tricks
+
+Both `honcho` and the `manage.py` script read the git-ignored `.env` environment file
+used for the 12factor style configuration of INLOOP. As shown above you should just
+copy this file from `.env_develop`. In some cases, you may want to set additional
+environment variables such as:
+
+* `DJDT`: if set to a truth value, enable the `django-debug-toolbar`.
+* `REDIS_PORT`: use another port (defaults to 6379) for the Redis server, e.g.,
+  in case it is already used by another program on your computer.  If you do
+  this, don't forget to update both `CACHE_URL` and `REDIS_URL` as well.
+
+
 ### Dependencies
 
 In general you'll need:
