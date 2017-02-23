@@ -1,33 +1,29 @@
 sudo: false
-
 language: python
-
 python:
-  - 3.4
-  - 3.5
-
-cache: pip
-
+  - "3.4"
+  - "3.5"
 git:
   submodules: false
-
+  depth: 1
 services:
   - docker
-
+cache:
+  pip: true
+env:
+  - TARGET=lint
+  - TARGET=coveragetest
 install:
-  - pip install -r requirements/main.txt
-  - pip install -r requirements/test.txt -r requirements/lint.txt
-  - (cd tests/functional/testrunner && docker build -t inloop-integration-test .)
-  - mkdir -p .state
-
+  - pip install -U pip setuptools
+  - make install-deps
 before_script:
   - pip freeze
-  - docker --version
-
 script:
-  - flake8
-  - isort --check-only
-  - coverage run manage.py test --verbosity 2
-
+  - make $TARGET
 after_success:
-  - coverage report
+  - if [[ $TARGET == coveragetest ]]; then coverage report; fi
+matrix:
+  fast_finish: true
+  exclude:
+    - python: "3.4"
+      env: TARGET=lint
