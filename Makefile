@@ -22,4 +22,19 @@ install-deps:
 	mkdir -p .state
 	touch .state/docker
 
-.PHONY: default coveragetest lint install-deps
+deps:
+	pip install -U pip-tools
+	pip-compile --no-annotate --no-header --upgrade requirements/main.in >/dev/null
+	pip-compile --no-annotate --no-header --upgrade requirements/prod.in >/dev/null
+
+clean:
+	docker ps -q -f status=exited | xargs docker rm
+	docker images -q -f dangling=true | xargs docker rmi
+	find inloop tests -name "*.pyc" -delete
+	find inloop tests -name "__pycache__" -delete
+
+purge: clean
+	rm -rf .state
+	-docker rmi $(IMAGE)
+
+.PHONY: default coveragetest lint install-deps deps clean purge
