@@ -1,6 +1,10 @@
 IMAGE := inloop-integration-test
 SUITE := tests
 
+PYTHON := python3.5
+PYTAG  := $(shell echo $(PYTHON) | sed 's/thon//;s/\.//')
+VENV   := $(PWD)/.venvs/$(PYTAG)
+
 default:
 	@echo "Please specify a Makefile target."
 	@exit 1
@@ -17,13 +21,32 @@ install-deps:
 	pip install -r requirements/test.txt
 	pip install -r requirements/lint.txt
 
+install-tools:
+	pip install -r requirements/dev.txt
+
 .state/docker: tests/functional/testrunner/Dockerfile
 	docker build -t $(IMAGE) tests/functional/testrunner
 	mkdir -p .state
 	touch .state/docker
 
+virtualenv:
+	rm -rf $(VENV)
+	$(PYTHON) -m venv $(VENV)
+	$(VENV)/bin/pip install -U pip setuptools
+
+initdb:
+	mkdir -p .state
+	python manage.py migrate
+	python manage.py createsuperuser --username admin --email admin@localhost
+
+devenv: virtualenv
+	-cp -i .env_develop .env
+	PATH=$(VENV)/bin:$(PATH) make install-deps install-tools initdb
+	@echo
+	@echo "virtualenv created -- now run 'source $(VENV)/bin/activate'."
+	@echo
+
 deps:
-	pip install -U pip-tools
 	pip-compile --no-annotate --no-header --upgrade requirements/main.in >/dev/null
 	pip-compile --no-annotate --no-header --upgrade requirements/prod.in >/dev/null
 
@@ -34,7 +57,7 @@ clean:
 	find inloop tests -name "__pycache__" -delete
 
 purge: clean
-	rm -rf .state
+	rm -rf .state .venvs .env
 	-docker rmi $(IMAGE)
 
-.PHONY: default coveragetest lint install-deps deps clean purge
+.PHONY: default coveragetest lint install-deps install-tools virtualenv initdb devenv deps clean purge
