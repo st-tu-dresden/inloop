@@ -3,6 +3,7 @@ language: python
 python:
   - "3.4"
   - "3.5"
+  - "3.6"
 git:
   submodules: false
   depth: 1
@@ -24,6 +25,10 @@ after_success:
   - if [[ $TARGET == coveragetest ]]; then coverage report; fi
 matrix:
   fast_finish: true
+  allow_failures:
+    - python: "3.6"
   exclude:
     - python: "3.4"
+      env: TARGET=lint
+    - python: "3.6"
       env: TARGET=lint
