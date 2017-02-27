@@ -1,34 +1,34 @@
-sudo: required
-
+sudo: false
 language: python
-
 python:
-  - 3.4
-  - 3.5
-
-cache: pip
-
+  - "3.4"
+  - "3.5"
+  - "3.6"
 git:
   submodules: false
-
+  depth: 1
 services:
   - docker
-
-before_install:
-  - sudo apt-get -y --purge remove docker-engine
-  - sudo apt-get -y install docker-engine
-  - docker --version
-
+cache:
+  pip: true
+env:
+  - TARGET=lint
+  - TARGET=coveragetest
 install:
-  - pip install -r requirements/main.txt
-  - pip install -r requirements/test.txt -r requirements/lint.txt
-  - (cd tests/functional/testrunner && docker build -t inloop-integration-test .)
-  - mkdir -p .state
-
+  - pip install -U pip setuptools
+  - make install-deps
+before_script:
+  - pip freeze
 script:
-  - flake8
-  - isort --check-only
-  - coverage run manage.py test --verbosity 2
-
+  - make $TARGET
 after_success:
-  - coverage report
+  - if [[ $TARGET == coveragetest ]]; then coverage report; fi
+matrix:
+  fast_finish: true
+  allow_failures:
+    - python: "3.6"
+  exclude:
+    - python: "3.4"
+      env: TARGET=lint
+    - python: "3.6"
+      env: TARGET=lint

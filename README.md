@@ -22,22 +22,10 @@ solutions submitted by students in isolated environments.
 Assuming you've met the [dependencies listed below](#dependencies), run the following inside
 a shell:
 
-    # setup a virtual environment and activate it
-    python3 -m venv .state/venv && source .state/venv/bin/activate
+    # bootstrap the development environment and load it
+    make devenv && source .venvs/py3*/bin/activate
 
-    # install required Python libraries
-    pip install -r requirements/main.txt -r requirements/dev.txt
-
-    # use the bundled .env file suitable for test and development
-    cp .env_develop .env
-
-    # initialize the database (uses SQLite locally)
-    ./manage.py migrate
-
-    # create a first user with superuser privileges
-    ./manage.py createsuperuser
-
-    # run and monitor all required components in developer mode
+    # run and monitor 'django-admin runserver', 'redis-server' and 'django-admin run_huey'
     honcho start
 
 The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
@@ -45,25 +33,17 @@ The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` wit
 
 ### Test suite
 
-We use Django standard facilities for testing. All tests reside in the `tests` package and
-consist of separate sub-packages for fast unit tests and slower integration tests:
+The command `make coveragetest` runs the complete test suite. You can pass an optional `SUITE`
+variable to `make` to narrow down the packages which should be searched for tests:
 
-    tests
-    ├── functional/
-    └── unit/
+    # runs all tests (15 sec)
+    make coveragetest
 
-Executing tests in the `tests.functional.testrunner` package requires the Docker image to
-be built once before:
+    # runs unit tests (3 sec)
+    make coveragetest SUITE=tests.unit
 
-    cd tests/functional/testrunner && docker build -t inloop-integration-test .
-
-Examples:
-
-    # run all tests (15 sec)
-    ./manage.py test
-
-    # run unit tests only (3 sec)
-    ./manage.py test tests.unit
+    # generate HTML test report
+    coverage html
 
 
 ### Tips and tricks
