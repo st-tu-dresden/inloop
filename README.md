@@ -127,7 +127,7 @@ to verify you can connect to the Docker daemon.
 ## Further documentation
 
 * [Contributor's guide](CONTRIBUTING.md)
-* [Deployment guide](docs/deployment-guide.md)
+* [Deployment guide](docs/deployment.md)
 * [Building CSS and Javascript bundles](docs/static-assets.md)
 
 
