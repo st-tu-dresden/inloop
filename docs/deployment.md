@@ -60,3 +60,40 @@ CA, such as [Let's Encrypt](https://letsencrypt.org), is needed.
 
 **Postgres up and running**: ensure that the PostgreSQL server is running and you can connect to
 the server as the database administrator (`sudo -u postgres -i psql`).
+
+
+Environment variables
+---------------------
+
+The following variables are **required**:
+
+Name                      | Description
+------------------------- | -----------
+`ALLOWED_HOSTS`           | Comma-separated list of [allowed hosts][1]
+`CACHE_URL`               | 12factor style cache URL, e.g. `redis://localhost:1234/0`
+`DATABASE_URL`            | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
+`DJANGO_SETTINGS_MODULE`  | Set to `inloop.settings` unless you know what you are doing
+`FROM_EMAIL`              | Address used for outgoing mail, e.g. `inloop@example.com`
+`GITHUB_SECRET`           | Github webhook endpoint secret
+`GIT_ROOT`                | Must be a subdirectory of `MEDIA_ROOT`
+`LANG`                    | Set to `en_US.UTF-8` unless you know what you are doing
+`MEDIA_ROOT`              | Path to the directory for user uploads
+`PYTHONPATH`              | Set it to the path of the INLOOP git clone
+`REDIS_URL`               | Redis URL used for the queue, e.g. `redis://localhost:1234/1`
+`SECRET_KEY`              | Set to a long **random** string
+`STATIC_ROOT`             | Path to the directory where all static files are collected
+
+
+The following variables may be set **optionally**:
+
+Name              | Description (default value)
+----------------- | ---------------------------
+`EMAIL_URL`       | 12factor style email URL (`smtp://:@localhost:25`)
+`SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`true`)
+`WEB_CONCURRENCY` | The amount of Gunicorn workers to start (`1`)
+
+Additionally, the setproctitle library (which is used by Gunicorn) recognizes `SPT_NOENV`. If set,
+it will [not overwrite `/proc/PID/environ`][2].
+
+[1]: https://docs.djangoproject.com/en/stable/ref/settings/#allowed-hosts
+[2]: https://pypi.python.org/pypi/setproctitle#environment-variables
