@@ -24,9 +24,9 @@ Things to note:
 - The core components of INLOOP, the web application and the job queue (the blue boxes), are both
   written in Python and communicate with each other via Redis and the PostgreSQL database. The
   former one is used as session store and job broker, the latter one for general persistence.
-- Client HTTP requests are first buffered and proxied by nginx, a robust, small and fast webserver
-  which, among other advantages, does a better job at handling TLS encryption and serving static
-  files than Gunicorn/Python.
+- Client HTTP(S) requests are first buffered and proxied by nginx, a robust, small and fast
+  webserver which, among other advantages, does a better job at handling SSL/TLS encryption and
+  serving static files than Gunicorn/Python.
 - The reverse proxy is the only component that is accessible from the "outside" (*the internet*).
   All other components communicate via the local loopback interface or a private network.
 - For development purposes, Django's `runserver` command incorporates everything that nginx,
