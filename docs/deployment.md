@@ -33,3 +33,30 @@ Things to note:
   Gunicorn and PostgreSQL provide in production (the green area).
 - In fact, INLOOP is a distributed application: it is possible to run the huey queue and Docker
   runtime on another host. For this to work, one needs to setup a shared filesystem (e.g., NFS).
+
+
+Prerequisites
+-------------
+
+**Supported operating system:** any modern Linux distribution will do the trick, but it should
+be able to run Docker and Python, of course (see the [README](../README.md) for version
+requirements). We recommend the latest stable release of Debian or Ubuntu LTS.
+
+**Operating system packages:** ensure you've installed all dependencies listed in the
+[README](../README.md).
+
+**Hostname setup:** verify your system's hostname is setup correctly. `hostname` and `hostname -f`
+should print the short and fully qualified hostname of your machine, e.g.:
+
+    $ hostname
+    inloop
+    $ hostname -f
+    inloop.inf.tu-dresden.de
+
+**SSL/TLS key and certificate:** INLOOP relies on HTTPS to safely handle user authentication and
+protect sensitive user data in transit. For evaluation purposes or a staging site, a self-signed
+certificate will be enough. For a production deployment, a certificate signed by a browser-accepted
+CA, such as [Let's Encrypt](https://letsencrypt.org), is needed.
+
+**Postgres up and running**: ensure that the PostgreSQL server is running and you can connect to
+the server as the database administrator (`sudo -u postgres -i psql`).
