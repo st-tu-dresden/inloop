@@ -25,10 +25,10 @@ a shell:
     # bootstrap the development environment and load it
     make devenv && source .venvs/py3*/bin/activate
 
-    # run and monitor 'django-admin runserver', 'redis-server' and 'django-admin run_huey'
+    # run and monitor the development webserver and workers
     honcho start
 
-The development webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
+The webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
 
 
 ### Test suite
@@ -54,9 +54,6 @@ copy this file from `.env_develop`. In some cases, you may want to set additiona
 environment variables such as:
 
 * `DJDT`: if set to a truth value, enable the `django-debug-toolbar`.
-* `REDIS_PORT`: use another port (defaults to 6379) for the Redis server, e.g.,
-  in case it is already used by another program on your computer.  If you do
-  this, don't forget to update both `CACHE_URL` and `REDIS_URL` as well.
 
 
 ### Dependencies
