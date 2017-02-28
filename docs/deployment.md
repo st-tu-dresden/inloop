@@ -38,9 +38,9 @@ Things to note:
 Prerequisites
 -------------
 
-**Supported operating system:** any modern Linux distribution will do the trick, but it should
-be able to run Docker and Python, of course (see the [README](../README.md) for version
-requirements). We recommend the latest stable release of Debian or Ubuntu LTS.
+**Supported operating system:** This manual is written for Debian 8 and Ubuntu 16.04/14.04. Any
+other modern Linux distribution should also do the trick, given that it is able to run Docker and
+Python (see the [README](../README.md) for exact version requirements).
 
 **Operating system packages:** ensure you've installed all dependencies listed in the
 [README](../README.md).
@@ -59,7 +59,17 @@ certificate will be enough. For a production deployment, a certificate signed by
 CA, such as [Let's Encrypt](https://letsencrypt.org), is needed.
 
 **Postgres up and running**: ensure that the PostgreSQL server is running and you can connect to
-the server as the database administrator (`sudo -u postgres -i psql`).
+the server using the database administrator role (`postgres`):
+
+    $ sudo -u postgres -i psql -c '\l'
+                                      List of databases
+       Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges
+    -----------+----------+----------+-------------+-------------+-----------------------
+     postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+     template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+               |          |          |             |             | postgres=CTc/postgres
+     template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | postgres=CTc/postgres
+    (3 rows)
 
 
 Environment variables
