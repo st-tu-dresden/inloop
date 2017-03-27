@@ -18,10 +18,26 @@ This is the **preferred way of contributing**. We also use this approach (aka th
    must be descriptive (e.g., `refactor-html`, `registration-tests`).
 2. Add commits and be sure to follow our [rules for commit messages](#commit-messages).
    Don't mix unrelated changes into one commit.
-3. Open a pull request so we can review the changes and give feedback.
+3. Open a pull request so we can review the changes and give feedback. Additionally,
+   our Travis CI will check if the test suite succeeds.
 
-It goes without saying, but you have to include [unit tests][django-testing], documentation
-and follow our [coding conventions](#coding-conventions).
+New code needs to include [unit tests][django-testing], documentation and must follow our [coding
+conventions](#coding-conventions).
+
+
+## Automated testing
+
+The command `make coveragetest` runs the complete test suite. You can pass an optional `SUITE`
+variable to `make` to narrow down the packages which should be searched for tests:
+
+    # runs all tests (15 sec)
+    make coveragetest
+
+    # runs unit tests (3 sec)
+    make coveragetest SUITE=tests.unit
+
+    # generate HTML test report
+    coverage html
 
 
 ## Rules for contributing code

@@ -10,122 +10,53 @@
 [![Development status: Beta](https://img.shields.io/badge/development%20status-beta-orange.svg)](#)
 [![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
 
-This is INLOOP, the interactive learning center for object-oriented programming.
+INLOOP, the interactive learning center for object-oriented programming, is a lean web app for
+online programming courses, built upon Django and Docker:
 
-INLOOP is a web application based on Django to manage programming assignments for
-computer science courses. It uses Docker containers to execute programming task
-solutions submitted by students in isolated environments.
+- **Flexible**: you can write tasks for arbitrary languages, as long as they can be packaged into a
+  Docker image.
+- **Secure**: solutions are checked inside a minimal and strictly isolated Docker container, which
+  is discarded after execution.
+- **Modern**: push-based (or periodic pull-based) import of tasks, Markdown task descriptions and
+  accompanying attachments from a Git repository.
+- **Fast & scalable**: solutions are processed asynchronously by a configurable amount of
+  background workers.
+- **Hackable**: modern, modular and PEP-8 compliant Python 3 code base with less than 3000 lines of
+  code, good test coverage and continuous integration tests.
 
 
 ## Quick start
 
-Assuming you've met the [dependencies listed below](#dependencies), run the following inside
-a shell:
+INLOOP requires the following software:
 
-    # bootstrap the development environment and load it
-    make devenv && source .venvs/py3*/bin/activate
+* Python 3.4 or 3.5
+* Docker 1.10+
+* Redis 2.6+
+* Git 2.3+
+* macOS or Linux
 
-    # run and monitor the development webserver and workers
-    honcho start
+A development instance can be set up as follows:
 
-The webserver now runs at <http://127.0.0.1:8000>. Exit `honcho` with `Ctrl-C`.
+```bash
+# clone (if not already done so)
+git clone https://github.com/st-tu-dresden/inloop.git && cd inloop
 
+# initialize a virtualenv with all needed Python packages
+make devenv
+source .venvs/py3*/bin/activate
 
-### Test suite
+# start and monitor the web server and huey workers
+honcho start
+```
 
-The command `make coveragetest` runs the complete test suite. You can pass an optional `SUITE`
-variable to `make` to narrow down the packages which should be searched for tests:
-
-    # runs all tests (15 sec)
-    make coveragetest
-
-    # runs unit tests (3 sec)
-    make coveragetest SUITE=tests.unit
-
-    # generate HTML test report
-    coverage html
-
-
-### Tips and tricks
-
-Both `honcho` and the `manage.py` script read the git-ignored `.env` environment file
-used for the 12factor style configuration of INLOOP. As shown above you should just
-copy this file from `.env_develop`. In some cases, you may want to set additional
-environment variables such as:
-
-* `DJDT`: if set to a truth value, enable the `django-debug-toolbar`.
-
-
-### Dependencies
-
-In general you'll need:
-
-* Git >= 2.3
-* Python >= 3.4
-* Docker >= 1.10
-* Redis >= 2.6
-* Optional: tools and libraries to build Python extensions (for psycopg2)
-* Optional: node.js and npm (to rebuild CSS and Javascript bundles)
-
-Platform specific instructions:
-
-* Ubuntu >= 14.04 and Debian >= 8:
-
-        sudo apt-get install build-essential git libpq-dev nodejs npm python3 python3-dev redis-server
-
-        sudo apt-get install python3-venv || sudo apt-get install python3.4-venv
-
-  For some silly reason I dare not explain here, on Ubuntu/Debian the `node` command is called
-  `nodejs` and you have to symlink it as follows in order to get `make assets` to work.
-
-        sudo ln -s /usr/bin/nodejs /usr/local/bin/node
-
-* Mac OS X using Homebrew:
-
-        brew install node python3 redis
-
-
-#### Docker setup on Mac OS X
-
-Install Docker for Mac as described on https://docs.docker.com/docker-for-mac/.
-
-
-#### Docker setup on Ubuntu/Debian
-
-The `docker.io` package shipped with Ubuntu and Debian is usually too old. Install
-from the upstream Docker APT repositories instead:
-
-* Ubuntu: https://docs.docker.com/engine/installation/linux/ubuntulinux/
-* Debian: https://docs.docker.com/engine/installation/linux/debian/
-
-Ensure you have at least Docker version 1.10 by checking the output of
-
-    docker --version
-
-INLOOP depends on the `--memory` option to limit memory available to a container.
-If you have followed the linked installation docs carefully, running
-
-    grep -o swapaccount=1 /proc/cmdline
-
-should print
-
-    swapaccount=1
-
-If not, you need to update your GRUB config to add the `swapaccount=1` param to your
-kernel command line and reboot (see the linked Docker docs for details).
-
-Finally run
-
-    docker run hello-world
-
-to verify you can connect to the Docker daemon.
+**Tip**: Add the line `DJDT=1` to your `.env` file to enable the Django debug toolbar.
 
 
 ## Further documentation
 
-* [Contributor's guide](CONTRIBUTING.md)
-* [Deployment guide](docs/deployment.md)
-* [Building CSS and Javascript bundles](docs/static-assets.md)
+* [Installation notes](docs/installation.md)
+* [Deployment](docs/deployment.md)
+* [Contributor guide](CONTRIBUTING.md)
 
 
 ## Authors and credits
