@@ -54,7 +54,7 @@ honcho start
 
 ## Further documentation
 
-* [Installation notes](docs/installation.md)
+* [Installation notes](docs/installation_notes.md)
 * [Deployment](docs/deployment.md)
 * [Contributor guide](CONTRIBUTING.md)
 
