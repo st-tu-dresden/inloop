@@ -72,6 +72,53 @@ the server using the database administrator role (`postgres`):
     (3 rows)
 
 
+Preparations
+------------
+
+Optional: separate file systems for `/var/lib/docker` and `/var/lib/inloop`
+
+Unix user accounts:
+- Management user account `inloop` (in groups `sudo` and `docker`)
+- Daemon user accounts `gunicorn` and `huey` (home `/var/lib/inloop`)
+
+SSH keys for `huey` (deployment keys)
+
+Create PostgreSQL user and schema
+
+
+Installation
+------------
+
+Set and `export` all required [environment variables](#environment-variables).
+
+    python3 -m venv $VENV_DIR && source $VENV_DIR/bin/activate
+    pip install -r requirements/main.txt -r requirements/prod.txt
+    ./manage.py migrate
+    ./manage.py createsuperuser
+
+    ./manage.py set_default_site --system-fqdn --name INLOOP
+    ./manage.py collectstatic
+
+Create upload directory with correct permissions
+
+    mkdir -p /var/lib/inloop/media/solutions
+    chown gunicorn:gunicorn /var/lib/inloop/media/solutions
+
+Configure automatic startup using the provided [upstart job files](../support/etc/init).
+
+Configure nginx by adapting the provided [example nginx location](../support/etc/nginx).
+
+
+Updates
+-------
+
+    git pull
+    pip install -r requirements/main.txt -r requirements/prod.txt
+    ./manage.py migrate
+    ./manage.py collectstatic
+    sudo service gunicorn restart
+
+
 Environment variables
 ---------------------
 
