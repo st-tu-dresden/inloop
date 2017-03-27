@@ -29,23 +29,22 @@ online programming courses, built upon Django and Docker:
 
 INLOOP requires the following software:
 
+* Debian 8+ or Ubuntu 16.04+, macOS 10.11+ (for development only)
 * Python 3.4 or 3.5
-* Docker 1.10+
+* Docker 1.10+ (see the [installation notes](docs/installation_notes.md) **!!!**)
 * Redis 2.6+
 * Git 2.3+
-* macOS or Linux
 
-A development instance can be set up as follows:
+Using the command line, a development instance can be set up as follows:
 
 ```bash
-# clone (if not already done so)
-git clone https://github.com/st-tu-dresden/inloop.git && cd inloop
+# 1.) install required software for Debian/Ubuntu or macOS
+./support/scripts/[debian|macos]_setup.sh
 
-# initialize a virtualenv with all needed Python packages
-make devenv
-source .venvs/py3*/bin/activate
+# 2.) initialize a virtualenv with all required Python packages
+make devenv && source .venvs/py3*/bin/activate
 
-# start and monitor the web server and huey workers
+# 3.) start and monitor the web server and huey workers
 honcho start
 ```
 
@@ -54,7 +53,6 @@ honcho start
 
 ## Further documentation
 
-* [Installation notes](docs/installation_notes.md)
 * [Deployment](docs/deployment.md)
 * [Contributor guide](CONTRIBUTING.md)
 
