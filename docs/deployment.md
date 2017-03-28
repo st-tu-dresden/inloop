@@ -146,6 +146,7 @@ The following variables may be set **optionally**:
 Name              | Description (default value)
 ----------------- | ---------------------------
 `EMAIL_URL`       | 12factor style email URL (`smtp://:@localhost:25`)
+`INTERNAL_IPS`    | Comma-separated list of IP addresses for which more verbose error reports are shown (`""`)
 `SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`true`)
 `WEB_CONCURRENCY` | The amount of Gunicorn workers to start (`1`)
 
