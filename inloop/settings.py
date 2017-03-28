@@ -126,14 +126,17 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_COOKIE_AGE = 7 * 24 * 3600
 
-if not DEBUG:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 STATIC_URL = env("STATIC_URL", default="/static/")
-STATIC_ROOT = env("STATIC_ROOT", default=str(BASE_DIR / "static"))
-
 MEDIA_URL = env("MEDIA_URL", default="/media/")
-MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "media"))
 
+if DEBUG:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+    STATIC_ROOT = str(BASE_DIR / "static")
+    MEDIA_ROOT = str(BASE_DIR / "media")
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+    STATIC_ROOT = env("STATIC_ROOT")
+    MEDIA_ROOT = env("MEDIA_ROOT")
 
 vars().update(env.email(default="smtp://:@localhost:25"))
 
