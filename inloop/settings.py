@@ -146,11 +146,12 @@ ADMINS = [
 EMAIL_SUBJECT_PREFIX = "[INLOOP] "
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("FROM_EMAIL")
 
-if env.bool("USE_X_FORWARDED", default=False):
+if env.bool("PROXY_ENABLED", default=False):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
     USE_X_FORWARDED_PORT = True
     MIDDLEWARE.insert(0, "inloop.common.middleware.SetRemoteAddrFromForwardedFor")
+    X_ACCEL_LOCATION = env("X_ACCEL_LOCATION")
 
 if env.bool("SECURE_COOKIES", default=True):
     SESSION_COOKIE_SECURE = True
@@ -160,11 +161,6 @@ HUEY = {
     "always_eager": False,
     "url": env("REDIS_URL"),
 }
-
-SENDFILE_METHOD = "django"
-if env("SENDFILE_NGINX_URL", default=None):
-    SENDFILE_METHOD = "nginx"
-    SENDFILE_NGINX_URL = env("SENDFILE_NGINX_URL")
 
 CHECKER = {
     "timeout": 120,

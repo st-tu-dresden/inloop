@@ -11,12 +11,12 @@ def sendfile_nginx(request, path, document_root=None):
 
     Requires a Nginx internal location to be configured like this:
 
-        location <SENDFILE_NGINX_URL> {
+        location <X_ACCEL_LOCATION> {
             internal;
             alias <MEDIA_ROOT>;
         }
 
-    (replace with the values from the production settings module)
+    (replace with the values from the settings module)
 
     Currently, document_root must be a subdirectory of MEDIA_ROOT and path
     must be relative.
@@ -35,11 +35,14 @@ def sendfile_nginx(request, path, document_root=None):
     filename = join(document_root, path)
 
     # the path relative to the MEDIA_ROOT (= alias directive)
-    filename_rel = relpath(filename, settings.MEDIA_ROOT)
+    filename_rel = relpath(filename, settings.MEDIA_ROOT).replace("\\", "/")
 
-    # send the path relative to MEDIA_ROOT, prefixed with Nginx' location
+    # the internal nginx location w/o trailing slashes
+    location = getattr(settings, "X_ACCEL_LOCATION", "").rstrip("/")
+
+    # send the path relative to MEDIA_ROOT, prefixed with nginx' location
     response = HttpResponse()
-    response["X-Accel-Redirect"] = join(settings.SENDFILE_NGINX_URL, filename_rel)
+    response["X-Accel-Redirect"] = "/".join([location, filename_rel])
 
     # we rely on nginx to set all approprioate headers (mime type, length, mod time etc.)
     del response['Content-Type']
@@ -47,17 +50,8 @@ def sendfile_nginx(request, path, document_root=None):
     return response
 
 
-def select_sendfile():
-    """
-    Assign the sendfile() implementation specified by settings.SENDFILE_METHOD.
-    """
-    method = getattr(settings, "SENDFILE_METHOD", "django")
-    if method == "django":
-        return serve
-    elif method == "nginx":
-        return sendfile_nginx
-    else:
-        raise NotImplemented("Unknown SENDFILE_METHOD %s" % method)
-
-
-sendfile = select_sendfile()
+# Select the sendfile implementation based on the settings:
+if hasattr(settings, "X_ACCEL_LOCATION"):
+    sendfile = sendfile_nginx
+else:
+    sendfile = serve

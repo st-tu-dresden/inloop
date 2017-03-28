@@ -6,7 +6,7 @@ from django.test.client import RequestFactory
 from inloop.common.sendfile import sendfile_nginx
 
 
-@override_settings(MEDIA_ROOT=str(settings.PACKAGE_DIR), SENDFILE_NGINX_URL="/sendfile")
+@override_settings(MEDIA_ROOT=str(settings.PACKAGE_DIR), X_ACCEL_LOCATION="/sendfile")
 class NginxSendfileTests(SimpleTestCase):
     def setUp(self):
         # we don't need a valid GET request, but it doesn't hurt either
