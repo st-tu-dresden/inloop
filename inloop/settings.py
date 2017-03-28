@@ -134,9 +134,6 @@ STATIC_ROOT = env("STATIC_ROOT", default=str(BASE_DIR / "static"))
 MEDIA_URL = env("MEDIA_URL", default="/media/")
 MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "media"))
 
-if env.bool("SECURE_COOKIES", default=False):
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
 
 vars().update(env.email(default="smtp://:@localhost:25"))
 
@@ -151,6 +148,10 @@ if env.bool("USE_X_FORWARDED", default=False):
     USE_X_FORWARDED_HOST = True
     USE_X_FORWARDED_PORT = True
     MIDDLEWARE.insert(0, "inloop.common.middleware.SetRemoteAddrFromForwardedFor")
+
+if env.bool("SECURE_COOKIES", default=True):
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 HUEY = {
     "always_eager": False,
