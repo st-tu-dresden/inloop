@@ -126,17 +126,17 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_COOKIE_AGE = 7 * 24 * 3600
 
-if not DEBUG:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 STATIC_URL = env("STATIC_URL", default="/static/")
-STATIC_ROOT = env("STATIC_ROOT", default=str(BASE_DIR / "static"))
-
 MEDIA_URL = env("MEDIA_URL", default="/media/")
-MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "media"))
 
-if env.bool("SECURE_COOKIES", default=False):
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+if DEBUG:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+    STATIC_ROOT = str(BASE_DIR / "static")
+    MEDIA_ROOT = str(BASE_DIR / "media")
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+    STATIC_ROOT = env("STATIC_ROOT")
+    MEDIA_ROOT = env("MEDIA_ROOT")
 
 vars().update(env.email(default="smtp://:@localhost:25"))
 
@@ -146,21 +146,21 @@ ADMINS = [
 EMAIL_SUBJECT_PREFIX = "[INLOOP] "
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("FROM_EMAIL")
 
-if env.bool("USE_X_FORWARDED", default=False):
+if env.bool("PROXY_ENABLED", default=False):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
     USE_X_FORWARDED_PORT = True
     MIDDLEWARE.insert(0, "inloop.common.middleware.SetRemoteAddrFromForwardedFor")
+    X_ACCEL_LOCATION = env("X_ACCEL_LOCATION")
+
+if env.bool("SECURE_COOKIES", default=True):
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 HUEY = {
     "always_eager": False,
     "url": env("REDIS_URL"),
 }
-
-SENDFILE_METHOD = "django"
-if env("SENDFILE_NGINX_URL", default=None):
-    SENDFILE_METHOD = "nginx"
-    SENDFILE_NGINX_URL = env("SENDFILE_NGINX_URL")
 
 CHECKER = {
     "timeout": 120,

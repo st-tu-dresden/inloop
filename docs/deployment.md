@@ -145,9 +145,14 @@ The following variables may be set **optionally**:
 
 Name              | Description (default value)
 ----------------- | ---------------------------
+`ADMINS`          | Comma-separated list of email addresses which should be notified on errors
+`DEBUG`           | Debug mode, don't use this in production (`False`)
 `EMAIL_URL`       | 12factor style email URL (`smtp://:@localhost:25`)
-`SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`true`)
+`INTERNAL_IPS`    | Comma-separated list of IP addresses for which more verbose error reports are shown
+`PROXY_ENABLED`   | Must be set to `True` if running behind nginx (`False`)
+`SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`True`)
 `WEB_CONCURRENCY` | The amount of Gunicorn workers to start (`1`)
+`X_ACCEL_LOCATION`| The internal `X-Accel-Redirect` location for nginx, e.g. `/sendfile`, must be set if `PROXY_ENABLED` is `True`
 
 Additionally, the setproctitle library (which is used by Gunicorn) recognizes `SPT_NOENV`. If set,
 it will [not overwrite `/proc/PID/environ`][2].
