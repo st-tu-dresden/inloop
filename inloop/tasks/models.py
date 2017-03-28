@@ -69,22 +69,33 @@ class TaskQuerySet(models.QuerySet):
 
 
 class TaskManager(models.Manager):
+    optional_fields = {"deadline"}
+
     @cached_property
     def required_fields(self):
+        """
+        Return a set with the names of required fields in the Task model.
+        """
         def exclude_field(f):
             return f.auto_created or f.blank or isinstance(f, models.SlugField)
         return {x.name for x in Task._meta.get_fields() if not exclude_field(x)}
 
     def update_or_create_related(self, data=None, **kwargs):
+        """
+        Update a Task (or create if nonexistent) and create related category if necessary.
+        """
         if not isinstance(data, dict):
             raise ValueError("data must be a dict")
+
         missing = self.required_fields - set(data) - set(kwargs)
         if missing:
             raise ValidationError("Missing required fields: %s" % ", ".join(missing))
-        clean_data = {k: v for k, v in data.items() if k in self.required_fields}
-        clean_data["category"], _ = Category.objects.get_or_create(name=clean_data["category"])
-        task, _ = self.update_or_create(defaults=clean_data, **kwargs)
-        return task
+
+        fields = self.optional_fields.union(self.required_fields)
+        clean_data = {k: v for k, v in data.items() if (k in fields and k in data)}
+        clean_data["category"] = Category.objects.get_or_create(name=clean_data["category"])[0]
+
+        return self.update_or_create(defaults=clean_data, **kwargs)[0]
 
 
 class Task(models.Model):
