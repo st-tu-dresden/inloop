@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -133,30 +135,38 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
         self.assertFalse(self.category2.task_set.not_completed_by(self.bob))
 
 
+# XXX: handling the removal of optional attributes
 class UpdateOrCreateRelatedTest(TestCase):
     def setUp(self):
         self.data = {
             "title": "Test title",
             "category": "Beginner",
             "pubdate": "2016-12-01 13:37:00+0100",
+            "deadline": "2017-03-31 13:37:00+0100",
             "description": "Task description"
         }
 
     def test_create(self):
         task = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
+        task.refresh_from_db()
         self.assertEqual(task.title, "Test title")
         self.assertEqual(task.system_name, "TestTask")
+        self.assertEqual(task.description, "Task description")
         self.assertEqual(task.category.name, "Beginner")
+        self.assertEqual(type(task.pubdate), datetime)
+        self.assertEqual(type(task.deadline), datetime)
         self.assertTrue(Category.objects.get(name="Beginner"))
 
     def test_update(self):
         task1 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
         self.data["title"] = "Another title"
         self.data["category"] = "Advanced"
+        self.data["description"] = "Another description"
         task2 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
         task1.refresh_from_db()
         self.assertEqual(task1.id, task2.id)
         self.assertEqual(task1.title, "Another title")
+        self.assertEqual(task1.description, "Another description")
         self.assertEqual(task1.category.name, "Advanced")
         self.assertTrue(Category.objects.get(name="Beginner"))
         self.assertTrue(Category.objects.get(name="Advanced"))
