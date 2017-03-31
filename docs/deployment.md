@@ -77,13 +77,33 @@ Preparations
 
 Optional: separate file systems for `/var/lib/docker` and `/var/lib/inloop`
 
-Unix user accounts:
-- Management user account `inloop` (in groups `sudo` and `docker`)
-- Daemon user accounts `gunicorn` and `huey` (home `/var/lib/inloop`)
-
-SSH keys for `huey` (deployment keys)
-
 Create PostgreSQL user and schema
+
+    sudo -u postgres -i createuser inloop
+    sudo -u postgres -i createdb --owner=inloop inloop
+
+Unix user accounts
+
+1. Management user account `inloop` (in groups `sudo` and `docker`):
+
+       sudo adduser inloop
+       sudo adduser inloop docker
+       sudo adduser inloop sudo
+
+2. Daemon user accounts `gunicorn` and `huey`:
+
+       sudo adduser --system --group --home /var/lib/inloop huey
+       sudo adduser --system --group --home / gunicorn
+
+SSH key w/o passphrase for `huey` (*deployment key*)
+
+    sudo -u huey -H ssh-keygen -N ''
+
+Prepare directories:
+
+    sudo mkdir -p /var/lib/inloop/media/solutions
+    sudo chown -R huey:huey /var/lib/inloop
+    sudo chown gunicorn:gunicorn /var/lib/inloop/media/solutions
 
 
 Installation
@@ -104,7 +124,8 @@ Create upload directory with correct permissions
     mkdir -p /var/lib/inloop/media/solutions
     chown gunicorn:gunicorn /var/lib/inloop/media/solutions
 
-Configure automatic startup using the provided [upstart job files](../support/etc/init).
+Configure automatic startup using the provided [upstart job files](../support/etc/init)
+or [systemd service units](../support/etc/systemd/system).
 
 Configure nginx by adapting the provided [example nginx location](../support/etc/nginx).
 
