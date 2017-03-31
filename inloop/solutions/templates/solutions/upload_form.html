@@ -2,23 +2,41 @@
 
 {% block title %}Solution upload - {{ task.title }} {% endblock %}
 
+{% block extrahead %}
+  <style>
+    #uploadBtn {
+      position: absolute;
+      opacity: 0;
+      filter: alpha(opacity=0);
+    }
+
+    #uploadBtn, #uploadFiles { width: 180px; }
+  </style>
+{% endblock %}
+
 {% block tab_content %}
 {% if not task.is_expired %}
+<p>
+  To upload more than one file, just click 'Browse' and mark multiple files in the
+  selection window by keeping <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on macOS) pressed while you click the files you
+  want to upload. Than click 'Open' and 'Submit'.
+</p>
 <form class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="form-group">
-    <input class="form-control" name="uploads" type="file" multiple>
+    <input id="uploadBtn" class="form-control" name="uploads" type="file" multiple>
+    <input id="uploadFiles" type="text" disabled="disabled" placeholder="Choose Files" />
   </div>
   <div class="form-group">
     <input class="btn btn-primary" type="submit" value="Submit">
   </div>
-  <p class="alert alert-info" role="alert">
-    To upload more than one file, just click 'Browse' and mark multiple files in the
-    selection window by keeping 'Ctrl' pressed while you click the files you
-    want to upload. Than click 'Open' and 'Submit'.
-  </p>
 </form>
+<script type="text/javascript">
+  document.getElementById("uploadBtn").onchange = function () {
+    document.getElementById("uploadFile").value = this.value;
+  };
+</script>
 {% else %}
 <p class="alert alert-warning">
   The deadline for this task has passed. You cannot submit new solutions.
