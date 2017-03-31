@@ -18,6 +18,8 @@ class Category(models.Model):
 
     slug = models.SlugField(max_length=50, unique=True, help_text="URL name")
     name = models.CharField(unique=True, max_length=50, help_text="Category name")
+    display_order = models.IntegerField(default=0, help_text="Display order (lower values first)")
+    description = models.TextField(default="", help_text="Short category description")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
