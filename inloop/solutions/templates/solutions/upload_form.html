@@ -17,9 +17,8 @@
 {% block tab_content %}
 {% if not task.is_expired %}
 <p>
-  To upload more than one file, just click 'Browse' and mark multiple files in the
-  selection window by keeping <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on macOS) pressed while you click the files you
-  want to upload. Than click 'Open' and 'Submit'.
+  To upload more than one file, just click 'Choose Files' and mark multiple files by holding
+  down <kbd>Ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
 </p>
 <form class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
@@ -34,7 +33,7 @@
 </form>
 <script type="text/javascript">
   document.getElementById("uploadBtn").onchange = function () {
-    document.getElementById("uploadFile").value = this.value;
+    document.getElementById("uploadFiles").value = this.value;
   };
 </script>
 {% else %}
