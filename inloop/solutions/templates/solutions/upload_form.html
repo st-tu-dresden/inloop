@@ -8,6 +8,7 @@
       position: absolute;
       opacity: 0;
       filter: alpha(opacity=0);
+      cursor: pointer;
     }
 
     #uploadBtn, #uploadFiles { width: 180px; }
@@ -16,19 +17,19 @@
 
 {% block tab_content %}
 {% if not task.is_expired %}
-<p>
-  To upload more than one file, just click 'Choose Files' and mark multiple files by holding
-  down <kbd>Ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
+<p class="help-block">
+  To upload more than one file, just click <i>Choose files...</i> and mark multiple files by holding
+  down <kbd>ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
 </p>
 <form class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="form-group">
     <input id="uploadBtn" class="form-control" name="uploads" type="file" multiple>
-    <input id="uploadFiles" type="text" disabled="disabled" placeholder="Choose Files" />
+    <input id="uploadFiles" type="text" disabled="disabled" placeholder="Choose files..." />
   </div>
   <div class="form-group">
-    <input class="btn btn-primary" type="submit" value="Submit">
+    <button type="submit" class="btn btn-sm btn-primary">Upload</button>
   </div>
 </form>
 <script type="text/javascript">
