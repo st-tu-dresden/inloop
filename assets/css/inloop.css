@@ -1,46 +1,48 @@
 /* @begin anchor.js styles */
 .anchorjs-link:hover {
-    text-decoration: none;
-    color: #aaa;
+  text-decoration: none;
+  color: #aaa;
 }
 
 .anchorjs-link {
-    color: #ddd;
+  color: #ddd;
 }
+
 /* @end */
 
 /* @begin common container styles */
-.tab-content, .static-tab-content {
-    margin: 1em;
+.tab-content,
+.static-tab-content {
+  margin: 1em;
 }
 .center-box-sm {
-    max-width: 25em;
-    .center-block;
+  max-width: 25em;
+  .center-block;
 }
 .center-box-md {
-    max-width: 35em;
-    .center-block;
+  max-width: 35em;
+  .center-block;
 }
 /* @end */
 
 /* Form styles */
 .help-block ul {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 /* @begin tables styles */
 .table-align-pretty {
-    td, th {
-        text-align: center;
-    }
-    td:first-child,
-    th:first-child {
-        text-align: left;
-    }
-    td:last-child,
-    th:last-child {
-        text-align: right;
-    }
+  td, th {
+    text-align: center;
+  }
+  td:first-child,
+  th:first-child {
+    text-align: left;
+  }
+  td:last-child,
+  th:last-child {
+    text-align: right;
+  }
 }
 /* @end */
 
