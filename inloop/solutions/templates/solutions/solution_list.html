@@ -1,4 +1,5 @@
 {% extends "tasks/base.html" %}
+{% load staticfiles %}
 
 {% block title %}{{ task.title }} solutions{% endblock %}
 
@@ -25,4 +26,10 @@
 {% else %}
 <p>You haven't submitted anything yet.</p>
 {% endif %}
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/jquery.timeago.js' %}"></script>
+<script src="{% static 'js/jquery.refresh.js' %}"></script>
+<script src="{% static 'js/solutionstatus.js' %}"></script>
 {% endblock %}
