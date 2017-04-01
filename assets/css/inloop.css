@@ -1,3 +1,9 @@
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
+  }
+}
+
 /* @begin anchor.js styles */
 .anchorjs-link:hover {
   text-decoration: none;
