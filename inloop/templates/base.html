@@ -9,7 +9,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}INLOOP{% endblock %} &ndash; INLOOP</title>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.css' %}">
   {% block extrahead %}{% endblock %}
 </head>
 <body class="{% block body_classes %}{% endblock %}">
@@ -53,7 +55,8 @@
 {% block content %}{% endblock %}
 </div>
 
-<script src="{% static 'js/inloop.min.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
 {% block extrabody %}{% endblock %}
 
 </body>

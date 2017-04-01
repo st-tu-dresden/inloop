@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "description": "Interactive Learning environment for Object-Oriented Programming",
   "dependencies": {
-    "less": "^2.7.1",
-    "less-plugin-autoprefix": "^1.5.1",
-    "less-plugin-clean-css": "^1.5.1",
-    "uglify-js": "^2.6.2"
+    "anchor-js": "^3.2.2",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "prismjs": "^1.6.0",
+    "timeago": "^1.5.4"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/st-tu-dresden/inloop.git"
   },
-  "author": "",
+  "author": "Martin Morgenstern",
   "license": "GPL-3.0"
 }

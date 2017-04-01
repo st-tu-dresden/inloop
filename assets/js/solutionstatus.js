@@ -1,6 +1,5 @@
 $(document).ready(function() {
-  anchors.add(".autolink h2, .autolink h3");
-
+  $(".timeago").timeago();
   $(".solution-pending").refreshJSON("activate", {
     url: "/solutions/:id:/status",
     interval: 5000,
@@ -11,6 +10,4 @@ $(document).ready(function() {
       }
     }
   });
-
-  $(".timeago").timeago();
 });

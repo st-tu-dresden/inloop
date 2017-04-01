@@ -1,4 +1,9 @@
 {% extends "base_site.html" %}
+{% load staticfiles %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
 
 {% block content %}
 
