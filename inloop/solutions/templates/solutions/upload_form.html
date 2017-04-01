@@ -32,9 +32,16 @@
   </div>
 </form>
 <script type="text/javascript">
-  document.getElementById("uploadBtn").onchange = function () {
-    document.getElementById("uploadFiles").value = this.value;
-  };
+  function displayText(files) {
+    if (files.length > 1)
+      return "[" + files.length + " files selected]";
+    else if (files.length == 1)
+      return files[0].name;
+    return "";
+  }
+  document.getElementById("uploadBtn").addEventListener("change", function () {
+    document.getElementById("uploadFiles").value = displayText(this.files);
+  });
 </script>
 {% else %}
 <p class="alert alert-warning">
