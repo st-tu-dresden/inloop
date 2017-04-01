@@ -20,6 +20,7 @@ install-deps:
 	pip install -r requirements/main.txt
 	pip install -r requirements/test.txt
 	pip install -r requirements/lint.txt
+	npm install --production
 
 install-tools:
 	pip install -r requirements/dev.txt
@@ -57,7 +58,7 @@ clean:
 	find inloop tests -name "__pycache__" -delete
 
 purge: clean
-	rm -rf .state .venvs .env
+	rm -rf .state .venvs .env node_modules
 	-docker rmi $(IMAGE)
 
 .PHONY: default coveragetest lint install-deps install-tools virtualenv initdb devenv deps clean purge
