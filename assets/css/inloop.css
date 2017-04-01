@@ -15,13 +15,19 @@
 .static-tab-content {
   margin: 1em;
 }
+/* XXX: refactor and reuse center-block */
 .center-box-sm {
   max-width: 25em;
-  .center-block;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
+/* XXX: refactor and reuse center-block */
 .center-box-md {
   max-width: 35em;
-  .center-block;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 /* @end */
 
@@ -31,18 +37,20 @@
 }
 
 /* @begin tables styles */
-.table-align-pretty {
-  td, th {
-    text-align: center;
-  }
-  td:first-child,
-  th:first-child {
-    text-align: left;
-  }
-  td:last-child,
-  th:last-child {
-    text-align: right;
-  }
+/* XXX: find a short and meaningful name */
+.table-align-pretty td,
+.table-align-pretty th {
+  text-align: center;
+}
+
+.table-align-pretty td:first-child,
+.table-align-pretty th:first-child {
+  text-align: left;
+}
+
+.table-align-pretty td:last-child,
+.table-align-pretty th:last-child {
+  text-align: right;
 }
 /* @end */
 
@@ -55,27 +63,30 @@
   font-size: 20px;
 }
 
-.solution-success {
-  .glyphicon-ok;
+.solution-success:before {
+	content: "\e013"
 }
 
-.solution-failure {
-  .glyphicon-minus-sign;
+.solution-failure:before {
+	content: "\e082"
 }
 
-.solution-error,
-.solution-killed,
-.solution-lost,
-.solution-timeout {
-  .glyphicon-exclamation-sign;
+.solution-error:before,
+.solution-killed:before,
+.solution-lost:before,
+.solution-timeout:before {
+	content: "\e101"
 }
 
 .solution-pending {
-  .glyphicon-cog;
   animation-name: spin;
   animation-duration: 3s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
+}
+
+.solution-pending:before {
+  content: "\e019";
 }
 
 @keyframes spin {
