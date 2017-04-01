@@ -110,6 +110,8 @@ if not DEBUG:
         ("django.template.loaders.cached.Loader", TEMPLATES[0]["OPTIONS"]["loaders"]),
     ]
 
+STATICFILES_DIRS = [str(BASE_DIR / "assets")]
+
 # TODO: investigate a better method to align Bootstrap alerts and contrib.messages
 MESSAGE_TAGS = {10: "info", 40: "danger"}
 
@@ -131,7 +133,7 @@ MEDIA_URL = env("MEDIA_URL", default="/media/")
 
 if DEBUG:
     STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
-    STATIC_ROOT = str(BASE_DIR / "static")
+    STATIC_ROOT = env("STATIC_ROOT", default=None)
     MEDIA_ROOT = str(BASE_DIR / "media")
 else:
     STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"

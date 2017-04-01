@@ -1,4 +1,9 @@
 {% extends "base_site.html" %}
+{% load staticfiles %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
 
 {% block content %}
 
@@ -24,4 +29,9 @@
 {% block tab_content %}{% endblock %}
 </div>
 
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/prism.js' %}"></script>
+<script src="{% static 'js/prism-java.min.js' %}"></script>
 {% endblock %}
