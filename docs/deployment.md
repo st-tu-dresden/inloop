@@ -48,8 +48,8 @@ Python (see the [README](../README.md) for exact version requirements).
 
 to install all required packages.
 
-**Hostname setup:** verify your system's hostname is setup correctly. `hostname` and `hostname -f`
-should print the short and fully qualified hostname of your machine, e.g.:
+**Hostname setup:** verify that your system's hostname is configured correctly. `hostname` and
+`hostname -f` should print the short and fully qualified hostname of your machine, e.g.:
 
     $ hostname
     inloop
