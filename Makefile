@@ -5,12 +5,18 @@ PYTHON := python3.5
 PYTAG  := $(shell echo $(PYTHON) | sed 's/thon//;s/\.//')
 VENV   := $(PWD)/.venvs/$(PYTAG)
 
+TEST_CMD := ./manage.py test --failfast $(SUITE)
+WATCH_DIRS := inloop tests
+
 default:
 	@echo "Please specify a Makefile target."
 	@exit 1
 
 coveragetest: .state/docker
-	coverage run manage.py test --failfast $(SUITE)
+	coverage run $(TEST_CMD)
+
+watchmedo:
+	@watchmedo shell-command --patterns="*.py" --recursive --command "$(TEST_CMD)" $(WATCH_DIRS)
 
 lint:
 	isort --quiet --check-only
@@ -61,4 +67,4 @@ purge: clean
 	rm -rf .state .venvs .env node_modules
 	-docker rmi $(IMAGE)
 
-.PHONY: default coveragetest lint install-deps install-tools virtualenv initdb devenv deps clean purge
+.PHONY: default coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge

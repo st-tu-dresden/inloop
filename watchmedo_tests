@@ -1,9 +1,0 @@
-#!/bin/sh
-##
-## Run all fast tests continuously.
-##
-
-test_cmd="python manage.py test --verbosity 0 --failfast tests.unit"
-watch_dirs="inloop tests"
-
-exec watchmedo shell-command --patterns="*.py" --recursive --command "$test_cmd" $watch_dirs
