@@ -117,16 +117,13 @@ Set and `export` all required [environment variables](#environment-variables).
     python3 -m venv $VENV_DIR && source $VENV_DIR/bin/activate
     pip install -r requirements/main.txt -r requirements/prod.txt
     ./manage.py migrate
-    ./manage.py createsuperuser
 
+    ./manage.py createsuperuser
     ./manage.py set_default_site --system-fqdn --name INLOOP
+
     npm install --production
     ./manage.py collectstatic
-
-Create upload directory with correct permissions
-
-    mkdir -p /var/lib/inloop/media/solutions
-    chown gunicorn:gunicorn /var/lib/inloop/media/solutions
+    gzip -kn $STATIC_ROOT/**/*.css $STATIC_ROOT/**/*.js
 
 Configure automatic startup using the provided [upstart job files](../support/etc/init)
 or [systemd service units](../support/etc/systemd/system).
@@ -142,6 +139,7 @@ Updates
     ./manage.py migrate
     ./manage.py collectstatic
     sudo service gunicorn restart
+    sudo service huey restart
 
 
 Environment variables
