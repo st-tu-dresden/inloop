@@ -117,6 +117,7 @@ Set and `export` all required [environment variables](#environment-variables).
     ./manage.py createsuperuser
 
     ./manage.py set_default_site --system-fqdn --name INLOOP
+    npm install --production
     ./manage.py collectstatic
 
 Create upload directory with correct permissions

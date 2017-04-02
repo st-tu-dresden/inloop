@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 INSTALL_CMD="${INSTALL_CMD:-sudo apt-get install}"
-PKGS_BASE="build-essential git python3 python3-dev python3-venv redis-server"
+PKGS_BASE="build-essential git python3 python3-dev python3-venv redis-server nodejs nodejs-legacy npm"
 PKGS_PROD="$PKGS_BASE libpq-dev daemontools"
-PKGS_DEV="$PKGS_BASE nodejs nodejs-legacy npm"
 
 case "$1" in
-    --dev)
-        CMD="$INSTALL_CMD $PKGS_DEV"
-        ;;
     --prod)
         CMD="$INSTALL_CMD $PKGS_PROD"
         ;;
