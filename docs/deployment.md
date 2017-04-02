@@ -38,12 +38,15 @@ Things to note:
 Prerequisites
 -------------
 
-**Supported operating system:** This manual is written for Debian 8 and Ubuntu 16.04/14.04. Any
+**Supported operating system:** This manual is written for Debian 8+ and Ubuntu 16.04+. Any
 other modern Linux distribution should also do the trick, given that it is able to run Docker and
 Python (see the [README](../README.md) for exact version requirements).
 
-**Operating system packages:** ensure you've installed all dependencies listed in the
-[README](../README.md).
+**Operating system packages:** For Debian and Ubuntu, you can use
+
+    ./support/scripts/debian_setup.sh --prod
+
+to install all required packages.
 
 **Hostname setup:** verify your system's hostname is setup correctly. `hostname` and `hostname -f`
 should print the short and fully qualified hostname of your machine, e.g.:
