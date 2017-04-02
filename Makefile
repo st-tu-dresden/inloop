@@ -44,7 +44,7 @@ virtualenv:
 initdb:
 	mkdir -p .state
 	python manage.py migrate
-	python manage.py createsuperuser --username admin --email admin@localhost
+	python manage.py loaddata demo_accounts
 
 devenv: virtualenv
 	-cp -i .env_develop .env
