@@ -4,6 +4,35 @@
   }
 }
 
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 90px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  padding: 20px 0;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+@media (min-width: 500px) {
+  .footer-left {
+    float: left;
+  }
+
+  .footer-right {
+    float: right;
+  }
+}
+
 /* @begin anchor.js styles */
 .anchorjs-link:hover {
   text-decoration: none;

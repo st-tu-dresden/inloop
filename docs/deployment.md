@@ -97,6 +97,7 @@ Set and `export` all required [environment variables](#environment-variables).
     ./manage.py createsuperuser
 
     ./manage.py set_default_site --system-fqdn --name INLOOP
+    ./manage.py loaddata about_pages
     ./manage.py collectstatic
 
 Create upload directory with correct permissions
