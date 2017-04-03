@@ -1,6 +1,6 @@
 {% load staticfiles %}
 {% load flatpages %}
-{% get_flatpages as fpages %}
+{% get_flatpages '/about/' as about_pages %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -31,9 +31,6 @@
             <ul class="nav navbar-nav navbar-right">
                 {% block navigation %}
                 <li><a href="{% url 'home' %}">Go Back</a></li>
-                {% for page in fpages %}
-                    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-                {% endfor %}
                 {% endblock %}
             </ul>
         </div>
@@ -61,6 +58,11 @@
       <li class="text-muted">
         &copy; {% now "Y" %} <a href="https://github.com/st-tu-dresden/inloop">@st-tu-dresden</a>
       </li>
+    </ul>
+    <ul class="list-inline pull-right">
+{% for page in about_pages %}
+      <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+{% endfor %}
     </ul>
   </div>
 </footer>
