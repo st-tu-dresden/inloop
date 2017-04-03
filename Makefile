@@ -44,7 +44,7 @@ virtualenv:
 initdb:
 	mkdir -p .state
 	python manage.py migrate
-	python manage.py loaddata demo_accounts development_site
+	python manage.py loaddata demo_accounts development_site about_pages
 
 devenv: virtualenv
 	-cp -i .env_develop .env
