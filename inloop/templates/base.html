@@ -55,6 +55,16 @@
 {% block content %}{% endblock %}
 </div>
 
+<footer class="footer">
+  <div class="container clearfix">
+    <ul class="list-inline pull-left">
+      <li class="text-muted">
+        &copy; {% now "Y" %} <a href="https://github.com/st-tu-dresden/inloop">@st-tu-dresden</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 {% block extrabody %}{% endblock %}
