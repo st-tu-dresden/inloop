@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin-bottom: 90px;
 }
 
 .footer {
@@ -20,6 +20,17 @@ body {
   height: 60px;
   padding: 20px 0;
   border-top: 1px solid #eee;
+  text-align: center;
+}
+
+@media (min-width: 500px) {
+  .footer-left {
+    float: left;
+  }
+
+  .footer-right {
+    float: right;
+  }
 }
 
 /* @begin anchor.js styles */

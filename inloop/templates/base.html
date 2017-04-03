@@ -54,12 +54,12 @@
 
 <footer class="footer">
   <div class="container clearfix">
-    <ul class="list-inline pull-left">
+    <ul class="list-inline footer-left">
       <li class="text-muted">
         &copy; {% now "Y" %} <a href="https://github.com/st-tu-dresden/inloop">@st-tu-dresden</a>
       </li>
     </ul>
-    <ul class="list-inline pull-right">
+    <ul class="list-inline footer-right">
 {% for page in about_pages %}
       <li><a href="{{ page.url }}">{{ page.title }}</a></li>
 {% endfor %}
