@@ -35,6 +35,10 @@ class PasswordChangeView(LoginRequiredMixin, FormView):
 
 
 class ProfileView(LoginRequiredMixin, View):
+    """
+    View and edit a User model and its related StudentDetails using one HTML form.
+    """
+
     template_name = "accounts/profile_form.html"
     success_url = reverse_lazy("accounts:profile")
 
@@ -50,14 +54,12 @@ class ProfileView(LoginRequiredMixin, View):
         return self.forms_invalid(forms)
 
     def get_forms(self, data=None):
-        forms = [UserChangeForm(instance=self.request.user, data=data)]
         # StudentDetails may not yet exist for this user:
-        try:
-            details = StudentDetails.objects.get(user=self.request.user)
-            forms.append(StudentDetailsForm(instance=details, data=data))
-        except StudentDetails.DoesNotExist:
-            forms.append(StudentDetailsForm(data=data))
-        return forms
+        details = StudentDetails.objects.get_or_create(user=self.request.user)[0]
+        return [
+            UserChangeForm(instance=self.request.user, data=data),
+            StudentDetailsForm(instance=details, data=data)
+        ]
 
     def forms_invalid(self, forms):
         return TemplateResponse(self.request, self.template_name, context={
