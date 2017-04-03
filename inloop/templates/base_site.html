@@ -8,7 +8,7 @@
     <li><a href="{{ page.url }}">{{ page.title }}</a></li>
   {% endfor %}
   {% if user.is_superuser or user.is_staff %}
-    <li><a href="{% url 'admin:index' %}">Management</a></li>
+    <li><a href="{% url 'admin:index' %}">Administration</a></li>
   {% endif %}
   <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
   <form id="logout-form" method="post" action="{% url 'logout' %}">
