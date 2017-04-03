@@ -2,6 +2,7 @@
 Description=INLOOP huey workers
 Requires=docker.service
 After=docker.service
+PartOf=gunicorn.service
 
 [Service]
 Environment=HOME=/var/lib/inloop

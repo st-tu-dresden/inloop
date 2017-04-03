@@ -139,7 +139,6 @@ Updates
     ./manage.py migrate
     ./manage.py collectstatic
     sudo service gunicorn restart
-    sudo service huey restart
 
 
 Environment variables
