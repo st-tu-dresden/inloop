@@ -5,12 +5,18 @@ PYTHON := python3.5
 PYTAG  := $(shell echo $(PYTHON) | sed 's/thon//;s/\.//')
 VENV   := $(PWD)/.venvs/$(PYTAG)
 
+TEST_CMD := ./manage.py test --failfast $(SUITE)
+WATCH_DIRS := inloop tests
+
 default:
 	@echo "Please specify a Makefile target."
 	@exit 1
 
 coveragetest: .state/docker
-	coverage run manage.py test --failfast $(SUITE)
+	coverage run $(TEST_CMD)
+
+watchmedo:
+	@watchmedo shell-command --patterns="*.py" --recursive --command "$(TEST_CMD)" $(WATCH_DIRS)
 
 lint:
 	isort --quiet --check-only
@@ -38,7 +44,7 @@ virtualenv:
 initdb:
 	mkdir -p .state
 	python manage.py migrate
-	python manage.py createsuperuser --username admin --email admin@localhost
+	python manage.py loaddata demo_accounts development_site about_pages
 
 devenv: virtualenv
 	-cp -i .env_develop .env
@@ -61,4 +67,4 @@ purge: clean
 	rm -rf .state .venvs .env node_modules
 	-docker rmi $(IMAGE)
 
-.PHONY: default coveragetest lint install-deps install-tools virtualenv initdb devenv deps clean purge
+.PHONY: default coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge
