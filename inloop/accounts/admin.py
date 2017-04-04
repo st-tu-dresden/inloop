@@ -6,7 +6,7 @@ from inloop.accounts.models import Course, StudentDetails
 @admin.register(StudentDetails)
 class StudentDetailsAdmin(admin.ModelAdmin):
     list_display = ["user", "email", "first_name", "last_name", "matnum", "course"]
-    list_filter = ["course"]
+    list_filter = ["course", "user__date_joined"]
     search_fields = ["user__first_name", "user__last_name", "user__email", "matnum"]
     fields = ["user", "email", "first_name", "last_name", "matnum", "course"]
     readonly_fields = ["user", "email", "first_name", "last_name"]

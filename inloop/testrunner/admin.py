@@ -16,7 +16,7 @@ class TestResultAdmin(admin.ModelAdmin):
         TestOutputInline
     ]
     list_display = ('id', 'linked_solution', 'created_at', 'runtime', 'return_code', 'is_success')
-    list_filter = ['return_code']
+    list_filter = ['return_code', 'created_at']
     readonly_fields = (
         'linked_solution', 'created_at', 'runtime',
         'return_code', 'is_success', 'stdout', 'stderr'
