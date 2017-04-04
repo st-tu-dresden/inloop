@@ -15,7 +15,7 @@ class SolutionAdmin(admin.ModelAdmin):
         SolutionFileInline
     ]
     list_display = ('id', 'author', 'task', 'submission_date', 'passed', 'site_link')
-    list_filter = ['passed', 'task']
+    list_filter = ['passed', 'task__category', 'task']
     search_fields = [
         'author__username',
         'author__email',
