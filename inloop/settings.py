@@ -75,7 +75,6 @@ if DEBUG and env.bool("DJDT", default=False):
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
     ROOT_URLCONF = "inloop.debug_urls"
-    DEBUG_TOOLBAR_CONFIG = {"JQUERY_URL": ""}
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Europe/Berlin"
