@@ -8,10 +8,6 @@ VENV   := $(PWD)/.venvs/$(PYTAG)
 TEST_CMD := ./manage.py test --failfast $(SUITE)
 WATCH_DIRS := inloop tests
 
-default:
-	@echo "Please specify a Makefile target."
-	@exit 1
-
 ## Run the test suite (takes an optional SUITE= argument)
 test: .state/docker
 	$(TEST_CMD)
@@ -80,4 +76,20 @@ purge: clean
 	rm -rf .state .venvs .env node_modules
 	-docker rmi $(IMAGE)
 
-.PHONY: default test coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge
+define PYHELPTEXT
+import re
+contents = open('Makefile').read()
+pattern = re.compile(r'## (.+)\\n([a-z-]+):')
+for desc, target in pattern.findall(contents):
+	print('  {:15s} {}'.format(target, desc))
+endef
+
+export PYHELPTEXT
+help:
+	@echo "Please specify one of the following targets:"
+	@echo
+	@echo "$$PYHELPTEXT" | python3
+	@echo
+
+.DEFAULT_GOAL := help
+.PHONY: test coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge help
