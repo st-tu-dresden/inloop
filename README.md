@@ -63,7 +63,7 @@ account *student* have been created, with both passwords set to *secret*.
 ## Authors and credits
 
 **Project lead**: Martin Morgenstern<br>
-**Contributors**: Dominik Muhs
+**Contributors**: Dominik Muhs, Jonathan Seitz
 
 INLOOP borrows its concept from the Praktomat, developed originally at the
 University of Passau and later at the Karlsruhe Institute of Technology:
