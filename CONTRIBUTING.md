@@ -27,8 +27,9 @@ conventions](#coding-conventions).
 
 ## Automated testing
 
-The command `make coveragetest` runs the complete test suite. You can pass an optional `SUITE`
-variable to `make` to narrow down the packages which should be searched for tests:
+The commands `make test` and `make coveragetest` run the complete test suite (the latter one
+additionally records code coverage). You can pass an optional `SUITE=` argument to `make` to narrow
+down the Python packages or modules which should be searched for tests:
 
     # runs all tests (15 sec)
     make coveragetest
@@ -36,8 +37,11 @@ variable to `make` to narrow down the packages which should be searched for test
     # runs unit tests (3 sec)
     make coveragetest SUITE=tests.unit
 
-    # generate HTML test report
+    # generate HTML test report (saved to htmlcov/index.html)
     coverage html
+
+**Tip**: Use `make watchmedo SUITE=tests.unit`, which watches for file changes in `inloop/` and
+`tests/` and re-runs the tests automatically.
 
 
 ## Rules for contributing code
