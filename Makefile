@@ -20,6 +20,11 @@ coveragetest: .state/docker
 watchmedo:
 	@watchmedo shell-command --patterns="*.py" --recursive --command "$(TEST_CMD)" $(WATCH_DIRS)
 
+## Start a live-reload proxy watching for style changes
+browsersync:
+	@command -v browser-sync >/dev/null || echo "Please run 'npm install -g browser-sync'." 1>&2
+	@browser-sync start --proxy localhost:8000 --files "assets,inloop/**/*.html"
+
 ## Run syntax and coding convention checks
 lint:
 	isort --quiet --check-only
