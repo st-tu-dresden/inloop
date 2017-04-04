@@ -12,6 +12,9 @@ default:
 	@echo "Please specify a Makefile target."
 	@exit 1
 
+test: .state/docker
+	$(TEST_CMD)
+
 coveragetest: .state/docker
 	coverage run $(TEST_CMD)
 
@@ -67,4 +70,4 @@ purge: clean
 	rm -rf .state .venvs .env node_modules
 	-docker rmi $(IMAGE)
 
-.PHONY: default coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge
+.PHONY: default test coveragetest watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge
