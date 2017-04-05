@@ -1,3 +1,4 @@
+defusedxml
 django-constance
 django-environ
 django-extensions
