@@ -9,7 +9,7 @@ Javadoc for the class
 
 which is part of Ant (see https://github.com/apache/ant).
 """
-from xml.etree import ElementTree as ET
+from defusedxml import ElementTree as ET
 
 
 def checkeroutput_filter(queryset):
