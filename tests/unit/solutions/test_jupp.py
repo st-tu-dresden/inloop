@@ -3,12 +3,13 @@ from unittest import TestCase
 
 from inloop.solutions.prettyprint import junit
 
+samples_path = Path(__file__).parent / "samples"
+
 
 class JUnitXMLTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        path = Path(__file__).parent / "xml" / "TEST-TaxiTest.xml"
-        with path.open(encoding="utf-8") as f:
+        with Path(samples_path, "TEST-TaxiTest.xml").open(encoding="utf-8") as f:
             cls.SAMPLE_XML = f.read()
 
     def setUp(self):
