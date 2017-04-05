@@ -56,6 +56,16 @@ class JUnitXMLTests(TestCase):
         ts = junit.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
         self.assertEqual(len(ts["testcases"]), 0)
 
+    def test_missing_systemerr_or_systemout(self):
+        documents = [
+            "<testsuite><system-err /></testsuite>",
+            "<testsuite><system-out /></testsuite>",
+            "<testsuite></testsuite>",
+        ]
+        for document in documents:
+            ts = junit.xml_to_dict(document)
+            self.assertEqual(len(ts["testcases"]), 0)
+
 
 class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):

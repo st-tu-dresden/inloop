@@ -42,9 +42,16 @@ def testsuite_to_dict(testsuite):
     ]
     ts["total"] = len(ts["testcases"])
     ts["passed"] = ts["total"] - ts["failures"] - ts["errors"]
-    ts["system_out"] = testsuite.find("system-out").text
-    ts["system_err"] = testsuite.find("system-err").text
+    ts["system_out"] = get_text_safe(testsuite.find("system-out"))
+    ts["system_err"] = get_text_safe(testsuite.find("system-err"))
     return ts
+
+
+def get_text_safe(element):
+    """Return the element's text attribute if possible, otherwise None."""
+    if element is not None:
+        return element.text
+    return None
 
 
 def testcase_to_dict(testcase):
