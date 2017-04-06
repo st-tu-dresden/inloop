@@ -66,6 +66,7 @@ class TaskQuerySet(models.QuerySet):
         return {
             "num_completed": num_completed,
             "num_published": num_published,
+            "is_completed": num_completed == num_published,
             "progress": progress
         }
 
