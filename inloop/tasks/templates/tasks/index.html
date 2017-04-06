@@ -12,7 +12,7 @@
   <table class="table table-align-pretty">
     <thead>
     <tr>
-      <th>Title</th>
+      <th>Category</th>
       <th>Progress</th>
       <th class="tasks-progressbar-col"></th>
       <th>Completed</th>
@@ -23,7 +23,7 @@
     {% for cat, data in categories %}
     <tr>
       <td>
-        <a href="{% url 'tasks:category' cat.slug %}">{{ cat.name }}</a><br />
+        <a href="{% url 'tasks:category' cat.slug %}">{{ cat.name }}</a><br>
         {{ cat.description }}
       </td>
       <td>{{ data.num_completed }} / {{ data.num_published }}</td>
