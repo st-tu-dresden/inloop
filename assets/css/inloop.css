@@ -130,6 +130,12 @@ body {
 }
 /* @end */
 
+/* @begin progressbar styles */
+.tasks-progressbar-col {
+  width: 30%;
+}
+/* @end */
+
 /* @begin <pre> styles for console outputs, stack traces, etc. */
 .console-output {
   font-size: 86%;
