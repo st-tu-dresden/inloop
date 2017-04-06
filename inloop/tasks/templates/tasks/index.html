@@ -21,22 +21,22 @@
     </thead>
 
     <tbody>
-    {% for cat, data in categories %}
+    {% for category, category_data in categories %}
     <tr>
       <td>
-        <a href="{% url 'tasks:category' cat.slug %}">{{ cat.name }}</a><br>
-        {{ cat.description|markdown }}
+        <a href="{% url 'tasks:category' category.slug %}">{{ category.name }}</a><br>
+        {{ category.description|markdown }}
       </td>
-      <td>{{ data.num_completed }} / {{ data.num_published }}</td>
+      <td>{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
       <td>
         <div class="progress">
-          <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.num_completed }}"
-              aria-valuemin="0" aria-valuemax="{{ data.num_published }}" style="width: {{ data.progress }}%;">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
+              aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
           </div><!--/.progress-bar-->
         </div><!--/.progress-->
       </td>
       <td>
-      {% if data.is_completed %}
+      {% if category_data.is_completed %}
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         <span class="sr-only">Yes</span>
       {% else %}
