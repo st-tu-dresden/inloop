@@ -1,4 +1,5 @@
 {% extends 'base_site.html' %}
+{% load markdown %}
 
 {% block title %}Homepage{% endblock %}
 
@@ -24,7 +25,7 @@
     <tr>
       <td>
         <a href="{% url 'tasks:category' cat.slug %}">{{ cat.name }}</a><br>
-        {{ cat.description }}
+        {{ cat.description|markdown }}
       </td>
       <td>{{ data.num_completed }} / {{ data.num_published }}</td>
       <td>
