@@ -76,7 +76,7 @@ if DEBUG and env.bool("DJDT", default=False):
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
     ROOT_URLCONF = "inloop.debug_urls"
 
-TIME_ZONE = "Europe/Berlin"
+TIME_ZONE = env("TIME_ZONE", default="Europe/Berlin")
 USE_TZ = True
 
 USE_I18N = USE_L10N = False
