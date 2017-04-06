@@ -22,6 +22,7 @@
 
     <tbody>
     {% for category, category_data in categories %}
+    {% if category_data.num_published > 0 %}
     <tr>
       <td>
         <a href="{% url 'tasks:category' category.slug %}">{{ category.name }}</a><br>
@@ -45,6 +46,7 @@
       {% endif %}
       </td>
     </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
   </table>
