@@ -1,37 +1,56 @@
 {% extends 'base_site.html' %}
+{% load markdown %}
 
 {% block title %}Homepage{% endblock %}
 
 {% block content %}
-<div class="center-box-md">
 
-  <div class="row">
-  {% for cat, data in categories %}
-  {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
-    <div class="col-md-6">
-      <div class="thumbnail">
-        <div class="caption">
-          <a href="{% url 'tasks:category' cat.slug %}">
-            <h3>{{ cat.name }}</h3>
-            <hr>
-            <div class="progress">
-              <div class="progress-bar" role="progressbar" aria-valuenow="{{ data.num_completed }}"
-                  aria-valuemin="0" aria-valuemax="{{ data.num_published }}" style="width: {{ data.progress }}%;">
-                {% if data.num_completed > 0 %}
-                {{ data.num_completed }} / {{ data.num_published }}
-                {% else %}
-                <span class="sr-only">No completed tasks</span>
-                {% endif %}
-              </div><!--/.progress-bar-->
-            </div><!--/.progress-->
-          </a>
-        </div><!--/.caption-->
-      </div><!--/.thumbnail-->
-    </div><!--/.col-md6-->
-    {% empty %}
-    <p>There are currently no tasks in the system.</p>
+<ol class="breadcrumb">
+  <li class="active">Tasks</li>
+</ol>
+
+{% if categories %}
+  <table class="table table-align-pretty">
+    <thead>
+    <tr>
+      <th>Category</th>
+      <th>Progress</th>
+      <th class="tasks-progressbar-col"></th>
+      <th>Completed</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for category, category_data in categories %}
+    <tr>
+      <td>
+        <a href="{% url 'tasks:category' category.slug %}">{{ category.name }}</a><br>
+        {{ category.description|markdown }}
+      </td>
+      <td>{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
+      <td>
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
+              aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
+          </div><!--/.progress-bar-->
+        </div><!--/.progress-->
+      </td>
+      <td>
+      {% if category_data.is_completed %}
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        <span class="sr-only">Yes</span>
+      {% else %}
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <span class="sr-only">No</span>
+      {% endif %}
+      </td>
+    </tr>
     {% endfor %}
-  </div><!--/.row-->
+    </tbody>
+  </table>
+{% else %}
+  <div class="alert alert-info">There are currently no tasks in the system.</div>
+{% endif %}
 
-</div><!--./center-box-md-->
+
 {% endblock %}

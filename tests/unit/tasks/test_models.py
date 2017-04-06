@@ -51,12 +51,14 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
             self.assertDictEqual(self.category1.completion_info(user), {
                 "num_completed": 0,
                 "num_published": 2,
+                "is_completed": False,
                 "progress": 0
             })
         for user in [self.bob, self.alice]:
             self.assertDictEqual(self.category2.completion_info(user), {
                 "num_completed": 0,
                 "num_published": 0,
+                "is_completed": True,
                 "progress": 0
             })
 
@@ -69,6 +71,7 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
             self.assertDictEqual(self.category1.completion_info(user), {
                 "num_completed": 1,
                 "num_published": 2,
+                "is_completed": False,
                 "progress": 50
             })
 
@@ -80,6 +83,7 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
             self.assertDictEqual(self.category1.completion_info(user), {
                 "num_completed": 2,
                 "num_published": 2,
+                "is_completed": True,
                 "progress": 100
             })
 
