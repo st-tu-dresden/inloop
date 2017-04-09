@@ -148,6 +148,7 @@ The following variables are **required**:
 
 Name                      | Description
 ------------------------- | -----------
+`ADMINS`                  | Comma-separated list of email addresses which receive error reports
 `ALLOWED_HOSTS`           | Comma-separated list of [allowed hosts][1]
 `CACHE_URL`               | 12factor style cache URL, e.g. `redis://localhost:1234/0`
 `DATABASE_URL`            | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
@@ -167,7 +168,6 @@ The following variables may be set **optionally**:
 
 Name              | Description (default value)
 ----------------- | ---------------------------
-`ADMINS`          | Comma-separated list of email addresses which should be notified on errors
 `DEBUG`           | Debug mode, don't use this in production (`False`)
 `EMAIL_URL`       | 12factor style email URL (`smtp://:@localhost:25`)
 `INTERNAL_IPS`    | Comma-separated list of IP addresses for which more verbose error reports are shown
