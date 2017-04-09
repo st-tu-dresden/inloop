@@ -141,6 +141,28 @@ Updates
     sudo service gunicorn restart
 
 
+Troubleshooting
+---------------
+
+Got a server error? Look here for hints:
+
+* Check your mailbox, because Django sends detailed error reports via e-mail.
+* Look for error messages in the nginx error log, usually located in `/var/log/nginx/error.log`.
+* For `systemd` users, service logs for gunicorn and huey can be viewed using
+
+       sudo journalctl _SYSTEMD_UNIT=gunicorn.service
+
+  and
+
+       sudo journalctl _SYSTEMD_UNIT=huey.service
+
+* If you are still stuck with `upstart` instead of `systemd`, the service logs are written to
+   `/var/log/upstart/gunicorn.log` and `/var/log/upstart/huey.log`.
+
+The most common source of errors are wrong file system permissions. Please double check that you
+have changed ownership and access rights as described in the [preparation section](#preparations).
+
+
 Environment variables
 ---------------------
 
