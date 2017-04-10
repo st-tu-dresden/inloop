@@ -1,0 +1,11 @@
+[Unit]
+Description=INLOOP gunicorn web workers
+Requires=huey.service
+After=huey.service
+
+[Service]
+ExecStart=/usr/bin/envdir /home/inloop/envdir setuidgid gunicorn gunicorn inloop.wsgi:application
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

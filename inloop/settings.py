@@ -1,8 +1,8 @@
 """
 INLOOP settings module, inspired by 12factor.
 
-Configuration is entirely controlled by environment vars. See docs/deployment-guide.md
-for a list and description of available options.
+Configuration is entirely controlled by environment vars. See
+docs/deployment.md for a list and description of available options.
 
 """
 
@@ -147,7 +147,7 @@ else:
 vars().update(env.email(default="smtp://:@localhost:25"))
 
 ADMINS = [
-    ("", email.strip()) for email in env.list("ADMINS", default="")
+    ("", email.strip()) for email in env.list("ADMINS")
 ]
 EMAIL_SUBJECT_PREFIX = "[INLOOP] "
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("FROM_EMAIL")

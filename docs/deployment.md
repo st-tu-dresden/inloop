@@ -38,15 +38,14 @@ Things to note:
 Prerequisites
 -------------
 
-**Supported operating system:** This manual is written for Debian 8 and Ubuntu 16.04/14.04. Any
+**Supported operating system:** This manual is written for Debian 8+ and Ubuntu 16.04+. Any
 other modern Linux distribution should also do the trick, given that it is able to run Docker and
 Python (see the [README](../README.md) for exact version requirements).
 
-**Operating system packages:** ensure you've installed all dependencies listed in the
-[README](../README.md).
+**Docker setup**: see the [installation notes](installation_notes.md).
 
-**Hostname setup:** verify your system's hostname is setup correctly. `hostname` and `hostname -f`
-should print the short and fully qualified hostname of your machine, e.g.:
+**Hostname setup:** verify that your system's hostname is configured correctly. `hostname` and
+`hostname -f` should print the short and fully qualified hostname of your machine, e.g.:
 
     $ hostname
     inloop
@@ -75,49 +74,227 @@ the server using the database administrator role (`postgres`):
 Preparations
 ------------
 
-Optional: separate file systems for `/var/lib/docker` and `/var/lib/inloop`
+#### Optional: isolate file systems
 
-Unix user accounts:
-- Management user account `inloop` (in groups `sudo` and `docker`)
-- Daemon user accounts `gunicorn` and `huey` (home `/var/lib/inloop`)
+For increased robustness, we recommend to create a separate partition (or LVM volume) and file
+system for the Docker runtime (`/var/lib/docker`) and the INLOOP data folder (`/var/lib/inloop`).
+The data folder may be mounted with stricter mount options (`nosuid` and `nodev`). How to do this
+is out of scope of this manual.
 
-SSH keys for `huey` (deployment keys)
 
-Create PostgreSQL user and schema
+#### Unix user accounts
+
+As mentioned in the [overview](#overview), the core components of INLOOP run under separate,
+unprivileged daemon user accounts, `gunicorn` and `huey`, created with:
+
+    sudo adduser --system --group --home /var/lib/inloop huey
+    sudo adduser --system --group --home / gunicorn
+
+Furthermore, a privileged management user account `inloop` must be created with:
+
+    sudo adduser inloop
+    sudo adduser inloop docker
+    sudo adduser inloop sudo
+
+The `inloop` account will be used by you for Git checkouts/pulls and the execution of Django
+management commands.
+
+
+#### SSH deployment key for imports from Git
+
+The Git import runs non-interactively and there will be no password prompt. Importing from a public
+Git repository works out of the box, but for protected repositories, a SSH key without a passphrase
+must be generated for the unix user `huey`:
+
+    sudo -u huey -H ssh-keygen -N ''
+
+This key can then be used as a *deployment key* for GitHub.
+
+
+#### PostgreSQL user and database
+
+Create a PostgreSQL user and database, both named `inloop`:
+
+    sudo -u postgres -i createuser inloop
+    sudo -u postgres -i createdb --owner=inloop inloop
+
+Because we have chosen the same name for the PostgreSQL user, the unix user `inloop` is now able to
+use `psql` without further authentication. This comes in handy for management tasks, such as the
+creation of database backups.
+
+
+#### Prepare directories
+
+We will place `MEDIA_ROOT` (see below) into `huey`'s home directory: `/var/lib/inloop/media`. For
+the user uploads to work, `gunicorn` must be able to write to `<MEDIA_ROOT>/solutions`. Everything
+else must be owned by `huey`:
+
+    sudo mkdir -p /var/lib/inloop/media/solutions
+    sudo chown -R huey:huey /var/lib/inloop
+    sudo chown gunicorn:gunicorn /var/lib/inloop/media/solutions
 
 
 Installation
 ------------
 
-Set and `export` all required [environment variables](#environment-variables).
+1. Log into the `inloop` user account, either via `su - inloop` or `sudo -u inloop -i`.
+2. Clone the INLOOP Git repository into `inloop`'s home:
 
-    python3 -m venv $VENV_DIR && source $VENV_DIR/bin/activate
-    pip install -r requirements/main.txt -r requirements/prod.txt
-    ./manage.py migrate
-    ./manage.py createsuperuser
+        git clone https://github.com/st-tu-dresden/inloop.git ~/inloop
+        cd ~/inloop
 
-    ./manage.py set_default_site --system-fqdn --name INLOOP
-    ./manage.py loaddata about_pages
-    ./manage.py collectstatic
+3. Install required operating system packages (for Debian and Ubuntu):
 
-Create upload directory with correct permissions
+        ./support/scripts/debian_setup.sh --prod
 
-    mkdir -p /var/lib/inloop/media/solutions
-    chown gunicorn:gunicorn /var/lib/inloop/media/solutions
+4. Create a clean virtualenv for INLOOP:
 
-Configure automatic startup using the provided [upstart job files](../support/etc/init).
+        python3 -m venv ~/virtualenv
 
-Configure nginx by adapting the provided [example nginx location](../support/etc/nginx).
+5. Configure INLOOP through environment variables. We will use the `envdir` tool from djb's
+   daemontools package for this purpose, because it makes it very easy to manage a set of
+   environment variables through files:
+
+        mkdir ~/envdir
+        chmod 700 ~/envdir
+
+   For each [required environment variable](#environment-variables), a file has to be created:
+
+        echo VALUE > ~/envdir/VARIABLE_NAME
+
+   For example:
+
+        echo inloop.settings > ~/envdir/DJANGO_SETTINGS_MODULE
+        echo en_US.UTF-8 > ~/envdir/LANG
+        echo ~/inloop > ~/envdir/PYTHONPATH
+        echo ~/virtualenv/bin:/usr/bin:/bin > ~/envdir/PATH
+        echo ~/htdocs/static > ~/envdir/STATIC_ROOT
+        echo /var/lib/inloop/media > ~/envdir/MEDIA_ROOT
+        pwgen -s 64 1 > ~/envdir/SECRET_KEY
+        ...
+
+   Since the services run under different unix user accounts, a password must be set for the
+   `inloop` database user:
+
+        psql -c "ALTER ROLE inloop WITH PASSWORD '<password>';"
+
+   Be sure to use the same password in the `DATABASE_URL` environment variable:
+
+        echo postgres://inloop:<password>@localhost:5432/inloop > ~/envdir/DATABASE_URL
+
+   A fully populated envdir will look like this:
+
+        inloop@inloop:~$ tree ~/envdir
+        /home/inloop/envdir/
+        ├── ADMINS
+        ├── ALLOWED_HOSTS
+        ├── CACHE_URL
+        ├── DATABASE_URL
+        ├── DJANGO_SETTINGS_MODULE
+        ├── FROM_EMAIL
+        ├── GITHUB_SECRET
+        ├── GIT_ROOT
+        ├── LANG
+        ├── MEDIA_ROOT
+        ├── PATH
+        ├── PROXY_ENABLED
+        ├── PYTHONPATH
+        ├── REDIS_URL
+        ├── SECRET_KEY
+        ├── SPT_NOENV
+        ├── STATIC_ROOT
+        ├── WEB_CONCURRENCY
+        └── X_ACCEL_LOCATION
+
+        0 directories, 19 files
+
+    You can list the effective configuration using:
+
+        envdir ~/envdir env
+
+6. Load the environment:
+
+        exec envdir ~/envdir $SHELL
+
+   Append the above line to `~/.bash_profile`, to automagically load the envdir whenever you login
+   as user `inloop`.
+
+7. Install all Python requirements and run database migrations. Before, please verify that the
+   output of `command -v pip` is `/home/inloop/virtualenv/bin/pip` and rerun steps 4-6 if this
+   is not the case.
+
+        cd ~/inloop
+        pip install -r requirements/main.txt -r requirements/prod.txt
+        django-admin migrate
+
+   **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.
+
+8. Install third-party JS/CSS frameworks and collect all static files into `STATIC_ROOT`:
+
+        npm install --production
+        mkdir -p $STATIC_ROOT
+        django-admin collectstatic
+
+9. Create a superuser, load initial data and configure Django's contrib.sites app:
+
+        django-admin createsuperuser
+        django-admin loaddata about_pages
+        django-admin set_default_site --system-fqdn --name INLOOP
+
+10. Finally, install the provided [upstart job files](../support/etc/init) or [systemd service
+    units](../support/etc/systemd/system) to their appropriate places. For `systemd` systems:
+
+        sudo cp ~/inloop/support/etc/systemd/system/*.service /etc/systemd/system
+        sudo systemctl enable gunicorn.service huey.service
+
+    For `upstart` systems:
+
+        sudo cp ~/inloop/support/etc/init/*.conf /etc/init
+
+11. Configure nginx as a reverse proxy by copying and adapting the provided [example nginx
+   location](../support/etc/nginx) to `/etc/nginx/conf.d` (or `/etc/nginx/sites-available.d`).
+
+Gunicorn and huey may be started and stopped via `sudo service [start|stop|restart] <name>` and
+will start automatically at boot.
 
 
 Updates
 -------
 
-    git pull
-    pip install -r requirements/main.txt -r requirements/prod.txt
-    ./manage.py migrate
-    ./manage.py collectstatic
-    sudo service gunicorn restart
+1. Load the latest code from the INLOOP `master` branch:
+
+        cd ~/inloop
+        git pull
+
+2. Repeat steps 7 and 8 from the [installation chapter](#installation).
+
+3. Restart services:
+
+        sudo service gunicorn restart
+
+   Huey will be restarted automatically as a dependent service.
+
+
+Troubleshooting
+---------------
+
+Got a server error? Look here for hints:
+
+* Check your mailbox, because Django sends detailed error reports via e-mail.
+* Look for error messages in the nginx error log, usually located in `/var/log/nginx/error.log`.
+* For `systemd` users, service logs for gunicorn and huey can be viewed using
+
+       sudo journalctl _SYSTEMD_UNIT=gunicorn.service
+
+  and
+
+       sudo journalctl _SYSTEMD_UNIT=huey.service
+
+* If you are still stuck with `upstart` instead of `systemd`, the service logs are written to
+   `/var/log/upstart/gunicorn.log` and `/var/log/upstart/huey.log`.
+
+The most common source of errors are wrong file system permissions. Please double check that you
+have changed ownership and access rights as described in the [preparation section](#preparations).
 
 
 Environment variables
@@ -127,6 +304,7 @@ The following variables are **required**:
 
 Name                      | Description
 ------------------------- | -----------
+`ADMINS`                  | Comma-separated list of email addresses which receive error reports
 `ALLOWED_HOSTS`           | Comma-separated list of [allowed hosts][1]
 `CACHE_URL`               | 12factor style cache URL, e.g. `redis://localhost:1234/0`
 `DATABASE_URL`            | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
@@ -146,7 +324,6 @@ The following variables may be set **optionally**:
 
 Name              | Description (default value)
 ----------------- | ---------------------------
-`ADMINS`          | Comma-separated list of email addresses which should be notified on errors
 `DEBUG`           | Debug mode, don't use this in production (`False`)
 `EMAIL_URL`       | 12factor style email URL (`smtp://:@localhost:25`)
 `INTERNAL_IPS`    | Comma-separated list of IP addresses for which more verbose error reports are shown
