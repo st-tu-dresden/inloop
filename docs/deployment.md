@@ -78,31 +78,60 @@ the server using the database administrator role (`postgres`):
 Preparations
 ------------
 
-Optional: separate file systems for `/var/lib/docker` and `/var/lib/inloop`
+#### Optional: isolate file systems
 
-Create PostgreSQL user and schema
+For increased robustness, we recommend to create a separate partition (or LVM volume) and file
+system for the Docker runtime (`/var/lib/docker`) and the INLOOP data folder (`/var/lib/inloop`).
+The data folder may be mounted with stricter mount options (`nosuid` and `nodev`). How to do this
+is out of scope of this manual.
+
+
+#### Unix user accounts
+
+As mentioned in the [overview](#overview), the core components of INLOOP run under separate,
+unprivileged daemon user accounts, `gunicorn` and `huey`, created with:
+
+    sudo adduser --system --group --home /var/lib/inloop huey
+    sudo adduser --system --group --home / gunicorn
+
+Furthermore, a privileged management user account `inloop` must be created with:
+
+    sudo adduser inloop
+    sudo adduser inloop docker
+    sudo adduser inloop sudo
+
+The `inloop` account will be used by you for Git checkouts/pulls and the execution of Django
+management commands.
+
+
+#### SSH deployment key for imports from Git
+
+The Git import runs non-interactively and there will be no password prompt. Importing from a public
+Git repository works out of the box, but for protected repositories, a SSH key without a passphrase
+must be generated for the unix user `huey`:
+
+    sudo -u huey -H ssh-keygen -N ''
+
+This key can then be used as a *deployment key* for GitHub.
+
+
+#### PostgreSQL user and database
+
+Create a PostgreSQL user and database, both named `inloop`:
 
     sudo -u postgres -i createuser inloop
     sudo -u postgres -i createdb --owner=inloop inloop
 
-Unix user accounts
+Because we have chosen the same name for the PostgreSQL user, the unix user `inloop` is now able to
+use `psql` without further authentication. This comes in handy for management tasks, such as the
+creation of database backups.
 
-1. Management user account `inloop` (in groups `sudo` and `docker`):
 
-       sudo adduser inloop
-       sudo adduser inloop docker
-       sudo adduser inloop sudo
+#### Prepare directories
 
-2. Daemon user accounts `gunicorn` and `huey`:
-
-       sudo adduser --system --group --home /var/lib/inloop huey
-       sudo adduser --system --group --home / gunicorn
-
-SSH key w/o passphrase for `huey` (*deployment key*)
-
-    sudo -u huey -H ssh-keygen -N ''
-
-Prepare directories:
+We will place `MEDIA_ROOT` (see below) into `huey`'s home directory: `/var/lib/inloop/media`. For
+the user uploads to work, `gunicorn` must be able to write to `<MEDIA_ROOT>/solutions`. Everything
+else must be owned by `huey`:
 
     sudo mkdir -p /var/lib/inloop/media/solutions
     sudo chown -R huey:huey /var/lib/inloop
