@@ -42,11 +42,7 @@ Prerequisites
 other modern Linux distribution should also do the trick, given that it is able to run Docker and
 Python (see the [README](../README.md) for exact version requirements).
 
-**Operating system packages:** For Debian and Ubuntu, you can use
-
-    ./support/scripts/debian_setup.sh --prod
-
-to install all required packages.
+**Docker setup**: see the [installation notes](installation_notes.md).
 
 **Hostname setup:** verify that your system's hostname is configured correctly. `hostname` and
 `hostname -f` should print the short and fully qualified hostname of your machine, e.g.:
@@ -141,33 +137,132 @@ else must be owned by `huey`:
 Installation
 ------------
 
-Set and `export` all required [environment variables](#environment-variables).
+1. Log into the `inloop` user account, either via `su - inloop` or `sudo -u inloop -i`.
+2. Clone the INLOOP Git repository into `inloop`'s home:
 
-    python3 -m venv $VENV_DIR && source $VENV_DIR/bin/activate
-    pip install -r requirements/main.txt -r requirements/prod.txt
-    ./manage.py migrate
+        git clone https://github.com/st-tu-dresden/inloop.git ~/inloop
+        cd ~/inloop
 
-    ./manage.py createsuperuser
-    ./manage.py set_default_site --system-fqdn --name INLOOP
+3. Install required operating system packages (for Debian and Ubuntu):
 
-    npm install --production
-    ./manage.py collectstatic
-    gzip -kn $STATIC_ROOT/**/*.css $STATIC_ROOT/**/*.js
+        ./support/scripts/debian_setup.sh --prod
 
-Configure automatic startup using the provided [upstart job files](../support/etc/init)
-or [systemd service units](../support/etc/systemd/system).
+4. Create a clean virtualenv for INLOOP:
 
-Configure nginx by adapting the provided [example nginx location](../support/etc/nginx).
+        python3 -m venv ~/virtualenv
+
+5. Configure INLOOP through environment variables. We will use the `envdir` tool from djb's
+   daemontools package for this purpose, because it makes it very easy to manage a set of
+   environment variables through files:
+
+        mkdir ~/envdir
+        chmod 700 ~/envdir
+
+   For each [required environment variable](#environment-variables), a file has to be created:
+
+        echo VALUE > ~/envdir/VARIABLE_NAME
+
+   For example:
+
+        echo inloop.settings > ~/envdir/DJANGO_SETTINGS_MODULE
+        echo en_US.UTF-8 > ~/envdir/LANG
+        echo ~/inloop > ~/envdir/PYTHONPATH
+        echo ~/virtualenv/bin:/usr/bin:/bin > ~/envdir/PATH
+        echo ~/htdocs/static > ~/envdir/STATIC_ROOT
+        echo /var/lib/inloop/media > ~/envdir/MEDIA_ROOT
+        pwgen -s 64 1 > ~/envdir/SECRET_KEY
+        ...
+
+   A fully populated envdir will look like this:
+
+        inloop@inloop:~$ tree ~/envdir
+        /home/inloop/envdir/
+        ├── ADMINS
+        ├── ALLOWED_HOSTS
+        ├── CACHE_URL
+        ├── DATABASE_URL
+        ├── DJANGO_SETTINGS_MODULE
+        ├── FROM_EMAIL
+        ├── GITHUB_SECRET
+        ├── GIT_ROOT
+        ├── LANG
+        ├── MEDIA_ROOT
+        ├── PATH
+        ├── PROXY_ENABLED
+        ├── PYTHONPATH
+        ├── REDIS_URL
+        ├── SECRET_KEY
+        ├── SPT_NOENV
+        ├── STATIC_ROOT
+        ├── WEB_CONCURRENCY
+        └── X_ACCEL_LOCATION
+
+        0 directories, 19 files
+
+    You can list the effective configuration using:
+
+        envdir ~/envdir env
+
+6. Load the environment:
+
+        exec envdir ~/envdir $SHELL
+
+   Append the above line to `~/.bash_profile`, to automagically load the envdir whenever you login
+   as user `inloop`.
+
+7. Install all Python requirements and run database migrations. Before, please verify that the
+   output of `command -v pip` is `/home/inloop/virtualenv/bin/pip` and rerun steps 4-6 if this
+   is not the case.
+
+        cd ~/inloop
+        pip install -r requirements/main.txt -r requirements/prod.txt
+        django-admin migrate
+
+   **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.
+
+8. Install third-party JS/CSS frameworks and collect all static files into `STATIC_ROOT`:
+
+        npm install --production
+        mkdir -p $STATIC_ROOT
+        django-admin collectstatic
+
+9. Create a superuser and configure Django's contrib.sites app:
+
+        django-admin createsuperuser
+        django-admin set_default_site --system-fqdn --name INLOOP
+
+10. Finally, install the provided [upstart job files](../support/etc/init) or [systemd service
+    units](../support/etc/systemd/system) to their appropriate places. For `systemd` systems:
+
+        sudo cp ~/inloop/support/etc/systemd/system/*.service /etc/systemd/system
+        sudo systemctl enable gunicorn.service huey.service
+
+    For `upstart` systems:
+
+        sudo cp ~/inloop/support/etc/init/*.conf /etc/init
+
+11. Configure nginx as a reverse proxy by copying and adapting the provided [example nginx
+   location](../support/etc/nginx) to `/etc/nginx/conf.d` (or `/etc/nginx/sites-available.d`).
+
+Gunicorn and huey may be started and stopped via `sudo service [start|stop|restart] <name>` and
+will start automatically at boot.
 
 
 Updates
 -------
 
-    git pull
-    pip install -r requirements/main.txt -r requirements/prod.txt
-    ./manage.py migrate
-    ./manage.py collectstatic
-    sudo service gunicorn restart
+1. Load the latest code from the INLOOP `master` branch:
+
+        cd ~/inloop
+        git pull
+
+2. Repeat steps 7 and 8 from the [installation chapter](#installation).
+
+3. Restart services:
+
+        sudo service gunicorn restart
+
+   Huey will be restarted automatically as a dependent service.
 
 
 Troubleshooting
