@@ -173,6 +173,15 @@ Installation
         pwgen -s 64 1 > ~/envdir/SECRET_KEY
         ...
 
+   Since the services run under different unix user accounts, a password must be set for the
+   `inloop` database user:
+
+        psql -c "ALTER ROLE inloop WITH PASSWORD '<password>';"
+
+   Be sure to use the same password in the `DATABASE_URL` environment variable:
+
+        echo postgres://inloop:<password>@localhost:5432/inloop > ~/envdir/DATABASE_URL
+
    A fully populated envdir will look like this:
 
         inloop@inloop:~$ tree ~/envdir
