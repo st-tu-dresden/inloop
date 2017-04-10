@@ -4,11 +4,8 @@
 {% if user.is_authenticated %}
   <li><a href="{% url 'home' %}">Home</a></li>
   <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
-  {% for page in fpages %}
-    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-  {% endfor %}
   {% if user.is_superuser or user.is_staff %}
-    <li><a href="{% url 'admin:index' %}">Management</a></li>
+    <li><a href="{% url 'admin:index' %}">Administration</a></li>
   {% endif %}
   <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
   <form id="logout-form" method="post" action="{% url 'logout' %}">
@@ -25,8 +22,5 @@
   <li><a href="{% url 'login' %}">Login</a></li>
   {% endif %}
   <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
-  {% for page in fpages %}
-    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-  {% endfor %}
 {% endif %}
 {% endblock %}

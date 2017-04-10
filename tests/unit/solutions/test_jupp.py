@@ -3,12 +3,13 @@ from unittest import TestCase
 
 from inloop.solutions.prettyprint import junit
 
+samples_path = Path(__file__).parent / "samples"
+
 
 class JUnitXMLTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        path = Path(__file__).parent / "xml" / "TEST-TaxiTest.xml"
-        with path.open(encoding="utf-8") as f:
+        with Path(samples_path, "TEST-TaxiTest.xml").open(encoding="utf-8") as f:
             cls.SAMPLE_XML = f.read()
 
     def setUp(self):
@@ -54,3 +55,21 @@ class JUnitXMLTests(TestCase):
     def test_no_testcases(self):
         ts = junit.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
         self.assertEqual(len(ts["testcases"]), 0)
+
+    def test_missing_systemerr_or_systemout(self):
+        documents = [
+            "<testsuite><system-err /></testsuite>",
+            "<testsuite><system-out /></testsuite>",
+            "<testsuite></testsuite>",
+        ]
+        for document in documents:
+            ts = junit.xml_to_dict(document)
+            self.assertEqual(len(ts["testcases"]), 0)
+
+
+class XMLBombProtectionTest(TestCase):
+    def test_malicious_xmlfile(self):
+        with Path(samples_path, "billion_laughs.xml").open(encoding="utf-8") as f:
+            contents = f.read()
+        with self.assertRaises(ValueError):
+            junit.xml_to_dict(contents)

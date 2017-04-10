@@ -16,4 +16,9 @@ class TaskAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
-admin.site.register(Category)
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'display_order')
+    list_filter = ['display_order']
+    search_fields = ['name', 'display_order']
+    prepopulated_fields = {'slug': ('name',)}

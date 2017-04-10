@@ -29,6 +29,12 @@ if ! command -v docker >/dev/null; then
     exit 1
 fi
 
+if ! groups | grep -qw docker; then
+    echo "WARNING: your account ($USER) is not part of the 'docker' group." >&2
+    echo "Please run 'sudo adduser $USER docker' and log in again to be able" >&2
+    echo "to use docker as a non-root user." >&2
+fi
+
 if ! grep -q swapaccount=1 /proc/cmdline; then
     echo 'Swap accounting seems to be disabled. Please make sure you have' >&2
     echo 'configured GRUB as described in docs/installation_notes.md.' >&2

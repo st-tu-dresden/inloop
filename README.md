@@ -48,6 +48,9 @@ make devenv && source .venvs/py3*/bin/activate
 honcho start
 ```
 
+For demonstration and development purposes only, a superuser account *admin* and an ordinary user
+account *student* have been created, with both passwords set to *secret*.
+
 **Tip**: Add the line `DJDT=1` to your `.env` file to enable the Django debug toolbar.
 
 
@@ -60,7 +63,7 @@ honcho start
 ## Authors and credits
 
 **Project lead**: Martin Morgenstern<br>
-**Contributors**: Dominik Muhs
+**Contributors**: Dominik Muhs, Jonathan Seitz
 
 INLOOP borrows its concept from the Praktomat, developed originally at the
 University of Passau and later at the Karlsruhe Institute of Technology:

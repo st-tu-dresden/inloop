@@ -26,9 +26,11 @@ from inloop.tasks.models import Category, Task
 def index(request):
     categories = [
         (category, category.completion_info(request.user))
-        for category in Category.objects.order_by("name")
+        for category in Category.objects.order_by("display_order", "name")
     ]
-    return TemplateResponse(request, "tasks/index.html", {"categories": categories})
+    return TemplateResponse(request, "tasks/index.html", {
+        "categories": categories,
+    })
 
 
 @login_required

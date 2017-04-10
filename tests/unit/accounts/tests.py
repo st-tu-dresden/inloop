@@ -2,6 +2,7 @@ import re
 
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 
@@ -29,6 +30,27 @@ class StudentDetailsFormTest(TestCase):
         self.assertIn("matnum", form1.errors)
         self.assertNotIn("matnum", form2.errors)
         self.assertNotIn("matnum", form3.errors)
+
+
+class ProfileViewTest(SimpleAccountsData, TestCase):
+    url = reverse("accounts:profile")
+
+    def test_form_submit(self):
+        with self.assertRaises(ObjectDoesNotExist):
+            StudentDetails.objects.get(user=self.bob)
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        response = self.client.post(self.url, data={
+            "matnum": "1234567",
+            "first_name": "Bob",
+            "last_name": "Example",
+            "course": "1",
+        }, follow=True)
+        self.assertContains(response, "Your profile has been updated successfully.")
+        details = StudentDetails.objects.get(user=self.bob)
+        self.assertEqual(details.matnum, "1234567")
+        self.bob.refresh_from_db()
+        self.assertEqual(self.bob.first_name, "Bob")
+        self.assertEqual(self.bob.last_name, "Example")
 
 
 @override_config(

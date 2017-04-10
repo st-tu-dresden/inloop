@@ -75,14 +75,18 @@ if DEBUG and env.bool("DJDT", default=False):
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
     ROOT_URLCONF = "inloop.debug_urls"
-    DEBUG_TOOLBAR_CONFIG = {"JQUERY_URL": ""}
 
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Europe/Berlin"
-USE_I18N = True
-USE_L10N = True
+TIME_ZONE = env("TIME_ZONE", default="Europe/Berlin")
 USE_TZ = True
+
+USE_I18N = USE_L10N = False
+
 FIRST_DAY_OF_WEEK = 1
+TIME_FORMAT = "H:i"
+DATE_FORMAT = "d-m-Y"
+DATETIME_FORMAT = DATE_FORMAT + ", " + TIME_FORMAT
+SHORT_DATE_FORMAT = DATE_FORMAT
+SHORT_DATETIME_FORMAT = DATETIME_FORMAT
 
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",

@@ -1,6 +1,6 @@
 {% load staticfiles %}
 {% load flatpages %}
-{% get_flatpages as fpages %}
+{% get_flatpages '/about/' as about_pages %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}INLOOP{% endblock %} &ndash; INLOOP</title>
+  <title>{% block title %}INLOOP{% endblock %} &ndash; {{ site.name }}</title>
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.min.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/inloop.css' %}">
@@ -31,9 +31,6 @@
             <ul class="nav navbar-nav navbar-right">
                 {% block navigation %}
                 <li><a href="{% url 'home' %}">Go Back</a></li>
-                {% for page in fpages %}
-                    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-                {% endfor %}
                 {% endblock %}
             </ul>
         </div>
@@ -54,6 +51,21 @@
 {% endblock %}
 {% block content %}{% endblock %}
 </div>
+
+<footer class="footer">
+  <div class="container clearfix">
+    <ul class="list-inline footer-left">
+      <li class="text-muted">
+        &copy; {% now "Y" %} <a href="https://github.com/st-tu-dresden/inloop">@st-tu-dresden</a>
+      </li>
+    </ul>
+    <ul class="list-inline footer-right">
+{% for page in about_pages %}
+      <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+{% endfor %}
+    </ul>
+  </div>
+</footer>
 
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>

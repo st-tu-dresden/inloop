@@ -235,9 +235,10 @@ Installation
         mkdir -p $STATIC_ROOT
         django-admin collectstatic
 
-9. Create a superuser and configure Django's contrib.sites app:
+9. Create a superuser, load initial data and configure Django's contrib.sites app:
 
         django-admin createsuperuser
+        django-admin loaddata about_pages
         django-admin set_default_site --system-fqdn --name INLOOP
 
 10. Finally, install the provided [upstart job files](../support/etc/init) or [systemd service
@@ -328,6 +329,7 @@ Name              | Description (default value)
 `INTERNAL_IPS`    | Comma-separated list of IP addresses for which more verbose error reports are shown
 `PROXY_ENABLED`   | Must be set to `True` if running behind nginx (`False`)
 `SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`True`)
+`TIME_ZONE`       | The time zone used for displayed dates (`Europe/Berlin`)
 `WEB_CONCURRENCY` | The amount of Gunicorn workers to start (`1`)
 `X_ACCEL_LOCATION`| The internal `X-Accel-Redirect` location for nginx, e.g. `/sendfile`, must be set if `PROXY_ENABLED` is `True`
 
