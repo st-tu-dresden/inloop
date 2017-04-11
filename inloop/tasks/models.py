@@ -40,7 +40,7 @@ class TaskQuerySet(models.QuerySet):
         return self.filter(solution__passed=True, solution__author=user).distinct()
 
     def not_completed_by(self, user):
-        return self.exclude(solution__passed=True, solution__author=user).distinct()
+        return self.exclude(id__in=self.completed_by(user).values("id"))
 
     def completed_by_values(self, user, sort_field):
         qs = self.order_by(sort_field)

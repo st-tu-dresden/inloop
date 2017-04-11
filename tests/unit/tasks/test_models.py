@@ -138,6 +138,15 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
         ])
         self.assertEqual(len(self.category2.task_set.not_completed_by(self.bob)), 0)
 
+    def test_issue184(self):
+        Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
+        Solution.objects.create(author=self.alice, task=self.published_task1)
+
+        self.assertEqual(len(self.category1.task_set.completed_by(self.bob)), 1)
+        self.assertEqual(len(self.category1.task_set.not_completed_by(self.bob)), 3)
+        self.assertEqual(len(self.category1.task_set.completed_by(self.alice)), 0)
+        self.assertEqual(len(self.category1.task_set.not_completed_by(self.alice)), 4)
+
 
 # XXX: handling the removal of optional attributes
 class UpdateOrCreateRelatedTest(TestCase):
