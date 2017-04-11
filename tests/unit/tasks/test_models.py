@@ -91,17 +91,17 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
 class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
     def test_no_solutions(self):
         for user in [self.bob, self.alice]:
-            self.assertFalse(Task.objects.completed_by(user))
-            self.assertFalse(self.category1.task_set.completed_by(user))
-            self.assertFalse(self.category2.task_set.completed_by(user))
+            self.assertEqual(len(Task.objects.completed_by(user)), 0)
+            self.assertEqual(len(self.category1.task_set.completed_by(user)), 0)
+            self.assertEqual(len(self.category2.task_set.completed_by(user)), 0)
 
     def test_only_failed_solutions(self):
         Solution.objects.create(author=self.bob, task=self.published_task1)
         Solution.objects.create(author=self.alice, task=self.published_task2)
         for user in [self.bob, self.alice]:
-            self.assertFalse(Task.objects.completed_by(user))
-            self.assertFalse(self.category1.task_set.completed_by(user))
-            self.assertFalse(self.category2.task_set.completed_by(user))
+            self.assertEqual(len(Task.objects.completed_by(user)), 0)
+            self.assertEqual(len(self.category1.task_set.completed_by(user)), 0)
+            self.assertEqual(len(self.category2.task_set.completed_by(user)), 0)
 
     def test_with_bobs_passed_solution(self):
         Solution.objects.create(author=self.bob, task=self.published_task1)
@@ -136,7 +136,16 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
         self.assertSequenceEqual(self.category1.task_set.not_completed_by(self.bob), [
             self.published_task2, self.unpublished_task1, self.unpublished_task2
         ])
-        self.assertFalse(self.category2.task_set.not_completed_by(self.bob))
+        self.assertEqual(len(self.category2.task_set.not_completed_by(self.bob)), 0)
+
+    def test_issue184(self):
+        Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
+        Solution.objects.create(author=self.alice, task=self.published_task1)
+
+        self.assertEqual(len(self.category1.task_set.completed_by(self.bob)), 1)
+        self.assertEqual(len(self.category1.task_set.not_completed_by(self.bob)), 3)
+        self.assertEqual(len(self.category1.task_set.completed_by(self.alice)), 0)
+        self.assertEqual(len(self.category1.task_set.not_completed_by(self.alice)), 4)
 
 
 # XXX: handling the removal of optional attributes
