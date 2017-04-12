@@ -8,19 +8,22 @@
     <li><a href="{% url 'admin:index' %}">Administration</a></li>
   {% endif %}
   <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
-  <form id="logout-form" method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-   </form>
-  <script>
-  document.getElementById("logout-link").addEventListener("click", function(e) {
-    e.preventDefault();
-    document.getElementById("logout-form").submit();
-  });
-  </script>
 {% else %}
   {% if not hide_login_link %}
   <li><a href="{% url 'login' %}">Login</a></li>
   {% endif %}
   <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
 {% endif %}
+{% endblock %}
+
+{% block extranav %}
+<form id="logout-form" method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+</form>
+<script>
+document.getElementById("logout-link").addEventListener("click", function(e) {
+  e.preventDefault();
+  document.getElementById("logout-form").submit();
+});
+</script>
 {% endblock %}
