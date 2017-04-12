@@ -1,5 +1,6 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
+{% load staticfiles %}
 {% block userlinks %}
     {% if site_url %}
         <a href="{{ site_url }}">{% trans 'View site' %}</a> /
@@ -17,10 +18,5 @@
     <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
         {% csrf_token %}
     </form>
-    <script>
-    document.getElementById("logout-link").addEventListener("click", function(e) {
-      e.preventDefault();
-      document.getElementById("logout-form").submit();
-    });
-    </script>
+    <script src="{% static 'js/logout.js' %}"></script>
 {% endblock %}
