@@ -1,19 +1,7 @@
 {% extends "tasks/base.html" %}
+{% load staticfiles %}
 
 {% block title %}Solution upload - {{ task.title }} {% endblock %}
-
-{% block extrahead %}
-  <style>
-    #uploadBtn {
-      position: absolute;
-      opacity: 0;
-      filter: alpha(opacity=0);
-      cursor: pointer;
-    }
-
-    #uploadBtn, #uploadFiles { width: 180px; }
-  </style>
-{% endblock %}
 
 {% block tab_content %}
 {% if not task.is_expired %}
@@ -32,21 +20,13 @@
     <button type="submit" class="btn btn-sm btn-primary">Upload</button>
   </div>
 </form>
-<script type="text/javascript">
-  function displayText(files) {
-    if (files.length > 1)
-      return "[" + files.length + " files selected]";
-    else if (files.length == 1)
-      return files[0].name;
-    return "";
-  }
-  document.getElementById("uploadBtn").addEventListener("change", function () {
-    document.getElementById("uploadFiles").value = displayText(this.files);
-  });
-</script>
 {% else %}
 <p class="alert alert-warning">
   The deadline for this task has passed. You cannot submit new solutions.
 </p>
 {% endif %}
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/upload_form.js' %}"></script>
 {% endblock %}

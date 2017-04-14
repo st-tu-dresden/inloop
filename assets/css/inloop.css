@@ -89,6 +89,19 @@ body {
 }
 /* @end */
 
+/* Upload form */
+#uploadBtn {
+  position: absolute;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+}
+
+#uploadBtn,
+#uploadFiles {
+  width: 180px;
+}
+
 /* @begin solution list view styles */
 .solutionstatus {
   display: inline-block;
