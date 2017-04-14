@@ -238,7 +238,7 @@ Installation
 9. Create a superuser, load initial data and configure Django's contrib.sites app:
 
         django-admin createsuperuser
-        django-admin loaddata about_pages
+        django-admin loaddata about_pages staff_group
         django-admin set_default_site --system-fqdn --name INLOOP
 
 10. Finally, install the provided [upstart job files](../support/etc/init) or [systemd service

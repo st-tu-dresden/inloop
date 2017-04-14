@@ -14,8 +14,9 @@ include a step by step description on how to reliably reproduce the problem.
 This is the **preferred way of contributing**. We also use this approach (aka the
 [Github flow][gh-flow]) internally to peer review changes.
 
-1. Fork off our repo and create a branch for the feature or bugfix. The branch name
-   must be descriptive (e.g., `refactor-html`, `registration-tests`).
+1. Fork our repo and create a branch for the feature or bugfix. The branch name should be
+   descriptive and in the slug form as returned by [`slugify()` from `django.utils.text`][slugify],
+   e.g. `refactor-html` or `registration-tests`.
 2. Add commits and be sure to follow our [rules for commit messages](#commit-messages).
    Don't mix unrelated changes into one commit.
 3. Open a pull request so we can review the changes and give feedback. Additionally,
@@ -90,3 +91,4 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [git-setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#Your-Identity
 [w3c-validator]: https://validator.w3.org/
+[slugify]: https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.text.slugify
