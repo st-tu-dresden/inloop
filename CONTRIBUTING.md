@@ -38,8 +38,8 @@ down the Python packages or modules which should be searched for tests:
     # runs unit tests (3 sec)
     make coveragetest SUITE=tests.unit
 
-    # generate HTML test report (saved to htmlcov/index.html)
-    coverage html
+    # generate and open HTML test report
+    make report
 
 **Tip**: Use `make watchmedo SUITE=tests.unit`, which watches for file changes in `inloop/` and
 `tests/` and re-runs the tests automatically.
@@ -89,6 +89,6 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[git-setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#Your-Identity
+[git-setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#_your_identity
 [w3c-validator]: https://validator.w3.org/
 [slugify]: https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.text.slugify

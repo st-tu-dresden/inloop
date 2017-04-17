@@ -18,8 +18,10 @@
 {% endblock %}
 
 {% block extranav %}
+{% if user.is_authenticated %}
 <form id="logout-form" method="post" action="{% url 'logout' %}">
   {% csrf_token %}
 </form>
 <script src="{% static 'js/logout.js' %}"></script>
+{% endif %}
 {% endblock %}
