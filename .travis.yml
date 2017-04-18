@@ -12,7 +12,7 @@ services:
 cache:
   pip: true
 env:
-  - TARGET=lint
+  - TARGET=xlint
   - TARGET=coveragetest
 install:
   - pip install -U pip setuptools
@@ -29,6 +29,6 @@ matrix:
     - python: "3.6"
   exclude:
     - python: "3.4"
-      env: TARGET=lint
+      env: TARGET=xlint
     - python: "3.6"
-      env: TARGET=lint
+      env: TARGET=xlint
