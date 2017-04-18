@@ -1,4 +1,5 @@
 # flake8: noqa
+# pylint: disable=all
 from unittest import skip
 
 from django.test import TestCase

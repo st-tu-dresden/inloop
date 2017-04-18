@@ -32,10 +32,15 @@ browsersync:
 	@command -v browser-sync >/dev/null || echo "Please run 'npm install -g browser-sync'." 1>&2
 	@browser-sync start --proxy localhost:8000 --files "assets,inloop/**/*.html"
 
-## Run syntax and coding convention checks
+## Run basic code convention and quality checks
 lint:
 	isort --quiet --check-only
 	flake8
+
+## Run extended code convention and quality checks (slower)
+xlint: lint
+	bandit --recursive inloop || true
+	pylint inloop tests || true
 
 ## Install Python and npm dependencies needed for development
 install-deps:

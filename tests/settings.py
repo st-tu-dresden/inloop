@@ -2,6 +2,7 @@ import warnings
 
 warnings.simplefilter("always")
 
+# pylint: disable=wildcard-import,unused-wildcard-import
 from inloop.settings import *   # noqa isort:skip
 
 HUEY = {
