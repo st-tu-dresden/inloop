@@ -2,3 +2,5 @@ bandit
 flake8
 flake8-docstrings
 isort
+pylint
+pylint-django

@@ -40,6 +40,7 @@ lint:
 ## Run extended code convention and quality checks (slower)
 xlint: lint
 	bandit --recursive inloop || true
+	pylint inloop tests || true
 
 ## Install Python and npm dependencies needed for development
 install-deps:
