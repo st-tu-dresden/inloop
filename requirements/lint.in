@@ -2,5 +2,6 @@ bandit
 flake8
 flake8-docstrings
 isort
+pydocstyle==1.1.1
 pylint
 pylint-django
