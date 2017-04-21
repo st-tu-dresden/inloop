@@ -81,6 +81,8 @@ devenv: virtualenv
 deps:
 	pip-compile --no-annotate --no-header --upgrade requirements/main.in >/dev/null
 	pip-compile --no-annotate --no-header --upgrade requirements/prod.in >/dev/null
+	pip-compile --no-annotate --no-header --upgrade requirements/lint.in >/dev/null
+	pip-compile --no-annotate --no-header --upgrade requirements/test.in >/dev/null
 
 ## Tidy up dangling docker images/containers and *.pyc files
 clean:
