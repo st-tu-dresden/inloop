@@ -1,4 +1,4 @@
-sudo: false
+dist: trusty
 language: python
 services:
   - docker
@@ -10,6 +10,8 @@ install:
 before_script:
   - pip freeze
 script:
+  - command -v docker
+  - echo $PATH
   - tox
 matrix:
   fast_finish: true
