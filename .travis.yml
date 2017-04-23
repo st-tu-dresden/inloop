@@ -1,8 +1,5 @@
 sudo: false
 language: python
-git:
-  submodules: false
-  depth: 1
 services:
   - docker
 cache:
