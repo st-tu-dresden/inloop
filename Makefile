@@ -1,9 +1,8 @@
 IMAGE := inloop-integration-test
 SUITE := tests
 
-PYTHON := python3.5
-PYTAG  := $(shell echo $(PYTHON) | sed 's/thon//;s/\.//')
-VENV   := $(PWD)/.venvs/$(PYTAG)
+PYTHON := python3
+VENV   := .state/venv
 
 OPEN_CMD := $(shell command -v gnome-open || command -v xdg-open || command -v open)
 
