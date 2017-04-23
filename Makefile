@@ -51,7 +51,7 @@ install-deps:
 
 ## Install Python tools (e.g., ipython, watchmedo, etc.)
 install-tools:
-	pip install -r requirements/dev.txt
+	pip install -r requirements/tools.txt
 
 .state/docker: tests/functional/testrunner/Dockerfile
 	docker build -t $(IMAGE) tests/functional/testrunner
@@ -83,6 +83,7 @@ deps:
 	pip-compile --no-annotate --no-header --upgrade requirements/prod.in >/dev/null
 	pip-compile --no-annotate --no-header --upgrade requirements/lint.in >/dev/null
 	pip-compile --no-annotate --no-header --upgrade requirements/test.in >/dev/null
+	pip-compile --no-annotate --no-header --upgrade requirements/tools.in >/dev/null
 
 ## Tidy up dangling docker images/containers and *.pyc files
 clean:
