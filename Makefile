@@ -106,4 +106,5 @@ help:
 	@echo
 
 .DEFAULT_GOAL := help
-.PHONY: test coveragetest report watchmedo lint install-deps virtualenv initdb devenv deps clean purge help
+.PHONY: test coveragetest report watchmedo browsersync lint xlint \
+	install-deps virtualenv initdb devenv deps clean purge help
