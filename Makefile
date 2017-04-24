@@ -49,28 +49,21 @@ xlint: lint
 	pylint inloop tests || true
 
 ## Install Python and npm dependencies needed for development
-install-deps:
+install-deps: $(VENV)/pyvenv.cfg
 	for req in {main,test,lint,tools}.txt; do $(PIP) install -q -r requirements/$$req ; done
 	npm install --production &>/dev/null
 
-virtualenv:
-	rm -rf $(VENV)
+$(VENV)/pyvenv.cfg:
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install -q -U pip setuptools
 
-initdb:
-	mkdir -p .state
+## Initialize a developer environment (takes an optional PYTHON=python3.x argument)
+devenv: install-deps
+	cp .env_develop .env
 	$(PY) manage.py migrate
 	$(PY) manage.py loaddata about_pages staff_group
 	$(PY) manage.py loaddata demo_accounts development_site
-
-## Initialize a developer environment (takes an optional PYTHON= argument)
-devenv: virtualenv
-	-cp -i .env_develop .env
-	make install-deps initdb
-	@echo
-	@echo "virtualenv created -- now run 'source $(VENV)/bin/activate'."
-	@echo
+	@echo ">>> virtualenv created -- now run 'source $(VENV)/bin/activate' <<<"
 
 ## Update version pins in the requirements files
 deps:
@@ -107,4 +100,4 @@ help:
 
 .DEFAULT_GOAL := help
 .PHONY: test coveragetest report watchmedo browsersync lint xlint \
-	install-deps virtualenv initdb devenv deps clean purge help
+	install-deps initdb devenv deps clean purge help
