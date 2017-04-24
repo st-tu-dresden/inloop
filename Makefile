@@ -19,6 +19,11 @@ test: .state/docker
 coveragetest: .state/docker
 	coverage run $(TEST_CMD)
 
+.state/docker: tests/functional/testrunner/Dockerfile
+	docker build -t $(IMAGE) tests/functional/testrunner
+	mkdir -p .state
+	touch .state/docker
+
 ## Generate and show the HTML coverage report in your browser
 report:
 	coverage html
@@ -47,11 +52,6 @@ xlint: lint
 install-deps:
 	for req in {main,test,lint,tools}.txt; do $(PIP) install -q -r requirements/$$req ; done
 	npm install --production &>/dev/null
-
-.state/docker: tests/functional/testrunner/Dockerfile
-	docker build -t $(IMAGE) tests/functional/testrunner
-	mkdir -p .state
-	touch .state/docker
 
 virtualenv:
 	rm -rf $(VENV)
