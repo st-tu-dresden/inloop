@@ -3,6 +3,8 @@ SUITE := tests
 
 PYTHON := python3
 VENV   := .state/venv
+PY     := $(VENV)/bin/python
+PIP    := $(VENV)/bin/pip
 
 OPEN_CMD := $(shell command -v gnome-open || command -v xdg-open || command -v open)
 
@@ -43,14 +45,8 @@ xlint: lint
 
 ## Install Python and npm dependencies needed for development
 install-deps:
-	pip install -r requirements/main.txt
-	pip install -r requirements/test.txt
-	pip install -r requirements/lint.txt
+	for req in {main,test,lint,tools}.txt; do $(PIP) install -r requirements/$$req ; done
 	npm install --production
-
-## Install Python tools (e.g., ipython, watchmedo, etc.)
-install-tools:
-	pip install -r requirements/tools.txt
 
 .state/docker: tests/functional/testrunner/Dockerfile
 	docker build -t $(IMAGE) tests/functional/testrunner
@@ -60,29 +56,27 @@ install-tools:
 virtualenv:
 	rm -rf $(VENV)
 	$(PYTHON) -m venv $(VENV)
-	$(VENV)/bin/pip install -U pip setuptools
+	$(PIP) install -U pip setuptools
 
 initdb:
 	mkdir -p .state
-	python manage.py migrate
-	python manage.py loaddata about_pages staff_group
-	python manage.py loaddata demo_accounts development_site
+	$(PY) manage.py migrate
+	$(PY) manage.py loaddata about_pages staff_group
+	$(PY) manage.py loaddata demo_accounts development_site
 
 ## Initialize a developer environment (takes an optional PYTHON= argument)
 devenv: virtualenv
 	-cp -i .env_develop .env
-	PATH=$(VENV)/bin:$(PATH) make install-deps install-tools initdb
+	make install-deps initdb
 	@echo
 	@echo "virtualenv created -- now run 'source $(VENV)/bin/activate'."
 	@echo
 
 ## Update version pins in the requirements files
 deps:
-	pip-compile --no-annotate --no-header --upgrade requirements/main.in >/dev/null
-	pip-compile --no-annotate --no-header --upgrade requirements/prod.in >/dev/null
-	pip-compile --no-annotate --no-header --upgrade requirements/lint.in >/dev/null
-	pip-compile --no-annotate --no-header --upgrade requirements/test.in >/dev/null
-	pip-compile --no-annotate --no-header --upgrade requirements/tools.in >/dev/null
+	@for req_in in requirements/*.in; do \
+		$(VENV)/bin/pip-compile --no-annotate --no-header --upgrade $$req_in >/dev/null ;\
+	done
 
 ## Tidy up dangling docker images/containers and *.pyc files
 clean:
@@ -112,4 +106,4 @@ help:
 	@echo
 
 .DEFAULT_GOAL := help
-.PHONY: test coveragetest report watchmedo lint install-deps install-tools virtualenv initdb devenv deps clean purge help
+.PHONY: test coveragetest report watchmedo lint install-deps virtualenv initdb devenv deps clean purge help
