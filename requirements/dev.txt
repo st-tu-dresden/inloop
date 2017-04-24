@@ -1,5 +1,0 @@
-django-debug-toolbar
-honcho
-ipython
-pip-tools
-watchdog
