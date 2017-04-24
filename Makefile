@@ -45,8 +45,8 @@ xlint: lint
 
 ## Install Python and npm dependencies needed for development
 install-deps:
-	for req in {main,test,lint,tools}.txt; do $(PIP) install -r requirements/$$req ; done
-	npm install --production
+	for req in {main,test,lint,tools}.txt; do $(PIP) install -q -r requirements/$$req ; done
+	npm install --production &>/dev/null
 
 .state/docker: tests/functional/testrunner/Dockerfile
 	docker build -t $(IMAGE) tests/functional/testrunner
@@ -56,7 +56,7 @@ install-deps:
 virtualenv:
 	rm -rf $(VENV)
 	$(PYTHON) -m venv $(VENV)
-	$(PIP) install -U pip setuptools
+	$(PIP) install -q -U pip setuptools
 
 initdb:
 	mkdir -p .state
