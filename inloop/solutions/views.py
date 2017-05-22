@@ -109,7 +109,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
         fileNames = SolutionFile.objects.filter(solution=fp.id)
         for fn in fileNames:
             file = open(str(fp.path) + "/" + str(fn), "r")
-            upfiles.append({'code': file.read(), 'title':str(fn)})
+            upfiles.append({'code': file.read(), 'title': str(fn)})
 
         context = {
             'solution': solution,
