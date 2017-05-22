@@ -51,8 +51,10 @@
   {# NOTE: states "lost" and "error" are handled in the view code #}
   {% endif %}
   {% for upfile in upfiles %}
-    <h3>{{ upfile.title }}</h3>
-    <pre class="console-output"><code>{{ upfile.code }}</code></pre>
+    <h3 class="inline">{{ upfile.title }}</h3><button type="button" class="solution-show" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
+      Show file
+    </button><br>
+    <pre id="collapse{{ forloop.counter }}" class="collapse"><code>{{ upfile.code }}</code></pre><br>
   {% endfor %}
   </div><!-- /#home -->
 

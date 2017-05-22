@@ -23,6 +23,10 @@ body {
   text-align: center;
 }
 
+.inline {
+  display: inline;
+}
+
 @media (min-width: 500px) {
   .footer {
     height: 50px;
@@ -104,6 +108,11 @@ body {
 #uploadBtn,
 #uploadFiles {
   width: 180px;
+}
+
+.solution-show {
+  color: #777;
+  background: none;
 }
 
 /* @begin solution list view styles */
