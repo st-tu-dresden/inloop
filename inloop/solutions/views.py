@@ -104,10 +104,18 @@ class SolutionDetailView(LoginRequiredMixin, View):
             junit.xml_to_dict(xml) for xml in xml_reports
         ]
 
+        upfiles = []
+        fp = Solution.objects.filter(id=solution.id)[0]
+        fileNames = SolutionFile.objects.filter(solution=fp.id)
+        for fn in fileNames:
+            file = open(str(fp.path) + "/" + str(fn), "r")
+            upfiles.append({'code': file.read(), 'title':str(fn)})
+
         context = {
             'solution': solution,
             'result': result,
-            'testsuites': testsuites
+            'testsuites': testsuites,
+            'upfiles': upfiles
         }
         context.update(self.get_context_data())
 

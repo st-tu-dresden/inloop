@@ -50,6 +50,10 @@
     </p>
   {# NOTE: states "lost" and "error" are handled in the view code #}
   {% endif %}
+  {% for upfile in upfiles %}
+    <h3>{{ upfile.title }}</h3>
+    <pre class="console-output"><code>{{ upfile.code }}</code></pre>
+  {% endfor %}
   </div><!-- /#home -->
 
   <div role="tabpanel" class="tab-pane" id="console">
