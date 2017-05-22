@@ -24,6 +24,7 @@ online programming courses, built upon Django and Docker:
 - **Hackable**: modern, modular and PEP-8 compliant Python 3 code base with less than 3000 lines of
   code, good test coverage and continuous integration tests.
 
+TEST.
 
 ## Quick start
 
