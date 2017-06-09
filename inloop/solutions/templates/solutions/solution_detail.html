@@ -56,13 +56,24 @@
   </div><!-- /#home -->
 
   <div role="tabpanel" class="tab-pane" id="files">
-  {% for upfile in upfiles %}
-    <h3 class="inline">{{ upfile.title }}</h3>
-    <button type="button" class="solution-show" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
-      Show file
-    </button><br>
-    <pre id="collapse{{ forloop.counter }}" class="collapse"><code>{{ upfile.code }}</code></pre><br>
-  {% endfor %}
+    {% if upfiles %}
+    <div class="list-group">
+    {% for upfile in upfiles %}
+      <a class="list-group-item"
+        href="{% url 'solutions:files' solution.task.slug solution.scoped_id upfile.title %}">
+        <div class="solutionstatus">
+          <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
+        </div>
+        <h4 class="list-group-item-heading">{{ upfile.title }}</h4>
+        <p class="list-group-item-text">
+          <!--Size-->
+        </p>
+      </a>
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>No files to show here.</p>
+    {% endif %}
   </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
