@@ -107,15 +107,13 @@ class SolutionDetailView(LoginRequiredMixin, View):
         ]
 
         upfiles = []
-        fp = Solution.objects.filter(id=solution.id)[0]
-        fileNames = SolutionFile.objects.filter(solution=fp.id)
-        for fn in fileNames:
-            file = open(str(fp.path) + "/" + str(fn), "r")
-            upfiles.append({
-                'code': file.read(),
-                'title': str(fn),
-                'size': os.path.getsize(str(fp.path)+"/"+str(fn))
-            })
+        for solutionfile in solution.solutionfile_set.all():
+            with solutionfile.absolute_path as f:
+                upfiles.append({
+                    "code": f.open(encoding="utf-8").read(),
+                    "title": solutionfile.name,
+                    "size": os.path.getsize(str(f))
+                })
 
         context = {
             'solution': solution,
