@@ -138,3 +138,24 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
     def get_object(self, **kwargs):
         self.solution = get_object_or_404(Solution, pk=kwargs["id"])
         return self.solution
+
+
+class SolutionFileView(LoginRequiredMixin, View):
+    def get(self, request, **kwargs):
+        task = Task.objects.published().filter(slug=kwargs["slug"])
+        solution = get_object_or_404(
+            Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
+        )
+        for solutionfile in solution.solutionfile_set.all():
+            if solutionfile.name == kwargs["title"]:
+                upfile = solutionfile
+                break
+
+        context = {
+            'task': task,
+            'solution': solution,
+            'title': kwargs["title"],
+            'code': upfile.absolute_path.open(encoding="utf-8").read()
+        }
+
+        return TemplateResponse(request, "solutions/solution_file.html", context)
