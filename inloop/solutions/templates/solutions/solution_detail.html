@@ -26,6 +26,9 @@
   <li role="presentation" class="active">
     <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
   </li>
+    <li role="presentation">
+      <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+    </li>
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
@@ -50,13 +53,17 @@
     </p>
   {# NOTE: states "lost" and "error" are handled in the view code #}
   {% endif %}
+  </div><!-- /#home -->
+
+  <div role="tabpanel" class="tab-pane" id="files">
   {% for upfile in upfiles %}
-    <h3 class="inline">{{ upfile.title }}</h3><button type="button" class="solution-show" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
+    <h3 class="inline">{{ upfile.title }}</h3>
+    <button type="button" class="solution-show" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
       Show file
     </button><br>
     <pre id="collapse{{ forloop.counter }}" class="collapse"><code>{{ upfile.code }}</code></pre><br>
   {% endfor %}
-  </div><!-- /#home -->
+  </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
   {% if result.stdout or result.stderr %}
