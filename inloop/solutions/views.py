@@ -1,3 +1,5 @@
+import os
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -109,7 +111,11 @@ class SolutionDetailView(LoginRequiredMixin, View):
         fileNames = SolutionFile.objects.filter(solution=fp.id)
         for fn in fileNames:
             file = open(str(fp.path) + "/" + str(fn), "r")
-            upfiles.append({'code': file.read(), 'title': str(fn)})
+            upfiles.append({
+                'code': file.read(),
+                'title': str(fn),
+                'size': os.path.getsize(str(fp.path)+"/"+str(fn))
+            })
 
         context = {
             'solution': solution,
