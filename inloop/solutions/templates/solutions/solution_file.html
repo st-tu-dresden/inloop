@@ -3,6 +3,10 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
+
 {% block content %}
 
 {# Breadcrumb #}
@@ -11,7 +15,15 @@
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
-  <li><a href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">Solution #{{ solution.scoped_id }}</a></li>
+  {% if impersonate %}
+  <li><a href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">
+    Solution #{{ solution.scoped_id }}
+  </a></li>
+  {% else %}
+  <li><a href="{% url 'solutions:detail' solution.task.slug solution.id %}">
+    Solution #{{ solution.id }}
+  </a></li>
+  {% endif %}
   <li class="active">{{ title }}</li>
 </ol>
 {% endwith %}
@@ -26,7 +38,7 @@
 </div>
 {% endif %}
 <h2>{{ title }}</h2>
-<pre><code>{{ code }}</code></pre><br>
+<pre><code class="language-java">{{ code }}</code></pre><br>
 
 {% endblock %}
 
