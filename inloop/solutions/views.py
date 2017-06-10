@@ -159,3 +159,26 @@ class SolutionFileView(LoginRequiredMixin, View):
         }
 
         return TemplateResponse(request, "solutions/solution_file.html", context)
+
+
+class StaffSolutionFileView(UserPassesTestMixin, SolutionFileView):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request, **kwargs):
+        solution = get_object_or_404(
+            Solution, id=kwargs["id"]
+        )
+        for solutionfile in solution.solutionfile_set.all():
+            if solutionfile.name == kwargs["title"]:
+                upfile = solutionfile
+                break
+
+        context = {
+            'solution': solution,
+            'title': kwargs["title"],
+            'code': upfile.absolute_path.open(encoding="utf-8").read(),
+            'impersonate': request.user != solution.author
+        }
+
+        return TemplateResponse(request, "solutions/solution_file.html", context)
