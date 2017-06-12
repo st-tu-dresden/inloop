@@ -1,5 +1,9 @@
 {% extends "base_site.html" %}
 
+{% block title %}
+Solution #{% if impersonate %}{{ solution.scoped_id }}{% else %}{{ solution.scoped_id }}{% endif %}
+{% endblock %}
+
 {% block content %}
 
 {# Breadcrumb #}
@@ -8,7 +12,9 @@
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
-  <li class="active">Solution #{{ solution.scoped_id }}</li>
+  <li class="active">Solution
+    #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+  </li>
 </ol>
 {% endwith %}
 {# /Breadcrumb #}
@@ -26,6 +32,9 @@
   <li role="presentation" class="active">
     <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
   </li>
+    <li role="presentation">
+      <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+    </li>
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
@@ -51,6 +60,32 @@
   {# NOTE: states "lost" and "error" are handled in the view code #}
   {% endif %}
   </div><!-- /#home -->
+
+  <div role="tabpanel" class="tab-pane" id="files">
+    {% if upfiles %}
+    <div class="list-group">
+    {% for upfile in upfiles %}
+      <a class="list-group-item" href="
+      {% if impersonate %}
+      {% url 'solutions:stafffile' solution.id upfile.title %}
+      {% else %}
+      {% url 'solutions:files' solution.task.slug solution.scoped_id upfile.title %}
+      {% endif %}
+      ">
+        <div class="solutionstatus">
+          <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
+        </div>
+        <h4 class="list-group-item-heading">{{ upfile.title }}</h4>
+        <p class="list-group-item-text">
+          {{ upfile.size }} Bytes
+        </p>
+      </a>
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>No files to show here.</p>
+    {% endif %}
+  </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
   {% if result.stdout or result.stderr %}

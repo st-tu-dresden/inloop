@@ -1,0 +1,51 @@
+{% extends "base_site.html" %}
+{% load staticfiles %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# Breadcrumb #}
+{% with task=solution.task %}
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
+  <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="
+    {% if impersonate %}
+      {% url 'solutions:staffdetail' solution.id %}
+    {% else %}
+      {% url 'solutions:detail' solution.task.slug solution.scoped_id %}
+    {% endif %}
+  ">
+    Solution
+    #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+  </a></li>
+  <li class="active">{{ title }}</li>
+</ol>
+{% endwith %}
+{# /Breadcrumb #}
+
+{% if impersonate %}
+<div class="alert alert-info }}" role="alert">
+  {% with author=solution.author %}
+  You are viewing a solution authored by
+  <a href="mailto:{{ author.email }}">{% firstof author.get_full_name author.get_username %}</a>.
+  {% endwith %}
+</div>
+{% endif %}
+<h2>{{ title }}</h2>
+<pre><code class="language-java">{{ code }}</code></pre><br>
+
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/prism.js' %}"></script>
+<script src="{% static 'js/prism-java.min.js' %}"></script>
+<script src="{% static 'js/anchor.min.js' %}"></script>
+<script src="{% static 'js/inloop.js' %}"></script>
+{% endblock %}
