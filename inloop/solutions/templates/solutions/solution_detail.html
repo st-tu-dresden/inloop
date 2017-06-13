@@ -32,6 +32,9 @@
   <li role="presentation" class="active">
     <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
   </li>
+    <li role="presentation">
+      <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+    </li>
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
@@ -57,6 +60,27 @@
   {# NOTE: states "lost" and "error" are handled in the view code #}
   {% endif %}
   </div><!-- /#home -->
+
+  <div role="tabpanel" class="tab-pane" id="files">
+    {% if upfiles %}
+    <div class="list-group">
+    {% for upfile in upfiles %}
+      <a class="list-group-item"
+        href="{% url 'solutions:files' solution.task.slug solution.scoped_id upfile.title %}">
+        <div class="solutionstatus">
+          <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
+        </div>
+        <h4 class="list-group-item-heading">{{ upfile.title }}</h4>
+        <p class="list-group-item-text">
+          {{ upfile.size }} Bytes
+        </p>
+      </a>
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>No files to show here.</p>
+    {% endif %}
+  </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
   {% if result.stdout or result.stderr %}
