@@ -8,7 +8,9 @@
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
-  <li class="active">Solution #{{ solution.scoped_id }}</li>
+  <li class="active">
+    Solution #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+  </li>
 </ol>
 {% endwith %}
 {# /Breadcrumb #}
