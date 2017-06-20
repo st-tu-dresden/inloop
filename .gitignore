@@ -25,3 +25,4 @@ media/
 
 # top-level .env file
 /.env
+/.venvs
