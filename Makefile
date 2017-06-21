@@ -1,3 +1,5 @@
+SHELL := bash
+
 IMAGE := inloop-integration-test
 SUITE := tests
 
