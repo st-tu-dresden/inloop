@@ -6,6 +6,7 @@ After=huey.service
 [Service]
 ExecStart=/usr/bin/envdir /home/inloop/envdir setuidgid gunicorn gunicorn inloop.wsgi:application
 ExecReload=/bin/kill -HUP $MAINPID
+SyslogIdentifier=gunicorn
 
 [Install]
 WantedBy=multi-user.target

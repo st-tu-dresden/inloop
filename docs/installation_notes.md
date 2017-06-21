@@ -14,20 +14,15 @@ Install Docker for Mac as described on https://docs.docker.com/docker-for-mac/.
 The `docker.io` package shipped with Ubuntu and Debian is usually too old. Install from the Docker
 APT repositories instead:
 
-* Ubuntu: https://docs.docker.com/engine/installation/linux/ubuntulinux/
+* Ubuntu: https://docs.docker.com/engine/installation/linux/ubuntu/
 * Debian: https://docs.docker.com/engine/installation/linux/debian/
 
-INLOOP depends on the `--memory` option to limit memory available to a container.  If you have
-followed the linked installation docs carefully, running
+**Important**: Please follow the [post-installation steps][docker-post-install] to enable swap
+limit support in the kernel. INLOOP uses the `--memory` option to limit memory available to a
+container. If not configured correctly, all integration tests will fail because the `docker`
+command permanently prints a warning message:
 
-    grep -o swapaccount=1 /proc/cmdline
-
-should print
-
-    swapaccount=1
-
-If not, you need to add `cgroup_enable=memory swapaccount=1` to your `GRUB_CMDLINE_LINUX` (usually
-in `/etc/default/grub`), run `update-grub` and reboot (see the linked Docker docs for details).
+> WARNING: Your kernel does not support swap limit capabilities. Limitation discarded.
 
 
 Old Git versions on Debian
@@ -44,3 +39,6 @@ introduced in Git 2.3. There are two possible workarounds for this problem:
 
       BatchMode yes
       StrictHostKeyChecking no
+
+
+[docker-post-install]: https://docs.docker.com/engine/installation/linux/linux-postinstall/#your-kernel-does-not-support-cgroup-swap-limit-capabilities 
