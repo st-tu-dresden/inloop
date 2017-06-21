@@ -37,19 +37,17 @@ INLOOP requires the following software:
 
 Using the command line, a development instance can be set up as follows:
 
-```bash
-# 1.) install required software for Debian/Ubuntu or macOS
-./support/scripts/[debian|macos]_setup.sh
+1. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
+   `./support/scripts/macos_setup.sh` (macOS).
 
-# 2.) initialize a virtualenv with all required Python packages
-make devenv && source .venvs/py3*/bin/activate
+2. Run `make devenv` and follow the printed instructions to bootstrap your local development
+   environment.
 
-# 3.) start and monitor the web server and huey workers
-honcho start
-```
+3. Start and monitor the development web server and huey workers with `honcho start`.
 
-For demonstration and development purposes only, a superuser account *admin* and an ordinary user
-account *student* have been created, with both passwords set to *secret*.
+4. The previous step prints the address and port number of the local webserver that was started.
+   You can immediately log in using the demo user accounts *admin* and *student* with the password
+   *secret*.
 
 **Tip**: Add the line `DJDT=1` to your `.env` file to enable the Django debug toolbar.
 

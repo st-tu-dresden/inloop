@@ -63,7 +63,8 @@ devenv: install-deps
 	$(PY) manage.py migrate
 	$(PY) manage.py loaddata about_pages staff_group
 	$(PY) manage.py loaddata demo_accounts development_site
-	@echo ">>> virtualenv created -- now run 'source $(VENV)/bin/activate' <<<"
+	@echo
+	@echo "👍  SUCCESS! Please run 'source $(VENV)/bin/activate' to load your virtualenv."
 
 ## Update version pins in the requirements files
 deps:
