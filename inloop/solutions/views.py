@@ -154,7 +154,7 @@ class SolutionFileView(LoginRequiredMixin, View):
         context = {
             'task': task,
             'solution': solution,
-            'title': kwargs["title"],
+            'filename': kwargs["title"],
             'code': upfile.absolute_path.open(encoding="utf-8").read()
         }
 

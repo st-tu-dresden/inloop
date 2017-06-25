@@ -1,7 +1,7 @@
 {% extends "base_site.html" %}
 {% load staticfiles %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ filename }}{% endblock %}
 
 {% block extrahead %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
@@ -24,7 +24,7 @@
     Solution #{{ solution.id }}
   </a></li>
   {% endif %}
-  <li class="active">{{ title }}</li>
+  <li class="active">{{ filename }}</li>
 </ol>
 {% endwith %}
 {# /Breadcrumb #}
@@ -37,7 +37,7 @@
   {% endwith %}
 </div>
 {% endif %}
-<h2>{{ title }}</h2>
+<h2>{{ filename }}</h2>
 <pre><code class="language-java">{{ code }}</code></pre><br>
 
 {% endblock %}
