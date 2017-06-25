@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^(?P<id>[\d]+)/status$', SolutionStatusView.as_view(), name='status'),
     url(r'^(?P<slug>[-\w]+)/$', SolutionListView.as_view(), name='list'),
     url(r'^(?P<slug>[-\w]+)/(?P<scoped_id>[\d]+)/$', SolutionDetailView.as_view(), name='detail'),
-    url(r'^(?P<slug>[-\w]+)/(?P<scoped_id>[\d]+)/(?P<title>[\w.]+)$', SolutionFileView.as_view(),
+    url(r'^(?P<slug>[-\w]+)/(?P<scoped_id>[\d]+)/(?P<filename>[\w.]+)$', SolutionFileView.as_view(),
         name='files'),
     url(r'^(?P<slug>[-\w]+)/upload$', SolutionUploadView.as_view(), name='upload'),
 ]

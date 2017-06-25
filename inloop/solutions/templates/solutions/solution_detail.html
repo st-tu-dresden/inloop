@@ -62,11 +62,11 @@
     <div class="list-group">
     {% for upfile in upfiles %}
       <a class="list-group-item"
-        href="{% url 'solutions:files' solution.task.slug solution.scoped_id upfile.title %}">
+        href="{% url 'solutions:files' solution.task.slug solution.scoped_id upfile.filename %}">
         <div class="solutionstatus">
           <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
         </div>
-        <h4 class="list-group-item-heading">{{ upfile.title }}</h4>
+        <h4 class="list-group-item-heading">{{ upfile.filename }}</h4>
         <p class="list-group-item-text">
           {{ upfile.size }} Bytes
         </p>

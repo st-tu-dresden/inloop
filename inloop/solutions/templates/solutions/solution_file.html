@@ -16,12 +16,12 @@
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
   {% if impersonate %}
-  <li><a href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">
-    Solution #{{ solution.scoped_id }}
-  </a></li>
-  {% else %}
   <li><a href="{% url 'solutions:detail' solution.task.slug solution.id %}">
     Solution #{{ solution.id }}
+  </a></li>
+  {% else %}
+  <li><a href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">
+    Solution #{{ solution.scoped_id }}
   </a></li>
   {% endif %}
   <li class="active">{{ filename }}</li>

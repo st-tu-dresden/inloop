@@ -108,12 +108,14 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
         upfiles = []
         for solutionfile in solution.solutionfile_set.all():
-            with solutionfile.absolute_path as f:
+            with solutionfile.absolute_path.open(encoding="utf-8") as f:
                 upfiles.append({
-                    "code": f.open(encoding="utf-8").read(),
-                    "title": solutionfile.name,
-                    "size": os.path.getsize(str(f))
+                    "code": f.read(),
+                    "filename": solutionfile.name,
+                    "size": solutionfile.absolute_path.stat().st_size
                 })
+                f.close()
+
 
         context = {
             'solution': solution,
@@ -146,16 +148,39 @@ class SolutionFileView(LoginRequiredMixin, View):
         solution = get_object_or_404(
             Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
         )
-        for solutionfile in solution.solutionfile_set.all():
-            if solutionfile.name == kwargs["title"]:
-                upfile = solutionfile
-                break
+        last_part = "/" + kwargs["filename"]
+        upfile = solution.solutionfile_set.get(file__endswith=last_part).absolute_path.open(
+            encoding="utf-8")
 
         context = {
             'task': task,
             'solution': solution,
-            'filename': kwargs["title"],
-            'code': upfile.absolute_path.open(encoding="utf-8").read()
+            'filename': kwargs["filename"],
+            'code': upfile.read()
         }
+        upfile.close()
+
+        return TemplateResponse(request, "solutions/solution_file.html", context)
+
+
+class StaffSolutionFileView(UserPassesTestMixin, SolutionFileView):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request, **kwargs):
+        solution = get_object_or_404(
+            Solution, id=kwargs["id"]
+        )
+        last_part = "/" + kwargs["filename"]
+        upfile = solution.solutionfile_set.get(file__endswith=last_part).absolute_path.open(
+            encoding="utf-8")
+
+        context = {
+            'solution': solution,
+            'filename': kwargs["filename"],
+            'code': upfile.read(),
+            'impersonate': request.user != solution.author
+        }
+        upfile.close()
 
         return TemplateResponse(request, "solutions/solution_file.html", context)
