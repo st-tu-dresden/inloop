@@ -1,5 +1,3 @@
-import os
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -115,7 +113,6 @@ class SolutionDetailView(LoginRequiredMixin, View):
                     "size": solutionfile.absolute_path.stat().st_size
                 })
                 f.close()
-
 
         context = {
             'solution': solution,
