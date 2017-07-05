@@ -104,10 +104,16 @@ class SolutionDetailView(LoginRequiredMixin, View):
             junit.xml_to_dict(xml) for xml in xml_reports
         ]
 
+        upfiles = [
+            {"filename": sf.name, "size": sf.absolute_path.stat().st_size}
+            for sf in solution.solutionfile_set.all()
+        ]
+
         context = {
             'solution': solution,
             'result': result,
-            'testsuites': testsuites
+            'testsuites': testsuites,
+            'upfiles': upfiles
         }
         context.update(self.get_context_data())
 
