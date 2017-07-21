@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     "inloop.accounts",
     "inloop.common",
+    "inloop.grading",
     "inloop.solutions",
     "inloop.tasks",
     "inloop.testrunner",
