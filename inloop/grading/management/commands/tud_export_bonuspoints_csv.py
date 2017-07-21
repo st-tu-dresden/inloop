@@ -34,6 +34,10 @@ class Command(BaseCommand):
         if not options["zeroes"]:
             grades = filter_zeroes(grades)
 
+        # we guessed some names and can't sort at the database layer
+        grades = list(grades)
+        grades.sort()
+
         with open(options["csv_file"], mode="w", newline="") as csv_file:
             writer = csv.writer(csv_file)
             for row in grades:
