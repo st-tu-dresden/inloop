@@ -23,7 +23,7 @@ def get_user_data(user):
         first_name, last_name = guess_name_from_email(user.email)
     else:
         first_name, last_name = user.first_name, user.last_name
-    return (last_name, first_name, user.email, matnum, course)
+    return (last_name, first_name, user.username, user.email, matnum, course)
 
 
 def guess_name_from_email(email):
@@ -64,7 +64,7 @@ def points_for_completed_tasks(category_name, start_date, max_points):
 
 def calculate_grades(users, gradefunc):
     """
-    Generate a sequence of 6-tuples with user data and the resulting grade using
+    Generate a sequence of tuples with user data and the resulting grade using
     the given user query set and grading function.
     """
     for user in users:
