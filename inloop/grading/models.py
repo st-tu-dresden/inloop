@@ -26,7 +26,7 @@ class DetectedPlagiarism(models.Model):
         return "solution #%d" % self.solution_id
 
 
-def ripoff_tasks_for_user(user):
+def get_ripoff_tasks_for_user(user):
     """Return tasks for which rip-offs were detected for this user."""
     return DetectedPlagiarism.objects.filter(
         solution__author=user, veto=False

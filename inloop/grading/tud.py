@@ -7,6 +7,7 @@ import re
 from django.db.models import ObjectDoesNotExist
 from django.utils.timezone import make_aware
 
+from inloop.grading.models import get_ripoff_tasks_for_user
 from inloop.tasks.models import Category
 
 
@@ -52,7 +53,9 @@ def points_for_completed_tasks(category_name, start_date, max_points):
     start_date = make_aware(start_date)
 
     def func(user):
-        points = len(category.task_set.filter(
+        points = len(category.task_set.exclude(
+            id__in=get_ripoff_tasks_for_user(user)
+        ).filter(
             solution__passed=True,
             solution__author=user,
             solution__submission_date__gte=start_date
