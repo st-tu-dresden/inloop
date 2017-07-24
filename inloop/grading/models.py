@@ -31,3 +31,10 @@ def ripoff_tasks_for_user(user):
     return DetectedPlagiarism.objects.filter(
         solution__author=user, veto=False
     ).values_list("solution__task", flat=True).distinct()
+
+
+def save_plagiarism_set(plagiarism_set):
+    test = PlagiarismTest.objects.create()
+    DetectedPlagiarism.objects.bulk_create([
+        DetectedPlagiarism(test=test, solution=solution) for solution in plagiarism_set
+    ])
