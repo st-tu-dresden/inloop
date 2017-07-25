@@ -38,7 +38,10 @@ def get_last_solutions(users, task):
     for user in users:
         last_solution = Solution.objects.filter(author=user, task=task).last()
         if last_solution is not None:
-            last_solutions[user.username] = last_solution
+            # escape hyphens in usernames with an unused (since
+            # disallowed) character, otherwise the usernames cannot
+            # be extracted from the jplag output
+            last_solutions[user.username.replace("-", "$")] = last_solution
     return last_solutions
 
 
