@@ -164,6 +164,9 @@ if env.bool("SECURE_COOKIES", default=True):
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+# necessary to pass security audits:
+CSRF_COOKIE_HTTPONLY = True
+
 HUEY = {
     "always_eager": False,
     "url": env("REDIS_URL"),
