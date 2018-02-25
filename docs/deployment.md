@@ -229,9 +229,8 @@ Installation
 
    **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.
 
-8. Install third-party JS/CSS frameworks and collect all static files into `STATIC_ROOT`:
+8. Collect all static files into `STATIC_ROOT`:
 
-        npm install --production
         mkdir -p $STATIC_ROOT
         django-admin collectstatic
 

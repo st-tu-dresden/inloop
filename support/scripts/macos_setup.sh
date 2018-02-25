@@ -4,7 +4,7 @@ if ! command -v brew >/dev/null; then
     exit 1
 fi
 
-brew install redis python3 node && brew services start redis
+brew install redis python3 && brew services start redis
 
 if [[ $? != 0 ]]; then
     echo 'Setup failed.' 2>&1

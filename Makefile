@@ -35,11 +35,6 @@ report:
 watchmedo:
 	@watchmedo shell-command --patterns="*.py" --recursive --command "$(TEST_CMD)" $(WATCH_DIRS)
 
-## Start a live-reload proxy watching for style changes
-browsersync:
-	@command -v browser-sync >/dev/null || echo "Please run 'npm install -g browser-sync'." 1>&2
-	@browser-sync start --proxy localhost:8000 --files "assets,inloop/**/*.html"
-
 ## Run basic code convention and quality checks
 lint:
 	isort --quiet --check-only
@@ -50,10 +45,9 @@ xlint: lint
 	bandit --recursive inloop || true
 	pylint inloop tests || true
 
-## Install Python and npm dependencies needed for development
+## Install Python dependencies needed for development
 install-deps: $(VENV)/pyvenv.cfg
 	for req in {main,test,lint,tools}.txt; do $(PIP) install -q -r requirements/$$req ; done
-	npm install --production &>/dev/null
 
 $(VENV)/pyvenv.cfg:
 	$(PYTHON) -m venv $(VENV)
