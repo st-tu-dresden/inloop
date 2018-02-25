@@ -61,7 +61,7 @@ Using the command line, a development instance can be set up as follows:
 ## Authors and credits
 
 **Project lead**: Martin Morgenstern<br>
-**Contributors**: Dominik Muhs, Jonathan Seitz
+**Contributors**: Dominik Muhs
 
 INLOOP borrows its concept from the Praktomat, developed originally at the
 University of Passau and later at the Karlsruhe Institute of Technology:
@@ -75,6 +75,7 @@ University of Passau and later at the Karlsruhe Institute of Technology:
 INLOOP is released under GPL version 3.
 
     Copyright (C) 2015-2017 Dominik Muhs and Martin Morgenstern
+    Copyright (C) 2018 Martin Morgenstern
     Economic rights: Technische Universität Dresden (Germany)
 
     INLOOP is free software: you can redistribute it and/or modify
