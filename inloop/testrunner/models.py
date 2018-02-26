@@ -52,11 +52,10 @@ def check_solution(solution):
             return_code=result_tuple.rc,
             time_taken=result_tuple.duration
         )
-        test_result.testoutput_set.set([
-            TestOutput(name=name, output=output)
-            for name, output
-            in result_tuple.file_dict.items()
-        ], bulk=False, clear=True)
+        TestOutput.objects.bulk_create([
+            TestOutput(result=test_result, name=name, output=output)
+            for name, output in result_tuple.file_dict.items()
+        ])
         solution.passed = test_result.is_success()
         solution.save()
     return test_result

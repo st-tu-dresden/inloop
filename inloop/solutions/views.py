@@ -48,9 +48,9 @@ class SolutionUploadView(LoginRequiredMixin, View):
                 author=request.user,
                 task=task
             )
-            solution.solutionfile_set.set([
-                SolutionFile(file=f) for f in uploads
-            ], bulk=False, clean=True)
+            SolutionFile.objects.bulk_create([
+                SolutionFile(solution=solution, file=upload) for upload in uploads
+            ])
 
         solution_submitted.send(sender=self.__class__, solution=solution)
         messages.success(request, "Your solution has been submitted to the checker.")
