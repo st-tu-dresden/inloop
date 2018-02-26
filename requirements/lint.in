@@ -1,7 +1,0 @@
-bandit
-flake8
-flake8-docstrings
-isort==4.2.5
-pydocstyle
-pylint
-pylint-django
