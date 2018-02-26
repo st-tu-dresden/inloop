@@ -28,21 +28,15 @@ conventions](#coding-conventions).
 
 ## Automated testing
 
-The commands `make test` and `make coveragetest` run the complete test suite (the latter one
-additionally records code coverage). You can pass an optional `SUITE=` argument to `make` to narrow
+The commands `make test` and `make coverage` run the complete test suite (the latter one
+additionally reports code coverage). You can pass an optional `SUITE=` argument to `make` to narrow
 down the Python packages or modules which should be searched for tests:
 
     # runs all tests (15 sec)
-    make coveragetest
+    make coverage
 
     # runs unit tests (3 sec)
-    make coveragetest SUITE=tests.unit
-
-    # generate and open HTML test report
-    make report
-
-**Tip**: Use `make watchmedo SUITE=tests.unit`, which watches for file changes in `inloop/` and
-`tests/` and re-runs the tests automatically.
+    make coverage SUITE=tests.unit
 
 
 ## Rules for contributing code
@@ -62,8 +56,6 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
   * Don't use relative imports.
   * Docstrings must follow the [Google Python Style Guide for Comments][google-style]. Don't
     use reStructured Text style comments.
-  * **Recommended**: use `flake8 --install-hook` to install a command line Git hook which
-    checks this automatically.
 * HTML (Django templates):
   * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
   * Use the [W3C Validator][w3c-validator] to verify that the output of processed templates is

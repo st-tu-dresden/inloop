@@ -30,26 +30,25 @@ online programming courses, built upon Django and Docker:
 INLOOP requires the following software:
 
 * Debian 8+ or Ubuntu 16.04+, macOS 10.11+ (for development only)
-* Python 3.4 or 3.5
+* Python 3.4, 3.5 or 3.6
 * Docker 1.10+ (see the [installation notes](docs/installation_notes.md) **!!!**)
 * Redis 2.6+
 * Git 2.3+
 
 Using the command line, a development instance can be set up as follows:
 
-1. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
+1. If don't have it already, install [pipenv](https://docs.pipenv.org/install/).
+
+2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
    `./support/scripts/macos_setup.sh` (macOS).
 
-2. Run `make devenv` and follow the printed instructions to bootstrap your local development
-   environment.
+3. Run `make init` and `make loaddb` to bootstrap your local development environment.
 
-3. Start and monitor the development web server and huey workers with `honcho start`.
+4. Start and monitor the development web server and huey workers with `pipenv run honcho start`.
 
-4. The previous step prints the address and port number of the local webserver that was started.
+5. The previous step prints the address and port number of the local webserver that was started.
    You can immediately log in using the demo user accounts *admin* and *student* with the password
    *secret*.
-
-**Tip**: Add the line `DJDT=1` to your `.env` file to enable the Django debug toolbar.
 
 
 ## Further documentation
