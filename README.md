@@ -7,22 +7,21 @@
        \/__/     \/__/     \/__/     \/__/     \/__/
 
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-[![Development status: Beta](https://img.shields.io/badge/development%20status-beta-orange.svg)](#)
 [![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
 
-INLOOP, the interactive learning center for object-oriented programming, is a lean web app for
-online programming courses, built upon Django and Docker:
+INLOOP, the *INteractive Learning center for Object-Oriented Programming*, is a Python web
+application to manage online programming courses, powered by Git, Django and Docker:
 
-- **Flexible**: you can write tasks for arbitrary languages, as long as they can be packaged into a
-  Docker image.
+- **Flexible**: you can write tasks for arbitrary programming languages, as long as they can be
+  packaged into a Docker image.
 - **Secure**: solutions are checked inside a minimal and strictly isolated Docker container, which
   is discarded after execution.
 - **Modern**: push-based (or periodic pull-based) import of tasks, Markdown task descriptions and
-  accompanying attachments from a Git repository.
+  accompanying material from a Git repository.
 - **Fast & scalable**: solutions are processed asynchronously by a configurable amount of
   background workers.
-- **Hackable**: modern, modular and PEP-8 compliant Python 3 code base with less than 3000 lines of
-  code, good test coverage and continuous integration tests.
+- **Easy to extend**: modern, modular and PEP-8 compliant Python 3 code base with less than 3000
+  lines of code, good test coverage and continuous integration tests.
 
 
 ## Quick start
