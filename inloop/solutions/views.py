@@ -107,7 +107,8 @@ class SolutionDetailView(LoginRequiredMixin, View):
         context = {
             'solution': solution,
             'result': result,
-            'testsuites': testsuites
+            'testsuites': testsuites,
+            'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())
 

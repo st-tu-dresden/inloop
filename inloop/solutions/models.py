@@ -132,5 +132,10 @@ class SolutionFile(models.Model):
         """Return the absolute file path as seen on the file system."""
         return Path(self.file.path)
 
+    @property
+    def size(self):
+        """Return the size of the file in bytes."""
+        return self.absolute_path.stat().st_size
+
     def __str__(self):
         return self.name
