@@ -1,0 +1,33 @@
+{% extends "base_site.html" %}
+{% load staticfiles %}
+
+{% block title %}Solution #{{ solution.scoped_id }} / {{ file.name }}{% endblock %}
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# Breadcrumb #}
+{% with task=solution.task %}
+<ol class="breadcrumb">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
+  <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="{% url 'solutions:detail' task.slug solution.scoped_id %}">Solution
+     #{{ solution.scoped_id }}</a></li>
+  <li class="active">{{ file.name }}</li>
+</ol>
+{% endwith %}
+{# /Breadcrumb #}
+
+<div>
+  <pre class="codehilite"><code class="language-java">{{ file.contents }}</code></pre>
+</div>
+
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/prism.js' %}"></script>
+<script src="{% static 'js/prism-java.min.js' %}"></script>
+{% endblock %}

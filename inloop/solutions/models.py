@@ -137,5 +137,10 @@ class SolutionFile(models.Model):
         """Return the size of the file in bytes."""
         return self.absolute_path.stat().st_size
 
+    @property
+    def contents(self):
+        with self.absolute_path.open() as f:
+            return f.read()
+
     def __str__(self):
         return self.name

@@ -65,7 +65,7 @@
     {% if files %}
     <div class="list-group">
     {% for file in files %}
-      <a class="list-group-item" href="#files">
+      <a class="list-group-item" href="{% url 'solutions:showfile' file.id %}">
         <h4 class="list-group-item-heading">{{ file.name }}</h4>
         <p class="list-group-item-text">{{ file.size|filesizeformat }}</p>
       </a>

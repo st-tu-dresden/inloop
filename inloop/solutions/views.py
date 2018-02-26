@@ -4,7 +4,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.views.generic import View
+from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.prettyprint import junit
@@ -127,3 +127,16 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
     def get_object(self, **kwargs):
         self.solution = get_object_or_404(Solution, pk=kwargs["id"])
         return self.solution
+
+
+class SolutionFileView(LoginRequiredMixin, DetailView):
+    context_object_name = "file"
+    template_name = "solutions/file_detail.html"
+
+    def get_queryset(self):
+        return SolutionFile.objects.filter(solution__author=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["solution"] = self.object.solution
+        return context
