@@ -31,7 +31,7 @@ INLOOP requires the following software:
 
 * Debian 8+ or Ubuntu 16.04+, macOS 10.11+ (for development only)
 * Python 3.4, 3.5 or 3.6
-* Docker 1.10+ (see the [installation notes](docs/installation_notes.md) **!!!**)
+* Docker 1.10+ ([Docker setup](docs/DOCKER_SETUP.md) **!!!**)
 * Redis 2.6+
 * Git 2.3+
 
@@ -53,7 +53,7 @@ Using the command line, a development instance can be set up as follows:
 
 ## Further documentation
 
-* [Deployment](docs/deployment.md)
+* [Installation/deployment manual](docs/INSTALL.md)
 * [Contributor guide](CONTRIBUTING.md)
 
 
