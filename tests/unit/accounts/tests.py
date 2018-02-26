@@ -58,17 +58,27 @@ class ProfileViewTest(SimpleAccountsData, TestCase):
     EMAIL_PATTERN=r"@example\.org\Z",
     EMAIL_ERROR_MESSAGE="This address does not end in `@example.org`."
 )
-class SignupFormTest(TestCase):
+class SignupFormTest(SimpleAccountsData, TestCase):
     def test_submit_invalid_email(self):
         form = SignupForm(data={"email": "bob@example.com"})
+        self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors)
-        self.assertSequenceEqual(form.errors["email"], [
+        self.assertEqual(form.errors["email"], [
             "<p>This address does not end in <code>@example.org</code>.</p>"
         ])
 
-    def test_submit_valid_email(self):
-        form = SignupForm(data={"email": "bob@example.org"})
-        self.assertNotIn("email", form.errors)
+    def test_case_insensitive_email_already_in_use(self):
+        form = SignupForm(data={"email": "Bob@example.org"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
+        self.assertEqual(len(form.errors["email"]), 1)
+        self.assertIn("This email address is already in use.", form.errors["email"][0])
+
+    def test_case_insensitive_user_already_exists(self):
+        form = SignupForm(data={"username": "Bob"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("username", form.errors)
+        self.assertEqual(form.errors["username"], ["A user with that username already exists."])
 
 
 class SignupViewTests(SimpleAccountsData, TestCase):

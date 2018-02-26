@@ -11,6 +11,8 @@ from registration.forms import RegistrationFormUniqueEmail
 from inloop.accounts.models import StudentDetails
 from inloop.common.templatetags.markdown import markdown
 
+User = get_user_model()
+
 
 class SignupForm(RegistrationFormUniqueEmail):
     """
@@ -39,6 +41,13 @@ class SignupForm(RegistrationFormUniqueEmail):
                 raise ValidationError(markdown(config.EMAIL_ERROR_MESSAGE))
         return super().clean_email()
 
+    def clean_username(self):
+        """Ensure no duplicate user names exist, using case-insensitive comparison."""
+        username = self.cleaned_data.get("username")
+        if User.objects.filter(username__iexact=username):
+            raise forms.ValidationError("A user with that username already exists.")
+        return username
+
 
 class StudentDetailsForm(forms.ModelForm):
     class Meta:
@@ -48,5 +57,5 @@ class StudentDetailsForm(forms.ModelForm):
 
 class UserChangeForm(forms.ModelForm):
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ["first_name", "last_name"]
