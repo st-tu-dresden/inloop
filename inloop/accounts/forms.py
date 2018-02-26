@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from constance import config
+from registration import validators
 from registration.forms import RegistrationFormUniqueEmail
 
 from inloop.accounts.models import StudentDetails
@@ -16,9 +17,14 @@ class SignupForm(RegistrationFormUniqueEmail):
     A user-friendly sign up form with dynamically configurable help texts and validation.
     """
 
+    # Have to redeclare the entire field from the super class in order
+    # to add our own help text:
     email = forms.EmailField(
-        label="Email",
-        help_text=lambda: markdown(config.EMAIL_HELP_TEXT)
+        help_text=lambda: markdown(config.EMAIL_HELP_TEXT),
+        required=True,
+        validators=[
+            validators.validate_confusables_email,
+        ]
     )
 
     def clean_email(self):
