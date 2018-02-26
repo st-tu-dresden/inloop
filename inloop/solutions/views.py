@@ -8,8 +8,8 @@ from django.views.generic import View
 
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.prettyprint import junit
+from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
-from inloop.testrunner.tasks import check_solution
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
@@ -52,7 +52,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
                 SolutionFile(file=f) for f in uploads
             ], bulk=False, clean=True)
 
-        check_solution(solution.id)
+        solution_submitted.send(sender=self.__class__, solution=solution)
         messages.success(request, "Your solution has been submitted to the checker.")
         return redirect("solutions:list", slug=slug)
 

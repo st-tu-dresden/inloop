@@ -1,8 +1,65 @@
 import signal
 
+from django.conf import settings
 from django.db import models
+from django.db.transaction import atomic
+
+from huey.contrib.djhuey import db_task
 
 from inloop.solutions.models import Solution
+from inloop.solutions.signals import solution_submitted
+from inloop.testrunner.runner import DockerTestRunner
+
+
+def handle_solution_submitted(sender, solution, **kwargs):
+    """Receiver for the solution_submitted signal in inloop.solutions."""
+    check_solution_async(solution.id)
+
+
+solution_submitted.connect(
+    handle_solution_submitted,
+    dispatch_uid="inloop.testrunner.tasks.handle_solution_submitted"
+)
+
+
+@db_task()
+def check_solution_async(solution_id):
+    """
+    Submit a job to check the solution specified by the given solution id.
+
+    This function will not block, instead it returns an AsyncData object
+    immediately. Blocking behavior can be achieved by calling
+    `check_solution()`, which circumvents the huey queue.
+
+    The job's return value will be the id of the created TestResult.
+    """
+    return check_solution(Solution.objects.get(pk=solution_id)).id
+
+
+def check_solution(solution):
+    """
+    Check the given solution with the test runner and return a TestResult.
+
+    This function will block until the test runner has finished.
+    """
+    runner = DockerTestRunner(settings.CHECKER, settings.DOCKER_IMAGE)
+    result_tuple = runner.check_task(solution.task.system_name, str(solution.path))
+    with atomic():
+        test_result = TestResult.objects.create(
+            solution=solution,
+            stdout=result_tuple.stdout,
+            stderr=result_tuple.stderr,
+            return_code=result_tuple.rc,
+            time_taken=result_tuple.duration
+        )
+        test_result.testoutput_set.set([
+            TestOutput(name=name, output=output)
+            for name, output
+            in result_tuple.file_dict.items()
+        ], bulk=False, clear=True)
+        solution.passed = test_result.is_success()
+        solution.save()
+    return test_result
 
 
 class TestResult(models.Model):

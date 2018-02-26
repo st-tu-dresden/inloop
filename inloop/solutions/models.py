@@ -72,40 +72,6 @@ class Solution(models.Model):
             raise AssertionError("Empty solution: %r" % self)
         return solution_file.absolute_path.parent
 
-    def do_check(self, checker):
-        """
-        Check this solution using the specified checker.
-
-        If the checker returns normally, a CheckerResult (possibly containing one or
-        more CheckerOutputs) will be saved to the database and returned.
-
-        This method will block until the checker is finished. For this reason, views
-        should call it through the asynchronous check_solution() wrapper, otherwise
-        the whole request will get stuck.
-        """
-        # XXX: have circular imports -> needs decoupling
-        from inloop.testrunner.models import TestOutput, TestResult
-
-        result_tuple = checker.check_task(self.task.system_name, str(self.path))
-
-        with atomic():
-            result = TestResult.objects.create(
-                solution=self,
-                stdout=result_tuple.stdout,
-                stderr=result_tuple.stderr,
-                return_code=result_tuple.rc,
-                time_taken=result_tuple.duration
-            )
-            result.testoutput_set.set([
-                TestOutput(name=name, output=output)
-                for name, output
-                in result_tuple.file_dict.items()
-            ], bulk=False, clear=True)
-            self.passed = result.is_success()
-            self.save()
-
-        return result
-
     def get_absolute_url(self):
         return reverse("solutions:staffdetail", kwargs={'id': self.id})
 
