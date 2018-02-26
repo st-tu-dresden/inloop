@@ -12,8 +12,7 @@ from password_reset.views import Recover, RecoverDone, Reset, ResetDone
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
                                               RegistrationView as HmacRegistrationView)
 
-from inloop.accounts.forms import (SignupForm, StudentDetailsForm,
-                                   UserChangeForm)
+from inloop.accounts.forms import SignupForm, StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
 
 

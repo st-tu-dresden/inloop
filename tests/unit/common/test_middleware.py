@@ -1,5 +1,4 @@
-from django.test import (RequestFactory, SimpleTestCase,
-                         TestCase, modify_settings)
+from django.test import RequestFactory, SimpleTestCase, TestCase, modify_settings
 
 from inloop.common.middleware import SetRemoteAddrFromForwardedFor
 

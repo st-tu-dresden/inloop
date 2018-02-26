@@ -1,8 +1,7 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (SolutionDetailView, SolutionListView,
-                                    SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView)
+from inloop.solutions.views import (SolutionDetailView, SolutionListView, SolutionStatusView,
+                                    SolutionUploadView, StaffSolutionDetailView)
 
 app_name = "solutions"
 urlpatterns = [

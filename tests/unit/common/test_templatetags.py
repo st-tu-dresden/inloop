@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from inloop.common.templatetags.markdown import markdown
 
-
 FENCED_CODE = """
 ```python
 print("Hello, World")
