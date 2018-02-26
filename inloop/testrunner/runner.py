@@ -169,12 +169,16 @@ class DockerTestRunner:
         """
         self.subpath_check(input_path, output_path)
         ctr_id = uuid.uuid4()
+        # Setting --hostname=localhost is necessary in addition to --net=none,
+        # otherwise each Ant Junit batch test takes about 5 seconds on Alpine
+        # Linux based images (Ant tries to resolve the container's hostname).
         args = [
             "docker",
             "run",
             "--rm",
             "--read-only",
             "--net=none",
+            "--hostname=localhost",
             "--memory=%s" % self.config.get("memory", "256m"),
             "--volume=%s:/checker/input:ro" % input_path,
             "--volume=%s:/checker/output" % output_path,
