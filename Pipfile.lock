@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1dde9e640fac7ff6df1ed56c10ed6a157649a590bce8111d3427622934c7a70d"
+            "sha256": "d6eec3e2dd4f2a8ad1e25860aa81c9eddc336c5e9283b08d62d4692738ce5b48"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -27,6 +27,13 @@
         ]
     },
     "default": {
+        "confusable-homoglyphs": {
+            "hashes": [
+                "sha256:4f5d42df30ba461281634ed9b3ad8303a0e94a13d28a7b225523ca9b9b29b65b",
+                "sha256:2dc772701291bd8343abd0dca01453b970a998a9dc7fc4be558d91472100e02e"
+            ],
+            "version": "==3.0.0"
+        },
         "defusedxml": {
             "hashes": [
                 "sha256:702a91ade2968a82beb0db1e0766a6a273f33d4616a6ce8cde475d8e09853b20",
@@ -78,9 +85,10 @@
         },
         "django-registration": {
             "hashes": [
-                "sha256:14ffa4c07ad902afaa1d096ea241282b76724348b8b7518cecad617870178283"
+                "sha256:d446eec9dbab12f5a98baa1af6c1db08b56b66eec047dbadf8bec09ce2787a95",
+                "sha256:667b4fb49447227b62ff76693697d77acb85cadb87129fd1cb94481971e76c51"
             ],
-            "version": "==2.2"
+            "version": "==2.4.1"
         },
         "django-widget-tweaks": {
             "hashes": [
