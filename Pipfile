@@ -29,7 +29,7 @@ setproctitle = "==1.1.10"
 coverage = "*"
 "flake8" = "*"
 "flake8-docstrings" = "*"
-isort = "==4.2.5"
+isort = "*"
 ipython = "*"
 honcho = "*"
 
