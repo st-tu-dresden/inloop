@@ -22,7 +22,7 @@
 {# /Breadcrumb #}
 
 <div>
-  <pre class="codehilite"><code class="language-java">{{ file.contents }}</code></pre>
+  <pre class="line-numbers codehilite"><code class="language-java">{{ file.contents }}</code></pre>
 </div>
 
 {% endblock %}
@@ -30,4 +30,5 @@
 {% block extrabody %}
 <script src="{% static 'js/prism.js' %}"></script>
 <script src="{% static 'js/prism-java.min.js' %}"></script>
+<script src="{% static 'js/prism-line-numbers.min.js' %}"></script>
 {% endblock %}
