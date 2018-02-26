@@ -7,21 +7,21 @@ name = "pypi"
 
 [packages]
 
-defusedxml = "==0.5.0"
+defusedxml = "*"
 django-constance = "*"
-django-environ = "==0.4.4"
+django-environ = "*"
 django-extensions = "*"
-django-password-reset = "==1.0"
-django-redis = "==4.8.0"
+django-password-reset = "*"
+django-redis = "*"
 django-registration = "*"
-django-widget-tweaks = "==1.4.1"
+django-widget-tweaks = "*"
 django = "<=1.11.99"
 huey = "*"
 markdown = "*"
-redis = "==2.10.6"
-gunicorn = "==19.7.1"
+redis = "*"
+gunicorn = "*"
 "psycopg2" = "*"
-setproctitle = "==1.1.10"
+setproctitle = "*"
 
 
 [dev-packages]
