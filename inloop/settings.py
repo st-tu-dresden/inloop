@@ -10,6 +10,7 @@ import sys
 from collections import OrderedDict
 from pathlib import Path
 
+from django.contrib.messages import constants as messages
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 
@@ -117,8 +118,11 @@ if not DEBUG:
 
 STATICFILES_DIRS = [str(BASE_DIR / "assets")]
 
-# TODO: investigate a better method to align Bootstrap alerts and contrib.messages
-MESSAGE_TAGS = {10: "info", 40: "danger"}
+# adapt the default message tags to Bootstrap CSS
+MESSAGE_TAGS = {
+    messages.DEBUG: "info",
+    messages.ERROR: "danger",
+}
 
 DATABASES = {
     "default": env.db()
