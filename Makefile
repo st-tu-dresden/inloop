@@ -1,6 +1,6 @@
 IMAGE   := inloop-integration-test
 TESTENV := PIPENV_DOTENV_LOCATION="$(shell pwd)/tests/.env"
-SUIE    := tests
+SUITE   := tests
 
 init:
 	pipenv install --dev
