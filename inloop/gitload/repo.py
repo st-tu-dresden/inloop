@@ -5,6 +5,8 @@ from pathlib import Path
 
 class Repository:
     def __init__(self, path):
+        if not path:
+            raise ValueError("path must not be empty")
         self._path = Path(path).resolve()
 
     @property
@@ -27,6 +29,10 @@ class Repository:
 class GitRepository(Repository):
     def __init__(self, path, url, branch, timeout=30):
         super().__init__(path)
+        if not url:
+            raise ValueError("url must not be empty")
+        if not branch:
+            raise ValueError("branch must not be empty")
         self.url = url
         self.branch = branch
         self.timeout = timeout
