@@ -192,8 +192,6 @@ Installation
         ├── DATABASE_URL
         ├── DJANGO_SETTINGS_MODULE
         ├── FROM_EMAIL
-        ├── GITHUB_SECRET
-        ├── GIT_ROOT
         ├── LANG
         ├── MEDIA_ROOT
         ├── PATH
@@ -309,8 +307,6 @@ Name                      | Description
 `DATABASE_URL`            | 12factor style database URL, e.g. `postgres://user:pass@host:port/db`
 `DJANGO_SETTINGS_MODULE`  | Set to `inloop.settings` unless you know what you are doing
 `FROM_EMAIL`              | Address used for outgoing mail, e.g. `inloop@example.com`
-`GITHUB_SECRET`           | Github webhook endpoint secret
-`GIT_ROOT`                | Must be a subdirectory of `MEDIA_ROOT`
 `LANG`                    | Set to `en_US.UTF-8` unless you know what you are doing
 `MEDIA_ROOT`              | Path to the directory for user uploads
 `PYTHONPATH`              | Set it to the path of the INLOOP git clone

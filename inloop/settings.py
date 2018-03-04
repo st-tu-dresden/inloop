@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     "inloop.solutions",
     "inloop.tasks",
     "inloop.testrunner",
-    "inloop.gh_import",
     "inloop.gitload",
 ]
 
@@ -182,12 +181,6 @@ CHECKER = {
     "timeout": 120,
 }
 DOCKER_IMAGE = "inloop-java-checker"
-
-GITHUB_SECRET = env("GITHUB_SECRET")
-GIT_ROOT = str(env("GIT_ROOT", cast=Path, default=BASE_DIR.parent / "inloop-tasks"))
-GIT_SSH_URL = env("GIT_URL", default="")
-GIT_SSH_KEY = None
-GIT_BRANCH = env("GIT_BRANCH", default="master")
 
 REPOSITORY_ROOT = str(Path(MEDIA_ROOT).joinpath("repository"))
 
