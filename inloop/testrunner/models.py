@@ -7,19 +7,7 @@ from django.db.transaction import atomic
 from huey.contrib.djhuey import db_task
 
 from inloop.solutions.models import Solution
-from inloop.solutions.signals import solution_submitted
 from inloop.testrunner.runner import DockerTestRunner
-
-
-def handle_solution_submitted(sender, solution, **kwargs):
-    """Receiver for the solution_submitted signal in inloop.solutions."""
-    check_solution_async(solution.id)
-
-
-solution_submitted.connect(
-    handle_solution_submitted,
-    dispatch_uid="inloop.testrunner.tasks.handle_solution_submitted"
-)
 
 
 @db_task()
