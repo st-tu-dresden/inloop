@@ -8,6 +8,8 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
 from django.utils.crypto import constant_time_compare, force_bytes
 from django.views.decorators.csrf import csrf_exempt
 
+from constance import config
+
 from inloop.gitload.secrets import GITHUB_KEY
 from inloop.gitload.tasks import load_tasks_async
 
@@ -40,7 +42,8 @@ def webhook_handler(request):
         event = request.META.get("HTTP_X_GITHUB_EVENT")
         if event == "push" and request.content_type == "application/json":
             payload = safe_json_load(request)
-            if payload.get("ref") == "refs/head/master":
+            configured_ref = "refs/head/%s" % config.GITLOAD_BRANCH
+            if config.GITLOAD_URL and payload.get("ref") == configured_ref:
                 load_tasks_async()
                 return HttpResponse()
     except JSONDecodeError:

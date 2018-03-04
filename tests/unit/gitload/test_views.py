@@ -1,8 +1,10 @@
-from unittest import TestCase
 from unittest.mock import patch
 
+from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.crypto import force_bytes
+
+from constance.test import override_config
 
 from inloop.gitload.secrets import GITHUB_KEY
 from inloop.gitload.views import compute_signature, webhook_handler
@@ -21,6 +23,12 @@ class SignatureTest(TestCase):
 
 
 @patch("inloop.gitload.views.load_tasks_async")
+@override_config(
+    # path must be non-empty, but should not be accessed
+    # during this test because the function is a mock
+    GITLOAD_URL="file:///nonexistent/path/to/repo.git",
+    GITLOAD_BRANCH="master"
+)
 class WebhookHandlerTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
