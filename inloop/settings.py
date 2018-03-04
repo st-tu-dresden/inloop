@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "inloop.tasks",
     "inloop.testrunner",
     "inloop.gh_import",
+    "inloop.gitload",
 ]
 
 MIDDLEWARE = [
