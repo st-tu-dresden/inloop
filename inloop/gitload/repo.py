@@ -51,7 +51,10 @@ class GitRepository(Repository):
         self.git("reset", "--hard", "origin/%s" % self.branch)
 
     def initialize(self):
-        self.path.mkdir(parents=True, exist_ok=True)
+        try:
+            self.path.mkdir(parents=True)
+        except FileExistsError:
+            pass
         self.git("clone", "--quiet", "--depth=1", "--branch", self.branch, self.url, ".")
 
     def git(self, *args):
