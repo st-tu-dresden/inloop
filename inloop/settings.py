@@ -180,7 +180,7 @@ HUEY = {
 CHECKER = {
     "timeout": 120,
 }
-DOCKER_IMAGE = "inloop-java-checker"
+DOCKER_IMAGE = "inloop-testrunner"
 
 REPOSITORY_ROOT = str(Path(MEDIA_ROOT).joinpath("repository"))
 
