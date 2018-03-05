@@ -15,7 +15,7 @@ from inloop.gitload.tasks import load_tasks_async
 
 try:
     from json import JSONDecodeError
-except NameError:
+except ImportError:
     JSONDecodeError = ValueError
 
 

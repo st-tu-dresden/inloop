@@ -6,7 +6,7 @@ from inloop.tasks.models import Category, Task
 
 try:
     from json import JSONDecodeError
-except NameError:
+except ImportError:
     JSONDecodeError = ValueError
 
 logger = logging.getLogger(__name__)
