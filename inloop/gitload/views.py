@@ -55,4 +55,4 @@ def webhook_handler(request):
         return HttpResponseBadRequest("Malformed payload.")
     except InvalidSignature:
         return HttpResponseBadRequest("Invalid or missing signature.")
-    return HttpResponseNotModified()
+    return HttpResponse(b"Event ignored")

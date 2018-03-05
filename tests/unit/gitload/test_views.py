@@ -65,7 +65,7 @@ class WebhookHandlerTest(TestCase):
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
         request.META["HTTP_X_GITHUB_EVENT"] = "ping"
         response = webhook_handler(request)
-        self.assertEqual(response.status_code, 304)
+        self.assertContains(response, "Event ignored")
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_ref_not_master(self, mock):
@@ -74,7 +74,7 @@ class WebhookHandlerTest(TestCase):
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
         response = webhook_handler(request)
-        self.assertEqual(response.status_code, 304)
+        self.assertContains(response, "Event ignored")
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_invalid_json(self, mock):
