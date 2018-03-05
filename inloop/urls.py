@@ -4,7 +4,7 @@ from django.contrib.auth.views import login
 from django.contrib.flatpages.views import flatpage
 
 from inloop.accounts import urls as account_urls
-from inloop.gh_import import urls as github_urls
+from inloop.gitload import urls as gitload_urls
 from inloop.solutions import urls as solution_urls
 from inloop.tasks import urls as task_urls
 from inloop.views import home, logout
@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^logout/$', logout, name="logout"),
 
     url(r'^account/', include(account_urls)),
-    url(r'^github/', include(github_urls)),
+    url(r'^gitload/', include(gitload_urls)),
     url(r'^solutions/', include(solution_urls)),
     url(r'^tasks/', include(task_urls)),
 

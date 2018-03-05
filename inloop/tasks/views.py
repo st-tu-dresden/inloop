@@ -62,7 +62,7 @@ def serve_attachment(request, slug, path):
     task = get_object_or_404(Task, slug=slug)
     filesystem_path = join(task.system_name, path)
 
-    return sendfile(request, filesystem_path, settings.GIT_ROOT)
+    return sendfile(request, filesystem_path, settings.REPOSITORY_ROOT)
 
 
 class TaskDetailView(LoginRequiredMixin, View):

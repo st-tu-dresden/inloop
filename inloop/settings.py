@@ -17,6 +17,7 @@ from django.urls import reverse_lazy
 from environ import Env
 
 from inloop.accounts import constance as accounts_constance
+from inloop.gitload import constance as gitload_constance
 
 if sys.getfilesystemencoding() != "utf-8":
     raise ImproperlyConfigured("LANG must be a utf-8 locale")
@@ -54,7 +55,7 @@ INSTALLED_APPS = [
     "inloop.solutions",
     "inloop.tasks",
     "inloop.testrunner",
-    "inloop.gh_import",
+    "inloop.gitload",
 ]
 
 MIDDLEWARE = [
@@ -179,13 +180,9 @@ HUEY = {
 CHECKER = {
     "timeout": 120,
 }
-DOCKER_IMAGE = "inloop-java-checker"
+DOCKER_IMAGE = "inloop-testrunner"
 
-GITHUB_SECRET = env("GITHUB_SECRET")
-GIT_ROOT = str(env("GIT_ROOT", cast=Path, default=BASE_DIR.parent / "inloop-tasks"))
-GIT_SSH_URL = env("GIT_URL", default="")
-GIT_SSH_KEY = None
-GIT_BRANCH = env("GIT_BRANCH", default="master")
+REPOSITORY_ROOT = str(Path(MEDIA_ROOT).joinpath("repository"))
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
@@ -206,3 +203,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {}
 CONSTANCE_CONFIG.update(accounts_constance.config)
 CONSTANCE_CONFIG_FIELDSETS.update(accounts_constance.fieldsets)
 CONSTANCE_ADDITIONAL_FIELDS.update(accounts_constance.fields)
+
+CONSTANCE_CONFIG.update(gitload_constance.config)
+CONSTANCE_CONFIG_FIELDSETS.update(gitload_constance.fieldsets)
