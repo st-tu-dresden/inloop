@@ -1,17 +1,22 @@
 import hashlib
 import hmac
 import json
-from json import JSONDecodeError
 
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseNotAllowed, HttpResponseNotModified)
 from django.utils.crypto import constant_time_compare, force_bytes
+from django.utils.text import force_text
 from django.views.decorators.csrf import csrf_exempt
 
 from constance import config
 
 from inloop.gitload.secrets import GITHUB_KEY
 from inloop.gitload.tasks import load_tasks_async
+
+try:
+    from json import JSONDecodeError
+except NameError:
+    JSONDecodeError = ValueError
 
 
 class InvalidSignature(Exception):
@@ -30,7 +35,7 @@ def safe_json_load(request):
     expected = compute_signature(request.body, force_bytes(GITHUB_KEY))
     if not constant_time_compare(signature, expected):
         raise InvalidSignature
-    return json.loads(request.body)
+    return json.loads(force_text(request.body))
 
 
 @csrf_exempt
