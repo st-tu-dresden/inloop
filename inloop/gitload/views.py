@@ -47,7 +47,7 @@ def webhook_handler(request):
         event = request.META.get("HTTP_X_GITHUB_EVENT")
         if event == "push" and request.content_type == "application/json":
             payload = safe_json_load(request)
-            configured_ref = "refs/head/%s" % config.GITLOAD_BRANCH
+            configured_ref = "refs/heads/%s" % config.GITLOAD_BRANCH
             if config.GITLOAD_URL and payload.get("ref") == configured_ref:
                 load_tasks_async()
                 return HttpResponse()

@@ -41,7 +41,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_valid_signature(self, mock):
-        data = b'{"ref": "refs/head/master"}'
+        data = b'{"ref": "refs/heads/master"}'
         request = self.factory.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
@@ -50,7 +50,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 1)
 
     def test_push_with_invalid_signature(self, mock):
-        data = b'{"ref": "refs/head/master"}'
+        data = b'{"ref": "refs/heads/master"}'
         request = self.factory.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = "invalid"
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
@@ -60,7 +60,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_event_not_push(self, mock):
-        data = b'{"ref": "refs/head/master"}'
+        data = b'{"ref": "refs/heads/master"}'
         request = self.factory.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
         request.META["HTTP_X_GITHUB_EVENT"] = "ping"
@@ -69,7 +69,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_ref_not_master(self, mock):
-        data = b'{"ref": "refs/head/develop"}'
+        data = b'{"ref": "refs/heads/develop"}'
         request = self.factory.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
