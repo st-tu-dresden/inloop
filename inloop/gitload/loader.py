@@ -1,9 +1,13 @@
 import json
 import logging
-from json import JSONDecodeError
 
 from inloop.gitload.signals import repository_loaded
 from inloop.tasks.models import Category, Task
+
+try:
+    from json import JSONDecodeError
+except NameError:
+    JSONDecodeError = ValueError
 
 logger = logging.getLogger(__name__)
 

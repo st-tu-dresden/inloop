@@ -14,7 +14,7 @@ class TaskLoadTest(TestCase):
     @patch("inloop.gitload.loader.logger")
     def test_load_tasks(self, mocked_logger, mocked_signal):
         load_tasks(Repository(TESTREPO_PATH))
-        mocked_signal.send.assert_called_once()
+        self.assertEqual(1, mocked_signal.send.call_count)
         self.assertEqual(3, mocked_logger.error.call_count)
 
     def test_load_task(self):
