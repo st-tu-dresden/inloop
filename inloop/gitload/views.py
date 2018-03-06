@@ -2,8 +2,7 @@ import hashlib
 import hmac
 import json
 
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseNotAllowed, HttpResponseNotModified)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.utils.crypto import constant_time_compare, force_bytes
 from django.utils.text import force_text
 from django.views.decorators.csrf import csrf_exempt
