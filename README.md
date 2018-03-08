@@ -56,6 +56,10 @@ You can use our [Java example task repository][repo-example] as a starting point
 
 [repo-example]: https://github.com/st-tu-dresden/inloop-java-repository-example
 
+## Demo
+
+[![INLOOP demo on YouTube](https://youtu.be/cZ_fGQzL5Sw)](docs/figures/video.jpg)
+
 
 ## Documentation
 
