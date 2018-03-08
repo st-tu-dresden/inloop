@@ -54,16 +54,10 @@ class DockerTestRunner:
         The following config keywords are supported:
 
             - timeout: maximum runtime of a container in seconds (default: 30)
-            - tmpdir:  directory where we should store temporary files
-                       (default: platform-dependent)
             - memory:  maximum memory a container may use, passed in as string
                        to the Docker CLI as --memory=XXX (defaut: 256m)
             - fssize:  the size of the mounted scratch file system (default: 32m)
         """
-        tmpdir = config.get("tmpdir")
-        if tmpdir:
-            self.ensure_absolute_dir(tmpdir)
-
         self.config = config
         self.image_name = image_name
 
@@ -93,7 +87,7 @@ class DockerTestRunner:
         # inside the container. To allow users other than root to write outputs, we create
         # a world-writable subdirectory called "storage" (because a world-writable mount
         # point would have security implications).
-        with tempfile.TemporaryDirectory(dir=self.config.get("tmpdir")) as output_path:
+        with tempfile.TemporaryDirectory() as output_path:
             # Resolve symbolic links:
             # On OS X, TMPDIR is set to some random subdir of /var/folders, which
             # resolves to /private/var/folders. Docker for Mac only accepts the

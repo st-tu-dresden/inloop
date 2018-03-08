@@ -30,7 +30,7 @@ def check_solution(solution):
 
     This function will block until the test runner has finished.
     """
-    runner = DockerTestRunner(settings.CHECKER, settings.DOCKER_IMAGE)
+    runner = DockerTestRunner(settings.TESTRUNNER_OPTIONS, settings.TESTRUNNER_IMAGE)
     test_output = runner.check_task(solution.task.system_name, str(solution.path))
     with atomic():
         test_result = TestResult.objects.create(

@@ -177,10 +177,10 @@ HUEY = {
     "url": env("REDIS_URL"),
 }
 
-CHECKER = {
+TESTRUNNER_OPTIONS = {
     "timeout": 120,
 }
-DOCKER_IMAGE = "inloop-testrunner"
+TESTRUNNER_IMAGE = "inloop-testrunner"
 
 REPOSITORY_ROOT = str(Path(MEDIA_ROOT).joinpath("repository"))
 
