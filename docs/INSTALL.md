@@ -42,7 +42,7 @@ Prerequisites
 other modern Linux distribution should also do the trick, given that it is able to run Docker and
 Python (see the [README](../README.md) for exact version requirements).
 
-**Docker setup**: see the [Docker installation notes](DOCKER_SETUP.md).
+**Docker setup**: see the [Docker installation notes](docker_setup.md).
 
 **Hostname setup:** verify that your system's hostname is configured correctly. `hostname` and
 `hostname -f` should print the short and fully qualified hostname of your machine, e.g.:

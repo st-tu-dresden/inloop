@@ -25,7 +25,7 @@ echo "Checking Docker prerequisites..."
 
 if ! command -v docker >/dev/null; then
     echo 'I cannot find a `docker` executable in your PATH. Please make sure' >&2
-    echo 'you have installed Docker as described in docs/DOCKER_SETUP.md.' >&2
+    echo 'you have installed Docker as described in docs/docker_setup.md.' >&2
     exit 1
 fi
 
@@ -37,7 +37,7 @@ fi
 
 if ! grep -q swapaccount=1 /proc/cmdline; then
     echo 'Swap accounting seems to be disabled. Please make sure you have' >&2
-    echo 'configured GRUB as described in docs/DOCKER_SETUP.md.' >&2
+    echo 'configured GRUB as described in docs/docker_setup.md.' >&2
     exit 1
 fi
 
