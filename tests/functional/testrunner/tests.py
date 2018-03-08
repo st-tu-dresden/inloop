@@ -19,9 +19,9 @@ class CollectorTest(TestCase):
         self.assertNotIn("empty2.txt", filenames)
 
     def test_collected_contents(self):
-        file_dict = collect_files(DATA_DIR)
-        self.assertEqual("", file_dict["empty1.txt"])
-        self.assertEqual("This is a test harness for collect_files().\n", file_dict["README.md"])
+        files = collect_files(DATA_DIR)
+        self.assertEqual("", files["empty1.txt"])
+        self.assertEqual("This is a test harness for collect_files().\n", files["README.md"])
 
 
 class DockerTestRunnerTests(TestCase):
@@ -113,13 +113,13 @@ class DockerTestRunnerTests(TestCase):
         self.assertEqual(result.rc, 0)
 
     def test_output_filedict(self):
-        """Test if we can create a file which appears in the file_dict."""
+        """Test if we can create a file which appears in the files dictionary."""
         result = self.runner.check_task(
             "echo -n FOO >/checker/output/storage/bar",
             self.input_path
         )
         self.assertEqual(result.rc, 0)
-        self.assertEqual("FOO", result.file_dict["bar"])
+        self.assertEqual("FOO", result.files["bar"])
 
     def test_container_unprivileged(self):
         """Test if we execute commands as unprivileged user."""

@@ -78,7 +78,6 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_invalid_json(self, mock):
-        # note the missing closing quote:
         data = b'<xml-is-not-json/>'
         request = self.factory.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)

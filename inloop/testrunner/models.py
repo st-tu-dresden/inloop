@@ -31,18 +31,18 @@ def check_solution(solution):
     This function will block until the test runner has finished.
     """
     runner = DockerTestRunner(settings.CHECKER, settings.DOCKER_IMAGE)
-    result_tuple = runner.check_task(solution.task.system_name, str(solution.path))
+    test_output = runner.check_task(solution.task.system_name, str(solution.path))
     with atomic():
         test_result = TestResult.objects.create(
             solution=solution,
-            stdout=result_tuple.stdout,
-            stderr=result_tuple.stderr,
-            return_code=result_tuple.rc,
-            time_taken=result_tuple.duration
+            stdout=test_output.stdout,
+            stderr=test_output.stderr,
+            return_code=test_output.rc,
+            time_taken=test_output.duration
         )
         TestOutput.objects.bulk_create([
-            TestOutput(result=test_result, name=name, output=output)
-            for name, output in result_tuple.file_dict.items()
+            TestOutput(result=test_result, name=name, output=content)
+            for name, content in test_output.files.items()
         ])
         solution.passed = test_result.is_success()
         solution.save()

@@ -24,10 +24,8 @@ def collect_files(path):
     return retval
 
 
-class TestOutput(namedtuple("_TestOutput", "rc stdout stderr duration file_dict")):
-    """
-    Container type wrapping the outputs of a test run.
-    """
+TestOutput = namedtuple("TestOutput", "rc stdout stderr duration files")
+TestOutput.__doc__ = "Container type wrapping the outputs of a test run."
 
 
 class DockerTestRunner:
@@ -111,9 +109,9 @@ class DockerTestRunner:
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
-            file_dict = collect_files(storage_dir)
+            files = collect_files(storage_dir)
 
-        return TestOutput(rc, stdout, stderr, duration, file_dict)
+        return TestOutput(rc, stdout, stderr, duration, files)
 
     def subpath_check(self, path1, path2):
         """
