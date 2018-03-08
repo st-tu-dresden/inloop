@@ -145,7 +145,7 @@ code {
 }
 
 .solution-failure:before {
-	content: "\e082"
+	content: "\e014"
 }
 
 .solution-error:before,
