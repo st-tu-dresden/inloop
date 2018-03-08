@@ -45,45 +45,6 @@ class DockerTestRunner:
         - process return codes
         - file sharing via mounted volumes
 
-    Each task repository must provide a Dockerfile. The resulting Docker image
-    is expected to be self-contained and must implement the following interface:
-
-      1. A non-zero return code indicates that the check failed for some reason.
-         Possible reasons include: failed compilation, failed unit test, internal
-         error due to misconfiguration/crash.
-
-      2. The image must provide an entrypoint that accepts the task name as one
-         and only argument.
-
-      3. The image mounts a read-only VOLUME at the path:
-
-            /checker/input
-
-         This is the place where user-submitted files are dropped.
-
-         Caveat: The hierarchy of the dropped files currently is flat, i.e., there
-         are *no* subdirectories and there is currently no way to specify them.
-
-      4. The image mounts a writable VOLUME at the path
-
-            /checker/output
-
-         containing a world-writable directory "storage". On the host, this is a
-         private directory bound to one container.
-
-         This is the place where the different execution stages can drop their
-         output as files (e.g., unit test result XML files, Findbug reports).
-
-      5. The rootfs of the container is mounted read-only. To store intermediate
-         results such as compiled class files, the scratch tmpfs at
-
-            /checker/scratch
-
-         must be used.
-
-      6. The image may output diagnostic information via stdout or stderr, which
-         will be saved for later examination.
-
     This class expects that the Docker image specified by image_name has already
     been built (e.g., during the import of a task repository).
     """

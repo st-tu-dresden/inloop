@@ -50,9 +50,14 @@ Using the command line, a development instance can be set up as follows:
    You can immediately log in using the demo user accounts *admin* and *student* with the password
    *secret*.
 
+You can use our [Java example task repository][repo-example] as a starting point to explore INLOOP.
+
+[repo-example]: https://github.com/st-tu-dresden/inloop-java-repository-example
+
 
 ## Documentation
 
+* [Task repository manual](docs/task_repository_manual.md)
 * [Installation/deployment manual](docs/INSTALL.md)
 * [Contributor guide](CONTRIBUTING.md)
 
