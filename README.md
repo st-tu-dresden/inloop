@@ -8,6 +8,7 @@
 
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
+[![Coverage Badge](https://api.codacy.com/project/badge/Coverage/2be604ceedf14603a56e165dfe1cae5a)](https://www.codacy.com/app/martinmo/inloop)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2be604ceedf14603a56e165dfe1cae5a)](https://www.codacy.com/app/martinmo/inloop)
 
 INLOOP, the *INteractive Learning center for Object-Oriented Programming*, is a Python web
