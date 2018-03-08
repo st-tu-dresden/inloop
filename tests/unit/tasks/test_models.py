@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -34,11 +31,6 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
         Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
         self.assertTrue(self.published_task1.is_completed_by(self.bob))
         self.assertFalse(self.published_task2.is_completed_by(self.bob))
-
-    def test_required_fields(self):
-        self.assertSetEqual(Task.objects.required_fields, {
-            "title", "description", "category", "pubdate", "system_name"
-        })
 
 
 class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
@@ -146,54 +138,3 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
         self.assertEqual(len(self.category1.task_set.not_completed_by(self.bob)), 3)
         self.assertEqual(len(self.category1.task_set.completed_by(self.alice)), 0)
         self.assertEqual(len(self.category1.task_set.not_completed_by(self.alice)), 4)
-
-
-# XXX: handling the removal of optional attributes
-class UpdateOrCreateRelatedTest(TestCase):
-    def setUp(self):
-        self.data = {
-            "title": "Test title",
-            "category": "Beginner",
-            "pubdate": "2016-12-01 13:37:00+0100",
-            "deadline": "2017-03-31 13:37:00+0100",
-            "description": "Task description"
-        }
-
-    def test_create(self):
-        task = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
-        task.refresh_from_db()
-        self.assertEqual(task.title, "Test title")
-        self.assertEqual(task.system_name, "TestTask")
-        self.assertEqual(task.description, "Task description")
-        self.assertEqual(task.category.name, "Beginner")
-        self.assertEqual(type(task.pubdate), datetime)
-        self.assertEqual(type(task.deadline), datetime)
-        self.assertTrue(Category.objects.get(name="Beginner"))
-
-    def test_update(self):
-        task1 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
-        self.data["title"] = "Another title"
-        self.data["category"] = "Advanced"
-        self.data["description"] = "Another description"
-        task2 = Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
-        task1.refresh_from_db()
-        self.assertEqual(task1.id, task2.id)
-        self.assertEqual(task1.title, "Another title")
-        self.assertEqual(task1.description, "Another description")
-        self.assertEqual(task1.category.name, "Advanced")
-        self.assertTrue(Category.objects.get(name="Beginner"))
-        self.assertTrue(Category.objects.get(name="Advanced"))
-
-    def test_invalid_date(self):
-        self.data["pubdate"] = "invalid"
-        with self.assertRaises(ValidationError):
-            Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
-
-    def test_missing_data(self):
-        self.data.pop("title")
-        with self.assertRaises(ValidationError):
-            Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
-
-    def test_invalid_key(self):
-        self.data["invalid_key"] = "invalid"
-        Task.objects.update_or_create_related(system_name="TestTask", data=self.data)
