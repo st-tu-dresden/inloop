@@ -3,6 +3,8 @@ import subprocess
 from pathlib import Path
 from unittest import TestCase
 
+from django.test import tag
+
 from inloop.testrunner.runner import DockerTestRunner, collect_files
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,6 +27,7 @@ class CollectorTest(TestCase):
         self.assertEqual("This is a test harness for collect_files().\n", files["README.md"])
 
 
+@tag("slow", "docker")
 class DockerTestRunnerTests(TestCase):
     """
     Each of the the following tests uses a *real* docker container, there is

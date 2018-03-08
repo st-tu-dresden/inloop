@@ -1,6 +1,9 @@
 IMAGE   := inloop-integration-test
 TESTENV := PIPENV_DOTENV_LOCATION="$(shell pwd)/tests/.env"
-SUITE   := tests
+
+ifndef TRAVIS
+TESTOPTS := --exclude-tag=slow
+endif
 
 init:
 	pipenv install --dev
@@ -13,10 +16,10 @@ loaddb:
 	pipenv run ./manage.py loaddata demo_accounts development_site
 
 test:
-	env $(TESTENV) pipenv run ./manage.py test $(SUITE)
+	env $(TESTENV) pipenv run ./manage.py test $(TESTOPTS)
 
 coverage:
-	env $(TESTENV) pipenv run coverage run ./manage.py test $(SUITE)
+	env $(TESTENV) pipenv run coverage run ./manage.py test $(TESTOPTS)
 	pipenv run coverage report
 
 lint:

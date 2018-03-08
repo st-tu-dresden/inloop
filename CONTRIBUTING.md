@@ -26,19 +26,6 @@ New code needs to include [unit tests][django-testing], documentation and must f
 conventions](#coding-conventions).
 
 
-## Automated testing
-
-The commands `make test` and `make coverage` run the complete test suite (the latter one
-additionally reports code coverage). You can pass an optional `SUITE=` argument to `make` to narrow
-down the Python packages or modules which should be searched for tests:
-
-    # runs all tests (15 sec)
-    make coverage
-
-    # runs unit tests (3 sec)
-    make coverage SUITE=tests.unit
-
-
 ## Rules for contributing code
 
 In general, do one thing at a time and don't bite off more than you can chew. Long living
