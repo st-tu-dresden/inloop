@@ -9,8 +9,11 @@ services:
 cache:
   pip: true
 install:
-  - pip install pipenv
+  - pip install pipenv codacy-coverage
   - make
 script:
   - make lint
   - make coverage
+after_success:
+  - pipenv run coverage xml
+  - python-codacy-coverage
