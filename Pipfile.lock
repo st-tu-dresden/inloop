@@ -3,19 +3,6 @@
         "hash": {
             "sha256": "acdc079d17180028f236e62cf3597e5a63a7775b81fb2b08c423fa15f353e816"
         },
-        "host-environment-markers": {
-            "implementation_name": "cpython",
-            "implementation_version": "3.6.4",
-            "os_name": "posix",
-            "platform_machine": "x86_64",
-            "platform_python_implementation": "CPython",
-            "platform_release": "17.4.0",
-            "platform_system": "Darwin",
-            "platform_version": "Darwin Kernel Version 17.4.0: Sun Dec 17 09:19:54 PST 2017; root:xnu-4570.41.2~1/RELEASE_X86_64",
-            "python_full_version": "3.6.4",
-            "python_version": "3.6",
-            "sys_platform": "darwin"
-        },
         "pipfile-spec": 6,
         "requires": {},
         "sources": [
@@ -43,10 +30,10 @@
         },
         "django": {
             "hashes": [
-                "sha256:ac4c797a328a5ac8777ad61bcd00da279773455cc78b4058de2a9842a0eb6ee8",
-                "sha256:22383567385a9c406d8a5ce080a2694c82c6b733e157922197e8b393bb3aacd9"
+                "sha256:74077d7309b48b97dacdac2dfb35c968028becf00a7a684e7f29b2af1b980edc",
+                "sha256:fd186d544c7c2f835668cf11f77be071307c9eb22615a5b3a16bdb14c8357f41"
             ],
-            "version": "==1.11.10"
+            "version": "==1.11.11"
         },
         "django-constance": {
             "hashes": [
