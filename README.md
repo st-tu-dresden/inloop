@@ -56,6 +56,14 @@ Using the command line, a development instance can be set up as follows:
 * [Contributor guide](CONTRIBUTING.md)
 
 
+## Publications
+
+* M. Morgenstern and B. Demuth: [Continuous Publishing of Online Programming Assignments with
+  INLOOP][isee18pdf] (ISEE 2018: 1st Workshop on Innovative Software Engineering Education).
+
+[isee18pdf]: http://ceur-ws.org/Vol-2066/isee2018paper08.pdf
+
+
 ## Authors and credits
 
 **Project lead**: Martin Morgenstern<br>
