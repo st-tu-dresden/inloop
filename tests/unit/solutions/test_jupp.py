@@ -3,17 +3,16 @@ from unittest import TestCase
 
 from inloop.solutions.prettyprint import junit
 
-samples_path = Path(__file__).parent / "samples"
+SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
+with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
+    SAMPLE_XML = fp.read()
+with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
+    MALICIOUS_XML = fp.read()
 
 
 class JUnitXMLTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with Path(samples_path, "TEST-TaxiTest.xml").open(encoding="utf-8") as f:
-            cls.SAMPLE_XML = f.read()
-
     def setUp(self):
-        self.ts = junit.xml_to_dict(self.SAMPLE_XML)
+        self.ts = junit.xml_to_dict(SAMPLE_XML)
 
     def test_sample_outputs(self):
         self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
@@ -69,7 +68,5 @@ class JUnitXMLTests(TestCase):
 
 class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):
-        with Path(samples_path, "billion_laughs.xml").open(encoding="utf-8") as f:
-            contents = f.read()
         with self.assertRaises(ValueError):
-            junit.xml_to_dict(contents)
+            junit.xml_to_dict(MALICIOUS_XML)

@@ -6,11 +6,12 @@ from inloop.common.validators import RegexSyntaxValidator
 
 
 class RegexSyntaxValidatorTest(TestCase):
-    validator = RegexSyntaxValidator()
+    def setUp(self):
+        self.validate = RegexSyntaxValidator()
 
     def test_invalid_regex(self):
         with self.assertRaises(ValidationError):
-            self.validator("a+*")
+            self.validate("a+*")
 
     def test_valid_regex(self):
-        self.validator("valid regex")
+        self.validate("valid regex")

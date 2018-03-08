@@ -4,19 +4,21 @@ from inloop.common.middleware import SetRemoteAddrFromForwardedFor
 
 
 class SetRemoteAddrFromForwardedForTestCase(SimpleTestCase):
-    rf = RequestFactory()
-    middleware = SetRemoteAddrFromForwardedFor(lambda r: r)
+    FACTORY = RequestFactory()
+
+    def setUp(self):
+        self.middleware = SetRemoteAddrFromForwardedFor(lambda r: r)
 
     def test_x_forwarded_for(self):
-        request = self.middleware(self.rf.get("/", HTTP_X_FORWARDED_FOR="1.1.1.1"))
+        request = self.middleware(self.FACTORY.get("/", HTTP_X_FORWARDED_FOR="1.1.1.1"))
         self.assertEqual(request.META["REMOTE_ADDR"], "1.1.1.1")
 
-        request = self.middleware(self.rf.get("/", HTTP_X_FORWARDED_FOR="3.3.3.3, 4.4.4.4"))
+        request = self.middleware(self.FACTORY.get("/", HTTP_X_FORWARDED_FOR="3.3.3.3, 4.4.4.4"))
         self.assertEqual(request.META["REMOTE_ADDR"], "3.3.3.3")
 
     def test_no_x_forwarded_for(self):
-        req = self.middleware(self.rf.get("/", REMOTE_ADDR="1.2.3.4"))
-        self.assertEqual(req.META["REMOTE_ADDR"], "1.2.3.4")
+        request = self.middleware(self.FACTORY.get("/", REMOTE_ADDR="1.2.3.4"))
+        self.assertEqual(request.META["REMOTE_ADDR"], "1.2.3.4")
 
 
 @modify_settings(MIDDLEWARE={

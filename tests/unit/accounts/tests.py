@@ -33,13 +33,13 @@ class StudentDetailsFormTest(TestCase):
 
 
 class ProfileViewTest(SimpleAccountsData, TestCase):
-    url = reverse("accounts:profile")
+    URL = reverse("accounts:profile")
 
     def test_form_submit(self):
         with self.assertRaises(ObjectDoesNotExist):
             StudentDetails.objects.get(user=self.bob)
         self.assertTrue(self.client.login(username="bob", password="secret"))
-        response = self.client.post(self.url, data={
+        response = self.client.post(self.URL, data={
             "matnum": "1234567",
             "first_name": "Bob",
             "last_name": "Example",
@@ -82,31 +82,31 @@ class SignupFormTest(SimpleAccountsData, TestCase):
 
 
 class SignupViewTests(SimpleAccountsData, TestCase):
-    url = reverse("accounts:signup")
+    URL = reverse("accounts:signup")
 
     def test_reverse_url(self):
-        self.assertEqual(self.url, "/account/signup/")
+        self.assertEqual(self.URL, "/account/signup/")
 
     @override_config(SIGNUP_ALLOWED=True)
     def test_signup_anonymous_users_only(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         self.assertContains(response, "Sign up")
 
         self.assertTrue(self.client.login(username="bob", password="secret"))
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         self.assertRedirects(
             response, "/", msg_prefix="Signup view should redirect authenticated users"
         )
 
     def test_signup_disallowed(self):
-        response1 = self.client.get(self.url, follow=True)
-        response2 = self.client.post(self.url, follow=True)
+        response1 = self.client.get(self.URL, follow=True)
+        response2 = self.client.post(self.URL, follow=True)
         for response in [response1, response2]:
             self.assertContains(response, "Sorry, signing up is not allowed at the moment.")
 
 
 class SignupWorkflowTest(TestCase):
-    form_data = {
+    FORM_DATA = {
         "username": "bob",
         "email": "bob@example.org",
         "password1": "secret",
@@ -122,7 +122,7 @@ class SignupWorkflowTest(TestCase):
 
     @override_config(SIGNUP_ALLOWED=True)
     def test_signup_workflow(self):
-        response = self.client.post(reverse("accounts:signup"), data=self.form_data, follow=True)
+        response = self.client.post(reverse("accounts:signup"), data=self.FORM_DATA, follow=True)
         self.assertContains(response, "Please check your mailbox.")
 
         self.assertFalse(self.client.login(username="bob", password="secret"),

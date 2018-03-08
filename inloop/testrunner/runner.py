@@ -8,7 +8,7 @@ import uuid
 from collections import namedtuple
 from os.path import isabs, isdir, isfile, join, normpath, realpath
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def collect_files(path):
@@ -147,7 +147,7 @@ class DockerTestRunner:
             task_name
         ]
 
-        logger.debug("Popen args: %s", args)
+        LOG.debug("Popen args: %s", args)
 
         proc = subprocess.Popen(
             args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -163,16 +163,16 @@ class DockerTestRunner:
             rc = signal.SIGKILL
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
-            logger.debug("removing timed out container %s", ctr_id)
+            LOG.debug("removing timed out container %s", ctr_id)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
 
         stderr = stderr.decode("utf-8", errors="replace")
         stdout = stdout.decode("utf-8", errors="replace")
 
-        logger.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
+        LOG.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
 
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
-            logger.error("docker failure (rc=%d): %s", rc, stderr)
+            LOG.error("docker failure (rc=%d): %s", rc, stderr)
 
         return (rc, stdout, stderr)

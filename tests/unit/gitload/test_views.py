@@ -30,20 +30,19 @@ class SignatureTest(TestCase):
     GITLOAD_BRANCH="master"
 )
 class WebhookHandlerTest(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.key = force_bytes(GITHUB_KEY)
+    FACTORY = RequestFactory()
+    KEY = force_bytes(GITHUB_KEY)
 
     def test_get_not_allowed(self, mock):
-        request = self.factory.get("/")
+        request = self.FACTORY.get("/")
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 405)
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_valid_signature(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.factory.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
+        request = self.FACTORY.post("/", data=data, content_type="application/json")
+        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 200)
@@ -51,7 +50,7 @@ class WebhookHandlerTest(TestCase):
 
     def test_push_with_invalid_signature(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.factory.post("/", data=data, content_type="application/json")
+        request = self.FACTORY.post("/", data=data, content_type="application/json")
         request.META["HTTP_X_HUB_SIGNATURE"] = "invalid"
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
         response = webhook_handler(request)
@@ -61,8 +60,8 @@ class WebhookHandlerTest(TestCase):
 
     def test_not_modified_when_event_not_push(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.factory.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
+        request = self.FACTORY.post("/", data=data, content_type="application/json")
+        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
         request.META["HTTP_X_GITHUB_EVENT"] = "ping"
         response = webhook_handler(request)
         self.assertContains(response, "Event ignored")
@@ -70,8 +69,8 @@ class WebhookHandlerTest(TestCase):
 
     def test_not_modified_when_ref_not_master(self, mock):
         data = b'{"ref": "refs/heads/develop"}'
-        request = self.factory.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
+        request = self.FACTORY.post("/", data=data, content_type="application/json")
+        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
         response = webhook_handler(request)
         self.assertContains(response, "Event ignored")
@@ -79,8 +78,8 @@ class WebhookHandlerTest(TestCase):
 
     def test_push_with_invalid_json(self, mock):
         data = b'<xml-is-not-json/>'
-        request = self.factory.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.key)
+        request = self.FACTORY.post("/", data=data, content_type="application/json")
+        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
         request.META["HTTP_X_GITHUB_EVENT"] = "push"
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 400)

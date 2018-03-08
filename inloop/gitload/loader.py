@@ -9,7 +9,7 @@ try:
 except ImportError:
     JSONDecodeError = ValueError
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class InvalidTask(Exception):
@@ -23,7 +23,7 @@ def load_tasks(repository):
         try:
             load_task(task_file)
         except InvalidTask as e:
-            logger.error("%s", e)
+            LOG.error("%s", e)
     repository_loaded.send(__name__, repository=repository)
 
 
