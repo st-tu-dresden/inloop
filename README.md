@@ -58,7 +58,7 @@ You can use our [Java example task repository][repo-example] as a starting point
 
 ## Demo
 
-[![INLOOP demo on YouTube](https://youtu.be/cZ_fGQzL5Sw)](docs/figures/video.jpg)
+[![INLOOP demo on YouTube](docs/figures/video.jpg)](https://youtu.be/cZ_fGQzL5Sw)
 
 
 ## Documentation
