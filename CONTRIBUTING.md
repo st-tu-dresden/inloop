@@ -26,6 +26,19 @@ New code needs to include [unit tests][django-testing], documentation and must f
 conventions](#coding-conventions).
 
 
+### Git setup
+
+If not done already, configure your real name and email:
+
+    git config --global user.name "John Doe"
+    git config --global user.email johndoe@example.com
+
+Apply the following configuration to your local Git clone of INLOOP:
+
+    git config merge.ff false
+    git config pull.rebase true
+
+
 ## Rules for contributing code
 
 In general, do one thing at a time and don't bite off more than you can chew. Long living
@@ -51,8 +64,6 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
 
 ### Commit messages
 
-First of all, [setup your Git client][git-setup] using your real name and email.
-
 We care about a [usable Git history][good-commits1] and are picky about [well-formed commit
 messages][good-commits2]. Put as much effort into your commit messages as into your code,
 other people will appreciate it.
@@ -68,6 +79,5 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[git-setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#_your_identity
 [w3c-validator]: https://validator.w3.org/
 [slugify]: https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.text.slugify
