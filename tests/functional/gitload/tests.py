@@ -14,13 +14,13 @@ class GitRepositoryTest(TestCase):
         self.tmpdir = TemporaryDirectory()
         self.repo1 = GitRepository(
             self.tmpdir.name,
-            "https://github.com/st-tu-dresden/inloop.git",
-            "master"
+            url="https://github.com/st-tu-dresden/inloop.git",
+            branch="master"
         )
         self.repo2 = GitRepository(
             self.tmpdir.name,
-            "https://github.com/st-tu-dresden/inloop-java-repository-example.git",
-            "master"
+            url="https://github.com/st-tu-dresden/inloop-java-repository-example.git",
+            branch="master"
         )
 
     def tearDown(self):

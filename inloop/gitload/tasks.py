@@ -12,6 +12,6 @@ def load_tasks_async():
     with HUEY.lock_task("import-lock"):
         load_tasks(GitRepository(
             settings.REPOSITORY_ROOT,
-            config.GITLOAD_URL,
-            config.GITLOAD_BRANCH
+            url=config.GITLOAD_URL,
+            branch=config.GITLOAD_BRANCH
         ))
