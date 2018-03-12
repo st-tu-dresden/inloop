@@ -3,6 +3,7 @@ Bonus point grading specific to TU Dresden.
 """
 
 import re
+from string import capwords
 
 from django.db.models import ObjectDoesNotExist
 from django.utils.timezone import make_aware
@@ -38,7 +39,7 @@ def guess_name_from_email(email):
     first_name = first_name.replace("_", " ")
     last_name = last_name.replace("_", " ")
     last_name = re.sub(r"[1-9]$", "", last_name)
-    return first_name.capitalize(), last_name.capitalize()
+    return capwords(first_name), capwords(last_name)
 
 
 def points_for_completed_tasks(category_name, start_date, max_points):
