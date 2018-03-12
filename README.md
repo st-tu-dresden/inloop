@@ -79,7 +79,7 @@ You can use our [Java example task repository][repo-example] as a starting point
 ## Authors and credits
 
 **Project lead**: Martin Morgenstern<br>
-**Contributors**: Dominik Muhs
+**Contributors**: Dominik Muhs, Philipp Matthes
 
 INLOOP borrows its concept from the Praktomat, developed originally at the
 University of Passau and later at the Karlsruhe Institute of Technology:
