@@ -26,10 +26,14 @@ class ArgumentCheckTest(TestCase):
         with self.assertRaisesRegex(ValueError, "path must not be empty"):
             Repository("")
 
+    def test_relative_path_raises_valueerror(self):
+        with self.assertRaisesRegex(ValueError, "path must be absolute"):
+            Repository("relative/path/")
+
     def test_empty_url_raises_valueerror(self):
         with self.assertRaisesRegex(ValueError, "url must not be empty"):
-            GitRepository("foo", url="", branch="master")
+            GitRepository(TESTREPO_PATH, url="", branch="master")
 
     def test_empty_branch_raises_valueerror(self):
         with self.assertRaisesRegex(ValueError, "branch must not be empty"):
-            GitRepository("foo", url="file:///path/to/repo", branch="")
+            GitRepository(TESTREPO_PATH, url="file:///path/to/repo", branch="")

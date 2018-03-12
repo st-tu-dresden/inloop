@@ -8,7 +8,10 @@ class Repository:
     def __init__(self, path):
         if not path:
             raise ValueError("path must not be empty")
-        self._path = Path(path).resolve()
+        _path = Path(path)
+        if not _path.is_absolute():
+            raise ValueError("path must be absolute")
+        self._path = _path
 
     @property
     def path(self):
