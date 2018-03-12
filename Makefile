@@ -23,7 +23,6 @@ coverage:
 	pipenv run coverage report
 
 lint:
-	pipenv run isort --quiet --check-only
-	pipenv run flake8
+	pipenv run $(SHELL) -c 'isort --quiet --check-only && flake8'
 
 .PHONY: init loaddb test coverage lint
