@@ -222,7 +222,8 @@ Installation
    is not the case.
 
         cd ~/inloop
-        pip install -r requirements/main.txt -r requirements/prod.txt
+        pip install pipenv
+        pipenv install
         django-admin migrate
 
    **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.
@@ -281,11 +282,11 @@ Got a server error? Look here for hints:
 * Look for error messages in the nginx error log, usually located in `/var/log/nginx/error.log`.
 * For `systemd` users, service logs for gunicorn and huey can be viewed using
 
-       sudo journalctl _SYSTEMD_UNIT=gunicorn.service
+       sudo journalctl -u gunicorn.service
 
   and
 
-       sudo journalctl _SYSTEMD_UNIT=huey.service
+       sudo journalctl -u huey.service
 
 * If you are still stuck with `upstart` instead of `systemd`, the service logs are written to
    `/var/log/upstart/gunicorn.log` and `/var/log/upstart/huey.log`.
@@ -325,7 +326,7 @@ Name              | Description (default value)
 `PROXY_ENABLED`   | Must be set to `True` if running behind nginx (`False`)
 `SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`True`)
 `TIME_ZONE`       | The time zone used for displayed dates (`Europe/Berlin`)
-`WEB_CONCURRENCY` | The amount of Gunicorn workers to start (`1`)
+`WEB_CONCURRENCY` | The number of Gunicorn workers to start (`1`)
 `X_ACCEL_LOCATION`| The internal `X-Accel-Redirect` location for nginx, e.g. `/sendfile`, must be set if `PROXY_ENABLED` is `True`
 
 Additionally, the setproctitle library (which is used by Gunicorn) recognizes `SPT_NOENV`. If set,

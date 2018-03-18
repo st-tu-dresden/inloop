@@ -20,7 +20,7 @@ application to manage online programming courses, powered by Git, Django and Doc
   is discarded after execution.
 - **Modern**: push-based (or periodic pull-based) import of tasks, Markdown task descriptions and
   accompanying material from a Git repository.
-- **Fast & scalable**: solutions are processed asynchronously by a configurable amount of
+- **Fast & scalable**: solutions are processed asynchronously by a configurable number of
   background workers.
 - **Easy to extend**: modern, modular and PEP-8 compliant Python 3 code base with less than 3000
   lines of code, good test coverage and continuous integration tests.
@@ -39,7 +39,7 @@ INLOOP requires the following software:
 
 Using the command line, a development instance can be set up as follows:
 
-1. If don't have it already, install [pipenv](https://docs.pipenv.org/install/).
+1. If you don't have it already, install [pipenv](https://docs.pipenv.org/install/).
 
 2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
    `./support/scripts/macos_setup.sh` (macOS).
