@@ -48,9 +48,9 @@ class ProfileViewTest(SimpleAccountsData, TestCase):
         self.assertContains(response, "Your profile has been updated successfully.")
         details = StudentDetails.objects.get(user=self.bob)
         self.assertEqual(details.matnum, "1234567")
-        self.bob.refresh_from_db()
-        self.assertEqual(self.bob.first_name, "Bob")
-        self.assertEqual(self.bob.last_name, "Example")
+        self.assertEqual(details.user, self.bob)
+        self.assertEqual(details.user.first_name, "Bob")
+        self.assertEqual(details.user.last_name, "Example")
 
 
 @override_config(
