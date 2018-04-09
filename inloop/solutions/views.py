@@ -104,6 +104,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
             junit.xml_to_dict(xml) for xml in xml_reports
         ]
 
+        # TODO: Issue #157 Check necessity of changes to fit SpotBugs
         context = {
             'solution': solution,
             'result': result,
