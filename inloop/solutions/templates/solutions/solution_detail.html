@@ -1,7 +1,13 @@
 {% extends "base_site.html" %}
 
+{% load staticfiles %}
+
 {% block title %}Solution
 #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -32,23 +38,66 @@
   <li role="presentation" class="active">
     <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
   </li>
-    <li role="presentation">
-      <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
-    </li>
+  <li role="presentation">
+    <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+  </li>
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
   <li role="presentation">
     <a href="#unittests" aria-controls="unittests" role="tab" data-toggle="tab">Unit tests</a>
   </li>
+  {% if checkstyle_data.total_warnings > 0 or checkstyle_data.total_errors > 0 %}
+  <li role="presentation">
+    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">
+        Style issues
+        {% if checkstyle_data.total_errors > 0 %}
+        <span class="badge progress-bar-danger annotation-badge">{{ checkstyle_data.total_errors }}</span>
+        {% endif %}
+        {% if checkstyle_data.total_warnings > 0 %}
+            <span class="badge progress-bar-warning annotation-badge">{{ checkstyle_data.total_warnings }}</span>
+        {% endif %}
+    </a>
+  </li>
+  {% endif %}
 </ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="home">
   {% if solution.passed %}
+
     <p class="alert alert-success">
-      Congratulations, your solution passed all tests.
+    Congratulations, your solution passed all tests.
     </p>
+
+    {% if checkstyle_data.total_issues == 0 %}
+    <div class="alert alert-success">
+        <h1 class="no-margin-top">Perfect! 😍</h1>
+        We detected no style issues with the code you submitted. Well done!
+    {% elif checkstyle_data.total_issues < 2 %}
+    <div class="alert alert-info">
+        <h1 class="no-margin-top">Almost perfect! 😎</h1>
+        Your code is beautiful, but there are some issues. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 5 %}
+    <div class="alert alert-warning">
+        <h1 class="no-margin-top">Good! 😇</h1>
+        Your submission is of good quality, but there are some issues. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 10 %}
+    <div class="alert alert-warning">
+        <h1 class="no-margin-top">Well... 😬</h1>
+        You should look over your code again. We detected multiple code style issues with your files. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 20 %}
+    <div class="alert alert-danger">
+        <h1 class="no-margin-top">Not so good... 😕</h1>
+        Your code works, but you should definitely look over it again. There are many code style issues with your files. Go to the style issues tab to identify them. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+    {% else %}
+    <div class="alert alert-danger">
+        <h1 class="no-margin-top">Sad... 😨</h1>
+        Whoops! In a later revision of INLOOP, we could deny your solution, since it has too many code style issues. Try looking over your code and resubmitting it again. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+    {% endif %}
+
+    </div>
+
   {% elif solution.status == "failure" %}
     <p class="alert alert-danger">
       Your solution did not pass the tests.
@@ -77,9 +126,16 @@
   </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
-  {% if result.stdout or result.stderr %}
-    <pre class="console-output"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
-  {% else %}
+  {% if result.stdout %}
+    <pre class="console-output">
+      <code>{{ result.stdout }}</code>
+    </pre>
+  {% endif %}
+  {% if result.stderr %}
+    <pre class="console-output bg-danger text-white">
+      <code>{{ result.stderr }}</code>
+    </pre>
+  {% elif not result.stdout %}
     <p>Nothing to show here.</p>
   {% endif %}
   </div><!-- /#console -->
@@ -87,6 +143,85 @@
   <div role="tabpanel" class="tab-pane" id="unittests">
   {% include "solutions/includes/testsuites.html" %}
   </div><!-- /#unittests -->
+
+  <div role="tabpanel" class="tab-pane" id="checkstyle">
+
+  {% if checkstyle_data %}
+  {% for file in checkstyle_data.files %}
+
+  {% if not file.total_checkstyle_warnings == 0 or not file.total_checkstyle_errors == 0 %}
+  <ul class="list-group">
+  <a class="list-group-item" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+  {% if file.total_checkstyle_warnings > 0 %}
+    {% if file.total_checkstyle_warnings == 1 %}
+      <span class="badge progress-bar-warning">1 Warning</span>
+    {% else %}
+      <span class="badge progress-bar-warning">{{ file.total_checkstyle_warnings }} Warnings</span>
+    {% endif %}
+  {% endif %}
+  {% if file.total_checkstyle_errors > 0 %}
+    {% if file.total_checkstyle_errors == 1 %}
+      <span class="badge progress-bar-danger">1 Severe Issue</span>
+    {% else %}
+      <span class="badge progress-bar-danger">{{ file.total_checkstyle_errors }} Severe Issues</span>
+    {% endif %}
+  {% endif %}
+    {{ file.attrib.name }}
+  </a>
+  <div class="collapse" id="toggle{{ forloop.counter }}">
+    {% if file.checkstyle_errors %}
+    <li class="list-group-item">
+    {% for error in file.checkstyle_errors %}
+    <div class="panel panel-danger bottom-spaced">
+      <div class="panel-heading">
+        <h1 class="panel-title">
+          {{ error.attrib.message }}
+        </h1>
+      </div>
+      <div class="panel-body" style="padding: 0px;">
+      <pre class="line-numbers codehilite"
+           data-start="{{ error.attrib.line }}"
+           style="margin-bottom: 0px; z-index: 0; border: none;"
+      ><code class="language-java">{{ error.code }}</code></pre>
+        <!--<span class="label label-default">This alert came from ...{{ error.attrib.source|slice:"-50:"|safe }}</span>-->
+      </div>
+    </div>
+    {% endfor %}
+    </li>
+    {% endif %}
+    {% if file.checkstyle_warnings %}
+    <li class="list-group-item">
+    {% for error in file.checkstyle_warnings %}
+    <div class="panel panel-warning bottom-spaced">
+      <div class="panel-heading">
+        <h1 class="panel-title">
+          {{ error.attrib.message }}
+        </h1>
+      </div>
+      <div class="panel-body no-pad">
+        <pre class="line-numbers codehilite error-panel"
+             data-start="{{ error.attrib.line }}"><code class="language-java">{{ error.code }}</code></pre>
+      </div>
+    </div>
+    {% endfor %}
+    </li>
+    {% endif %}
+  </div>
+  </ul>
+  {% endif %}
+
+  {% endfor %}
+
+  {% else %}
+    <p>Nothing to show here.</p>
+  {% endif %}
+  </div><!-- /#checkstyle -->
 </div><!-- /.tab-content -->
 
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/prism.js' %}"></script>
+<script src="{% static 'js/prism-java.min.js' %}"></script>
+<script src="{% static 'js/prism-line-numbers.min.js' %}"></script>
 {% endblock %}

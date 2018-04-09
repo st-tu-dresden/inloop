@@ -7,7 +7,9 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint import junit
+from inloop.solutions.prettyprint.tools import (CheckstyleData, checkeroutput_filter,
+                                                context_from_xml_strings,
+                                                xml_strings_from_testoutput, xml_to_dict)
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -97,17 +99,31 @@ class SolutionDetailView(LoginRequiredMixin, View):
             )
             return redirect("solutions:list", slug=solution.task.slug)
 
-        # TODO: PrettyPrinters should be configurable (for now, we only have one for JUnit)
         result = solution.testresult_set.last()
-        xml_reports = junit.checkeroutput_filter(result.testoutput_set)
-        testsuites = [
-            junit.xml_to_dict(xml) for xml in xml_reports
-        ]
+
+        xml_reports_junit = checkeroutput_filter(result.testoutput_set)
+        testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
+
+        xml_strings_checkstyle = xml_strings_from_testoutput(
+            testoutput_set=result.testoutput_set,
+            startswith="checkstyle_errors",
+            endswith=".xml"
+        )
+
+        checkstyle_context = context_from_xml_strings(
+            xml_strings=xml_strings_checkstyle,
+            filter_keys=[]
+        )
+
+        checkstyle_data = CheckstyleData(
+            checkstyle_context, solution.solutionfile_set.all()
+        )
 
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
+            'checkstyle_data': checkstyle_data,
             'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())
@@ -121,7 +137,7 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
 
     def get_context_data(self):
         return {
-            "impersonate": self.request.user != self.solution.author
+            "impersonate": self.request.user != self.solution.author,
         }
 
     def get_object(self, **kwargs):
