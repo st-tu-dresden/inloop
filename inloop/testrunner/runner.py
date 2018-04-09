@@ -70,6 +70,7 @@ class DockerTestRunner:
         if not isdir(path):
             raise ValueError("not a directory: %s" % path)
 
+    # TODO: Issue #157 Use check_task to communicate with SpotBugs
     def check_task(self, task_name, input_path):
         """
         Execute a check for the given task name using the files under the path specified

@@ -11,6 +11,8 @@ which is part of Ant (see https://github.com/apache/ant).
 """
 from defusedxml import ElementTree as ET
 
+# TODO: Issue #157 Test Compatibility with SpotBugs
+
 
 def checkeroutput_filter(queryset):
     """

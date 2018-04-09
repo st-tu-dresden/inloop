@@ -33,6 +33,7 @@ def check_solution(solution):
     runner = DockerTestRunner(settings.TESTRUNNER_OPTIONS, settings.TESTRUNNER_IMAGE)
     test_output = runner.check_task(solution.task.system_name, str(solution.path))
     with atomic():
+        # TODO: Issue #157 Pipe SpotBugs output to test_result
         test_result = TestResult.objects.create(
             solution=solution,
             stdout=test_output.stdout,
@@ -61,6 +62,7 @@ class TestResult(models.Model):
     stderr = models.TextField(default="")
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
+    # TODO: Issue #157 Add Fields for SpotBugs support
 
     # to be removed:
     passed = models.BooleanField(default=False)
