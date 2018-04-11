@@ -55,7 +55,7 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
             })
 
     def test_completion_info(self):
-        for i in range(2):
+        for _ in range(2):
             Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
             Solution.objects.create(author=self.alice, task=self.published_task1, passed=True)
 
@@ -67,7 +67,7 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
                 "progress": 50
             })
 
-        for i in range(2):
+        for _ in range(2):
             Solution.objects.create(author=self.bob, task=self.published_task2, passed=True)
             Solution.objects.create(author=self.alice, task=self.published_task2, passed=True)
 
