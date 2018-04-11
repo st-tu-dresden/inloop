@@ -32,19 +32,20 @@
   <li role="presentation" class="active">
     <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Overview</a>
   </li>
-    <li role="presentation">
-      <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
-    </li>
+  <li role="presentation">
+    <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+  </li>
   <li role="presentation">
     <a href="#console" aria-controls="console" role="tab" data-toggle="tab">Console output</a>
   </li>
   <li role="presentation">
     <a href="#unittests" aria-controls="unittests" role="tab" data-toggle="tab">Unit tests</a>
   </li>
-  <!-- # TODO: Issue #157 Add section for SpotBugs output -->
+  <li role="presentation">
+    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">Style checks</a>
+  </li>
 </ul>
 
-<!-- # TODO: Issue #157 Implement frontend view of SpotBugs output -->
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="home">
   {% if solution.passed %}
@@ -80,7 +81,11 @@
 
   <div role="tabpanel" class="tab-pane" id="console">
   {% if result.stdout or result.stderr %}
-    <pre class="console-output"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
+    <pre class="console-output">
+      <code>
+        {{ result.stdout }}{{ result.stderr }}
+      </code>
+    </pre>
   {% else %}
     <p>Nothing to show here.</p>
   {% endif %}
@@ -89,6 +94,31 @@
   <div role="tabpanel" class="tab-pane" id="unittests">
   {% include "solutions/includes/testsuites.html" %}
   </div><!-- /#unittests -->
+
+  <div role="tabpanel" class="tab-pane" id="checkstyle">
+  {% if checkstyle %}
+  {% for check in checkstyle %}
+    Checkstyle version : {{ check.version }}
+    {% for file_dict in check.files %}
+      {% for filename, data in file_dict.items %}
+      <pre class="console-output">
+        File {{ filename }}
+        {% for e in data %}
+          <code>
+          Issue in column {{ e.column }} and line {{ e.line }}:
+          {{ e.message }}
+          Severity: {{ e.severity }}
+          Source: {{ e.source }}
+          </code>
+        {% endfor %}
+      </pre>
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+  {% else %}
+    <p>Nothing to show here.</p>
+  {% endif %}
+  </div><!-- /#checkstyle -->
 </div><!-- /.tab-content -->
 
 {% endblock %}

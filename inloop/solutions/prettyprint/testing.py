@@ -11,25 +11,41 @@ which is part of Ant (see https://github.com/apache/ant).
 """
 from defusedxml import ElementTree as ET
 
-# TODO: Issue #157 Test Compatibility with SpotBugs
 
-
-def checkeroutput_filter(queryset):
+def checkeroutput_filter(queryset, filter_type="junit"):
     """
     Return a list of XML reports filtered from the CheckerOutput queryset.
 
-    The filter takes advantage of the fact that all XML reports comply to the
-    pattern TEST-*.xml.
+    Currently supported output types:
+    - junit
+    - checkstyle
+
+    The filter takes advantage of the fact that all XML reports comply to
+    a specific pattern.
     """
-    return queryset.filter(
-        name__startswith="TEST-",
-        name__endswith=".xml"
-    ).values_list("output", flat=True)
+
+    if filter_type == "junit":
+        return queryset.filter(
+            name__startswith="TEST-",
+            name__endswith=".xml"
+        ).values_list("output", flat=True)
+    elif filter_type == "checkstyle":
+        return queryset.filter(
+            name__startswith="checkstyle",
+            name__endswith=".xml"
+        ).values_list("output", flat=True)
+    else:
+        raise ValueError("The checkeroutput filter type must be \"junit\" or \"checkstyle\".")
 
 
-def xml_to_dict(xml_report):
-    """Parse the given JUnit XML string and return a dict representation."""
-    return testsuite_to_dict(ET.fromstring(xml_report))
+def xml_to_dict(xml_report, xml_type="junit"):
+    """Parse the given JUnit or checkstyle XML string and return a dict representation."""
+    if xml_type == "junit":
+        return testsuite_to_dict(ET.fromstring(xml_report))
+    elif xml_type == "checkstyle":
+        return checkstyle_to_dict(ET.fromstring(xml_report))
+    else:
+        raise ValueError("The xml type must be \"junit\" or \"checkstyle\".")
 
 
 def testsuite_to_dict(testsuite):
@@ -47,6 +63,23 @@ def testsuite_to_dict(testsuite):
     ts["system_out"] = get_text_safe(testsuite.find("system-out"))
     ts["system_err"] = get_text_safe(testsuite.find("system-err"))
     return ts
+
+
+def checkstyle_to_dict(checkstyle):
+    """Return a dict representation of the given <checkstyle/> Element."""
+    if checkstyle.tag != "checkstyle":
+        raise ValueError("The root tag must be a <checkstyle/>.")
+    cs = dict(checkstyle.attrib)
+    cs["files"] = [
+        {
+            file.attrib["name"]: [
+                error.attrib
+                for error in file.findall("error")
+            ]
+        }
+        for file in checkstyle.findall("file")
+    ]
+    return cs
 
 
 def get_text_safe(element):

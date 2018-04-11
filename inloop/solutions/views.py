@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -7,7 +9,7 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint import junit
+from inloop.solutions.prettyprint import testing
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -99,16 +101,18 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
         # TODO: PrettyPrinters should be configurable (for now, we only have one for JUnit)
         result = solution.testresult_set.last()
-        xml_reports = junit.checkeroutput_filter(result.testoutput_set)
-        testsuites = [
-            junit.xml_to_dict(xml) for xml in xml_reports
-        ]
 
-        # TODO: Issue #157 Check necessity of changes to fit SpotBugs
+        xml_reports_junit = testing.checkeroutput_filter(result.testoutput_set, filter_type="junit")
+        testsuites = [testing.xml_to_dict(xml, xml_type="junit") for xml in xml_reports_junit]
+
+        xml_reports_checkstyle = testing.checkeroutput_filter(result.testoutput_set, filter_type="checkstyle")
+        checkstyle = [testing.xml_to_dict(xml, xml_type="checkstyle") for xml in xml_reports_checkstyle]
+
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
+            'checkstyle': checkstyle,
             'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())
