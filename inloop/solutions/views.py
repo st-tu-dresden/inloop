@@ -10,6 +10,7 @@ from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.prettyprint import testing
+from inloop.solutions.prettyprint.xml_context_parser import XMLContextParser
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -107,6 +108,19 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
         xml_reports_checkstyle = testing.checkeroutput_filter(result.testoutput_set, filter_type="checkstyle")
         checkstyle = [testing.xml_to_dict(xml, xml_type="checkstyle") for xml in xml_reports_checkstyle]
+
+        parser = XMLContextParser(solution=solution)
+        junit_context = parser.context(
+            startswith=parser.STARTSWITH["junit"],
+            endswith=parser.ENDSWITH["junit"],
+            filter_keys=["testcase", "system-out", "system-err"]
+        )
+        checkstyle_context = parser.context(
+            startswith=parser.STARTSWITH["checkstyle"],
+            endswith=parser.ENDSWITH["checkstyle"],
+            filter_keys=["files", "name", "error"]
+        )
+        print(checkstyle_context)
 
         context = {
             'solution': solution,
