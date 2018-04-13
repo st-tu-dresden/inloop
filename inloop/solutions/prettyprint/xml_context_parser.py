@@ -13,6 +13,13 @@ from defusedxml import ElementTree as ET
 
 
 class XMLContextParser(object):
+    """
+    Manages the context parsing between Docker XML files and templates.
+
+    When created, a solution is parsed, which contains the xml we need to
+    transform and parse our data in directly processable dicts.
+    """
+
     STARTSWITH = {
         "junit": "TEST-",
         "checkstyle": "checkstyle",
@@ -24,27 +31,72 @@ class XMLContextParser(object):
     }
 
     def __init__(self, *, solution):
+        """
+        Initializes this object. Unwraps the testoutput_set of the most recent test result
+        to the internal variable self.testoutput.set.
+
+        Args:
+            solution (QuerySet): solution containing XML files.
+
+        """
         result = solution.testresult_set.last()
         self.testoutput_set = result.testoutput_set
 
     def __str__(self):
+        """
+        Describes this object
+
+        Returns:
+            str: A string describing this object
+        """
         return "<XMLParser object with testoutput set: {}>".format(self.testoutput_set)
 
     def __repr__(self):
+        """
+        Describes this object
+
+        Returns:
+            str: A string representation of this object
+        """
         return self.__str__()
 
     def context(self, *, startswith, endswith, filter_keys):
+        """
+        Generates context for the solution file passed on initialization.
+
+        Args:
+            startswith (str): Filters the testoutput set by this start string.
+            endswith (str): Filters the testoutput set by this end string.
+            filter_keys(list): Filters the testoutput set by these keys.
+
+        Returns:
+            dict: The context in a dict format.
+
+        """
         filtered_set = self.testoutput_set.filter(name__startswith=startswith, name__endswith=endswith)
         flattened_set = filtered_set.values_list("output", flat=True)
         context = []
         for xml_string in flattened_set:
-            # throws element_tree.ParseError, ValueError
-            element_tree = ET.fromstring(xml_string)
+            try:
+                element_tree = ET.fromstring(xml_string)
+            except (ValueError, ET.ParseError) as e:
+                raise e
             context.append(XMLContextParser.element_tree_to_dict(element_tree, filter_keys))
         return context
 
     @staticmethod
     def element_tree_to_dict(tree, filter_keys):
+        """
+        Recursive function to filter and transform defusedxml.ElementTree to dicts.
+
+        Args:
+            tree (ElementTree): The input ElementTree.
+            filter_keys (list): Filters the tree by a list of strings.
+
+        Returns:
+            dict: The filtered and transformed ElementTree as a dict.
+
+        """
         if filter_keys:
             children = [child for child in tree.getchildren() if child.tag in filter_keys]
         else:
