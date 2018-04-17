@@ -130,12 +130,12 @@ class SolutionDetailView(LoginRequiredMixin, View):
         for solution_file in solution.solutionfile_set.all():
             print(solution_file.contents)
 
-
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
             'checkstyle_files': checkstyle_files,
+            'solution_files': solution.solutionfile_set.all(),
             'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())

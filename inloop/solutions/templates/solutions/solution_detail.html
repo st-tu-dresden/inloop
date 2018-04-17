@@ -6,9 +6,11 @@
 #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
 {% endblock %}
 
-{% block content %}
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% block content %}
 
 {# Breadcrumb #}
 {% with task=solution.task %}
@@ -103,10 +105,14 @@
   </div><!-- /#unittests -->
 
   <div role="tabpanel" class="tab-pane" id="checkstyle">
-  {% if checkstyle_files %}
+  {% if solution_files %}
+  {% for file in solution_files %}
   <div>
     <pre class="line-numbers codehilite"><code class="language-java">{{ file.contents }}</code></pre>
   </div>
+  {% endfor %}
+  {% endif %}
+  {% if checkstyle_files %}
   {% for file in checkstyle_files %}
   {{ file.attrib.name }}
     {% for error in file.children %}
@@ -121,4 +127,10 @@
   </div><!-- /#checkstyle -->
 </div><!-- /.tab-content -->
 
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/prism.js' %}"></script>
+<script src="{% static 'js/prism-java.min.js' %}"></script>
+<script src="{% static 'js/prism-line-numbers.min.js' %}"></script>
 {% endblock %}
