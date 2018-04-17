@@ -109,7 +109,7 @@
   {% if checkstyle_files %}
   {% for file in checkstyle_files %}
   <ul class="list-group">
-  <a class="list-group-item active" href="#toggle{{ forloop.counter }}" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+  <a class="list-group-item active" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
     <span class="badge">{{ file.num_warnings }} Warnings</span>
     <span class="badge">{{ file.num_errors }} Severe Issues</span>
     {{ file.attrib.name }}
