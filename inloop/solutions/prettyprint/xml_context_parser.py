@@ -20,16 +20,6 @@ class XMLContextParser(object):
     transform and parse our data in directly processable dicts.
     """
 
-    STARTSWITH = {
-        "junit": "TEST-",
-        "checkstyle": "checkstyle",
-    }
-
-    ENDSWITH = {
-        "junit": ".xml",
-        "checkstyle": ".xml",
-    }
-
     def __init__(self, *, solution):
         """
         Initializes this object. Unwraps the testoutput_set of the most recent test result
@@ -75,13 +65,19 @@ class XMLContextParser(object):
         """
         filtered_set = self.testoutput_set.filter(name__startswith=startswith, name__endswith=endswith)
         flattened_set = filtered_set.values_list("output", flat=True)
-        context = []
+        context = {
+            "startswith": startswith,
+            "endswith": endswith,
+            "filter_keys": filter_keys,
+            "data": []
+        }
         for xml_string in flattened_set:
             try:
                 element_tree = ET.fromstring(xml_string)
-            except (ValueError, ET.ParseError) as e:
-                raise e
-            context.append(XMLContextParser.element_tree_to_dict(element_tree, filter_keys))
+                context["data"].append(element_tree.attrib)
+            except (ValueError, ET.ParseError):
+                continue
+            context["data"].append(XMLContextParser.element_tree_to_dict(element_tree, filter_keys))
         return context
 
     @staticmethod

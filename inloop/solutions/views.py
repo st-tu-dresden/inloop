@@ -111,16 +111,28 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
         parser = XMLContextParser(solution=solution)
         junit_context = parser.context(
-            startswith=parser.STARTSWITH["junit"],
-            endswith=parser.ENDSWITH["junit"],
-            filter_keys=["testcase", "system-out", "system-err"]
+            startswith="TEST-",
+            endswith=".xml",
+            filter_keys=["testcase", "system-out", "system-err", "failures", "errors", "failure", "error"]
         )
         checkstyle_context = parser.context(
-            startswith=parser.STARTSWITH["checkstyle"],
-            endswith=parser.ENDSWITH["checkstyle"],
-            filter_keys=["files", "name", "error"]
+            startswith="checkstyle_errors",
+            endswith=".xml",
+            filter_keys=[]
         )
-        print(checkstyle_context)
+        spotbugs_context = parser.context(
+            startswith="spotbugs_errors",
+            endswith=".xml",
+            filter_keys=[]
+        )
+        pmd_context = parser.context(
+            startswith="pmd_errors",
+            endswith=".xml",
+            filter_keys=[]
+        )
+
+        for c in [junit_context, checkstyle_context, spotbugs_context, pmd_context]:
+            print("Context search ({}{}): {}".format(c["startswith"], c["endswith"], c["data"]))
 
         context = {
             'solution': solution,
