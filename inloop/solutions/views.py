@@ -127,8 +127,23 @@ class SolutionDetailView(LoginRequiredMixin, View):
         )
 
         checkstyle_files = Parser.extract(data=checkstyle_context["data"], key="file")
-        for solution_file in solution.solutionfile_set.all():
-            print(solution_file.contents)
+
+        # Assign source code files
+        for file in checkstyle_files:
+            file_paths = file["attrib"]["name"].split("/")
+            if file_paths:
+                file_name = file_paths[len(file_paths)-1]
+                for solution_file in solution.solutionfile_set.all():
+                    if solution_file.name == file_name:
+                        file["source"] = solution_file.contents
+                        break
+                source_split = file["source"].splitlines()
+                # Insert empty code line on top
+                source_split.insert(0, "\n")
+                for error in [e for e in file["children"] if e["tag"] == "error"]:
+                    error["code"] = source_split[int(error["attrib"]["line"])]
+                file["num_errors"] = len([e for e in file["children"] if e["attrib"]["severity"] == "error"])
+                file["num_warnings"] = len([e for e in file["children"] if e["attrib"]["severity"] == "warning"])
 
         context = {
             'solution': solution,
