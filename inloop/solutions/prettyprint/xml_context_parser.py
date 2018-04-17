@@ -9,6 +9,8 @@ Javadoc for the class
 
 which is part of Ant (see https://github.com/apache/ant).
 """
+from itertools import groupby, chain
+
 from defusedxml import ElementTree as ET
 
 
@@ -79,6 +81,56 @@ class XMLContextParser(object):
                 continue
             context["data"].append(XMLContextParser.element_tree_to_dict(element_tree, filter_keys))
         return context
+
+    @staticmethod
+    def extract(*, dictionary, key):
+        """
+        Recursive function to extract a list of items from a given dictionary by key.
+        Searches the given dictionary recursively and adds every value that is
+        assigned to a key that corresponds to the parameter key.
+
+        Example:
+            If a dictionary of the following form is passed:
+
+            {
+                "data" : [
+                    {"error": {"file": "test1.java", "severity": "error" ...}},
+                    {"error": {"file": "test2.java", "severity": "error" ...}},
+                    {"error": {"file": "test3.java", "severity": "warning" ...}},
+                ],
+                "error" : {"amount": 3, "kind": ["error", "warning"]}
+            }
+
+            this function will return a list of the following kind:
+            [
+                {"file": "test1.java", "severity": "error" ...},
+                {"file": "test2.java", "severity": "error" ...},
+                {"file": "test3.java", "severity": "warning" ...},
+                {"amount": 3, "kind": ["error", "warning"]}
+            ]
+
+        Args:
+            dictionary: The input dictionary, list or value.
+            key (str): Extract this key from the dictionary.
+
+        Returns:
+            list: A list of all elements that correspond to the given key.
+
+        """
+        values = []
+        if type(dictionary) is dict:
+            for k, v in dictionary.items():
+                if k == key:
+                    values.append(v)
+                if type(v) is dict:
+                    values = values + XMLContextParser.extract(dictionary=v, key=key)
+                elif type(v) is list and not type(v) is str:
+                    for ele in v:
+
+                        values = values + XMLContextParser.extract(dictionary=ele, key=key)
+                else:
+                    continue
+        return values
 
     @staticmethod
     def element_tree_to_dict(tree, filter_keys):

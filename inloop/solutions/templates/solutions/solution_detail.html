@@ -99,28 +99,11 @@
   </div><!-- /#unittests -->
 
   <div role="tabpanel" class="tab-pane" id="checkstyle">
-  {% if checkstyle %}
-  {% for check in checkstyle %}
-    {% for file_dict in check.files %}
-      {% for filename, data in file_dict.items %}
-      <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" href="#collapse">File {{ filename|safe }}</a>
-      </h4>
-      </div>
-      <div id="collapse" class="panel-collapse collapse">
-        {% for e in data %}
-        <pre class="console-output">
-          <code>
-              {{ e.message }} (Severity: {{ e.severity }})
-              Issue in column {{ e.column }} and line {{ e.line }}
-          </code>
-        </pre>
-        {% endfor %}
-      </div>
-      {% endfor %}
-    {% endfor %}
-    Powered by Checkstyle (Version {{ check.version }})
+  {% if checkstyle_errors %}
+  {% for error in checkstyle_errors %}
+    <pre class="console-output">
+      <code>{{ error }}</code>
+    </pre>
   {% endfor %}
   {% else %}
     <p>Nothing to show here.</p>
