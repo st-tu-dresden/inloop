@@ -133,8 +133,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
         junit_system_out = Parser.extract(dictionary=junit_context, key="system_out")
         junit_system_err = Parser.extract(dictionary=junit_context, key="system_err")
 
-        for l in [checkstyle_errors, junit_testcases, junit_system_out, junit_system_err]:
-            print(l)
+        print(checkstyle_context)
 
         context = {
             'solution': solution,
@@ -154,7 +153,7 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
 
     def get_context_data(self):
         return {
-            "impersonate": self.request.user != self.solution.author
+            "impersonate": self.request.user != self.solution.author,
         }
 
     def get_object(self, **kwargs):
