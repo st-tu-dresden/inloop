@@ -127,9 +127,9 @@ class SolutionDetailView(LoginRequiredMixin, View):
         )
 
         checkstyle_files = Parser.extract(data=checkstyle_context["data"], key="file")
-        for file in checkstyle_files:
-            for child in file["children"]:
-                print("Error found in file {}: {}".format(file["attrib"]["name"], child))
+        for solution_file in solution.solutionfile_set.all():
+            print(solution_file.contents)
+
 
         context = {
             'solution': solution,

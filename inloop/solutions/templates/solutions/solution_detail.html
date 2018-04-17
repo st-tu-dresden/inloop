@@ -103,14 +103,17 @@
   </div><!-- /#unittests -->
 
   <div role="tabpanel" class="tab-pane" id="checkstyle">
-  {% if checkstyle_errors %}
+  {% if checkstyle_files %}
   <div>
     <pre class="line-numbers codehilite"><code class="language-java">{{ file.contents }}</code></pre>
   </div>
-  {% for error in checkstyle_errors %}
+  {% for file in checkstyle_files %}
+  {{ file.attrib.name }}
+    {% for error in file.children %}
     <pre class="console-output">
       <code>{{ error }}</code>
     </pre>
+    {% endfor %}
   {% endfor %}
   {% else %}
     <p>Nothing to show here.</p>
