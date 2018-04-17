@@ -128,18 +128,16 @@ class SolutionDetailView(LoginRequiredMixin, View):
             filter_keys=[]
         )
 
-        checkstyle_errors = Parser.extract(dictionary=checkstyle_context, key="error")
-        junit_testcases = Parser.extract(dictionary=junit_context, key="testcase")
-        junit_system_out = Parser.extract(dictionary=junit_context, key="system_out")
-        junit_system_err = Parser.extract(dictionary=junit_context, key="system_err")
-
-        print(checkstyle_context)
+        checkstyle_files = Parser.extract(data=checkstyle_context["data"], key="file")
+        for file in checkstyle_files:
+            for child in file["children"]:
+                print("Error found in file {}: {}".format(file["attrib"]["name"], child))
 
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
-            'checkstyle_errors': checkstyle_errors,
+            'checkstyle_files': checkstyle_files,
             'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())
