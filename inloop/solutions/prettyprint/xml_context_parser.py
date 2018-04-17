@@ -138,40 +138,22 @@ class XMLContextParser(object):
         }
 
 
-def checkeroutput_filter(queryset, filter_type="junit"):
+def checkeroutput_filter(queryset):
     """
     Return a list of XML reports filtered from the CheckerOutput queryset.
-
-    Currently supported output types:
-    - junit
-    - checkstyle
 
     The filter takes advantage of the fact that all XML reports comply to
     a specific pattern.
     """
-
-    if filter_type == "junit":
-        return queryset.filter(
-            name__startswith="TEST-",
-            name__endswith=".xml"
-        ).values_list("output", flat=True)
-    elif filter_type == "checkstyle":
-        return queryset.filter(
-            name__startswith="checkstyle",
-            name__endswith=".xml"
-        ).values_list("output", flat=True)
-    else:
-        raise ValueError("The checkeroutput filter type must be \"junit\" or \"checkstyle\".")
+    return queryset.filter(
+        name__startswith="TEST-",
+        name__endswith=".xml"
+    ).values_list("output", flat=True)
 
 
-def xml_to_dict(xml_report, xml_type="junit"):
+def xml_to_dict(xml_report):
     """Parse the given JUnit or checkstyle XML string and return a dict representation."""
-    if xml_type == "junit":
-        return testsuite_to_dict(ET.fromstring(xml_report))
-    elif xml_type == "checkstyle":
-        return checkstyle_to_dict(ET.fromstring(xml_report))
-    else:
-        raise ValueError("The xml type must be \"junit\" or \"checkstyle\".")
+    return testsuite_to_dict(ET.fromstring(xml_report))
 
 
 def testsuite_to_dict(testsuite):
@@ -189,23 +171,6 @@ def testsuite_to_dict(testsuite):
     ts["system_out"] = get_text_safe(testsuite.find("system-out"))
     ts["system_err"] = get_text_safe(testsuite.find("system-err"))
     return ts
-
-
-def checkstyle_to_dict(checkstyle):
-    """Return a dict representation of the given <checkstyle/> Element."""
-    if checkstyle.tag != "checkstyle":
-        raise ValueError("The root tag must be a <checkstyle/>.")
-    cs = dict(checkstyle.attrib)
-    cs["files"] = [
-        {
-            file.attrib["name"]: [
-                error.attrib
-                for error in file.findall("error")
-            ]
-        }
-        for file in checkstyle.findall("file")
-    ]
-    return cs
 
 
 def get_text_safe(element):
