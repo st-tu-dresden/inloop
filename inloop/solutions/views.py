@@ -142,8 +142,8 @@ class SolutionDetailView(LoginRequiredMixin, View):
                 source_split.insert(0, "\n")
                 for error in [e for e in file["children"] if e["tag"] == "error"]:
                     error["code"] = source_split[int(error["attrib"]["line"])]
-                file["num_errors"] = len([e for e in file["children"] if e["attrib"]["severity"] == "error"])
-                file["num_warnings"] = len([e for e in file["children"] if e["attrib"]["severity"] == "warning"])
+                file["checkstyle_errors"] = [e for e in file["children"] if e["attrib"]["severity"] == "error"]
+                file["checkstyle_warnings"] = [e for e in file["children"] if e["attrib"]["severity"] == "warning"]
 
         context = {
             'solution': solution,
