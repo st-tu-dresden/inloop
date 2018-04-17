@@ -96,7 +96,7 @@ class XMLContextParser(object):
 
         """
         values = []
-        if type(data) is dict:
+        if isinstance(data, dict):
             try:
                 tag = data["tag"]
                 _ = data["attrib"]
@@ -108,7 +108,7 @@ class XMLContextParser(object):
                 values.append(data)
             for child in children:
                 values += XMLContextParser.extract(data=child, key=key)
-        elif type(data) is list:
+        elif isinstance(data, list):
             for ele in data:
                 values += XMLContextParser.extract(data=ele, key=key)
         return values

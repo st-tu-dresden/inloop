@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
