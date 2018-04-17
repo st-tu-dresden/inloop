@@ -150,7 +150,12 @@ class XMLContextParser(object):
         else:
             children = tree.getchildren()
         if children:
-            return {tree.tag: [XMLContextParser.element_tree_to_dict(child, filter_keys) for child in children]}
+            return {
+                "tag": tree.tag,
+                "attrib": tree.attrib,
+                "text": tree.text,
+                "children": [XMLContextParser.element_tree_to_dict(child, filter_keys) for child in children],
+            }
         else:
             if tree.attrib is not None:
                 return {tree.tag: tree.attrib}

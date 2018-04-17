@@ -1,10 +1,14 @@
 {% extends "base_site.html" %}
 
+{% load staticfiles %}
+
 {% block title %}Solution
 #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
 {% endblock %}
 
 {% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
 
 {# Breadcrumb #}
 {% with task=solution.task %}
@@ -100,6 +104,9 @@
 
   <div role="tabpanel" class="tab-pane" id="checkstyle">
   {% if checkstyle_errors %}
+  <div>
+    <pre class="line-numbers codehilite"><code class="language-java">{{ file.contents }}</code></pre>
+  </div>
   {% for error in checkstyle_errors %}
     <pre class="console-output">
       <code>{{ error }}</code>
