@@ -105,7 +105,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
         testsuites = [testing.xml_to_dict(xml) for xml in xml_reports_junit]
 
         parser = Parser(solution=solution)
-        junit_context = parser.context(
+        _ = parser.context(
             startswith="TEST-",
             endswith=".xml",
             filter_keys=["testcase", "system-out", "system-err", "failures", "errors", "failure", "error"]
@@ -115,12 +115,12 @@ class SolutionDetailView(LoginRequiredMixin, View):
             endswith=".xml",
             filter_keys=[]
         )
-        spotbugs_context = parser.context(
+        _ = parser.context(
             startswith="spotbugs_errors",
             endswith=".xml",
             filter_keys=[]
         )
-        pmd_context = parser.context(
+        _ = parser.context(
             startswith="pmd_errors",
             endswith=".xml",
             filter_keys=[]
