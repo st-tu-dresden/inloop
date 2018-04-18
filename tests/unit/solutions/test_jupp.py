@@ -5,14 +5,72 @@ from inloop.solutions.prettyprint import tools
 
 SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
 with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
-    SAMPLE_XML = fp.read()
+    SAMPLE_XML_JUNIT = fp.read()
+with SAMPLES_PATH.joinpath("Checkstyle.xml").open() as fp:
+    SAMPLE_XML_CHECKSTYLE = fp.read()
 with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
     MALICIOUS_XML = fp.read()
+
+SAMPLE_DICT = [
+    {'version': '8.9'},
+    {
+       'tag': 'checkstyle',
+       'attrib': {'version': '8.9'},
+       'text': '\n',
+       'children': [
+           {
+               'tag': 'file',
+               'attrib': {'name': '/checker/input/Book.java'},
+               'text': '\n',
+               'children': [
+                   {
+                       'tag': 'error',
+                       'attrib': {
+                           'line': '0',
+                           'severity': 'error',
+                           'message': 'File does not end with a newline.',
+                           'source': 'com.puppycrawl.tools.checkstyle'
+                                     '.checks.NewlineAtEndOfFileCheck'
+                       },
+                       'text': None,
+                       'children': []
+                   },
+                   {
+                       'tag': 'error',
+                       'attrib': {
+                           'line': '1',
+                           'column': '9',
+                           'severity': 'warning',
+                           'message': "Name 'U01.src' must match pattern"
+                                      " '^[a-z]+(\\.[a-z][a-z0-9]{1,})*$'.",
+                           'source': 'com.puppycrawl.tools.checkstyle'
+                                     '.checks.naming.PackageNameCheck'
+                       },
+                       'text': None,
+                       'children': []
+                   },
+                   {
+                       'tag': 'error',
+                       'attrib': {
+                           'line': '1',
+                           'column': '17',
+                           'severity': 'error',
+                           'message': "';' is not followed by whitespace.",
+                           'source': 'com.puppycrawl.tools.checkstyle'
+                                     '.checks.whitespace.WhitespaceAfterCheck'},
+                       'text': None,
+                       'children': []
+                   }
+               ]
+           }
+       ]
+    }
+]
 
 
 class JUnitXMLTests(TestCase):
     def setUp(self):
-        self.ts = tools.xml_to_dict(SAMPLE_XML)
+        self.ts = tools.xml_to_dict(SAMPLE_XML_JUNIT)
 
     def test_sample_outputs(self):
         self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
