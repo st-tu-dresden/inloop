@@ -70,3 +70,7 @@ class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):
         with self.assertRaises(ValueError):
             tools.xml_to_dict(MALICIOUS_XML)
+
+
+class CheckstyleXMLTests(TestCase):
+    pass
