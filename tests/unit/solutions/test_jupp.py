@@ -1,7 +1,7 @@
 from pathlib import Path
 from unittest import TestCase
 
-from inloop.solutions.prettyprint import testing
+from inloop.solutions.prettyprint import tools
 
 SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
 with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
@@ -12,7 +12,7 @@ with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
 
 class JUnitXMLTests(TestCase):
     def setUp(self):
-        self.ts = testing.xml_to_dict(SAMPLE_XML)
+        self.ts = tools.xml_to_dict(SAMPLE_XML)
 
     def test_sample_outputs(self):
         self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
@@ -49,10 +49,10 @@ class JUnitXMLTests(TestCase):
 
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
-            testing.xml_to_dict("<invalid-root />")
+            tools.xml_to_dict("<invalid-root />")
 
     def test_no_testcases(self):
-        ts = testing.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
+        ts = tools.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
         self.assertEqual(len(ts["testcases"]), 0)
 
     def test_missing_systemerr_or_systemout(self):
@@ -62,11 +62,11 @@ class JUnitXMLTests(TestCase):
             "<testsuite></testsuite>",
         ]
         for document in documents:
-            ts = testing.xml_to_dict(document)
+            ts = tools.xml_to_dict(document)
             self.assertEqual(len(ts["testcases"]), 0)
 
 
 class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):
         with self.assertRaises(ValueError):
-            testing.xml_to_dict(MALICIOUS_XML)
+            tools.xml_to_dict(MALICIOUS_XML)
