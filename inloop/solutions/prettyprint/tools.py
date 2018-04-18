@@ -127,15 +127,98 @@ class XMLContextParser(object):
 
         """
         if filter_keys:
-            children = [child for child in tree.getchildren() if child.tag in filter_keys]
+            children = [
+                child for child in tree.getchildren() if child.tag in filter_keys
+            ]
         else:
             children = tree.getchildren()
         return {
             "tag": tree.tag,
             "attrib": tree.attrib,
             "text": tree.text,
-            "children": [XMLContextParser.element_tree_to_dict(child, filter_keys) for child in children],
+            "children": [
+                XMLContextParser.element_tree_to_dict(child, filter_keys)
+                for child in children
+            ],
         }
+
+
+def assign_sources_to_files(checkstyle_files, solution):
+    """
+    Assign source code to files by name similarity.
+
+    Args:
+        checkstyle_files (list): The input files list.
+        solution: The solution object.
+
+    Returns:
+        list: The checkstyle_files with assigned source code.
+    """
+    for file in checkstyle_files:
+        try:
+            file_paths = file["attrib"]["name"].split("/")
+        except KeyError as e:
+            raise e
+        if file_paths:
+            file_name = file_paths[-1]
+            for solution_file in solution.solutionfile_set.all():
+                if solution_file.name == file_name:
+                    try:
+                        file["source"] = solution_file.contents
+                    except KeyError as e:
+                        raise e
+                    else:
+                        break
+    return checkstyle_files
+
+
+def assign_code_to_errors(checkstyle_files):
+    """
+    Assign source code to their errors by splitting
+    the file source code in lines.
+
+    Args:
+        checkstyle_files (list): The input files list.
+
+    Returns:
+        list: The checkstyle_files list with assigned code lines.
+    """
+    for file in checkstyle_files:
+        try:
+            source_split = file["source"].splitlines()
+        except KeyError as e:
+            raise e
+        # Insert empty code line on top to match Checkstyle output
+        # since the 1st code line is the line in source_split
+        # with the index 0. We shift the list by 1.
+        source_split.insert(0, "\n")
+        try:
+            for error in [e for e in file["children"] if e["tag"] == "error"]:
+                error["code"] = source_split[int(error["attrib"]["line"])]
+        except (KeyError, IndexError) as e:
+            raise e
+    return checkstyle_files
+
+
+def assign_grouped_errors(checkstyle_files):
+    """
+    Groups checkstyle error types (warning, error) and adds
+    them to the checkstyle_files list.
+
+    Args:
+        checkstyle_files (list): The input files list.
+
+    Returns:
+        list: The checkstyle_files with grouped errors.
+    """
+    for file in checkstyle_files:
+        file["checkstyle_errors"] = [
+            e for e in file["children"] if e["attrib"]["severity"] == "error"
+        ]
+        file["checkstyle_warnings"] = [
+            e for e in file["children"] if e["attrib"]["severity"] == "warning"
+        ]
+    return checkstyle_files
 
 
 def checkeroutput_filter(queryset):

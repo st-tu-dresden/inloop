@@ -7,8 +7,12 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint import testing
-from inloop.solutions.prettyprint.xml_context_parser import XMLContextParser as Parser
+from inloop.solutions.prettyprint.tools import XMLContextParser as Parser
+from inloop.solutions.prettyprint.tools import xml_to_dict
+from inloop.solutions.prettyprint.tools import checkeroutput_filter
+from inloop.solutions.prettyprint.tools import assign_sources_to_files
+from inloop.solutions.prettyprint.tools import assign_code_to_errors
+from inloop.solutions.prettyprint.tools import assign_grouped_errors
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -101,14 +105,22 @@ class SolutionDetailView(LoginRequiredMixin, View):
         # TODO: PrettyPrinters should be configurable (for now, we only have one for JUnit)
         result = solution.testresult_set.last()
 
-        xml_reports_junit = testing.checkeroutput_filter(result.testoutput_set)
-        testsuites = [testing.xml_to_dict(xml) for xml in xml_reports_junit]
+        xml_reports_junit = checkeroutput_filter(result.testoutput_set)
+        testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
 
         parser = Parser(solution=solution)
         _ = parser.context(
             startswith="TEST-",
             endswith=".xml",
-            filter_keys=["testcase", "system-out", "system-err", "failures", "errors", "failure", "error"]
+            filter_keys=[
+                "testcase",
+                "system-out",
+                "system-err",
+                "failures",
+                "errors",
+                "failure",
+                "error",
+            ]
         )
         checkstyle_context = parser.context(
             startswith="checkstyle_errors",
@@ -127,23 +139,9 @@ class SolutionDetailView(LoginRequiredMixin, View):
         )
 
         checkstyle_files = Parser.extract(data=checkstyle_context["data"], key="file")
-
-        # Assign source code files
-        for file in checkstyle_files:
-            file_paths = file["attrib"]["name"].split("/")
-            if file_paths:
-                file_name = file_paths[len(file_paths)-1]
-                for solution_file in solution.solutionfile_set.all():
-                    if solution_file.name == file_name:
-                        file["source"] = solution_file.contents
-                        break
-                source_split = file["source"].splitlines()
-                # Insert empty code line on top
-                source_split.insert(0, "\n")
-                for error in [e for e in file["children"] if e["tag"] == "error"]:
-                    error["code"] = source_split[int(error["attrib"]["line"])]
-                file["checkstyle_errors"] = [e for e in file["children"] if e["attrib"]["severity"] == "error"]
-                file["checkstyle_warnings"] = [e for e in file["children"] if e["attrib"]["severity"] == "warning"]
+        checkstyle_files = assign_sources_to_files(checkstyle_files, solution)
+        checkstyle_files = assign_code_to_errors(checkstyle_files)
+        checkstyle_files = assign_grouped_errors(checkstyle_files)
 
         context = {
             'solution': solution,
