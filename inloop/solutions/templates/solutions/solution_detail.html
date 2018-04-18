@@ -123,8 +123,10 @@
           {{ error.attrib.message }}
         </h1>
       </div>
-      <div class="panel-body" style="padding: 8px;">
-        <pre class="line-numbers codehilite" data-start="{{ error.attrib.line }}" style="margin-bottom: 5px;"><code class="language-java">{{ error.code }}</code></pre>
+      <div class="panel-body" style="padding: 10px;">
+      <pre class="line-numbers codehilite"
+           data-start="{{ error.attrib.line }}"
+           style="margin-bottom: 0px;"><code class="language-java">{{ error.code }}</code></pre>
         <!--<span class="label label-default">This alert came from ...{{ error.attrib.source|slice:"-50:"|safe }}</span>-->
       </div>
     </div>
