@@ -7,12 +7,9 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint.tools import XMLContextParser as Parser
-from inloop.solutions.prettyprint.tools import xml_to_dict
-from inloop.solutions.prettyprint.tools import checkeroutput_filter
-from inloop.solutions.prettyprint.tools import assign_sources_to_files
-from inloop.solutions.prettyprint.tools import assign_code_to_errors
-from inloop.solutions.prettyprint.tools import assign_grouped_errors
+from inloop.solutions.prettyprint.tools import (XMLContextParser as Parser, assign_code_to_errors,
+                                                assign_grouped_errors, assign_sources_to_files,
+                                                checkeroutput_filter, xml_to_dict)
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -109,31 +106,8 @@ class SolutionDetailView(LoginRequiredMixin, View):
         testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
 
         parser = Parser(solution=solution)
-        _ = parser.context(
-            startswith="TEST-",
-            endswith=".xml",
-            filter_keys=[
-                "testcase",
-                "system-out",
-                "system-err",
-                "failures",
-                "errors",
-                "failure",
-                "error",
-            ]
-        )
         checkstyle_context = parser.context(
             startswith="checkstyle_errors",
-            endswith=".xml",
-            filter_keys=[]
-        )
-        _ = parser.context(
-            startswith="spotbugs_errors",
-            endswith=".xml",
-            filter_keys=[]
-        )
-        _ = parser.context(
-            startswith="pmd_errors",
             endswith=".xml",
             filter_keys=[]
         )
