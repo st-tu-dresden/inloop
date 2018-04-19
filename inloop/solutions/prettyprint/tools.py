@@ -63,7 +63,10 @@ class XMLContextParser(object):
             dict: The context in a dict format.
 
         """
-        filtered_set = self.testoutput_set.filter(name__startswith=startswith, name__endswith=endswith)
+        filtered_set = self.testoutput_set.filter(
+            name__startswith=startswith,
+            name__endswith=endswith
+        )
         flattened_set = filtered_set.values_list("output", flat=True)
         context = {
             "startswith": startswith,
@@ -77,7 +80,9 @@ class XMLContextParser(object):
                 context["data"].append(element_tree.attrib)
             except (ValueError, ET.ParseError):
                 continue
-            context["data"].append(XMLContextParser.element_tree_to_dict(element_tree, filter_keys))
+            context["data"].append(
+                XMLContextParser.element_tree_to_dict(element_tree, filter_keys)
+            )
         return context
 
     @staticmethod
@@ -99,8 +104,6 @@ class XMLContextParser(object):
         if isinstance(data, dict):
             try:
                 tag = data["tag"]
-                _ = data["attrib"]
-                _ = data["text"]
                 children = data["children"]
             except KeyError:
                 return values
