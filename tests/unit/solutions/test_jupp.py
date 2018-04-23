@@ -1,6 +1,7 @@
 from pathlib import Path
 from unittest import TestCase
-from defusedxml import ElementTree as ET
+
+from defusedxml import ElementTree
 
 from inloop.solutions.prettyprint import tools
 from inloop.solutions.prettyprint.tools import XMLContextParser
@@ -137,7 +138,7 @@ class CheckstyleXMLTests(TestCase):
         self.assertEqual(len(data[0]["children"]), 3)
 
     def test_to_dict(self):
-        element_tree = ET.fromstring(SAMPLE_XML_CHECKSTYLE)
+        element_tree = ElementTree.fromstring(SAMPLE_XML_CHECKSTYLE)
         dictionary1 = XMLContextParser.element_tree_to_dict(
             element_tree,
             filter_keys=[]
@@ -169,7 +170,3 @@ class CheckstyleXMLTests(TestCase):
     def test_etree_empty_args(self):
         tree = XMLContextParser.element_tree_to_dict(None, filter_keys=[])
         self.assertEqual(tree, dict())
-
-
-
-
