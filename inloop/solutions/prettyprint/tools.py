@@ -29,8 +29,11 @@ class XMLContextParser(object):
             solution (QuerySet): solution containing XML files.
 
         """
-        result = solution.testresult_set.last()
-        self.testoutput_set = result.testoutput_set
+        if solution:
+            result = solution.testresult_set.last()
+            self.testoutput_set = result.testoutput_set
+        else:
+            raise ValueError("Solution must not be empty!")
 
     def __str__(self):
         """
@@ -129,6 +132,8 @@ class XMLContextParser(object):
             dict: The filtered and transformed ElementTree as a dict.
 
         """
+        if not tree:
+            return dict()
         if filter_keys:
             children = [
                 child for child in tree.getchildren() if child.tag in filter_keys
