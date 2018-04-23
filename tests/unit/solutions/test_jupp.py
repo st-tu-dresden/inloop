@@ -1,7 +1,9 @@
 from pathlib import Path
 from unittest import TestCase
+from defusedxml import ElementTree as ET
 
 from inloop.solutions.prettyprint import tools
+from inloop.solutions.prettyprint.tools import XMLContextParser
 
 SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
 with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
@@ -11,7 +13,7 @@ with SAMPLES_PATH.joinpath("Checkstyle.xml").open() as fp:
 with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
     MALICIOUS_XML = fp.read()
 
-SAMPLE_DICT = [
+SAMPLE_DATA = [
     {'version': '8.9'},
     {
         'tag': 'checkstyle',
@@ -128,4 +130,46 @@ class XMLBombProtectionTest(TestCase):
 
 
 class CheckstyleXMLTests(TestCase):
-    pass
+    def test_extract(self):
+        data = XMLContextParser.extract(data=SAMPLE_DATA, key="file")
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["tag"], "file")
+        self.assertEqual(len(data[0]["children"]), 3)
+
+    def test_to_dict(self):
+        element_tree = ET.fromstring(SAMPLE_XML_CHECKSTYLE)
+        dictionary1 = XMLContextParser.element_tree_to_dict(
+            element_tree,
+            filter_keys=[]
+        )
+        dictionary2 = dictionary = XMLContextParser.element_tree_to_dict(
+            element_tree,
+            filter_keys=None
+        )
+        for dictionary in [dictionary1, dictionary2]:
+            self.assertTrue(isinstance(dictionary, dict))
+            self.assertEqual(dictionary["tag"], "checkstyle")
+            self.assertTrue(len(dictionary["children"]) > 0)
+            self.assertEqual(dictionary["attrib"]["version"], "8.9")
+
+    def test_extract_none(self):
+        data1 = XMLContextParser.extract(data=None, key=None)
+        data2 = XMLContextParser.extract(data=SAMPLE_DATA, key=None)
+        data3 = XMLContextParser.extract(data=None, key="file")
+        for data in [data1, data2, data3]:
+            self.assertEqual(data, [])
+
+    def test_init_none(self):
+        try:
+            XMLContextParser(solution=None)
+            self.fail("Should throw ValueError if initialized with None")
+        except ValueError:
+            pass
+
+    def test_etree_empty_args(self):
+        tree = XMLContextParser.element_tree_to_dict(None, filter_keys=[])
+        self.assertEqual(tree, dict())
+
+
+
+
