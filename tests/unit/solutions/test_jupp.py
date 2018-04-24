@@ -168,5 +168,8 @@ class CheckstyleXMLTests(TestCase):
             pass
 
     def test_etree_empty_args(self):
-        tree = XMLContextParser.element_tree_to_dict(None, filter_keys=[])
-        self.assertEqual(tree, dict())
+        try:
+            XMLContextParser.element_tree_to_dict(None, filter_keys=[])
+            self.fail("Should throw AttributeError if init. with None")
+        except AttributeError:
+            pass
