@@ -114,24 +114,25 @@
 
   {% if not warnings == 0 or not errors == 0 %}
   <ul class="list-group">
-  <a class="list-group-item active" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
-    <span class="badge">{{ file.checkstyle_warnings|length }} Warnings</span>
-    <span class="badge">{{ file.checkstyle_errors|length }} Severe Issues</span>
+  <a class="list-group-item" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+    <span class="badge">{{ warnings }} Warnings</span>
+    <span class="badge">{{ errors }} Severe Issues</span>
     {{ file.attrib.name }}
   </a>
   <div class="collapse" id="toggle{{ forloop.counter }}">
     <li class="list-group-item">
     {% for error in file.checkstyle_errors %}
-    <div class="panel panel-danger">
+    <div class="panel panel-danger" style="margin-bottom: 10px;">
       <div class="panel-heading">
         <h1 class="panel-title">
           {{ error.attrib.message }}
         </h1>
       </div>
-      <div class="panel-body" style="padding: 10px;">
+      <div class="panel-body" style="padding: 0px;">
       <pre class="line-numbers codehilite"
            data-start="{{ error.attrib.line }}"
-           style="margin-bottom: 0px;"><code class="language-java">{{ error.code }}</code></pre>
+           style="margin-bottom: 0px; z-index: 0; border: none;"
+      ><code class="language-java">{{ error.code }}</code></pre>
         <!--<span class="label label-default">This alert came from ...{{ error.attrib.source|slice:"-50:"|safe }}</span>-->
       </div>
     </div>
@@ -139,14 +140,14 @@
     </li>
     <li class="list-group-item">
     {% for error in file.checkstyle_warnings %}
-    <div class="panel panel-warning">
+    <div class="panel panel-warning" style="margin-bottom: 10px;">
       <div class="panel-heading">
         <h1 class="panel-title">
           {{ error.attrib.message }}
         </h1>
       </div>
-      <div class="panel-body" style="padding: 8px;">
-        <pre class="line-numbers codehilite" data-start="{{ error.attrib.line }}" style="margin-bottom: 5px;"><code class="language-java">{{ error.code }}</code></pre>
+      <div class="panel-body" style="padding: 0px;">
+        <pre class="line-numbers codehilite" data-start="{{ error.attrib.line }}" style="margin-bottom: 0px; z-index: 0; border: none;"><code class="language-java">{{ error.code }}</code></pre>
       </div>
     </div>
     {% endfor %}
