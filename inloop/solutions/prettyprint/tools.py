@@ -132,8 +132,6 @@ class XMLContextParser(object):
             dict: The filtered and transformed ElementTree as a dict.
 
         """
-        if not tree:
-            return dict()
         if filter_keys:
             children = [
                 child for child in tree.getchildren() if child.tag in filter_keys
