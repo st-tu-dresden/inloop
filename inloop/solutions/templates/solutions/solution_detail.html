@@ -48,7 +48,7 @@
     <a href="#unittests" aria-controls="unittests" role="tab" data-toggle="tab">Unit tests</a>
   </li>
   <li role="presentation">
-    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">Style checks</a>
+    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">Style issues</a>
   </li>
 </ul>
 
@@ -108,6 +108,11 @@
 
   {% if checkstyle_files %}
   {% for file in checkstyle_files %}
+
+  {% with file.checkstyle_warnings|length as warnings %}
+  {% with file.checkstyle_errors|length as errors %}
+
+  {% if not warnings == 0 or not errors == 0 %}
   <ul class="list-group">
   <a class="list-group-item active" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
     <span class="badge">{{ file.checkstyle_warnings|length }} Warnings</span>
@@ -148,6 +153,11 @@
     </li>
   </div>
   </ul>
+  {% endif %}
+
+  {% endwith %}
+  {% endwith %}
+
   {% endfor %}
 
   {% else %}
