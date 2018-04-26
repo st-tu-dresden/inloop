@@ -203,3 +203,25 @@ code {
   padding: 0 2rem;
 }
 /* @end */
+
+/* @begin Badge superscript style*/
+.superscript {
+  position: relative;
+  top: -0.5em;
+  font-size: 50%;
+}
+/* @end */
+
+.no-pad {
+  padding: 0px;
+}
+
+.bottom-spaced {
+  margin-bottom: 10px;
+}
+
+.below-panel {
+  margin-bottom: 0px;
+  z-index: 0;
+  border: none;
+}
