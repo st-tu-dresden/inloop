@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -116,12 +118,16 @@ class SolutionDetailView(LoginRequiredMixin, View):
         checkstyle_files = assign_sources_to_files(checkstyle_files, solution)
         checkstyle_files = assign_code_to_errors(checkstyle_files)
         checkstyle_files = assign_grouped_errors(checkstyle_files)
+        total_checkstyle_errors = sum([len(file["checkstyle_errors"]) for file in checkstyle_files])
+        total_checkstyle_warnings = sum([len(file["checkstyle_warnings"]) for file in checkstyle_files])
 
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
             'checkstyle_files': checkstyle_files,
+            'total_checkstyle_errors': total_checkstyle_errors,
+            'total_checkstyle_warnings': total_checkstyle_warnings,
             'solution_files': solution.solutionfile_set.all(),
             'files': solution.solutionfile_set.all(),
         }

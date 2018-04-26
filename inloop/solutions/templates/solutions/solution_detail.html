@@ -47,9 +47,15 @@
   <li role="presentation">
     <a href="#unittests" aria-controls="unittests" role="tab" data-toggle="tab">Unit tests</a>
   </li>
+  {% if total_checkstyle_warnings > 0 or total_checkstyle_errors > 0 %}
   <li role="presentation">
-    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">Style issues</a>
+    <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">
+        Style issues
+        <span style="position: relative; top: -0.5em; font-size: 50%;" class="badge progress-bar-danger">{{ total_checkstyle_errors }}</span>
+        <span style="position: relative; top: -0.5em; font-size: 50%;" class="badge progress-bar-warning">{{ total_checkstyle_warnings }}</span>
+    </a>
   </li>
+  {% endif %}
 </ul>
 
 <div class="tab-content">
@@ -115,11 +121,12 @@
   {% if not warnings == 0 or not errors == 0 %}
   <ul class="list-group">
   <a class="list-group-item" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
-    <span class="badge">{{ warnings }} Warnings</span>
-    <span class="badge">{{ errors }} Severe Issues</span>
+    <span class="badge progress-bar-warning">{{ warnings }} Warnings</span>
+    <span class="badge progress-bar-danger">{{ errors }} Severe Issues</span>
     {{ file.attrib.name }}
   </a>
   <div class="collapse" id="toggle{{ forloop.counter }}">
+    {% if file.checkstyle_errors %}
     <li class="list-group-item">
     {% for error in file.checkstyle_errors %}
     <div class="panel panel-danger" style="margin-bottom: 10px;">
@@ -138,6 +145,8 @@
     </div>
     {% endfor %}
     </li>
+    {% endif %}
+    {% if file.checkstyle_warnings %}
     <li class="list-group-item">
     {% for error in file.checkstyle_warnings %}
     <div class="panel panel-warning" style="margin-bottom: 10px;">
@@ -147,11 +156,14 @@
         </h1>
       </div>
       <div class="panel-body" style="padding: 0px;">
-        <pre class="line-numbers codehilite" data-start="{{ error.attrib.line }}" style="margin-bottom: 0px; z-index: 0; border: none;"><code class="language-java">{{ error.code }}</code></pre>
+        <pre class="line-numbers codehilite"
+             data-start="{{ error.attrib.line }}"
+             style="margin-bottom: 0px; z-index: 0; border: none;"><code class="language-java">{{ error.code }}</code></pre>
       </div>
     </div>
     {% endfor %}
     </li>
+    {% endif %}
   </div>
   </ul>
   {% endif %}
