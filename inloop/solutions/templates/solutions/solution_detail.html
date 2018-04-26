@@ -51,8 +51,12 @@
   <li role="presentation">
     <a href="#checkstyle" aria-controls="checkstyle" role="tab" data-toggle="tab">
         Style issues
+        {% if total_checkstyle_errors > 0 %}
         <span style="position: relative; top: -0.5em; font-size: 50%;" class="badge progress-bar-danger">{{ total_checkstyle_errors }}</span>
-        <span style="position: relative; top: -0.5em; font-size: 50%;" class="badge progress-bar-warning">{{ total_checkstyle_warnings }}</span>
+        {% endif %}
+        {% if total_checkstyle_warnings > 0 %}
+            <span style="position: relative; top: -0.5em; font-size: 50%;" class="badge progress-bar-warning">{{ total_checkstyle_warnings }}</span>
+        {% endif %}
     </a>
   </li>
   {% endif %}
@@ -121,8 +125,12 @@
   {% if not warnings == 0 or not errors == 0 %}
   <ul class="list-group">
   <a class="list-group-item" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+  {% if warnings > 0 %}
     <span class="badge progress-bar-warning">{{ warnings }} Warnings</span>
+  {% endif %}
+  {% if errors > 0 %}
     <span class="badge progress-bar-danger">{{ errors }} Severe Issues</span>
+  {% endif %}
     {{ file.attrib.name }}
   </a>
   <div class="collapse" id="toggle{{ forloop.counter }}">
