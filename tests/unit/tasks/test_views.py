@@ -11,7 +11,6 @@ class IndexViewTest(SimpleAccountsData, TaskData, TestCase):
         self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.client.get(url, follow=True)
         self.assertContains(response, self.published_task1.title)
-        self.assertNotContains(response, self.unpublished_task1.title)
 
 
 class TaskDetailViewTest(SimpleAccountsData, TaskData, TestCase):
