@@ -78,7 +78,7 @@ class GitRepository(Repository):
         initialized, using a failure-resistant strategy (currently fetch + hard reset).
         """
         self.git("remote", "set-url", "origin", self.url)
-        self.git("fetch", "--quiet", "--depth=1", "origin")
+        self.git("fetch", "--quiet", "--depth=1", "origin", "+refs/heads/*:refs/remotes/origin/*")
         self.git("stash", "-u")
         self.git("reset", "--hard", "origin/%s" % self.branch)
 
