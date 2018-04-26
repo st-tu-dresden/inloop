@@ -218,12 +218,34 @@ def assign_grouped_errors(checkstyle_files):
         list: The checkstyle_files with grouped errors.
     """
     for file in checkstyle_files:
-        file["checkstyle_errors"] = [
-            e for e in file["children"] if e["attrib"]["severity"] == "error"
-        ]
-        file["checkstyle_warnings"] = [
-            e for e in file["children"] if e["attrib"]["severity"] == "warning"
-        ]
+        try:
+            file["checkstyle_errors"] = [
+                e for e in file["children"] if e["attrib"]["severity"] == "error"
+            ]
+            file["checkstyle_warnings"] = [
+                e for e in file["children"] if e["attrib"]["severity"] == "warning"
+            ]
+        except KeyError as e:
+            raise e
+    return checkstyle_files
+
+
+def remove_input_path(checkstyle_files, input_path="/checker/input/"):
+    """
+    Removes the input path from the checkstyle_files list.
+
+    Args:
+        checkstyle_files (list): The input files list.
+        input_path (str): The input path.
+
+    Returns:
+        list: The checkstyle_files with modified input paths.
+    """
+    for file in checkstyle_files:
+        try:
+            file["attrib"]["name"] = file["attrib"]["name"].replace(input_path, "")
+        except KeyError as e:
+            raise e
     return checkstyle_files
 
 
