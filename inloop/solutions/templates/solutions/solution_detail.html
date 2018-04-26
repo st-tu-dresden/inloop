@@ -65,9 +65,43 @@
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="home">
   {% if solution.passed %}
+
     <p class="alert alert-success">
-      Congratulations, your solution passed all tests.
+    Congratulations, your solution passed all tests.
     </p>
+
+    {% with total_checkstyle_errors|add:total_checkstyle_warnings as total %}
+
+    {% if total == 0 %}
+    <div class="alert alert-success">
+        <h1 style="margin-top: 0px">Perfect! 😍</h1>
+        We detected no style issues with the code you submitted. Well done!
+    {% elif total < 2 %}
+    <div class="alert alert-info">
+        <h1 style="margin-top: 0px">Almost perfect! 😎</h1>
+        Your code is beautiful, but there are some issues. Go to the style issues tab to identify them.
+    {% elif total < 5 %}
+    <div class="alert alert-warning">
+        <h1 style="margin-top: 0px">Good! 😇</h1>
+        Your submission is of good quality, but there are some issues. Go to the style issues tab to identify them.
+    {% elif total < 10 %}
+    <div class="alert alert-warning">
+        <h1 style="margin-top: 0px">Well... 😬</h1>
+        You should look over your code again. We detected multiple code style issues with your files. Go to the style issues tab to identify them.
+    {% elif total < 20 %}
+    <div class="alert alert-danger">
+        <h1 style="margin-top: 0px">Not so good... 😕</h1>
+        Your code works, but you should definitely look over it again. There are many code style issues with your files. Go to the style issues tab to identify them. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+    {% else %}
+    <div class="alert alert-danger">
+        <h1 style="margin-top: 0px">Sad... 😨</h1>
+        Whoops! In a later revision of INLOOP, we could deny your solution, since it has too many code style issues. Try looking over your code and resubmitting it again. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+    {% endif %}
+
+    </div>
+
+    {% endwith %}
+
   {% elif solution.status == "failure" %}
     <p class="alert alert-danger">
       Your solution did not pass the tests.
