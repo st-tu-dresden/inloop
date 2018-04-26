@@ -42,7 +42,6 @@ def category(request, slug):
     unpublished_tasks = category.task_set.unpublished().completed_by_values(
         request.user, "title"
     )
-    print(unpublished_tasks)
     have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(request, 'tasks/category.html', {
         'category': category,
