@@ -7,9 +7,10 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint.tools import (XMLContextParser as Parser, assign_code_to_errors,
-                                                assign_grouped_errors, assign_sources_to_files,
-                                                checkeroutput_filter, xml_to_dict, remove_input_path)
+from inloop.solutions.prettyprint.tools import (XMLContextParser as Parser,
+                                                assign_code_to_errors, assign_grouped_errors,
+                                                assign_sources_to_files, checkeroutput_filter,
+                                                remove_input_path, xml_to_dict)
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
