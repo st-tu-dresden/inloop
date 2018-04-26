@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -11,7 +9,7 @@ from django.views.generic import DetailView, View
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.prettyprint.tools import (XMLContextParser as Parser, assign_code_to_errors,
                                                 assign_grouped_errors, assign_sources_to_files,
-                                                checkeroutput_filter, xml_to_dict)
+                                                checkeroutput_filter, xml_to_dict, remove_input_path)
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -118,8 +116,13 @@ class SolutionDetailView(LoginRequiredMixin, View):
         checkstyle_files = assign_sources_to_files(checkstyle_files, solution)
         checkstyle_files = assign_code_to_errors(checkstyle_files)
         checkstyle_files = assign_grouped_errors(checkstyle_files)
-        total_checkstyle_errors = sum([len(file["checkstyle_errors"]) for file in checkstyle_files])
-        total_checkstyle_warnings = sum([len(file["checkstyle_warnings"]) for file in checkstyle_files])
+        checkstyle_files = remove_input_path(checkstyle_files)
+        total_checkstyle_errors = sum(
+            [len(file["checkstyle_errors"]) for file in checkstyle_files]
+        )
+        total_checkstyle_warnings = sum(
+            [len(file["checkstyle_warnings"]) for file in checkstyle_files]
+        )
 
         context = {
             'solution': solution,
