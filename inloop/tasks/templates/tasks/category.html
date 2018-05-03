@@ -16,7 +16,7 @@
     <thead>
     <tr>
       <th>Title</th>
-      <th>Published on</th>
+      <th>Publication date</th>
       {% if have_deadlines %}
       <th>Deadline</th>
       {% endif %}
@@ -25,6 +25,7 @@
     </thead>
 
     <tbody>
+
     {% for task in tasks %}
     <tr>
       <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
@@ -43,9 +44,31 @@
       </td>
     </tr>
     {% endfor %}
+
+    {% for task in unpublished_tasks %}
+    <tr style="color: lightgrey;">
+      <td>{{ task.title }}</td>
+      <td>{% firstof task.pubdate|date:"d-m-Y" "-" %}</td>
+      {% if have_deadlines %}
+      <td>{% firstof task.deadline|date:"d-m-Y" "-"  %}</td>
+      {% endif %}
+      <td>
+      {% if task.completed %}
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        <span class="sr-only">Yes</span>
+      {% else %}
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <span class="sr-only">No</span>
+      {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+
     </tbody>
   </table>
-{% else %}
+{% endif %}
+
+{% if not tasks %}
   <div class="alert alert-info">You are lucky! Nothing to do here.</div>
 {% endif %}
 

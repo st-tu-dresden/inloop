@@ -33,6 +33,9 @@ class Category(models.Model):
 class TaskQuerySet(models.QuerySet):
     """Enhances QuerySet with convenience methods to get task completion status."""
 
+    def unpublished(self):
+        return self.filter(pubdate__gte=timezone.now())
+
     def published(self):
         return self.filter(pubdate__lt=timezone.now())
 
