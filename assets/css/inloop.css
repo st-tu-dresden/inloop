@@ -4,6 +4,10 @@
   }
 }
 
+a {
+  color: red;
+}
+
 html {
   position: relative;
   min-height: 100%;
