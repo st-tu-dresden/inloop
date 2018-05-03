@@ -169,4 +169,4 @@ class DockerTestRunner:
             # exit codes set exclusively by the Docker daemon
             LOG.error("docker failure (rc=%d): %s", rc, stderr)
 
-        return (rc, stdout, stderr)
+        return rc, stdout, stderr
