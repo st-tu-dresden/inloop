@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<ol class="breadcrumb">
+<ol class="breadcrumb colorful-nav">
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li class="active">{{ task.title }}</li>
