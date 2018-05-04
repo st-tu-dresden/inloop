@@ -11,7 +11,7 @@
 
 {% if categories %}
   <table class="table table-align-pretty">
-    <thead class="thead-">
+    <thead>
     <tr>
       <th>Category</th>
       <th>Progress</th>
@@ -31,15 +31,9 @@
       <td>{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
       <td>
         <div class="progress">
-            {% if category_data.num_completed != category_data.num_published %}
-          <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
               aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
           </div><!--/.progress-bar-->
-            {% else %}
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
-              aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
-          </div><!--/.progress-bar-->
-            {% endif %}
         </div><!--/.progress-->
       </td>
       <td>
