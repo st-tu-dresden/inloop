@@ -225,3 +225,40 @@ code {
   z-index: 0;
   border: none;
 }
+
+.breadcrumb.colorful-nav {
+  background-color: #3c40c6;
+  border-radius: 0px 0px 8px 8px;
+}
+
+.breadcrumb.colorful-nav * {
+  color: white;
+}
+
+.no-margin-below {
+  margin-bottom: 0px;
+}
+
+.add-margin-top {
+  margin-top: 20px;
+}
+
+.progress-bar-inloop {
+  background: #3c40c6 none repeat-x;
+}
+
+.navigation-bar-inloop {
+  background: #1e272e none repeat-x;
+}
+
+.navigation-bar-inloop * {
+  text-shadow: none !important;
+}
+
+a {
+  color: #3c40c6;
+}
+
+.alert-inloop {
+  background: #3c40c6 none repeat-x;
+}
