@@ -227,7 +227,7 @@ code {
 }
 
 .breadcrumb.colorful-nav {
-  background-color: #3c40c6;
+  background-color: #3867d6;
   border-radius: 0px 0px 8px 8px;
 }
 
@@ -244,7 +244,7 @@ code {
 }
 
 .progress-bar-inloop {
-  background: #3c40c6 none repeat-x;
+  background: #3867d6 none repeat-x;
 }
 
 .navigation-bar-inloop {
@@ -256,9 +256,13 @@ code {
 }
 
 a {
-  color: #3c40c6;
+  color: #3867d6;
 }
 
 .alert-inloop {
-  background: #3c40c6 none repeat-x;
+  background: #3867d6 none repeat-x;
+}
+
+code {
+  color: #3867d6;
 }
