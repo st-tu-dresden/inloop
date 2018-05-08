@@ -120,15 +120,9 @@ code {
 
 /* Upload form */
 #uploadBtn {
-  position: absolute;
   opacity: 0;
   filter: alpha(opacity=0);
   cursor: pointer;
-}
-
-#uploadBtn,
-#uploadFiles {
-  width: 180px;
 }
 
 /* @begin solution list view styles */
@@ -228,19 +222,11 @@ code {
 
 .breadcrumb.colorful-nav {
   background-color: #3867d6;
-  border-radius: 0px 0px 8px 8px;
+  border-radius: 8px 8px 8px 8px;
 }
 
 .breadcrumb.colorful-nav * {
   color: white;
-}
-
-.no-margin-below {
-  margin-bottom: 0px;
-}
-
-.add-margin-top {
-  margin-top: 20px;
 }
 
 .progress-bar-inloop {
@@ -265,4 +251,27 @@ a {
 
 code {
   color: #3867d6;
+}
+
+/* Dropzone Style */
+.upload-drop-zone {
+  height: 200px;
+  border-width: 2px;
+  margin-bottom: 20px;
+}
+
+.upload-drop-zone {
+  color: #ccc;
+  border: dashed #3867d6;
+  line-height: 200px;
+  text-align: center
+}
+.upload-drop-zone.drop {
+  color: #222;
+  border-color: #222;
+}
+
+.full {
+  width: 100%;
+  height: 100%;
 }
