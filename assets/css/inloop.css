@@ -238,7 +238,7 @@ code {
 }
 
 .navigation-bar-inloop * {
-  text-shadow: none !important;
+  text-shadow: none;
 }
 
 a {
