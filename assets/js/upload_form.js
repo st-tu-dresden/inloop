@@ -1,6 +1,6 @@
 function displayText(files) {
   if (files.length > 1) {
-    return "[" + files.length + " files selected]";
+    return files.length + " files selected";
   } else if (files.length == 1) {
     return files[0].name;
   }
@@ -8,5 +8,7 @@ function displayText(files) {
 }
 
 document.getElementById("uploadBtn").addEventListener("change", function () {
-  document.getElementById("uploadFiles").value = displayText(this.files);
+  document.getElementById("submit").submit();
 });
+
+

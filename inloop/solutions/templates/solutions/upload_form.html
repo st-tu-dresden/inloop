@@ -9,15 +9,12 @@
   To upload more than one file, just click <i>Choose files...</i> and mark multiple files by holding
   down <kbd>ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
 </p>
-<form class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
+<form id="submit" class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
-  <div class="form-group">
-    <input id="uploadBtn" class="form-control" name="uploads" type="file" multiple>
-    <input id="uploadFiles" type="text" disabled="disabled" placeholder="Choose files..." />
-  </div>
-  <div class="form-group">
-    <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+  <div class="form-group upload-drop-zone" style="position: relative; width: 100%">
+    <input id="uploadBtn" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
+    <label id="uploadFiles" for="uploads">Choose files...</label>
   </div>
 </form>
 {% else %}
