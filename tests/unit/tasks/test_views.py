@@ -18,7 +18,9 @@ class IndexViewTest(SimpleAccountsData, TaskData, TestCase):
         self.assertContains(self.response, self.unpublished_task2.title)
 
     def test_task_styling(self):
-        print(self.response.rendered_content)
+        html = str(self.response.rendered_content)
+        self.assertTrue("<tr style=\"color: lightgrey;\"" in html)
+        self.assertTrue("<tr>" in html)
 
 
 class TaskDetailViewTest(SimpleAccountsData, TaskData, TestCase):
