@@ -1,18 +1,85 @@
 from pathlib import Path
 from unittest import TestCase
 
-from inloop.solutions.prettyprint import junit
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+from defusedxml import ElementTree
+
+from inloop.solutions.prettyprint import tools
+from inloop.solutions.prettyprint.tools import (context_from_xml_strings,
+                                                element_tree_to_dict, extract_items_by_key)
+
+SAMPLE_DATA = [
+    {'version': '8.9'},
+    {
+        'tag': 'checkstyle',
+        'attrib': {'version': '8.9'},
+        'text': '\n',
+        'children': [
+            {
+                'tag': 'file',
+                'attrib': {'name': '/checker/input/Book.java'},
+                'text': '\n',
+                'children': [
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '0',
+                            'severity': 'error',
+                            'message': 'File does not end with a newline.',
+                            'source': 'checks.NewlineAtEndOfFileCheck'
+                        },
+                        'text': None,
+                        'children': []
+                    },
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '1',
+                            'column': '9',
+                            'severity': 'warning',
+                            'message': "Name 'U01.src' must match pattern"
+                                      " '^[a-z]+(\\.[a-z][a-z0-9]{1,})*$'.",
+                            'source': 'checks.naming.PackageNameCheck'
+                        },
+                        'text': None,
+                        'children': []
+                    },
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '1',
+                            'column': '17',
+                            'severity': 'error',
+                            'message': "';' is not followed by whitespace.",
+                            'source': 'checks.whitespace.WhitespaceAfterCheck'},
+                        'text': None,
+                        'children': []
+                    }
+                ]
+            }
+        ]
+    }
+]
 
 SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
 with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
-    SAMPLE_XML = fp.read()
+    SAMPLE_XML_JUNIT = fp.read()
+with SAMPLES_PATH.joinpath("Checkstyle.xml").open() as fp:
+    SAMPLE_XML_CHECKSTYLE = fp.read()
 with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
     MALICIOUS_XML = fp.read()
+with SAMPLES_PATH.joinpath("Fibonacci.java").open() as fp:
+    SAMPLE_JAVA_FILE = SimpleUploadedFile(
+        "Fibonacci.java",
+        str.encode(fp.read()),
+        content_type="text/plain"
+    )
 
 
 class JUnitXMLTests(TestCase):
     def setUp(self):
-        self.ts = junit.xml_to_dict(SAMPLE_XML)
+        self.ts = tools.xml_to_dict(SAMPLE_XML_JUNIT)
 
     def test_sample_outputs(self):
         self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
@@ -49,10 +116,10 @@ class JUnitXMLTests(TestCase):
 
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
-            junit.xml_to_dict("<invalid-root />")
+            tools.xml_to_dict("<invalid-root />")
 
     def test_no_testcases(self):
-        ts = junit.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
+        ts = tools.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
         self.assertEqual(len(ts["testcases"]), 0)
 
     def test_missing_systemerr_or_systemout(self):
@@ -62,11 +129,61 @@ class JUnitXMLTests(TestCase):
             "<testsuite></testsuite>",
         ]
         for document in documents:
-            ts = junit.xml_to_dict(document)
+            ts = tools.xml_to_dict(document)
             self.assertEqual(len(ts["testcases"]), 0)
 
 
 class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):
         with self.assertRaises(ValueError):
-            junit.xml_to_dict(MALICIOUS_XML)
+            tools.xml_to_dict(MALICIOUS_XML)
+
+
+class CheckstyleXMLTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.xml_strings_context = context_from_xml_strings(
+            xml_strings=[SAMPLE_XML_CHECKSTYLE], filter_keys=[]
+        )
+
+    def test_extract(self):
+        data = extract_items_by_key(data=SAMPLE_DATA, key="file")
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["tag"], "file")
+        self.assertEqual(len(data[0]["children"]), 3)
+
+    def test_to_dict(self):
+        element_tree = ElementTree.fromstring(SAMPLE_XML_CHECKSTYLE)
+        dictionary1 = element_tree_to_dict(
+            element_tree,
+            filter_keys=[]
+        )
+        dictionary2 = dictionary = element_tree_to_dict(
+            element_tree,
+            filter_keys=None
+        )
+        for dictionary in [dictionary1, dictionary2]:
+            self.assertTrue(isinstance(dictionary, dict))
+            self.assertEqual(dictionary["tag"], "checkstyle")
+            self.assertTrue(len(dictionary["children"]) > 0)
+            self.assertEqual(dictionary["attrib"]["version"], "8.9")
+
+    def test_extract_none(self):
+        data1 = extract_items_by_key(data=None, key=None)
+        data2 = extract_items_by_key(data=SAMPLE_DATA, key=None)
+        data3 = extract_items_by_key(data=None, key="file")
+        for data in [data1, data2, data3]:
+            self.assertEqual(data, [])
+
+    def test_etree_empty_args(self):
+        try:
+            element_tree_to_dict(None, filter_keys=[])
+            self.fail("Should throw AttributeError if init. with None")
+        except AttributeError:
+            pass
+
+    def test_xml_parsing(self):
+        contents = str(self.xml_strings_context)
+        self.assertTrue("'if' is not preceded with whitespace." in contents)
+        self.assertTrue("'{' at column 52 should have line break after." in contents)
+        self.assertTrue("';' is not followed by whitespace." in contents)
