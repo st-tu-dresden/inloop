@@ -7,10 +7,9 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint.tools import (XMLContextParser as Parser,
-                                                assign_code_to_errors, assign_grouped_errors,
-                                                assign_sources_to_files, checkeroutput_filter,
-                                                remove_input_path, xml_to_dict)
+from inloop.solutions.prettyprint.tools import (CheckstyleData, checkeroutput_filter,
+                                                context_from_xml_strings,
+                                                xml_strings_from_testoutput, xml_to_dict)
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
@@ -100,39 +99,31 @@ class SolutionDetailView(LoginRequiredMixin, View):
             )
             return redirect("solutions:list", slug=solution.task.slug)
 
-        # TODO: PrettyPrinters should be configurable (for now, we only have one for JUnit)
         result = solution.testresult_set.last()
 
         xml_reports_junit = checkeroutput_filter(result.testoutput_set)
         testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
 
-        parser = Parser(solution=solution)
-        checkstyle_context = parser.context(
+        xml_strings_checkstyle = xml_strings_from_testoutput(
+            testoutput_set=result.testoutput_set,
             startswith="checkstyle_errors",
-            endswith=".xml",
+            endswith=".xml"
+        )
+
+        checkstyle_context = context_from_xml_strings(
+            xml_strings=xml_strings_checkstyle,
             filter_keys=[]
         )
 
-        checkstyle_files = Parser.extract(data=checkstyle_context["data"], key="file")
-        checkstyle_files = assign_sources_to_files(checkstyle_files, solution)
-        checkstyle_files = assign_code_to_errors(checkstyle_files)
-        checkstyle_files = assign_grouped_errors(checkstyle_files)
-        checkstyle_files = remove_input_path(checkstyle_files)
-        total_checkstyle_errors = sum(
-            [len(file["checkstyle_errors"]) for file in checkstyle_files]
-        )
-        total_checkstyle_warnings = sum(
-            [len(file["checkstyle_warnings"]) for file in checkstyle_files]
+        checkstyle_data = CheckstyleData(
+            checkstyle_context, solution.solutionfile_set.all()
         )
 
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
-            'checkstyle_files': checkstyle_files,
-            'total_checkstyle_errors': total_checkstyle_errors,
-            'total_checkstyle_warnings': total_checkstyle_warnings,
-            'solution_files': solution.solutionfile_set.all(),
+            'checkstyle_data': checkstyle_data,
             'files': solution.solutionfile_set.all(),
         }
         context.update(self.get_context_data())

@@ -207,7 +207,7 @@ code {
 /* @end */
 
 .no-pad {
-  padding: 0px;
+  padding: 0;
 }
 
 .bottom-spaced {
@@ -215,7 +215,7 @@ code {
 }
 
 .below-panel {
-  margin-bottom: 0px;
+  margin-bottom: 0;
   z-index: 0;
   border: none;
 }
@@ -282,4 +282,18 @@ code {
 
 .darken-logo:hover {
   filter: brightness(1.0);
+.no-margin-top {
+  margin-top: 0;
+}
+
+.annotation-badge {
+  position: relative;
+  top: -0.5em;
+  font-size: 50%;
+}
+
+.error-panel {
+  margin-bottom: 0px;
+  z-index: 0;
+  border: none;
 }
