@@ -120,15 +120,9 @@ code {
 
 /* Upload form */
 #uploadBtn {
-  position: absolute;
   opacity: 0;
   filter: alpha(opacity=0);
   cursor: pointer;
-}
-
-#uploadBtn,
-#uploadFiles {
-  width: 180px;
 }
 
 /* @begin solution list view styles */
@@ -203,3 +197,103 @@ code {
   padding: 0 2rem;
 }
 /* @end */
+
+/* @begin Badge superscript style*/
+.superscript {
+  position: relative;
+  top: -0.5em;
+  font-size: 50%;
+}
+/* @end */
+
+.no-pad {
+  padding: 0;
+}
+
+.bottom-spaced {
+  margin-bottom: 10px;
+}
+
+.below-panel {
+  margin-bottom: 0;
+  z-index: 0;
+  border: none;
+}
+
+.breadcrumb.colorful-nav {
+  background-color: #3867d6;
+  border-radius: 8px 8px 8px 8px;
+}
+
+.breadcrumb.colorful-nav * {
+  color: white;
+}
+
+.progress-bar-inloop {
+  background: #3867d6 none repeat-x;
+}
+
+.navigation-bar-inloop {
+  background: #1e272e none repeat-x;
+}
+
+.navigation-bar-inloop * {
+  text-shadow: none;
+}
+
+a {
+  color: #3867d6;
+}
+
+.alert-inloop {
+  background: #3867d6 none repeat-x;
+}
+
+code {
+  color: #3867d6;
+}
+
+/* Dropzone Style */
+.upload-drop-zone {
+  height: 200px;
+  border-width: 2px;
+  margin-bottom: 20px;
+}
+
+.upload-drop-zone {
+  color: #ccc;
+  border: dashed #3867d6;
+  line-height: 200px;
+  text-align: center
+}
+.upload-drop-zone.drop {
+  color: #222;
+  border-color: #222;
+}
+
+.full {
+  width: 100%;
+  height: 100%;
+}
+
+.darken-logo {
+  filter: brightness(0.75);
+}
+
+.darken-logo:hover {
+  filter: brightness(1.0);
+.no-margin-top {
+  margin-top: 0;
+}
+
+.annotation-badge {
+  position: relative;
+  top: -0.5em;
+  font-size: 50%;
+}
+
+.error-panel {
+  margin-bottom: 0px;
+  z-index: 0;
+  border: none;
+}

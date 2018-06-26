@@ -6,12 +6,21 @@ from tests.unit.tasks.mixins import TaskData
 
 
 class IndexViewTest(SimpleAccountsData, TaskData, TestCase):
-    def test_task_visibility(self):
+    def setUp(self):
         url = reverse("tasks:category", kwargs={"slug": self.category1.slug})
         self.assertTrue(self.client.login(username="bob", password="secret"))
-        response = self.client.get(url, follow=True)
-        self.assertContains(response, self.published_task1.title)
-        self.assertNotContains(response, self.unpublished_task1.title)
+        self.response = self.client.get(url, follow=True)
+
+    def test_task_visibility(self):
+        self.assertContains(self.response, self.published_task1.title)
+        self.assertContains(self.response, self.published_task2.title)
+        self.assertContains(self.response, self.unpublished_task1.title)
+        self.assertContains(self.response, self.unpublished_task2.title)
+
+    def test_task_styling(self):
+        html = str(self.response.rendered_content)
+        self.assertTrue("<tr style=\"color: lightgrey;\"" in html)
+        self.assertTrue("<tr>" in html)
 
 
 class TaskDetailViewTest(SimpleAccountsData, TaskData, TestCase):

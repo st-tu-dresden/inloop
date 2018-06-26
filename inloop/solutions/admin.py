@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from inloop.solutions.models import Solution, SolutionFile
+from inloop.solutions.statistics.tools import Statistics
 
 
 class SolutionFileInline(admin.StackedInline):
@@ -11,6 +12,7 @@ class SolutionFileInline(admin.StackedInline):
 
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
+    change_list_template = "admin/solutions/solutions.html"
     inlines = [
         SolutionFileInline
     ]
@@ -26,6 +28,18 @@ class SolutionAdmin(admin.ModelAdmin):
 
     def site_link(self, obj):
         return '<a href="%s">%s details</a>' % (obj.get_absolute_url(), obj)
+
+    def changelist_view(self, request, extra_context=None):
+        # Filter our admin view by the selected viewport filter
+        solutions = Solution.objects.filter(**request.GET.dict())
+
+        statistics = Statistics(solutions)
+
+        extra = {
+            'statistics': statistics,
+        }
+        extra.update(extra_context or {})
+        return super(SolutionAdmin, self).changelist_view(request, extra_context=extra)
 
     site_link.allow_tags = True
     site_link.short_description = "View on site"
