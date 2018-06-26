@@ -76,6 +76,59 @@ with SAMPLES_PATH.joinpath("Fibonacci.java").open() as fp:
         content_type="text/plain"
     )
 
+SAMPLE_DATA = [
+    {'version': '8.9'},
+    {
+        'tag': 'checkstyle',
+        'attrib': {'version': '8.9'},
+        'text': '\n',
+        'children': [
+            {
+                'tag': 'file',
+                'attrib': {'name': '/checker/input/Book.java'},
+                'text': '\n',
+                'children': [
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '0',
+                            'severity': 'error',
+                            'message': 'File does not end with a newline.',
+                            'source': 'checks.NewlineAtEndOfFileCheck'
+                        },
+                        'text': None,
+                        'children': []
+                    },
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '1',
+                            'column': '9',
+                            'severity': 'warning',
+                            'message': "Name 'U01.src' must match pattern"
+                                      " '^[a-z]+(\\.[a-z][a-z0-9]{1,})*$'.",
+                            'source': 'checks.naming.PackageNameCheck'
+                        },
+                        'text': None,
+                        'children': []
+                    },
+                    {
+                        'tag': 'error',
+                        'attrib': {
+                            'line': '1',
+                            'column': '17',
+                            'severity': 'error',
+                            'message': "';' is not followed by whitespace.",
+                            'source': 'checks.whitespace.WhitespaceAfterCheck'},
+                        'text': None,
+                        'children': []
+                    }
+                ]
+            }
+        ]
+    }
+]
+
 
 class JUnitXMLTests(TestCase):
     def setUp(self):
