@@ -71,28 +71,28 @@
     </p>
     {% if checkstyle_data.total_issues == 0 %}
     <div class="alert alert-success">
-        <h1 class="no-margin-top">Perfect! 😍</h1>
+        <h1 class="no-margin-top">Code Quality: A+</h1>
         We detected no style issues with the code you submitted. Well done!
-    {% elif checkstyle_data.total_issues < 2 %}
-    <div class="alert alert-info">
-        <h1 class="no-margin-top">Almost perfect! 😎</h1>
-        Your code is beautiful, but there are some issues. Go to the style issues tab to identify them.
     {% elif checkstyle_data.total_issues < 5 %}
+    <div class="alert alert-info">
+        <h1 class="no-margin-top">Code Quality: A</h1>
+        Your code is looking very good, but there are some issues. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 15 %}
     <div class="alert alert-warning">
-        <h1 class="no-margin-top">Good! 😇</h1>
-        Your submission is of good quality, but there are some issues. Go to the style issues tab to identify them.
-    {% elif checkstyle_data.total_issues < 10 %}
+        <h1 class="no-margin-top">Code Quality: B</h1>
+        Your submission has good quality, but there are some issues. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 30 %}
     <div class="alert alert-warning">
-        <h1 class="no-margin-top">Well... 😬</h1>
-        You should look over your code again. We detected multiple code style issues with your files. Go to the style issues tab to identify them.
-    {% elif checkstyle_data.total_issues < 20 %}
+        <h1 class="no-margin-top">Code Quality: C</h1>
+        You should look over your code again. We detected various code style issues with your files. Go to the style issues tab to identify them.
+    {% elif checkstyle_data.total_issues < 60 %}
     <div class="alert alert-danger">
-        <h1 class="no-margin-top">Not so good... 😕</h1>
-        Your code works, but you should definitely look over it again. There are many code style issues with your files. Go to the style issues tab to identify them. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+        <h1 class="no-margin-top">Code Quality: C-</h1>
+        Your code compiles, but you should definitely look over it again. There are many code style issues with your files. Go to the style issues tab to identify them. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
     {% else %}
     <div class="alert alert-danger">
-        <h1 class="no-margin-top">Sad... 😨</h1>
-        Whoops! In a later revision of INLOOP, we could deny your solution, since it has too many code style issues. Try looking over your code and resubmitting it again. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
+        <h1 class="no-margin-top">Code Quality: D</h1>
+        Your code was able to compile, but you should try looking over your code and resubmitting it again. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
     {% endif %}
 
     </div>
