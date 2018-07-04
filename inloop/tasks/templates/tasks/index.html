@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<ol class="breadcrumb">
+<ol class="breadcrumb colorful-nav">
   <li class="active">Tasks</li>
 </ol>
 
@@ -31,7 +31,7 @@
       <td>{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
       <td>
         <div class="progress">
-          <div class="progress-bar" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
+          <div class="progress-bar progress-bar-inloop" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
               aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
           </div><!--/.progress-bar-->
         </div><!--/.progress-->
@@ -59,7 +59,7 @@
       <td style="color: lightgrey">{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
       <td>
         <div style="color: lightgrey" class="progress">
-          <div class="progress-bar" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
+          <div class="progress-bar progress-bar-inloop" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
               aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
           </div><!--/.progress-bar-->
         </div><!--/.progress-->
