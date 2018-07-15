@@ -19,9 +19,10 @@ class Category(models.Model):
     display_order = models.IntegerField(default=0, help_text="Display order (lower values first)")
     description = models.TextField(default="", help_text="Short category description")
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     def completion_info(self, user):
         return self.task_set.completion_info(user)
