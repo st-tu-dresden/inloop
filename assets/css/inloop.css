@@ -282,6 +282,8 @@ code {
 
 .darken-logo:hover {
   filter: brightness(1.0);
+}
+
 .no-margin-top {
   margin-top: 0;
 }
