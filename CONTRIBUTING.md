@@ -39,6 +39,20 @@ Apply the following configuration to your local Git clone of INLOOP:
     git config pull.rebase true
 
 
+## Python dependency upgrades
+
+This project uses `pipenv` to manage Python dependencies. The tool reads and saves
+requirements from and to `Pipfile` and `Pipfile.lock` files.
+
+* You can check the currently pinned dependency versions (in `Pipfile.lock`) for known
+  security vulnerabilities using `pipenv check`.
+* Other than that, you can use `pip` to check for outdated versions in general with
+  `pipenv run pip list -o`.
+* Use `pipenv update --dev` to update all dependencies. Afterwards, commit the updated
+  `Pipfile.lock` (and `Pipfile`, if changed) to the Git repository. (Please do not mix
+  changes unrelated to the upgrade into the commit.)
+
+
 ## Rules for contributing code
 
 In general, do one thing at a time and don't bite off more than you can chew. Long living
@@ -69,6 +83,7 @@ messages][good-commits2]. Put as much effort into your commit messages as into y
 other people will appreciate it.
 
 Pull requests containing [unhelpful commit messages][ugly-commits] won't be accepted.
+
 
 
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
