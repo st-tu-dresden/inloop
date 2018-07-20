@@ -6,6 +6,7 @@ from django.test import TestCase
 
 
 # XXX: this beast needs to split up
+# XXX: override MEDIA_ROOT with a temporary dir (setUp()/tearDown())
 @skip
 class HugeSteamingPileOfCrapMonolithModelTest(TestCase):
     def setUp(self):

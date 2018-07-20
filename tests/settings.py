@@ -17,3 +17,7 @@ CONSTANCE_BACKEND = "tests.backends.ConstanceDictBackend"
 INSTALLED_APPS += [     # noqa
     "tests.unit.context_processors",
 ]
+
+# force tests which do not use @override_settings to fail
+MEDIA_ROOT = None
+REPOSITORY_ROOT = None

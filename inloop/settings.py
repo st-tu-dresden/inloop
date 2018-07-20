@@ -182,7 +182,7 @@ TESTRUNNER_OPTIONS = {
 }
 TESTRUNNER_IMAGE = "inloop-testrunner"
 
-REPOSITORY_ROOT = str(Path(MEDIA_ROOT).joinpath("repository"))
+REPOSITORY_ROOT = str(Path(MEDIA_ROOT) / "repository")
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
