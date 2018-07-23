@@ -1,5 +1,7 @@
 import re
+from unittest import mock
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.db.models import ObjectDoesNotExist
@@ -9,9 +11,11 @@ from django.urls import reverse
 from constance.test import override_config
 
 from inloop.accounts.forms import SignupForm, StudentDetailsForm
-from inloop.accounts.models import Course, StudentDetails
+from inloop.accounts.models import Course, StudentDetails, user_profile_complete
 
 from tests.unit.accounts.mixins import SimpleAccountsData
+
+User = get_user_model()
 
 
 class AccountModelsTest(SimpleAccountsData, TestCase):
@@ -20,6 +24,43 @@ class AccountModelsTest(SimpleAccountsData, TestCase):
         self.assertEqual(str(details), "bob")
         self.assertEqual(str(details.course), "Other")
         self.assertTrue(Course.objects.get(name="Other"))
+
+    def test_profile_complete1(self):
+        """Profile is not complete when related StudentDetails object is missing."""
+        with self.assertRaises(User.studentdetails.RelatedObjectDoesNotExist):
+            self.alice.studentdetails
+        self.assertFalse(user_profile_complete(self.alice))
+
+    def test_profile_complete2(self):
+        """Profile is not complete when matnum, first_name or last_name fields are empty."""
+        StudentDetails.objects.create(user=self.bob)
+        self.assertTrue(self.bob.studentdetails)
+        self.assertFalse(user_profile_complete(self.bob))
+
+    def test_profile_complete3(self):
+        """Profile is complete when matnum, first_name and last_name are not empty."""
+        StudentDetails.objects.create(user=self.bob, matnum="1234567")
+        self.assertTrue(self.bob.studentdetails)
+        self.bob.first_name = "Bob"
+        self.bob.last_name = "Ross"
+        self.bob.save()
+        self.assertTrue(user_profile_complete(self.bob))
+
+    @mock.patch("inloop.accounts.models.messages.warning")
+    def test_profile_complete_signal1(self, mock):
+        """After logging in, no message is displayed for a complete profile."""
+        StudentDetails.objects.create(user=self.bob, matnum="1234567")
+        self.bob.first_name = "Bob"
+        self.bob.lasst_name = "Ross"
+        self.bob.save()
+        self.client.login(username="bob", password="secret")
+        self.assertFalse(mock.called)
+
+    @mock.patch("inloop.accounts.models.messages.warning")
+    def test_profile_complete_signal2(self, mock):
+        """After logging in, a message is displayed for an incomplete profile."""
+        self.client.login(username="bob", password="secret")
+        self.assertTrue(mock.called)
 
 
 class StudentDetailsFormTest(TestCase):

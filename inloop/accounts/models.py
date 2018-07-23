@@ -1,6 +1,34 @@
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.signals import user_logged_in
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import ObjectDoesNotExist
+from django.dispatch import receiver
+from django.urls import reverse
+from django.utils.text import mark_safe
+
+INCOMPLETE_HINT = (
+    "Your user profile is incomplete. To ensure we can award bonus points to you, please "
+    "set your name and matriculation number on <a href=\"%s\">My Profile</a>."
+)
+
+
+@receiver(user_logged_in, dispatch_uid="complete_profile_hint")
+def complete_profile_hint(sender, user, request, **kwargs):
+    """Show logged in users a hint if they do not have a complete profile."""
+    if not user_profile_complete(user):
+        message = mark_safe(INCOMPLETE_HINT % reverse("accounts:profile"))
+        # fail_silently needs to be set for unit tests using RequestFactory
+        messages.warning(request, message, fail_silently=True)
+
+
+def user_profile_complete(user):
+    """Return True if the given user has set matnum, first and last name."""
+    try:
+        return all((user.first_name, user.last_name, user.studentdetails.matnum))
+    except ObjectDoesNotExist:
+        return False
 
 
 class Course(models.Model):
