@@ -3,7 +3,7 @@ TESTENV := PIPENV_DOTENV_LOCATION="$(shell pwd)/tests/.env"
 SOURCES := inloop tests
 
 ifndef TRAVIS
-TESTOPTS := --exclude-tag=slow
+override TESTOPTS += --exclude-tag=slow
 endif
 
 init:

@@ -18,48 +18,57 @@ from tests.unit.accounts.mixins import SimpleAccountsData
 User = get_user_model()
 
 
-class AccountModelsTest(SimpleAccountsData, TestCase):
-    def test_default_callable(self):
-        details = StudentDetails.objects.create(user=self.bob)
-        self.assertEqual(str(details), "bob")
+class AccountModelsTest(TestCase):
+    def setUp(self):
+        """Create a fresh user object for each test, so we can modify it."""
+        super().setUp()
+        self.sarah = User.objects.create_user(
+            username="sarah",
+            email="sarah@example.org",
+            password="secret"
+        )
+
+    def test_course_default(self):
+        details = StudentDetails.objects.create(user=self.sarah)
+        self.assertEqual(str(details), "sarah")
         self.assertEqual(str(details.course), "Other")
         self.assertTrue(Course.objects.get(name="Other"))
 
     def test_profile_complete1(self):
         """Profile is not complete when related StudentDetails object is missing."""
         with self.assertRaises(User.studentdetails.RelatedObjectDoesNotExist):
-            self.alice.studentdetails
-        self.assertFalse(user_profile_complete(self.alice))
+            self.sarah.studentdetails
+        self.assertFalse(user_profile_complete(self.sarah))
 
     def test_profile_complete2(self):
         """Profile is not complete when matnum, first_name or last_name fields are empty."""
-        StudentDetails.objects.create(user=self.bob)
-        self.assertTrue(self.bob.studentdetails)
-        self.assertFalse(user_profile_complete(self.bob))
+        StudentDetails.objects.create(user=self.sarah)
+        self.assertTrue(self.sarah.studentdetails)
+        self.assertFalse(user_profile_complete(self.sarah))
 
     def test_profile_complete3(self):
         """Profile is complete when matnum, first_name and last_name are not empty."""
-        StudentDetails.objects.create(user=self.bob, matnum="1234567")
-        self.assertTrue(self.bob.studentdetails)
-        self.bob.first_name = "Bob"
-        self.bob.last_name = "Ross"
-        self.bob.save()
-        self.assertTrue(user_profile_complete(self.bob))
+        StudentDetails.objects.create(user=self.sarah, matnum="1234567")
+        self.assertTrue(self.sarah.studentdetails)
+        self.sarah.first_name = "Sarah"
+        self.sarah.last_name = "Connor"
+        self.sarah.save()
+        self.assertTrue(user_profile_complete(self.sarah))
 
     @mock.patch("inloop.accounts.models.messages.warning")
     def test_profile_complete_signal1(self, mock):
         """After logging in, no message is displayed for a complete profile."""
-        StudentDetails.objects.create(user=self.bob, matnum="1234567")
-        self.bob.first_name = "Bob"
-        self.bob.lasst_name = "Ross"
-        self.bob.save()
-        self.client.login(username="bob", password="secret")
+        StudentDetails.objects.create(user=self.sarah, matnum="1234567")
+        self.sarah.first_name = "Sarah"
+        self.sarah.last_name = "Connor"
+        self.sarah.save()
+        self.client.login(username="sarah", password="secret")
         self.assertFalse(mock.called)
 
     @mock.patch("inloop.accounts.models.messages.warning")
     def test_profile_complete_signal2(self, mock):
         """After logging in, a message is displayed for an incomplete profile."""
-        self.client.login(username="bob", password="secret")
+        self.client.login(username="sarah", password="secret")
         self.assertTrue(mock.called)
 
 
