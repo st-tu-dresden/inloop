@@ -1,5 +1,6 @@
 IMAGE   := inloop-integration-test
 TESTENV := PIPENV_DOTENV_LOCATION="$(shell pwd)/tests/.env"
+SOURCES := inloop tests
 
 ifndef TRAVIS
 TESTOPTS := --exclude-tag=slow
@@ -23,6 +24,6 @@ coverage:
 	pipenv run coverage report
 
 lint:
-	pipenv run $(SHELL) -c 'isort --quiet --check-only && flake8'
+	pipenv run $(SHELL) -c 'isort --check-only --recursive $(SOURCES) && flake8 $(SOURCES)'
 
 .PHONY: init loaddb test coverage lint
