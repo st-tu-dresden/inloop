@@ -60,7 +60,7 @@ class AccountModelsTest(TestCase):
         """After logging in, no message is displayed for a complete profile."""
         StudentDetails.objects.create(user=self.sarah, matnum="1234567")
         self.sarah.first_name = "Sarah"
-        self.sarah.lasst_name = "Connor"
+        self.sarah.last_name = "Connor"
         self.sarah.save()
         self.client.login(username="sarah", password="secret")
         self.assertFalse(mock.called)
