@@ -1,6 +1,9 @@
 """
 Mixins for setting up test account data in unit tests.
 
+The test data will be initialized ONCE for each test class and
+MUST NOT be modified by the tests.
+
 By convention, every password is set to "secret".
 """
 
