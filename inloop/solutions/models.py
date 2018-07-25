@@ -95,13 +95,19 @@ class Solution(models.Model):
         return "pending"
 
     @atomic
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         if not self.scoped_id:
             current_max = Solution.objects.filter(
                 author=self.author, task=self.task
             ).aggregate(Max("scoped_id"))["scoped_id__max"]
             self.scoped_id = (current_max or 0) + 1
-        return super().save(*args, **kwargs)
+        return super().save(
+            force_insert,
+            force_update,
+            using,
+            update_fields
+        )
 
     def __repr__(self):
         return "<%s: id=%r author=%r task=%r>" % \
