@@ -55,21 +55,21 @@ class AccountModelsTest(TestCase):
         self.sarah.save()
         self.assertTrue(user_profile_complete(self.sarah))
 
-    @mock.patch("inloop.accounts.models.messages.warning")
-    def test_profile_complete_signal1(self, mock):
+    @mock.patch("inloop.accounts.models.messages")
+    def test_profile_complete_signal1(self, mocked_messages):
         """After logging in, no message is displayed for a complete profile."""
         StudentDetails.objects.create(user=self.sarah, matnum="1234567")
         self.sarah.first_name = "Sarah"
         self.sarah.last_name = "Connor"
         self.sarah.save()
         self.client.login(username="sarah", password="secret")
-        self.assertFalse(mock.called)
+        self.assertFalse(mocked_messages.warning.called)
 
-    @mock.patch("inloop.accounts.models.messages.warning")
-    def test_profile_complete_signal2(self, mock):
+    @mock.patch("inloop.accounts.models.messages")
+    def test_profile_complete_signal2(self, mocked_messages):
         """After logging in, a message is displayed for an incomplete profile."""
         self.client.login(username="sarah", password="secret")
-        self.assertTrue(mock.called)
+        self.assertTrue(mocked_messages.warning.called)
 
 
 class StudentDetailsFormTest(TestCase):
