@@ -16,10 +16,7 @@ public class Fibonacci {
     return a;
     }
 
-    /* This string is just here for testing purposes.
-     * The Checkstyle tests need this string to
-     * work properly. Please do not
-     * modify this string
-     * unless intentionally doing so.
+    /*
+     * This string is just here for testing purposes.
      */
 }

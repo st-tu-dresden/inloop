@@ -3,12 +3,15 @@ Plagiarism detection support using jPlag.
 
 Assumes that the jPlag JAR archive is on the CLASSPATH.
 """
-
 import re
 import subprocess
 from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
+
+from django.conf import settings
+
+from huey.contrib.djhuey import db_task
 
 from inloop.grading.models import save_plagiarism_set
 from inloop.solutions.models import Solution
@@ -16,15 +19,44 @@ from inloop.solutions.models import Solution
 LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
-def jplag_check(users, tasks, min_similarity, result_dir):
-    result_path = Path(result_dir)
-    plagiarism_set = set()
-    for task in tasks:
-        plagiarism_set.update(jplag_check_task(users, task, min_similarity, result_path))
-    save_plagiarism_set(plagiarism_set)
+@db_task()
+def jplag_check_async(
+    users,
+    tasks,
+    min_similarity=settings.JPLAG_SIMILARITY,
+    result_dir=None
+):
+    jplag_check(users, tasks, min_similarity, result_dir)
+
+
+def jplag_check(
+    users,
+    tasks,
+    min_similarity=settings.JPLAG_SIMILARITY,
+    result_dir=None
+):
+    """
+    Check tasks with JPlag.
+
+    Returns:
+        set: The detected plagiarisms
+    """
+    with TemporaryDirectory() as path:
+        path = Path(path if not result_dir else result_dir)
+        plagiarism_set = set()
+        for task in tasks:
+            plagiarism_set.update(jplag_check_task(users, task, min_similarity, path))
+        save_plagiarism_set(plagiarism_set, str(path))
+        return plagiarism_set
 
 
 def jplag_check_task(users, task, min_similarity, result_path):
+    """
+    Check a given task for given users, comparing their solutions
+    and triggering a detected plagiarism when two solutions
+    match to a specified similarity. Store JPlag output in
+    a specified output directory.
+    """
     with TemporaryDirectory() as root_path:
         root_path = Path(root_path)
         last_solutions = get_last_solutions(users, task)
@@ -34,9 +66,16 @@ def jplag_check_task(users, task, min_similarity, result_path):
 
 
 def get_last_solutions(users, task):
+    """
+    Get the last solution of the given users to a specific task.
+    """
     last_solutions = {}
     for user in users:
-        last_solution = Solution.objects.filter(author=user, task=task).last()
+        last_solution = Solution.objects.filter(
+            author=user,
+            task=task,
+            passed=True
+        ).last()
         if last_solution is not None:
             # escape hyphens in usernames with an unused (since
             # disallowed) character, otherwise the usernames cannot
@@ -51,6 +90,9 @@ def prepare_directories(root_path, last_solutions):
 
 
 def parse_output(output, min_similarity, last_solutions):
+    """
+    Parse JPlag output.
+    """
     plagiarism_set = set()
     for match in LINE_REGEX.finditer(output):
         username1, username2, similarity = match.groups()
@@ -62,7 +104,11 @@ def parse_output(output, min_similarity, last_solutions):
 
 
 def exec_jplag(min_similarity, root_path, result_path):
-    args = "java jplag.JPlag -vq -l java17".split()
+    args = ["java"]
+    args += ["-cp", settings.JPLAG_JAR_PATH]
+    args += ["jplag.JPlag"]
+    args += ["-vl"]
+    args += ["-l", "java17"]
     args += ["-m", str(min_similarity)]
     args += ["-r", str(result_path)]
     args += [str(root_path)]

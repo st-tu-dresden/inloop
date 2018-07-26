@@ -18,4 +18,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         users = User.objects.filter(is_staff=False)
         tasks = Task.objects.filter(category__name=options["category_name"])
-        jplag_check(users, tasks, options["similarity"], options["result_dir"])
+        jplag_check(users, tasks, options["similarity"])
