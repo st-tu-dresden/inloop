@@ -31,12 +31,14 @@ def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_d
     Returns:
         A set containing the solutions that have been identified as plagiarism.
     """
-    with TemporaryDirectory() as path:
-        path = Path(path if not result_dir else result_dir)
+    with TemporaryDirectory() as tmpdir:
+        path = Path(tmpdir)
         plagiarism_set = set()
         for task in tasks:
             plagiarism_set.update(jplag_check_task(users, task, min_similarity, path))
         save_plagiarism_set(plagiarism_set, str(path))
+        if result_dir:
+            copytree(str(path), str(result_dir))
         return plagiarism_set
 
 
@@ -47,8 +49,8 @@ def jplag_check_task(users, task, min_similarity, result_path):
     match to a specified similarity. Store JPlag output in
     a specified output directory.
     """
-    with TemporaryDirectory() as root_path:
-        root_path = Path(root_path)
+    with TemporaryDirectory() as tmpdir:
+        root_path = Path(tmpdir)
         last_solutions = get_last_solutions(users, task)
         prepare_directories(root_path, last_solutions)
         output = exec_jplag(min_similarity, root_path, result_path.joinpath(task.slug))

@@ -1,7 +1,7 @@
 import os
 import shutil
-import tempfile
-from tempfile import TemporaryDirectory
+from pathlib import Path
+from tempfile import TemporaryDirectory, mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
@@ -36,7 +36,7 @@ public class Fibonacci {
 }
 """
 
-TEST_MEDIA_ROOT = tempfile.mkdtemp()
+TEST_MEDIA_ROOT = mkdtemp()
 
 
 @tag("slow")
@@ -59,16 +59,27 @@ class JPlagCheckTest(PlagiatedSolutionsData, TestCase):
             file=SimpleUploadedFile('FibonacciAlice.java', FIBONACCI.encode())
         )
 
-    def test_jplag(self):
+    def test_jplag_check_with_resultdir(self):
+        """JPlag check should return the right results when given a result_dir."""
         with TemporaryDirectory() as path:
-            check = jplag_check(
-                min_similarity=100,
+            output = jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.task],
-                result_dir=path
+                min_similarity=100,
+                result_dir=Path(path).joinpath("jplag")
             )
-        self.assertTrue(self.passed_solution_bob in check)
-        self.assertTrue(self.passed_solution_alice in check)
+        self.assertTrue(self.passed_solution_bob in output)
+        self.assertTrue(self.passed_solution_alice in output)
+
+    def test_jplag_check_without_resultdir(self):
+        """JPlag check should return the right results also without result_dir."""
+        output = jplag_check(
+            users=[self.alice, self.bob],
+            tasks=[self.task],
+            min_similarity=100,
+        )
+        self.assertTrue(self.passed_solution_bob in output)
+        self.assertTrue(self.passed_solution_alice in output)
 
     @classmethod
     def tearDownClass(cls):
