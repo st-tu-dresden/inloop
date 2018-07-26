@@ -206,3 +206,6 @@ CONSTANCE_ADDITIONAL_FIELDS.update(accounts_constance.fields)
 
 CONSTANCE_CONFIG.update(gitload_constance.config)
 CONSTANCE_CONFIG_FIELDSETS.update(gitload_constance.fieldsets)
+
+JPLAG_JAR_PATH = str(BASE_DIR / "lib" / "jplag-2.11.9-SNAPSHOT.jar")
+JPLAG_SIMILARITY = 90

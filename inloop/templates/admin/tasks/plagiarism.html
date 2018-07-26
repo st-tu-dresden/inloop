@@ -1,0 +1,24 @@
+{% extends 'admin/change_list.html' %} {% load i18n %}
+{% load staticfiles %}
+
+{% block object-tools %}
+
+    {% if test %}
+
+    <div style="margin-bottom: 75px; background-color: #79aec8; color: #fff; padding: 20px; border-radius: 20px; margin-right: 20px;">
+        Last plagiarism test: {{ test.created_at }} ({{ test.created_at|timesince }} ago) -
+        Detected plagiarisms: {{ test.all_detected_plagiarisms.count }}
+    </div >
+
+    {% endif %}
+
+    {{ block.super }}
+
+{% endblock %}
+
+{% block object-tools-items %}
+    {% if test %}
+        <a style="margin-right: 10px"
+           href="{% url 'admin:grading_plagiarismtest_changelist' %}">Show detected plagiarisms</a>
+    {% endif %}
+{% endblock %}

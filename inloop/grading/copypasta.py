@@ -1,7 +1,7 @@
 """
-Plagiarism detection support using jPlag.
+Plagiarism detection support using JPlag.
 
-Assumes that the jPlag JAR archive is on the CLASSPATH.
+Assumes that the JPlag JAR archive is on the CLASSPATH.
 """
 
 import re
@@ -10,23 +10,63 @@ from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
 
+from django.conf import settings
+
+from huey.contrib.djhuey import db_task
+
 from inloop.grading.models import save_plagiarism_set
 from inloop.solutions.models import Solution
 
 LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
-def jplag_check(users, tasks, min_similarity, result_dir):
-    result_path = Path(result_dir)
-    plagiarism_set = set()
-    for task in tasks:
-        plagiarism_set.update(jplag_check_task(users, task, min_similarity, result_path))
-    save_plagiarism_set(plagiarism_set)
+@db_task()
+def jplag_check_async(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
+    jplag_check(users, tasks, min_similarity, result_dir)
+
+
+def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
+    """
+    Check solutions of the given users for the given tasks with JPlag.
+
+    Args:
+        users: A User queryset.
+        tasks: A Task queryset.
+        min_similarity: Minimum solution similarity after which two solutions
+            shall be regarded as plagiarism (optional).
+        result_dir: Directory where JPlag HTML files shall be saved to (optional).
+            The given directory must not already exist.
+
+    Returns:
+        A set containing the solutions that have been identified as plagiarism.
+    """
+    with TemporaryDirectory() as tmpdir:
+        path = Path(tmpdir)
+        plagiarism_set = set()
+        for task in tasks:
+            plagiarism_set.update(jplag_check_task(users, task, min_similarity, path))
+        save_plagiarism_set(plagiarism_set, str(path))
+        if result_dir:
+            copytree(str(path), str(result_dir))
+        return plagiarism_set
 
 
 def jplag_check_task(users, task, min_similarity, result_path):
-    with TemporaryDirectory() as root_path:
-        root_path = Path(root_path)
+    """
+    Check solutions of the given users for the given single task with JPlag.
+
+    Args:
+        users: A User queryset.
+        task: A Task object.
+        min_similarity: Minimum solution similarity after which two solutions
+            shall be regarded as plagiarism.
+        result_path: Directory where JPlag HTML files shall be saved to (optional).
+
+    Returns:
+        A set containing the solutions that have been identified as plagiarism.
+    """
+    with TemporaryDirectory() as tmpdir:
+        root_path = Path(tmpdir)
         last_solutions = get_last_solutions(users, task)
         prepare_directories(root_path, last_solutions)
         output = exec_jplag(min_similarity, root_path, result_path.joinpath(task.slug))
@@ -34,9 +74,12 @@ def jplag_check_task(users, task, min_similarity, result_path):
 
 
 def get_last_solutions(users, task):
+    """
+    Get the last valid solution of the given users for a given task.
+    """
     last_solutions = {}
     for user in users:
-        last_solution = Solution.objects.filter(author=user, task=task).last()
+        last_solution = Solution.objects.filter(author=user, task=task, passed=True).last()
         if last_solution is not None:
             # escape hyphens in usernames with an unused (since
             # disallowed) character, otherwise the usernames cannot
@@ -46,11 +89,30 @@ def get_last_solutions(users, task):
 
 
 def prepare_directories(root_path, last_solutions):
+    """
+    Copy the given solutions to root_path, using the folder structure expected by JPlag.
+
+    The expected folder structure, for one task, will look like this:
+
+        root_path/
+            user-1/
+                File1.java
+                File2.java
+            user-2/
+                File1.java
+                File2.java
+    """
     for username, last_solution in last_solutions.items():
         copytree(str(last_solution.path), str(root_path.joinpath(username)))
 
 
 def parse_output(output, min_similarity, last_solutions):
+    """
+    Extract plagiarism check results from the given JPlag command line output.
+
+    Returns:
+         A set containing the solutions that have been identified as plagiarism.
+    """
     plagiarism_set = set()
     for match in LINE_REGEX.finditer(output):
         username1, username2, similarity = match.groups()
@@ -62,7 +124,14 @@ def parse_output(output, min_similarity, last_solutions):
 
 
 def exec_jplag(min_similarity, root_path, result_path):
-    args = "java jplag.JPlag -vq -l java17".split()
+    """
+    Execute the JPlag Java program with the given parameters and return its output.
+    """
+    args = ["java"]
+    args += ["-cp", settings.JPLAG_JAR_PATH]
+    args += ["jplag.JPlag"]
+    args += ["-vl"]
+    args += ["-l", "java17"]
     args += ["-m", str(min_similarity)]
     args += ["-r", str(result_path)]
     args += [str(root_path)]
