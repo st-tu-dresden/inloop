@@ -152,9 +152,7 @@ class SolutionFile(models.Model):
 @receiver(post_delete, sender=SolutionFile, dispatch_uid="delete_solutionfile")
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
-    Deletes file from filesystem
-    when corresponding Solution object is deleted.
+    Removes file from filesystem when corresponding Solution object is deleted.
     """
-    if instance.file:
-        if os.path.isfile(instance.file.path):
-            os.remove(instance.file.path)
+    if instance.file and os.path.isfile(instance.file.path):
+        os.remove(instance.file.path)
