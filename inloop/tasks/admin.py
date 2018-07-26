@@ -8,8 +8,7 @@ from inloop.tasks.models import Category, Task
 
 def jplag_check_tasks(modeladmin, request, queryset):
     """
-    Synchronous function to check selected
-    tasks in admin model with JPlag.
+    Synchronous function to check selected tasks in admin model with JPlag.
     """
     users = User.objects.all()
     jplag_check_async(users=users, tasks=queryset)
@@ -20,15 +19,15 @@ def jplag_check_tasks(modeladmin, request, queryset):
 
 def jplag_check_category(modeladmin, request, queryset):
     """
-    Synchronous convenience function to check selected topics
-    in the admin model with JPlag.
+    Synchronous convenience function to check selected categories in the
+    admin model with JPlag.
     """
     tasks = Task.objects.filter(category__in=queryset)
     jplag_check_tasks(modeladmin, request, tasks)
 
 
-jplag_check_tasks.short_description = 'Check tasks for Plagiarisms'
-jplag_check_category.short_description = 'Check category for Plagiarisms'
+jplag_check_tasks.short_description = 'Check tasks for plagiarism'
+jplag_check_category.short_description = 'Check category for plagiarism'
 
 
 @admin.register(Task)

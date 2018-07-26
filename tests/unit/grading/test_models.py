@@ -4,9 +4,6 @@ from tests.unit.grading.mixins import DetectedPlagiarismData
 
 
 class GradingModelsTest(DetectedPlagiarismData, TestCase):
-    def setUp(self):
-        super().setUp()
-
     def test_all_detected_plagiarisms_property(self):
         self.assertTrue(
             self.detected_plagiarism_alice

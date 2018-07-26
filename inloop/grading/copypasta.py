@@ -20,26 +20,16 @@ LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
 @db_task()
-def jplag_check_async(
-    users,
-    tasks,
-    min_similarity=settings.JPLAG_SIMILARITY,
-    result_dir=None
-):
+def jplag_check_async(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
     jplag_check(users, tasks, min_similarity, result_dir)
 
 
-def jplag_check(
-    users,
-    tasks,
-    min_similarity=settings.JPLAG_SIMILARITY,
-    result_dir=None
-):
+def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
     """
     Check tasks with JPlag.
 
     Returns:
-        set: The detected plagiarisms
+        A set containing the solutions that have been identified as plagiarism.
     """
     with TemporaryDirectory() as path:
         path = Path(path if not result_dir else result_dir)
@@ -67,15 +57,11 @@ def jplag_check_task(users, task, min_similarity, result_path):
 
 def get_last_solutions(users, task):
     """
-    Get the last solution of the given users to a specific task.
+    Get the last valid solution of the given users for a given task.
     """
     last_solutions = {}
     for user in users:
-        last_solution = Solution.objects.filter(
-            author=user,
-            task=task,
-            passed=True
-        ).last()
+        last_solution = Solution.objects.filter(author=user, task=task, passed=True).last()
         if last_solution is not None:
             # escape hyphens in usernames with an unused (since
             # disallowed) character, otherwise the usernames cannot
@@ -104,6 +90,9 @@ def parse_output(output, min_similarity, last_solutions):
 
 
 def exec_jplag(min_similarity, root_path, result_path):
+    """
+    Execute the JPlag Java program with the given parameters and return its output.
+    """
     args = ["java"]
     args += ["-cp", settings.JPLAG_JAR_PATH]
     args += ["jplag.JPlag"]

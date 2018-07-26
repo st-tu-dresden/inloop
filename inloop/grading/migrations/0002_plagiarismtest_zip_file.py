@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='plagiarismtest',
             name='zip_file',
-            field=models.FileField(null=True, upload_to=inloop.grading.models.get_upload_path),
+            field=models.FileField(null=True, upload_to=inloop.grading.models.zipfile_upload_path),
         ),
     ]

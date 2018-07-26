@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.http import HttpResponse
 
@@ -6,7 +5,9 @@ from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
 
 
 def download_jplag_zip(modeladmin, request, queryset):
-    """Fetch the stored jplag zip file and return it as a download"""
+    """
+    Fetch the stored JPlag zip file and return it as a download.
+    """
     if len(queryset) != 1:
         modeladmin.message_user(
             request, "You can not download more or less than one zip file at a time."
@@ -24,9 +25,7 @@ def download_jplag_zip(modeladmin, request, queryset):
         "identifier": str(test.created_at).replace(' ', '_'),
         "file_type": ".zip",
     })
-    response[
-        "Content-Disposition"
-    ] = attachment
+    response["Content-Disposition"] = attachment
     return response
 
 
@@ -36,6 +35,7 @@ download_jplag_zip.short_description = "Download JPlag output as zip"
 class PlagiarismAdmin(admin.ModelAdmin):
     """
     Convenience model for the plagiarism testing frontend.
+
     Adds a plagiarism test information bar by simple inheritance.
     Can be used by admin models associated with Plagiarism tests,
     such as the Task/Solutions interfaces.
@@ -47,25 +47,17 @@ class PlagiarismAdmin(admin.ModelAdmin):
         extra = {
             'test': last_plagiarism_test,
         }
-        extra.update(extra_context or {})
-        return super(PlagiarismAdmin, self).changelist_view(request, extra_context=extra)
+        if extra_context is not None:
+            extra.update(extra_context)
+        return super().changelist_view(request, extra_context=extra)
 
 
 @admin.register(DetectedPlagiarism)
 class DetectedPlagiarismsAdmin(PlagiarismAdmin):
-    list_display = (
-        'test',
-        'veto',
-    )
+    list_display = ('test', 'veto')
 
 
 @admin.register(PlagiarismTest)
 class PlagiarismTestsAdmin(PlagiarismAdmin):
-    list_display = (
-        'id',
-        'created_at',
-        'command',
-        'all_detected_plagiarisms',
-    )
-
-    actions = [download_jplag_zip]
+    list_display = ('id', 'created_at', 'command', 'all_detected_plagiarisms')
+    actions = (download_jplag_zip,)

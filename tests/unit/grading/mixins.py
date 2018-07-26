@@ -1,5 +1,5 @@
 """
-Mixins for setting up test plagiarism data
+Mixins for setting up test plagiarism test data.
 """
 
 from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
@@ -10,10 +10,6 @@ from tests.unit.solutions.mixins import SimpleTaskData
 
 
 class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):
-    """
-    Set up some solutions.
-    """
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
