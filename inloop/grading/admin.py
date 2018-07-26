@@ -1,3 +1,5 @@
+from os.path import basename
+
 from django.contrib import admin
 from django.http import HttpResponse
 
@@ -10,21 +12,17 @@ def download_jplag_zip(modeladmin, request, queryset):
     """
     if len(queryset) != 1:
         modeladmin.message_user(
-            request, "You can not download more or less than one zip file at a time."
+            request, "You cannot download more or less than one zip file at a time."
         )
         return
-    test = queryset[0]
-    if not test.zip_file:
+    zip_file = queryset[0].zip_file
+    if not zip_file:
         modeladmin.message_user(
             request, "The selected plagiarism test has no downloadable zip file."
         )
-    with open(test.zip_file.path, 'rb') as source:
-        response = HttpResponse(source, content_type='application/zip')
-    attachment = "attachment; filename={prefix}_{identifier}{file_type}".format_map({
-        "prefix": "Jplag_Output",
-        "identifier": str(test.created_at).replace(' ', '_'),
-        "file_type": ".zip",
-    })
+    with open(zip_file.path, "rb") as source:
+        response = HttpResponse(source, content_type="application/zip")
+    attachment = "attachment; filename=%s" % basename(zip_file.path)
     response["Content-Disposition"] = attachment
     return response
 

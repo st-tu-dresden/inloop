@@ -9,12 +9,10 @@ from django.dispatch import receiver
 from inloop.solutions.models import Solution
 
 
-def zipfile_upload_path(obj, filename):
+def zipfile_upload_path(test, filename):
     """Return upload file paths for the PlagiarismTest.zip_file field."""
-    return "plagiarism_tests/{created_at}/{filename}".format_map({
-        "created_at": obj.created_at,
-        "filename": filename,
-    })
+    timestamp = test.created_at.strftime("%Y%m%d-%H%M")
+    return "plagiarism_tests/jplag-results-%s.zip" % timestamp
 
 
 class PlagiarismTest(models.Model):
