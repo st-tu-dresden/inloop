@@ -17,8 +17,8 @@
 {% endblock %}
 
 {% block object-tools-items %}
-
     {% if test %}
-        <a style="margin-right: 10px" href="/admin/grading/plagiarismtest/">Show detected plagiarisms</a>
+        <a style="margin-right: 10px"
+           href="{% url 'admin:grading_plagiarismtest_changelist' %}">Show detected plagiarisms</a>
     {% endif %}
 {% endblock %}
