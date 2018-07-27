@@ -14,7 +14,7 @@ class SolutionFileInline(admin.StackedInline):
 class SolutionAdmin(admin.ModelAdmin):
     class Media:
         css = {
-            "all": []
+            "all": ["css/admin/solutions.css"]
         }
         js = ["js/Chart.min.js"]
 

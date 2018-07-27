@@ -2,29 +2,26 @@
 {% load staticfiles %}
 
 {% block object-tools %}
-    <div style="margin-bottom: 100px;">
-        <h5 style="display:inline-block; background-color: #f3f3f3; padding: 20px; border-radius: 20px; margin-right: 20px;">
-        Passed and Failed Solutions (accumulated)
-        <canvas id="pass-rate-chart" width="300" height="300"></canvas>
-        </h5>
+<div class="solution-stats-container">
+  <div class="solution-stats-box">
+    <h5>Passed and Failed Solutions (accumulated)</h5>
+    <canvas id="pass-rate-chart" width="300" height="300"></canvas>
+  </div>
+  <div class="solution-stats-box">
+    <h5>Solution Submissions</h5>
+    <canvas id="submission-dates-chart" width="620" height="300"></canvas>
+  </div>
+  <div class="solution-stats-box">
+    <h5>Tries Until Solution Passes</h5>
+    <canvas id="tries-chart" width="620" height="300"></canvas>
+  </div>
+  <div class="solution-stats-box">
+    <h5>Hotspot Tasks</h5>
+    <canvas id="hotspot-chart" width="300" height="300"></canvas>
+  </div>
+</div>
 
-        <h5 style="display:inline-block; background-color: #f3f3f3; padding: 20px; border-radius: 20px; margin-right: 20px;">
-        Solution Submissions
-        <canvas id="submission-dates-chart" width="620" height="300"></canvas>
-        </h5>
-
-        <h5 style="display:inline-block; background-color: #f3f3f3; padding: 20px; border-radius: 20px; margin-right: 20px;">
-        Tries Until Solution Passes
-        <canvas id="tries-chart" width="620" height="300"></canvas>
-        </h5>
-
-        <h5 style="display:inline-block; background-color: #f3f3f3; padding: 20px; border-radius: 20px; margin-right: 20px;">
-        Hotspot Tasks
-        <canvas id="hotspot-chart" width="300" height="300"></canvas>
-        </h5>
-    </div>
-
-    {{ block.super }}
+{{ block.super }}
 
     <script type="text/javascript">
     var passRateChartElement = document.getElementById("pass-rate-chart").getContext('2d');
