@@ -1,5 +1,4 @@
 {% extends 'admin/change_list.html' %}
-{% load staticfiles %}
 
 {% block object-tools %}
 <div class="solution-stats-container">
@@ -23,157 +22,161 @@
 
 {{ block.super }}
 
-    <script type="text/javascript">
-    var passRateChartElement = document.getElementById("pass-rate-chart").getContext('2d');
-    var passRateData = {
-        datasets: [{
-            data: [
-                {{ statistics.passed }},
-                {{ statistics.failed }}
-            ],
-            backgroundColor: [
-                '#79aec8',
-                '#ffffff'
-            ]
+<script type="text/javascript">
+  var colors = {
+    lightBlue: '#79aec8',
+    transparentWhite: 'rgba(255,255,255,0.5)'
+  };
+  var passRateChartElement = document.getElementById("pass-rate-chart").getContext('2d');
+  var passRateData = {
+    datasets: [{
+      data: [
+        {{ statistics.passed }},
+        {{ statistics.failed }}
+      ],
+      backgroundColor: [
+        colors.lightBlue,
+        '#ffffff'
+      ]
+    }],
+    labels: [
+      'Passed',
+      'Failed'
+    ]
+  };
+  var passRateChart = new Chart(passRateChartElement, {
+    type: 'doughnut',
+    data: passRateData,
+    options: {
+      responsive: false
+    }
+  });
+  var submissionDatesElement = document.getElementById("submission-dates-chart").getContext("2d");
+  var submissionDatesChart = new Chart(submissionDatesElement, {
+    type: 'line',
+    data: {
+      labels: [
+        {% for date_label, date_value in statistics.submission_dates %}
+          new Date('{{ date_label|escapejs }}').toDateString(),
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Submissions',
+          data: [
+            {% for date_label, date_value in statistics.submission_dates %}
+              {
+                t: new Date('{{ date_label|escapejs }}'),
+                y: {{ date_value }}
+              },
+            {% endfor %}
+          ],
+          backgroundColor: [colors.transparentWhite],
+          borderColor: [colors.lightBlue],
+          borderWidth: 2,
+          lineTension: 0.0,
+          pointRadius: 1,
+          pointHoverRadius: 5
+        }
+      ]
+    },
+    options: {
+      responsive: false
+    }
+  });
+  var triesElement = document.getElementById("tries-chart").getContext("2d");
+  var triesChart = new Chart(triesElement, {
+    type: 'bar',
+    data: {
+      labels: [
+        {% for key, value in statistics.passed_after %}
+          '{{ key|escapejs }}',
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Tries Until Passed',
+          data: [
+            {% for key, value in statistics.passed_after %}
+              {
+                t: '{{ key|escapejs }}',
+                y: {{ value }}
+              },
+            {% endfor %}
+          ],
+          backgroundColor: colors.transparentWhite,
+          borderColor: colors.lightBlue,
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: false,
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+  var hotspotElement = document.getElementById("hotspot-chart").getContext("2d");
+  var hotSpotChart = new Chart(hotspotElement, {
+    type: 'scatter',
+    data: {
+      labels: [
+        {% for taskname, data in statistics.hotspots %}
+          '{{ taskname|escapejs }}',
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Task submissions and success rates',
+          data: [
+            {% for taskname, data in statistics.hotspots %}
+              {
+                x: {{ data.passed_submissions }},
+                y: {{ data.failed_submissions }}
+              },
+            {% endfor %}
+          ],
+          backgroundColor: colors.transparentWhite,
+          borderColor: colors.lightBlue,
+          radius: 5.0,
+        }
+      ]
+    },
+    options: {
+      responsive: false,
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          },
+          scaleLabel: {
+            display: true,
+            labelString: 'Failed Solutions'
+          }
         }],
-        labels: [
-            'Passed',
-            'Failed'
-        ]
-    };
-    var passRateChart = new Chart(passRateChartElement,{
-        type: 'doughnut',
-        data: passRateData,
-        options: {
-            responsive: false
+        xAxes: [{
+          ticks: {
+            beginAtZero: true
+          },
+          scaleLabel: {
+            display: true,
+            labelString: 'Passed Solutions'
+          }
+        }]
+      },
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            return data.labels[tooltipItem.index];
+          }
         }
-    });
-    var submissionDatesElement = document.getElementById("submission-dates-chart").getContext("2d");
-    var submissionDatesChart = new Chart(submissionDatesElement, {
-        type: 'line',
-        data: {
-            labels: [
-                {% for date_label, date_value in statistics.submission_dates %}
-                    new Date('{{ date_label|escapejs }}').toDateString(),
-                {% endfor %}
-            ],
-            datasets: [
-                {
-                    label: 'Submissions',
-                    data: [
-                        {% for date_label, date_value in statistics.submission_dates %}
-                            {
-                                t: new Date('{{ date_label|escapejs }}'),
-                                y: {{ date_value }}
-                            },
-                        {% endfor %}
-                    ],
-                    backgroundColor: ['rgba(255,255,255,0.5)'],
-                    borderColor: ['#79aec8'],
-                    borderWidth: 2,
-                    lineTension: 0.0,
-                    pointRadius: 1,
-                    pointHoverRadius: 5
-                }
-            ]
-        },
-        options: {
-            responsive: false
-        }
-    });
-    var triesElement = document.getElementById("tries-chart").getContext("2d");
-    var triesChart = new Chart(triesElement, {
-        type: 'bar',
-        data: {
-            labels: [
-                {% for key, value in statistics.passed_after %}
-                    '{{ key|escapejs }}',
-                {% endfor %}
-            ],
-            datasets: [
-                {
-                    label: 'Tries Until Passed',
-                    data: [
-                        {% for key, value in statistics.passed_after %}
-                            {
-                                t: '{{ key|escapejs }}',
-                                y: {{ value }}
-                            },
-                        {% endfor %}
-                    ],
-                    backgroundColor: 'rgba(255,255,255,0.5)',
-                    borderColor: '#79aec8',
-                    borderWidth: 2
-                }
-            ]
-        },
-        options: {
-            responsive: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var hotspotElement = document.getElementById("hotspot-chart").getContext("2d");
-    var hotSpotChart = new Chart(hotspotElement, {
-        type: 'scatter',
-        data: {
-            labels: [
-                {% for taskname, data in statistics.hotspots %}
-                    '{{ taskname|escapejs }}',
-                {% endfor %}
-            ],
-            datasets: [
-                {
-                    label: 'Task submissions and success rates',
-                    data: [
-                        {% for taskname, data in statistics.hotspots %}
-                        {
-                            x: {{ data.passed_submissions }},
-                            y: {{ data.failed_submissions }}
-                        },
-                        {% endfor %}
-                    ],
-                    backgroundColor: 'rgba(255,255,255,0.5)',
-                    borderColor: '#79aec8',
-                    radius: 5.0,
-                }
-            ]
-        },
-        options: {
-            responsive: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Failed Solutions'
-                    }
-                }],
-                xAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Passed Solutions'
-                    }
-                }]
-            },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                       return data.labels[tooltipItem.index];
-                    }
-                }
-            }
-        }
-    });
-    </script>
+      }
+    }
+  });
+</script>
 {% endblock %}
