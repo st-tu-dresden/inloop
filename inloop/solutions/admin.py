@@ -13,9 +13,7 @@ class SolutionFileInline(admin.StackedInline):
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
     class Media:
-        css = {
-            "all": ["css/admin/solutions.css"]
-        }
+        css = {"all": ["css/admin/solutions.css"]}
         js = ["js/Chart.min.js"]
 
     change_list_template = "admin/solutions/solutions.html"
@@ -33,10 +31,9 @@ class SolutionAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         # Filter our admin view by the selected viewport filter
         solutions = Solution.objects.filter(**request.GET.dict())
-        statistics = Statistics(solutions)
-        extra = {
-            'statistics': statistics,
-        }
+        extra = {}
+        if solutions:
+            extra["statistics"] = Statistics(solutions)
         if extra_context is not None:
             extra.update(extra_context)
         return super().changelist_view(request, extra_context=extra)
