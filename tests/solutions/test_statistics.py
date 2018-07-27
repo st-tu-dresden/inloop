@@ -64,11 +64,14 @@ class StatisticsTest(SolutionsData, TestCase):
         self.assertTrue(task_title in hotspots_f)
         self.assertTrue(task_title in hotspots_p)
         value_b = list(hotspots_b.values())[-1]
+        self.assertEqual(value_b['passed_submissions'], 1)
+        self.assertEqual(value_b['failed_submissions'], 1)
         value_f = list(hotspots_f.values())[-1]
+        self.assertEqual(value_f['passed_submissions'], 0)
+        self.assertEqual(value_f['failed_submissions'], 1)
         value_p = list(hotspots_p.values())[-1]
-        self.assertTrue({'passed_submissions': 1, 'failed_submissions': 1} == value_b)
-        self.assertTrue({'passed_submissions': 1, 'failed_submissions': 0} == value_p)
-        self.assertTrue({'passed_submissions': 0, 'failed_submissions': 1} == value_f)
+        self.assertEqual(value_p['passed_submissions'], 1)
+        self.assertEqual(value_p['failed_submissions'], 0)
 
     def test_submission_dates(self):
         submission_date_failed = self.failed_solution.submission_date

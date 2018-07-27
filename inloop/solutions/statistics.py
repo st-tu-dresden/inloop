@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import groupby
 
@@ -79,19 +80,13 @@ class Statistics:
 
         Return the dictionary holding tasks by passed and failed solutions.
         """
-        tasks_data_dict = dict()
+        hotspot_tasks = defaultdict(lambda: defaultdict(int))
         for solution in self.solutions:
-            if solution.task.title not in tasks_data_dict:
-                tasks_data_dict[solution.task.title] = {
-                    'passed_submissions': 1 if solution.passed else 0,
-                    'failed_submissions': 1 if not solution.passed else 0,
-                }
+            if solution.passed:
+                hotspot_tasks[solution.task.title]['passed_submissions'] += 1
             else:
-                if solution.passed:
-                    tasks_data_dict[solution.task.title]['passed_submissions'] += 1
-                else:
-                    tasks_data_dict[solution.task.title]['failed_submissions'] += 1
-        return tasks_data_dict.items()
+                hotspot_tasks[solution.task.title]['failed_submissions'] += 1
+        return hotspot_tasks.items()
 
 
 def date_range_in_between(start_date, end_date):
