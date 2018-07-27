@@ -89,7 +89,7 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
 [inloop-issues]: https://github.com/st-tu-dresden/inloop/issues
 [pep8]: https://www.python.org/dev/peps/pep-0008/
-[google-style]: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
+[google-style]: https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings
 [gh-flow]: https://guides.github.com/introduction/flow/
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
