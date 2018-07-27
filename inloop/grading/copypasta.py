@@ -21,8 +21,27 @@ LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
 @db_task()
-def jplag_check_async(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
-    jplag_check(users, tasks, min_similarity, result_dir)
+def jplag_check_async(users, tasks):
+    """
+    Submit a job to check solutions using the jplag_check function.
+
+    This function returns immediately and is supposed to be called from inside
+    view code. The actual JPlag invocation happens in a background worker process
+    that will wait for JPlag to complete.
+
+    The given queryset arguments will be serialized (pickled) before they are sent
+    to the background queue.
+
+    The results of the check will be available in the PlagiarismTest model.
+
+    Args:
+        users: A User queryset.
+        tasks: A Task queryset.
+
+    Returns:
+        A huey TaskResultWrapper object.
+    """
+    jplag_check(users, tasks)
 
 
 def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
