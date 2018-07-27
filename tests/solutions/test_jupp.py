@@ -3,8 +3,8 @@ from unittest import TestCase
 
 from defusedxml import ElementTree
 
-from inloop.solutions.prettyprint import tools
-from inloop.solutions.prettyprint.tools import (context_from_xml_strings,
+from inloop.solutions.prettyprint import junit
+from inloop.solutions.prettyprint.checkstyle import (context_from_xml_strings,
                                                 element_tree_to_dict, extract_items_by_key)
 
 SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
@@ -71,7 +71,7 @@ SAMPLE_DATA = [
 
 class JUnitXMLTests(TestCase):
     def setUp(self):
-        self.ts = tools.xml_to_dict(SAMPLE_XML_JUNIT)
+        self.ts = junit.xml_to_dict(SAMPLE_XML_JUNIT)
 
     def test_sample_outputs(self):
         self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
@@ -108,10 +108,10 @@ class JUnitXMLTests(TestCase):
 
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
-            tools.xml_to_dict("<invalid-root />")
+            junit.xml_to_dict("<invalid-root />")
 
     def test_no_testcases(self):
-        ts = tools.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
+        ts = junit.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
         self.assertEqual(len(ts["testcases"]), 0)
 
     def test_missing_systemerr_or_systemout(self):
@@ -121,14 +121,14 @@ class JUnitXMLTests(TestCase):
             "<testsuite></testsuite>",
         ]
         for document in documents:
-            ts = tools.xml_to_dict(document)
+            ts = junit.xml_to_dict(document)
             self.assertEqual(len(ts["testcases"]), 0)
 
 
 class XMLBombProtectionTest(TestCase):
     def test_malicious_xmlfile(self):
         with self.assertRaises(ValueError):
-            tools.xml_to_dict(MALICIOUS_XML)
+            junit.xml_to_dict(MALICIOUS_XML)
 
 
 class CheckstyleXMLTests(TestCase):

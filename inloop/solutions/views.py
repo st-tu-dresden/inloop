@@ -7,9 +7,9 @@ from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.prettyprint.tools import (CheckstyleData, checkeroutput_filter,
-                                                context_from_xml_strings,
-                                                xml_strings_from_testoutput, xml_to_dict)
+from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
+                                                     xml_strings_from_testoutput)
+from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.tasks.models import Task
 
