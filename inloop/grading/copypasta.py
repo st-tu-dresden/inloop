@@ -60,7 +60,7 @@ def jplag_check_task(users, task, min_similarity, result_path):
         task: A Task object.
         min_similarity: Minimum solution similarity after which two solutions
             shall be regarded as plagiarism.
-        result_path: Directory where JPlag HTML files shall be saved to (optional).
+        result_path: Directory where JPlag HTML files shall be saved to.
 
     Returns:
         A set containing the solutions that have been identified as plagiarism.
