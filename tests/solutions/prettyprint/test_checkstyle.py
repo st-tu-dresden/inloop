@@ -83,7 +83,7 @@ class CheckstyleXMLTests(TestCase):
             element_tree,
             filter_keys=[]
         )
-        dictionary2 = dictionary = element_tree_to_dict(
+        dictionary2 = element_tree_to_dict(
             element_tree,
             filter_keys=None
         )
@@ -101,11 +101,8 @@ class CheckstyleXMLTests(TestCase):
             self.assertEqual(data, [])
 
     def test_etree_empty_args(self):
-        try:
+        with self.assertRaises(AttributeError):
             element_tree_to_dict(None, filter_keys=[])
-            self.fail("Should throw AttributeError if init. with None")
-        except AttributeError:
-            pass
 
     def test_xml_parsing(self):
         contents = str(self.xml_strings_context)
