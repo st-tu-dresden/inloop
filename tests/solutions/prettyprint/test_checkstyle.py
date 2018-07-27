@@ -1,21 +1,16 @@
-from pathlib import Path
 from unittest import TestCase
 
 from defusedxml import ElementTree
 
-from inloop.solutions.prettyprint import junit
 from inloop.solutions.prettyprint.checkstyle import (context_from_xml_strings,
-                                                element_tree_to_dict, extract_items_by_key)
+                                                     element_tree_to_dict, extract_items_by_key)
 
-SAMPLES_PATH = Path(__file__).parent.joinpath("samples")
-with SAMPLES_PATH.joinpath("TEST-TaxiTest.xml").open() as fp:
-    SAMPLE_XML_JUNIT = fp.read()
-with SAMPLES_PATH.joinpath("Checkstyle.xml").open() as fp:
-    SAMPLE_XML_CHECKSTYLE = fp.read()
-with SAMPLES_PATH.joinpath("billion_laughs.xml").open() as fp:
-    MALICIOUS_XML = fp.read()
+from . import SAMPLES_PATH
 
-SAMPLE_DATA = [
+with SAMPLES_PATH.joinpath("checkstyle.xml").open() as fp:
+    CHECKSTYLE_SAMPLE_XML = fp.read()
+
+CHECKSTYLE_SAMPLE_DATA = [
     {'version': '8.9'},
     {
         'tag': 'checkstyle',
@@ -69,83 +64,21 @@ SAMPLE_DATA = [
 ]
 
 
-class JUnitXMLTests(TestCase):
-    def setUp(self):
-        self.ts = junit.xml_to_dict(SAMPLE_XML_JUNIT)
-
-    def test_sample_outputs(self):
-        self.assertTrue(self.ts["system_out"].startswith("Andrea Bora"))
-        self.assertEqual(self.ts["system_err"], None)
-
-    def test_sample_attributes(self):
-        self.assertEqual(self.ts["total"], 5)
-        self.assertEqual(self.ts["errors"], 0)
-        self.assertEqual(self.ts["failures"], 1)
-        self.assertEqual(self.ts["passed"], 4)
-        self.assertEqual(self.ts["name"], "TaxiTest")
-
-    def test_sample_testcases(self):
-        testcases = self.ts["testcases"]
-        self.assertEqual(len(testcases), 5)
-
-        tc1 = testcases[0]
-        self.assertEqual(tc1["name"], "testTaxiAdd")
-        self.assertFalse(hasattr(tc1, "failure"))
-
-        tc2 = testcases[4]
-        self.assertEqual(tc2["name"], "taxiAllGetOutTaxiNotEmpty")
-        failure = tc2["failure"]
-        self.assertEqual(failure["type"], "junit.framework.AssertionFailedError")
-        self.assertIn("allGetOut()", failure["message"])
-        self.assertIn("allGetOut()", failure["stacktrace"])
-
-        tc3 = testcases[3]
-        self.assertEqual(tc3["name"], "testTaxiDriverAssigned")
-        error = tc3["error"]
-        self.assertEqual(error["type"], "java.lang.IllegalArgumentException")
-        self.assertEqual("Sample message", error["message"])
-        self.assertIn("Exception: Sample message", error["stacktrace"])
-
-    def test_invalid_input(self):
-        with self.assertRaises(ValueError):
-            junit.xml_to_dict("<invalid-root />")
-
-    def test_no_testcases(self):
-        ts = junit.xml_to_dict("<testsuite><system-out /><system-err /></testsuite>")
-        self.assertEqual(len(ts["testcases"]), 0)
-
-    def test_missing_systemerr_or_systemout(self):
-        documents = [
-            "<testsuite><system-err /></testsuite>",
-            "<testsuite><system-out /></testsuite>",
-            "<testsuite></testsuite>",
-        ]
-        for document in documents:
-            ts = junit.xml_to_dict(document)
-            self.assertEqual(len(ts["testcases"]), 0)
-
-
-class XMLBombProtectionTest(TestCase):
-    def test_malicious_xmlfile(self):
-        with self.assertRaises(ValueError):
-            junit.xml_to_dict(MALICIOUS_XML)
-
-
 class CheckstyleXMLTests(TestCase):
     def setUp(self):
         super().setUp()
         self.xml_strings_context = context_from_xml_strings(
-            xml_strings=[SAMPLE_XML_CHECKSTYLE], filter_keys=[]
+            xml_strings=[CHECKSTYLE_SAMPLE_XML], filter_keys=[]
         )
 
     def test_extract(self):
-        data = extract_items_by_key(data=SAMPLE_DATA, key="file")
+        data = extract_items_by_key(data=CHECKSTYLE_SAMPLE_DATA, key="file")
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["tag"], "file")
         self.assertEqual(len(data[0]["children"]), 3)
 
     def test_to_dict(self):
-        element_tree = ElementTree.fromstring(SAMPLE_XML_CHECKSTYLE)
+        element_tree = ElementTree.fromstring(CHECKSTYLE_SAMPLE_XML)
         dictionary1 = element_tree_to_dict(
             element_tree,
             filter_keys=[]
@@ -162,7 +95,7 @@ class CheckstyleXMLTests(TestCase):
 
     def test_extract_none(self):
         data1 = extract_items_by_key(data=None, key=None)
-        data2 = extract_items_by_key(data=SAMPLE_DATA, key=None)
+        data2 = extract_items_by_key(data=CHECKSTYLE_SAMPLE_DATA, key=None)
         data3 = extract_items_by_key(data=None, key="file")
         for data in [data1, data2, data3]:
             self.assertEqual(data, [])
