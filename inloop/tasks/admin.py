@@ -10,16 +10,17 @@ User = get_user_model()
 
 @admin.register(Task)
 class TaskAdmin(PlagiarismAdmin):
-    fieldsets = [
-        (None, {'fields': ['title', 'category']}),
-        ('Date Information', {'fields': ['pubdate', 'deadline']}),
-        ('Content', {'fields': ['description', 'slug']})
-    ]
-    list_display = ('title', 'category', 'pubdate', 'deadline')
+    fieldsets = [(None, {
+        'fields': ['title', 'category']
+    }), ('Date Information', {
+        'fields': ['pubdate', 'deadline']
+    }), ('Content', {
+        'fields': ['description', 'slug']
+    })]
+    list_display = ['title', 'category', 'pubdate', 'deadline']
     list_filter = ['pubdate', 'deadline', 'category']
     search_fields = ['title', 'description']
-    prepopulated_fields = {'slug': ('title',)}
-
+    prepopulated_fields = {'slug': ('title', )}
     actions = ['jplag_check_tasks']
 
     def jplag_check_tasks(self, request, queryset):
@@ -35,11 +36,10 @@ class TaskAdmin(PlagiarismAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(PlagiarismAdmin):
-    list_display = ('name', 'display_order')
+    list_display = ['name', 'display_order']
     list_filter = ['display_order']
     search_fields = ['name', 'display_order']
-    prepopulated_fields = {'slug': ('name',)}
-
+    prepopulated_fields = {'slug': ('name', )}
     actions = ['jplag_check_category']
 
     def jplag_check_category(self, request, queryset):
