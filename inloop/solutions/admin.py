@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from inloop.solutions.models import Solution, SolutionFile
-from inloop.solutions.statistics.tools import Statistics
+from inloop.solutions.statistics import Statistics
 
 
 class SolutionFileInline(admin.StackedInline):

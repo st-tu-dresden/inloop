@@ -1,8 +1,8 @@
-import datetime
+from datetime import datetime, timedelta
 
 from django.test import TestCase
 
-from inloop.solutions.statistics.tools import Statistics, date_range_in_between
+from inloop.solutions.statistics import Statistics, date_range_in_between
 
 from tests.unit.solutions.mixins import SolutionsData
 
@@ -15,14 +15,14 @@ class StatisticsTest(SolutionsData, TestCase):
         self.statistics_failed_only = Statistics([self.failed_solution], "%Y-%m-%d")
 
     def test_single_date_range(self):
-        date = datetime.datetime.now()
+        date = datetime.now()
         date_range = date_range_in_between(date, date)
         self.assertEqual(len(date_range), 1)
 
     def test_date_range(self):
-        start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(days=10)
-        test_date = start_date + datetime.timedelta(days=3)
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=10)
+        test_date = start_date + timedelta(days=3)
         date_range = date_range_in_between(start_date, end_date)
         self.assertEqual(len(date_range), 11)
         self.assertTrue(start_date in date_range)
