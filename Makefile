@@ -8,7 +8,7 @@ endif
 
 init:
 	pipenv install --dev
-	docker build -t $(IMAGE) tests/functional/testrunner
+	docker build -t $(IMAGE) tests/testrunner
 	ln -snf .env.develop .env
 
 loaddb:
