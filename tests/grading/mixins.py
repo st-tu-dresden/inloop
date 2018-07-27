@@ -5,8 +5,8 @@ Mixins for setting up test plagiarism test data.
 from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
 from inloop.solutions.models import Solution
 
-from tests.unit.accounts.mixins import SimpleAccountsData
-from tests.unit.solutions.mixins import SimpleTaskData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.solutions.mixins import SimpleTaskData
 
 
 class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):

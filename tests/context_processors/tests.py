@@ -2,7 +2,7 @@ from django.contrib.sites.models import Site
 from django.test import TestCase, override_settings
 
 
-@override_settings(ROOT_URLCONF="tests.unit.context_processors.urls")
+@override_settings(ROOT_URLCONF="tests.context_processors.urls")
 class CurrentSiteContextProcessorTest(TestCase):
     def test_site_attributes(self):
         site = Site.objects.get_current()

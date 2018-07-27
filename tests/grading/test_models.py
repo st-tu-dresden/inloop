@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from tests.unit.grading.mixins import DetectedPlagiarismData
+from tests.grading.mixins import DetectedPlagiarismData
 
 
 class GradingModelsTest(DetectedPlagiarismData, TestCase):

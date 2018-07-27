@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings, tag
 from inloop.grading.copypasta import jplag_check
 from inloop.solutions.models import SolutionFile
 
-from tests.unit.grading.mixins import PlagiatedSolutionsData
+from tests.grading.mixins import PlagiatedSolutionsData
 
 FIBONACCI = """
 public class Fibonacci {

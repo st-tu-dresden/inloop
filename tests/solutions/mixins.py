@@ -6,7 +6,7 @@ By convention, every password is set to "secret".
 from inloop.solutions.models import Solution
 from inloop.tasks.models import Task
 
-from tests.unit.accounts.mixins import SimpleAccountsData
+from tests.accounts.mixins import SimpleAccountsData
 
 
 class SimpleTaskData:

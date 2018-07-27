@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from tests.unit.accounts.mixins import SimpleAccountsData
-from tests.unit.tasks.mixins import TaskData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.tasks.mixins import TaskData
 
 
 class IndexViewTest(SimpleAccountsData, TaskData, TestCase):

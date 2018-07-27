@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from inloop.solutions.statistics import Statistics, date_range_in_between
 
-from tests.unit.solutions.mixins import SolutionsData
+from tests.solutions.mixins import SolutionsData
 
 
 class StatisticsTest(SolutionsData, TestCase):

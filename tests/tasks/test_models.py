@@ -4,8 +4,8 @@ from django.utils import timezone
 from inloop.solutions.models import Solution
 from inloop.tasks.models import Category, Task
 
-from tests.unit.accounts.mixins import SimpleAccountsData
-from tests.unit.tasks.mixins import TaskData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.tasks.mixins import TaskData
 
 
 class TaskTests(SimpleAccountsData, TaskData, TestCase):

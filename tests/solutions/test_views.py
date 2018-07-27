@@ -3,8 +3,8 @@ from django.utils.encoding import force_text
 
 from inloop.solutions.models import Solution
 
-from tests.unit.accounts.mixins import SimpleAccountsData
-from tests.unit.tasks.mixins import TaskData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.tasks.mixins import TaskData
 
 
 class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):

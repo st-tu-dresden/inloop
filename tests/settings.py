@@ -15,7 +15,7 @@ AUTH_PASSWORD_VALIDATORS = []
 CONSTANCE_BACKEND = "tests.backends.ConstanceDictBackend"
 
 INSTALLED_APPS += [     # noqa
-    "tests.unit.context_processors",
+    "tests.context_processors",
 ]
 
 # force tests which do not use @override_settings to fail

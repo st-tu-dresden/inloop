@@ -13,7 +13,7 @@ from constance.test import override_config
 from inloop.accounts.forms import SignupForm, StudentDetailsForm
 from inloop.accounts.models import Course, StudentDetails, user_profile_complete
 
-from tests.unit.accounts.mixins import SimpleAccountsData
+from tests.accounts.mixins import SimpleAccountsData
 
 User = get_user_model()
 

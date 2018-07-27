@@ -2,7 +2,7 @@ from django.contrib.auth import SESSION_KEY
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from tests.unit.accounts.mixins import SimpleAccountsData
+from tests.accounts.mixins import SimpleAccountsData
 
 
 class ProtectedLogoutTest(SimpleAccountsData, TestCase):
