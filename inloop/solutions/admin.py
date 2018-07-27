@@ -12,6 +12,12 @@ class SolutionFileInline(admin.StackedInline):
 
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            "all": []
+        }
+        js = ["js/Chart.min.js"]
+
     change_list_template = "admin/solutions/solutions.html"
     inlines = [SolutionFileInline]
     list_display = ['id', 'author', 'task', 'submission_date', 'passed', 'site_link']

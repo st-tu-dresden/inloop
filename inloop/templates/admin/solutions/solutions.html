@@ -26,8 +26,7 @@
 
     {{ block.super }}
 
-    <script src="{% static 'js/Chart.min.js' %}"></script>
-    <script>
+    <script type="text/javascript">
     var passRateChartElement = document.getElementById("pass-rate-chart").getContext('2d');
     var passRateData = {
         datasets: [{
@@ -58,7 +57,7 @@
         data: {
             labels: [
                 {% for date_label, date_value in statistics.submission_dates %}
-                    new Date('{{ date_label }}').toDateString(),
+                    new Date('{{ date_label|escapejs }}').toDateString(),
                 {% endfor %}
             ],
             datasets: [
@@ -67,7 +66,7 @@
                     data: [
                         {% for date_label, date_value in statistics.submission_dates %}
                             {
-                                t: new Date('{{ date_label|safe }}'),
+                                t: new Date('{{ date_label|escapejs }}'),
                                 y: {{ date_value }}
                             },
                         {% endfor %}
@@ -91,7 +90,7 @@
         data: {
             labels: [
                 {% for key, value in statistics.passed_after %}
-                    '{{ key }}',
+                    '{{ key|escapejs }}',
                 {% endfor %}
             ],
             datasets: [
@@ -100,8 +99,8 @@
                     data: [
                         {% for key, value in statistics.passed_after %}
                             {
-                                t: '{{ key|safe }}',
-                                y: {{ value|safe }}
+                                t: '{{ key|escapejs }}',
+                                y: {{ value }}
                             },
                         {% endfor %}
                     ],
@@ -128,7 +127,7 @@
         data: {
             labels: [
                 {% for taskname, data in statistics.hotspots %}
-                    '{{ taskname|safe }}',
+                    '{{ taskname|escapejs }}',
                 {% endfor %}
             ],
             datasets: [
@@ -137,8 +136,8 @@
                     data: [
                         {% for taskname, data in statistics.hotspots %}
                         {
-                            x: {{ data.passed_submissions|safe }},
-                            y: {{ data.failed_submissions|safe }}
+                            x: {{ data.passed_submissions }},
+                            y: {{ data.failed_submissions }}
                         },
                         {% endfor %}
                     ],
@@ -173,8 +172,7 @@
             tooltips: {
                 callbacks: {
                     label: function(tooltipItem, data) {
-                       var label = data.labels[tooltipItem.index];
-                       return label;
+                       return data.labels[tooltipItem.index];
                     }
                 }
             }
