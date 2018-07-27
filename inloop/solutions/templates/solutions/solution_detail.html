@@ -67,8 +67,10 @@
   {% if solution.passed %}
 
     <p class="alert alert-success">
-    Congratulations, your solution passed all tests.
+      Congratulations, your solution passed all tests.
     </p>
+
+    {%  if checkstyle_data %}
     {% if checkstyle_data.total_issues == 0 %}
     <div class="alert alert-success">
         <h1 class="no-margin-top">Code Quality: A+</h1>
@@ -94,8 +96,9 @@
         <h1 class="no-margin-top">Code Quality: D</h1>
         Your code was able to compile, but you should try looking over your code and resubmitting it again. We encourage you to improve the quality of your code. It is not about mastering fiddly code-conventions, but about learning good coding practices. For this reason, we provide the style issues tab. Have a look!
     {% endif %}
-
     </div>
+    {% endif %}
+
 
   {% elif solution.status == "failure" %}
     <p class="alert alert-danger">

@@ -110,14 +110,12 @@ class SolutionDetailView(LoginRequiredMixin, View):
             endswith=".xml"
         )
 
-        checkstyle_context = context_from_xml_strings(
-            xml_strings=xml_strings_checkstyle,
-            filter_keys=[]
-        )
-
-        checkstyle_data = CheckstyleData(
-            checkstyle_context, solution.solutionfile_set.all()
-        )
+        if xml_strings_checkstyle:
+            checkstyle_context = context_from_xml_strings(
+                xml_strings=xml_strings_checkstyle, filter_keys=[])
+            checkstyle_data = CheckstyleData(checkstyle_context, solution.solutionfile_set.all())
+        else:
+            checkstyle_data = None
 
         context = {
             'solution': solution,
