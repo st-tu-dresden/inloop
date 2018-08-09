@@ -17,3 +17,5 @@ script:
 after_success:
   - pipenv run coverage xml
   - python-codacy-coverage
+notifications:
+  email: false
