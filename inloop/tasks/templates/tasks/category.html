@@ -1,4 +1,5 @@
 {% extends 'base_site.html' %}
+{% load staticfiles %}
 
 {% block title %}{{ category.name }} tasks{% endblock %}
 
@@ -12,7 +13,7 @@
 <h2>{{ category.name }} tasks</h2>
 
 {% if tasks %}
-  <table class="table table-align-pretty">
+  <table id="tablesort" class="table table-align-pretty">
     <thead>
     <tr>
       <th>Title</th>
@@ -71,5 +72,11 @@
 {% if not tasks %}
   <div class="alert alert-info">You are lucky! Nothing to do here.</div>
 {% endif %}
+
+<script src="{% static 'js/tablesort.min.js' %}"></script>
+
+<!-- Include sort types you need -->
+<script src="{% static 'js/tablesort.date.min.js' %}"></script>
+<script>new Tablesort(document.getElementById('tablesort'));</script>
 
 {% endblock %}

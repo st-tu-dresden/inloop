@@ -1,5 +1,6 @@
 {% extends 'base_site.html' %}
 {% load markdown %}
+{% load staticfiles %}
 
 {% block title %}Homepage{% endblock %}
 
@@ -10,7 +11,7 @@
 </ol>
 
 {% if categories %}
-  <table class="table table-align-pretty">
+  <table id="tablesort" class="table table-align-pretty">
     <thead>
     <tr>
       <th>Category</th>
@@ -76,6 +77,11 @@
 {% else %}
   <div class="alert alert-info">There are currently no tasks in the system.</div>
 {% endif %}
+    
+<script src="{% static 'js/tablesort.min.js' %}"></script>
 
+<!-- Include sort types you need -->
+<script src="{% static 'js/tablesort.date.min.js' %}"></script>
+<script>new Tablesort(document.getElementById('tablesort'));</script>
 
 {% endblock %}
