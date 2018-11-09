@@ -24,8 +24,7 @@ class SimpleTaskData:
 
 class SolutionsData(SimpleAccountsData, SimpleTaskData):
     """
-    Set up two solutions, one of which failed
-    and the other one succeeded.
+    Set up simple solutions.
     """
     @classmethod
     def setUpTestData(cls):
