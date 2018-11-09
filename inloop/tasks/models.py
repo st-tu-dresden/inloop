@@ -76,6 +76,9 @@ class TaskQuerySet(models.QuerySet):
 class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
+    class Meta:
+        ordering = ["deadline", "pubdate", "title"]
+
     # mandatory fields
     title = models.CharField(max_length=100, help_text="Task title")
     system_name = models.CharField(max_length=100, unique=True, help_text="Internally used name")
