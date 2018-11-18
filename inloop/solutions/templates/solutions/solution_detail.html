@@ -128,18 +128,18 @@
   </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
+  {% spaceless %}
+  <pre class="console-output">
   {% if result.stdout %}
-    <pre class="console-output">
-      <code>{{ result.stdout }}</code>
-    </pre>
+    <code>{{ result.stdout }}</code>
   {% endif %}
   {% if result.stderr %}
-    <pre class="console-output bg-danger text-white">
-      <code>{{ result.stderr }}</code>
-    </pre>
+    <code>{{ result.stderr }}</code>
   {% elif not result.stdout %}
     <p>Nothing to show here.</p>
   {% endif %}
+  </pre>
+  {% endspaceless %}
   </div><!-- /#console -->
 
   <div role="tabpanel" class="tab-pane" id="unittests">
