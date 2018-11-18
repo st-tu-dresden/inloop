@@ -194,8 +194,23 @@ code {
 
 /* @begin JUnit view styles */
 .testcase-list {
-  padding: 0 2rem;
+  padding: 0 2rem 2rem;
+  list-style-type: none;
 }
+
+.inline {
+  display: inline;
+}
+
+.disguised:hover, .disguised:visited, .disguised:link, .disguised:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.testcase-list .glyphicon {
+  padding-right: 1rem;
+}
+
 /* @end */
 
 /* @begin Badge superscript style*/
@@ -282,6 +297,8 @@ code {
 
 .darken-logo:hover {
   filter: brightness(1.0);
+}
+
 .no-margin-top {
   margin-top: 0;
 }

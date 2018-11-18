@@ -1,40 +1,78 @@
-{% for testsuite in testsuites %}
-  <h4>{{ testsuite.name }} (passed {{ testsuite.passed }} of {{ testsuite.total }})</h4>
-  <ul class="testcase-list">
-  {% for tc in testsuite.testcases %}
-    <li>
-      <h5 class="testcase-name">
-        <code>{{ tc.name }}()</code>
-        {% if not tc.failure and not tc.error %}
-          passed
-        {% else %}
-          failed with:
-        {% endif %}
-      </h5>
-      {% if tc.failure.stacktrace or tc.error.stacktrace %}
-      {% spaceless %}
-      <pre class="console-output">
-        <code>{% firstof tc.failure.stacktrace tc.error.stacktrace %}</code>
-      </pre>
-      {% endspaceless %}
-      {% endif %}
-    </li>
-  {% endfor %}
+{% if not testsuites %}
+Nothing to show here.
+{% endif %}
 
+{% for testsuite in testsuites %}
+  <div class="bottom-spaced">
+  <h4 class="inline">{{ testsuite.name }} (passed {{ testsuite.passed }} of {{ testsuite.total }})</h4>
   {% if testsuite.system_out %}
-    <li>
-      <h5><code>System.out</code> contains:</h5>
-      <pre class="console-output"><code>{{ testsuite.system_out }}</code></pre>
-    </li>
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggleSystemOut{{ forloop.counter }}">
+      <code class="inline">System.out</code>
+    </a>
   {% endif %}
   {% if testsuite.system_err %}
-    <li>
-      <h5><code>System.err</code> contains:</h5>
-      <pre class="console-output"><code>{{ testsuite.system_err }}</code></pre>
-    </li>
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggleSystemErr{{ forloop.counter }}">
+    <code class="inline">System.err</code>
+    </a>
+  {% endif %}
+  </div>
+
+  <ul class="testcase-list">
+
+  {% if testsuite.system_out %}
+  <div class="collapse" id="toggleSystemOut{{ forloop.counter }}">
+  <li>
+    <h5><code>System.out</code> contains:</h5>
+    <pre class="console-output"><code>{{ testsuite.system_out }}</code></pre>
+  </li>
+  </div>
+  {% endif %}
+  {% if testsuite.system_err %}
+  <div class="collapse" id="toggleSystemErr{{ forloop.counter }}">
+  <li>
+    <h5><code>System.err</code> contains:</h5>
+    <pre class="console-output"><code>{{ testsuite.system_err }}</code></pre>
+  </li>
+  </div>
   {% endif %}
 
+  {% for tc in testsuite.testcases %}
+
+  {% if not tc.failure and not tc.error %}
+
+  <li class="bottom-spaced">
+  <div class="glyphicon glyphicon-ok inline text-success"></div>
+  <h5 class="testcase-name inline">
+    <code>{{ tc.name }}()</code>
+    passed
+  </h5>
+  </li>
+
+  {% else %}
+
+  <li class="bottom-spaced">
+  <a class="disguised" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+  <div class="glyphicon glyphicon-remove inline text-danger"></div>
+  <h5 class="inline">
+    {% firstof tc.failure.message tc.error.message %}
+  </h5>
+  </a>
+  </li>
+
+  <div class="collapse" id="toggle{{ forloop.counter }}">
+    {% if tc.failure.stacktrace or tc.error.stacktrace %}
+    {% spaceless %}
+    <pre class="console-output">
+      <code>{% firstof tc.failure.stacktrace tc.error.stacktrace %}</code>
+    </pre>
+    {% endspaceless %}
+    {% endif %}
+  </div>
+
+  {% endif %}
+
+  {% endfor %}
+
   </ul>
-{% empty %}
-  <p>Nothing to show here.</p>
+
 {% endfor %}
