@@ -202,7 +202,10 @@ code {
   display: inline;
 }
 
-.disguised:hover, .disguised:visited, .disguised:link, .disguised:active {
+.disguised:hover,
+.disguised:visited,
+.disguised:link,
+.disguised:active {
   text-decoration: none;
   color: inherit;
 }

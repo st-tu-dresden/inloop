@@ -12,7 +12,7 @@
   {% endif %}
   {% if testsuite.system_err %}
     <a class="disguised" href="#" data-toggle="collapse" data-target="#toggleSystemErr{{ forloop.counter }}">
-    <code class="inline">System.err</code>
+      <code class="inline">System.err</code>
     </a>
   {% endif %}
   </div>
@@ -41,22 +41,17 @@
   {% if not tc.failure and not tc.error %}
 
   <li class="bottom-spaced">
-  <div class="glyphicon glyphicon-ok inline text-success"></div>
-  <h5 class="testcase-name inline">
-    <code>{{ tc.name }}()</code>
-    passed
-  </h5>
+    <div class="glyphicon glyphicon-ok inline text-success"></div>
+    <h5 class="testcase-name inline"><code>{{ tc.name }}()</code> passed</h5>
   </li>
 
   {% else %}
 
   <li class="bottom-spaced">
-  <a class="disguised" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
-  <div class="glyphicon glyphicon-remove inline text-danger"></div>
-  <h5 class="inline">
-    {% firstof tc.failure.message tc.error.message %}
-  </h5>
-  </a>
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+      <div class="glyphicon glyphicon-remove inline text-danger"></div>
+      <h5 class="inline">{% firstof tc.failure.message tc.error.message %}</h5>
+    </a>
   </li>
 
   <div class="collapse" id="toggle{{ forloop.counter }}">
