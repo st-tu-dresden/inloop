@@ -17,24 +17,20 @@
   {% endif %}
   </div>
 
-  <ul class="testcase-list">
-
   {% if testsuite.system_out %}
   <div class="collapse" id="stdout-{{ forloop.counter }}">
-  <li>
     <h5><code>System.out</code> contains:</h5>
     <pre class="console-output"><code>{{ testsuite.system_out }}</code></pre>
-  </li>
   </div>
   {% endif %}
   {% if testsuite.system_err %}
   <div class="collapse" id="stderr-{{ forloop.counter }}">
-  <li>
     <h5><code>System.err</code> contains:</h5>
     <pre class="console-output"><code>{{ testsuite.system_err }}</code></pre>
-  </li>
   </div>
   {% endif %}
+
+  <ul class="testcase-list">
 
   {% for tc in testsuite.testcases %}
 
@@ -52,17 +48,16 @@
       <div class="glyphicon glyphicon-remove inline text-danger"></div>
       <h5 class="inline">{% firstof tc.failure.message tc.error.message %}</h5>
     </a>
+    <div class="collapse" id="stacktrace-{{ forloop.counter }}">
+      {% if tc.failure.stacktrace or tc.error.stacktrace %}
+      {% spaceless %}
+      <pre class="console-output">
+        <code>{% firstof tc.failure.stacktrace tc.error.stacktrace %}</code>
+      </pre>
+      {% endspaceless %}
+      {% endif %}
+    </div>
   </li>
-
-  <div class="collapse" id="stacktrace-{{ forloop.counter }}">
-    {% if tc.failure.stacktrace or tc.error.stacktrace %}
-    {% spaceless %}
-    <pre class="console-output">
-      <code>{% firstof tc.failure.stacktrace tc.error.stacktrace %}</code>
-    </pre>
-    {% endspaceless %}
-    {% endif %}
-  </div>
 
   {% endif %}
 
