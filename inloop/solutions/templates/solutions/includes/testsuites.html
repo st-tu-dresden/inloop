@@ -6,12 +6,12 @@
   <div class="bottom-spaced">
   <h4 class="inline">{{ testsuite.name }} (passed {{ testsuite.passed }} of {{ testsuite.total }})</h4>
   {% if testsuite.system_out %}
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggleSystemOut{{ forloop.counter }}">
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#stdout-{{ forloop.counter }}">
       <code class="inline">System.out</code>
     </a>
   {% endif %}
   {% if testsuite.system_err %}
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggleSystemErr{{ forloop.counter }}">
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#stderr-{{ forloop.counter }}">
       <code class="inline">System.err</code>
     </a>
   {% endif %}
@@ -20,7 +20,7 @@
   <ul class="testcase-list">
 
   {% if testsuite.system_out %}
-  <div class="collapse" id="toggleSystemOut{{ forloop.counter }}">
+  <div class="collapse" id="stdout-{{ forloop.counter }}">
   <li>
     <h5><code>System.out</code> contains:</h5>
     <pre class="console-output"><code>{{ testsuite.system_out }}</code></pre>
@@ -28,7 +28,7 @@
   </div>
   {% endif %}
   {% if testsuite.system_err %}
-  <div class="collapse" id="toggleSystemErr{{ forloop.counter }}">
+  <div class="collapse" id="stderr-{{ forloop.counter }}">
   <li>
     <h5><code>System.err</code> contains:</h5>
     <pre class="console-output"><code>{{ testsuite.system_err }}</code></pre>
@@ -48,13 +48,13 @@
   {% else %}
 
   <li class="bottom-spaced">
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#toggle{{ forloop.counter }}">
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#stacktrace-{{ forloop.counter }}">
       <div class="glyphicon glyphicon-remove inline text-danger"></div>
       <h5 class="inline">{% firstof tc.failure.message tc.error.message %}</h5>
     </a>
   </li>
 
-  <div class="collapse" id="toggle{{ forloop.counter }}">
+  <div class="collapse" id="stacktrace-{{ forloop.counter }}">
     {% if tc.failure.stacktrace or tc.error.stacktrace %}
     {% spaceless %}
     <pre class="console-output">
