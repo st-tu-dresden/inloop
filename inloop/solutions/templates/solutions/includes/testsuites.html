@@ -37,16 +37,20 @@
   {% if not tc.failure and not tc.error %}
 
   <li class="bottom-spaced">
-    <div class="glyphicon glyphicon-ok inline text-success"></div>
-    <h5 class="testcase-name inline"><code>{{ tc.name }}()</code> passed</h5>
+    <h5 class="testcase-name inline">
+      <span class="glyphicon glyphicon-ok text-success"></span>
+      <code>{{ tc.name }}()</code> passed
+    </h5>
   </li>
 
   {% else %}
 
   <li class="bottom-spaced">
     <a class="disguised" href="#" data-toggle="collapse" data-target="#stacktrace-{{ forloop.counter }}">
-      <div class="glyphicon glyphicon-remove inline text-danger"></div>
-      <h5 class="inline">{% firstof tc.failure.message tc.error.message %}</h5>
+      <h5 class="inline">
+        <span class="glyphicon glyphicon-remove text-danger"></span>
+        {% firstof tc.failure.message tc.error.message %}
+      </h5>
     </a>
     <div class="collapse" id="stacktrace-{{ forloop.counter }}">
       {% if tc.failure.stacktrace or tc.error.stacktrace %}
