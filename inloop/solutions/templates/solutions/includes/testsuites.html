@@ -34,18 +34,13 @@
 
   {% for tc in testsuite.testcases %}
 
-  {% if not tc.failure and not tc.error %}
-
   <li class="bottom-spaced">
+  {% if not tc.failure and not tc.error %}
     <h5 class="testcase-name inline">
       <span class="glyphicon glyphicon-ok text-success"></span>
       <code>{{ tc.name }}()</code> passed
     </h5>
-  </li>
-
   {% else %}
-
-  <li class="bottom-spaced">
     <a class="disguised" href="#" data-toggle="collapse" data-target="#stacktrace-{{ forloop.counter }}">
       <h5 class="inline">
         <span class="glyphicon glyphicon-remove text-danger"></span>
@@ -61,9 +56,8 @@
       {% endspaceless %}
       {% endif %}
     </div>
-  </li>
-
   {% endif %}
+  </li>
 
   {% endfor %}
 
