@@ -181,6 +181,10 @@ code {
 .console-output code {
   white-space: pre;
 }
+
+.stacktrace {
+  margin: 10px 0;
+}
 /* @end */
 
 /* @begin <img> styles */

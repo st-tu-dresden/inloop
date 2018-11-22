@@ -51,7 +51,7 @@
     <div class="collapse" id="stacktrace-{{ forloop.counter }}">
       {% if tc.failure.stacktrace or tc.error.stacktrace %}
       {% spaceless %}
-      <pre class="console-output">
+      <pre class="console-output stacktrace">
         <code>{% firstof tc.failure.stacktrace tc.error.stacktrace %}</code>
       </pre>
       {% endspaceless %}
