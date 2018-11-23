@@ -143,8 +143,9 @@ class DockerTestRunner:
 
         LOG.debug("Popen args: %s", args)
 
+        # Pipe stderr to stdout to interleave both streams
         proc = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
 
         try:
@@ -160,8 +161,14 @@ class DockerTestRunner:
             LOG.debug("removing timed out container %s", ctr_id)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
 
-        stderr = stderr.decode("utf-8", errors="replace")
-        stdout = stdout.decode("utf-8", errors="replace")
+        if stderr:
+            stderr = stderr.decode("utf-8", errors="replace")
+        else:
+            stderr = ""
+        if stdout:
+            stdout = stdout.decode("utf-8", errors="replace")
+        else:
+            stdout = ""
 
         LOG.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
 
