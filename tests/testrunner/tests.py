@@ -58,8 +58,12 @@ class DockerTestRunnerTests(TestCase):
             DATA_DIR
         )
         self.assertEqual(result.rc, 42)
-        self.assertEqual(result.stdout, "OUT")
-        self.assertEqual(result.stderr, "ERR")
+        # Stdout should contain both OUT and ERR,
+        # because they are interleaved
+        self.assertEqual(result.stdout, "OUTERR")
+        # Stderr should default to "", even if
+        # nothing is piped to stderr
+        self.assertEqual(result.stderr, "")
         self.assertGreaterEqual(result.duration, 0.0)
 
     def test_kill_on_timeout(self):
@@ -76,8 +80,8 @@ class DockerTestRunnerTests(TestCase):
             DATA_DIR
         )
         self.assertEqual(result.rc, signal.SIGKILL)
-        self.assertEqual(result.stdout, "OUT")
-        self.assertEqual(result.stderr, "ERR")
+        self.assertEqual(result.stdout, "OUTERR")
+        self.assertEqual(result.stderr, "")
 
     def test_inbound_mountpoint(self):
         """Test if the input mount point works correctly."""
