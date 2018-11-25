@@ -66,6 +66,19 @@ class DockerTestRunnerTests(TestCase):
         self.assertEqual(result.stderr, "")
         self.assertGreaterEqual(result.duration, 0.0)
 
+    def test_output_interleaved(self):
+        """Test if stdout and stderr are interleaved correctly."""
+        result = self.runner.check_task(
+            "echo -n OUT; echo -n ERR >&2; echo -n OUT; exit 42",
+            DATA_DIR
+        )
+        self.assertEqual(result.rc, 42)
+        # Stdout should contain OUT, ERR and OUT
+        # appended to each other in the correct order
+        self.assertEqual(result.stdout, "OUTERROUT")
+        self.assertEqual(result.stderr, "")
+        self.assertGreaterEqual(result.duration, 0.0)
+
     def test_kill_on_timeout(self):
         """Test if the container gets killed after the timeout."""
         result = self.runner.check_task("sleep 10", DATA_DIR)
