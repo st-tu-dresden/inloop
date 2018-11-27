@@ -11,6 +11,9 @@ init:
 	docker build -t $(IMAGE) tests/testrunner
 	ln -snf .env.develop .env
 
+run:
+	pipenv run honcho start
+
 loaddb:
 	pipenv run ./manage.py migrate
 	pipenv run ./manage.py loaddata about_pages staff_group
