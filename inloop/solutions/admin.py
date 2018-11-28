@@ -31,16 +31,16 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
 
     def generate_links(self):
         """Derive semesters of submitted solutions."""
+        semesters = [('Any semester', {})]
         first_solution = Solution.objects.first()
         if not first_solution:
-            return []
+            return semesters
 
         # start and end are both in the CEST timezone
         tzinfo_cest = timezone(timedelta(hours=2))
         summer_start = datetime(2018, 4, 1, tzinfo=tzinfo_cest)
         winter_start = datetime(2018, 10, 1, tzinfo=tzinfo_cest)
 
-        semesters = []
         for year in range(first_solution.submission_date.year, now().year + 1):
             semesters.append(("Summer {}".format(year), {
                 self.lookup_kwarg_since: str(summer_start.replace(year)),
