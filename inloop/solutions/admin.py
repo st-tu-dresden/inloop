@@ -40,7 +40,7 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         """Derive semesters of submitted solutions."""
         solutions = Solution.objects.all().order_by("submission_date")
         if not solutions:
-            return None
+            return []
         first_solution_submission_date = solutions[0].submission_date.date()
         first_solution_year = first_solution_submission_date.year
         current_year = timezone.now().year
