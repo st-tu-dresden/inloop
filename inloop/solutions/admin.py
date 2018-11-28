@@ -1,20 +1,10 @@
-import calendar
 from datetime import datetime, timedelta, timezone
 
 from django.contrib import admin
-from django.utils.timezone import localdate, now
+from django.utils.timezone import now
 
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.statistics import Statistics
-
-
-def start_of_month(year, month):
-    return str(localdate(now()).replace(year=year, month=month, day=1))
-
-
-def end_of_month(year, month):
-    month = month % 12 + 1
-    return str(localdate(now()).replace(year=year, month=month, day=1))
 
 
 class SolutionFileInline(admin.StackedInline):
@@ -53,31 +43,6 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         return semesters
 
 
-class LastMonthsDateFieldFilter(admin.DateFieldListFilter):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.title = "month"
-        self.links = list(self.links) + self.generate_links()
-
-    @staticmethod
-    def get_last_months():
-        solutions = Solution.objects.all()
-        months = set()
-        for solution in solutions:
-            months.add((solution.submission_date.year, solution.submission_date.month))
-        return months
-
-    def generate_links(self):
-        """Derive last 12 months."""
-        months = []
-        for (year, month) in LastMonthsDateFieldFilter.get_last_months():
-            months.append(("{} {}".format(calendar.month_abbr[month], year), {
-                self.lookup_kwarg_since: start_of_month(year, month),
-                self.lookup_kwarg_until: end_of_month(year, month)
-            }))
-        return months
-
-
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
     class Media:
@@ -91,7 +56,7 @@ class SolutionAdmin(admin.ModelAdmin):
         'passed',
         'task__category',
         ('submission_date', SemesterFieldListFilter),
-        ('submission_date', LastMonthsDateFieldFilter),
+        'submission_date',
         'task'
     ]
     search_fields = [
