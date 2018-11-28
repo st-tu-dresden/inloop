@@ -1,27 +1,20 @@
 import calendar
+from datetime import datetime, timedelta, timezone
 
 from django.contrib import admin
-from django.utils import timezone
+from django.utils.timezone import localdate, now
 
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.solutions.statistics import Statistics
 
 
-def start_of_summer_semester(year):
-    return str(timezone.localdate(timezone.now()).replace(year=year, month=4, day=1))
-
-
-def start_of_winter_semester(year):
-    return str(timezone.localdate(timezone.now()).replace(year=year, month=10, day=1))
-
-
 def start_of_month(year, month):
-    return str(timezone.localdate(timezone.now()).replace(year=year, month=month, day=1))
+    return str(localdate(now()).replace(year=year, month=month, day=1))
 
 
 def end_of_month(year, month):
     month = month % 12 + 1
-    return str(timezone.localdate(timezone.now()).replace(year=year, month=month, day=1))
+    return str(localdate(now()).replace(year=year, month=month, day=1))
 
 
 class SolutionFileInline(admin.StackedInline):
@@ -41,20 +34,22 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         first_solution = Solution.objects.first()
         if not first_solution:
             return []
-        first_solution_year = first_solution.submission_date.year
-        current_year = timezone.now().year
+
+        # start and end are both in the CEST timezone
+        tzinfo_cest = timezone(timedelta(hours=2))
+        summer_start = datetime(2018, 4, 1, tzinfo=tzinfo_cest)
+        winter_start = datetime(2018, 10, 1, tzinfo=tzinfo_cest)
+
         semesters = []
-
-        for year in range(first_solution_year, current_year + 1):
-            semesters.append(("Summer Semester {}".format(year), {
-                self.lookup_kwarg_since: start_of_summer_semester(year),
-                self.lookup_kwarg_until: start_of_winter_semester(year)
+        for year in range(first_solution.submission_date.year, now().year + 1):
+            semesters.append(("Summer {}".format(year), {
+                self.lookup_kwarg_since: str(summer_start.replace(year)),
+                self.lookup_kwarg_until: str(winter_start.replace(year))
             }))
-            semesters.append(("Winter Semester {}".format(year), {
-                self.lookup_kwarg_since: start_of_winter_semester(year),
-                self.lookup_kwarg_until: start_of_summer_semester(year + 1)
+            semesters.append(("Winter {}/{}".format(year, year + 1), {
+                self.lookup_kwarg_since: str(winter_start.replace(year)),
+                self.lookup_kwarg_until: str(summer_start.replace(year=year + 1))
             }))
-
         return semesters
 
 
