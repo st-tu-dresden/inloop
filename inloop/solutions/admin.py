@@ -32,17 +32,16 @@ class SolutionFileInline(admin.StackedInline):
 
 class SemesterFieldListFilter(admin.DateFieldListFilter):
     def __init__(self, *args, **kwargs):
-        super(SemesterFieldListFilter, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title = "semester"
         self.links = self.generate_links()
 
     def generate_links(self):
         """Derive semesters of submitted solutions."""
-        solutions = Solution.objects.all().order_by("submission_date")
-        if not solutions:
+        first_solution = Solution.objects.first()
+        if not first_solution:
             return []
-        first_solution_submission_date = solutions[0].submission_date.date()
-        first_solution_year = first_solution_submission_date.year
+        first_solution_year = first_solution.submission_date.year
         current_year = timezone.now().year
         semesters = []
 
@@ -61,10 +60,9 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
 
 class LastMonthsDateFieldFilter(admin.DateFieldListFilter):
     def __init__(self, *args, **kwargs):
-        super(LastMonthsDateFieldFilter, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title = "month"
-        self.links = list(self.links)
-        self.links += self.generate_links()
+        self.links = list(self.links) + self.generate_links()
 
     @staticmethod
     def get_last_months():
@@ -110,7 +108,7 @@ class SolutionAdmin(admin.ModelAdmin):
         return '<a href="%s">%s details</a>' % (obj.get_absolute_url(), obj)
 
     def changelist_view(self, request, extra_context=None):
-        """Filter admin view by the selected viewport filter"""
+        """Filter admin view by the selected viewport filter."""
         solutions = Solution.objects.filter(**request.GET.dict())
         extra = {}
         if solutions:
