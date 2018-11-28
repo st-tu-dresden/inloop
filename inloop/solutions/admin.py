@@ -47,19 +47,14 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         semesters = []
 
         for year in range(first_solution_year, current_year + 1):
-            semesters.append(
-                ("Summer Semester {}".format(year), {
-                    self.lookup_kwarg_since: start_of_summer_semester(year),
-                    self.lookup_kwarg_until: start_of_winter_semester(year)
-                })
-            )
-
-            semesters.append(
-                ("Winter Semester {}".format(year), {
-                    self.lookup_kwarg_since: start_of_winter_semester(year),
-                    self.lookup_kwarg_until: start_of_summer_semester(year + 1)
-                })
-            )
+            semesters.append(("Summer Semester {}".format(year), {
+                self.lookup_kwarg_since: start_of_summer_semester(year),
+                self.lookup_kwarg_until: start_of_winter_semester(year)
+            }))
+            semesters.append(("Winter Semester {}".format(year), {
+                self.lookup_kwarg_since: start_of_winter_semester(year),
+                self.lookup_kwarg_until: start_of_summer_semester(year + 1)
+            }))
 
         return semesters
 
@@ -83,12 +78,10 @@ class LastMonthsDateFieldFilter(admin.DateFieldListFilter):
         """Derive last 12 months."""
         months = []
         for (year, month) in LastMonthsDateFieldFilter.get_last_months():
-            months.append(
-                ("{} {}".format(calendar.month_abbr[month], year), {
-                    self.lookup_kwarg_since: start_of_month(year, month),
-                    self.lookup_kwarg_until: end_of_month(year, month)
-                })
-            )
+            months.append(("{} {}".format(calendar.month_abbr[month], year), {
+                self.lookup_kwarg_since: start_of_month(year, month),
+                self.lookup_kwarg_until: end_of_month(year, month)
+            }))
         return months
 
 
