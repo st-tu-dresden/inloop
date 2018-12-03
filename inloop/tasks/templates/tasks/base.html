@@ -13,16 +13,20 @@
   <li class="active">{{ task.title }}</li>
 </ol>
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs sticky-nav sticky-tab-layout">
   <li role="presentation" {% if active_tab == 0 %}class="active"{% endif %}>
     <a href="{% url 'tasks:detail' task.slug %}">Description</a>
   </li>
   <li role="presentation" {% if active_tab == 1 %}class="active"{% endif %}>
-    <a href="{% url 'solutions:upload' task.slug %}">Manual upload</a>
+    <a href="{% url 'solutions:editor' task.slug %}">Editor</a>
   </li>
   <li role="presentation" {% if active_tab == 2 %}class="active"{% endif %}>
+    <a href="{% url 'solutions:upload' task.slug %}">Manual upload</a>
+  </li>
+  <li role="presentation" {% if active_tab == 3 %}class="active"{% endif %}>
     <a href="{% url 'solutions:list' task.slug %}">Your solutions</a>
   </li>
+{% block extra_tab %}{% endblock %}
 </ul>
 
 <div class="static-tab-content">

@@ -1,7 +1,10 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
@@ -20,11 +23,73 @@ class SolutionStatusView(LoginRequiredMixin, View):
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
 
 
+class SolutionEditorView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        return TemplateResponse(request, "solutions/editor/editor.html", {
+            "task": get_object_or_404(Task.objects.published(), slug=slug),
+            "active_tab": 1
+        })
+
+    def post(self, request, slug):
+        task = get_object_or_404(Task.objects.published(), slug=slug)
+        failure_response = JsonResponse({"success": False})
+
+        if not request.is_ajax():
+            return failure_response
+
+        if task.is_expired:
+            messages.error(request, "The deadline for this task has passed.")
+            return failure_response
+
+        try:
+            json_data = json.loads(request.body)
+            uploads = json_data["uploads"]
+        # NOTE: JSONDecodeError is only available since Python 3.5
+        except (KeyError, ValueError):
+            return failure_response
+
+        if not uploads:
+            messages.error(request, "You haven't uploaded any files.")
+            return failure_response
+
+        if not all([file_name.endswith(".java") for file_name, _ in uploads.items()]):
+            messages.error(request, "You have uploaded invalid files (allowed: *.java).")
+            return failure_response
+
+        files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
+
+        with transaction.atomic():
+            solution = Solution.objects.create(
+                author=request.user,
+                task=task
+            )
+            SolutionFile.objects.bulk_create([
+                SolutionFile(solution=solution, file=f) for f in files
+            ])
+
+        solution_submitted.send(sender=self.__class__, solution=solution)
+        messages.success(request, "Your solution has been submitted to the checker.")
+        return JsonResponse({"success": True})
+
+
+class ModularSolutionEditorFileView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        editor_id = request.GET.get("editor_id")
+        file_name = request.GET.get("file_name")
+        if not id or not file_name:
+            raise Http404("No id or file_name supplied to modular editor file view.")
+        return TemplateResponse(request, "solutions/editor/modular_editor_file.html", {
+            "task": get_object_or_404(Task.objects.published(), slug=slug),
+            "editor_id": editor_id,
+            "file_name": file_name,
+        })
+
+
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, "solutions/upload_form.html", {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 1
+            'active_tab': 2
         })
 
     def post(self, request, slug):
@@ -69,7 +134,7 @@ class SolutionListView(LoginRequiredMixin, View):
         return TemplateResponse(request, "solutions/solution_list.html", {
             'task': task,
             'solutions': solutions,
-            'active_tab': 2
+            'active_tab': 3
         })
 
 

@@ -1,0 +1,64 @@
+{% extends "tasks/base.html" %}
+{% load staticfiles %}
+
+{% block title %}Editor{% endblock %}
+
+{% block extra_tab %}
+{% if not task.is_expired %}
+<li style="float: right;">
+  <div class="btn-group">
+    <button id="status-button" type="button" class="btn btn-default alert-success button-flat"
+            onclick="editor.save(); blur();" title="Save this solution">
+      <span id="status-button-icon" class="glyphicon glyphicon-floppy-saved"></span>
+    </button>
+  </div>
+
+  <button id="submit-button" type="button" onclick="editor.upload(); blur();"
+          class="btn btn-default alert-info button-flat" aria-label="Submit">
+    <span class="glyphicon glyphicon-equalizer"></span>
+    Submit
+  </button>
+
+  <div class="btn-group">
+    <button type="button" class="btn btn-default alert-info button-flat"
+            onclick="editor.createNewEmptyEditor(); blur();">
+      <span class="glyphicon glyphicon-plus-sign"></span>
+      New File
+    </button>
+  </div>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block tab_content %}
+{% if not task.is_expired %}
+
+<div id="editors">
+
+</div>
+
+{% else %}
+<p class="alert alert-warning">
+  The deadline for this task has passed. You cannot submit new solutions.
+</p>
+{% endif %}
+
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/ace/ace.js' %}"></script>
+<script src="{% static 'js/ace/ext-language_tools.js' %}"></script>
+<script src="{% static 'js/ace/mode-java.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/rusha.min.js' %}"></script>
+<script src="{% static 'js/editor.js' %}"></script>
+<script>
+    let editor = new Editor({
+        csrfToken : "{{ csrf_token }}",
+        modularEditorUrl : "{% url 'solutions:modular-editor' task.slug %}",
+        solutionsEditorUrl : "{% url 'solutions:editor' task.slug %}",
+        solutionsListUrl : "{% url 'solutions:list' task.slug %}",
+    });
+    editor.load();
+</script>
+{% endblock %}
