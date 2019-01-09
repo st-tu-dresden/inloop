@@ -26,8 +26,10 @@
   <li role="presentation" {% if active_tab == 3 %}class="active"{% endif %}>
     <a href="{% url 'solutions:list' task.slug %}">Your solutions</a>
   </li>
-{% block extra_tab %}{% endblock %}
+{% block extra_in_tab %}{% endblock %}
 </ul>
+
+{% block extra_after_tab %}{% endblock %}
 
 <div class="static-tab-content">
 {% block tab_content %}{% endblock %}

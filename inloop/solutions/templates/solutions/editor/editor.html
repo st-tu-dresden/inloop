@@ -3,7 +3,7 @@
 
 {% block title %}Editor{% endblock %}
 
-{% block extra_tab %}
+{% block extra_in_tab %}
 {% if not task.is_expired %}
 <li style="float: right;">
   <div class="btn-group">
@@ -33,9 +33,24 @@
 {% block tab_content %}
 {% if not task.is_expired %}
 
-<div id="editors">
+<div id="demo" class="collapse" style="position: fixed; z-index: 30; left: 50%; bottom: 50px; transform: translate(-50%); background: rgba(55, 55, 55, 0.1); animation: border-radius-fade 1s ease-in-out alternate infinite;">
+
+<div class="btn-group-vertical" style="padding: 2px; z-index: 20;">
+  <button class="btn btn-default button-flat" onclick="blur();">VeryLongSolutionFileNameOfAnInloopSolution.java</button>
+  <button class="btn btn-default button-flat" onclick="blur();">NewFile.java</button>
+</div>
 
 </div>
+
+<div style="position: fixed; z-index: 30; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.5);">
+<button type="button" class="btn btn-default button-flat shadowed" style="background-color: #333; color: #fff; text-shadow: none;"
+        onclick="blur();" data-target="#demo" data-toggle="collapse">
+  <span id="status-button-icon" class="glyphicon glyphicon-th-list"></span>
+    Files
+</button>
+</div>
+
+<div id="editors"></div>
 
 {% else %}
 <p class="alert alert-warning">
