@@ -13,7 +13,7 @@
   <li class="active">{{ task.title }}</li>
 </ol>
 
-<ul class="nav nav-tabs sticky-nav sticky-tab-layout">
+<ul class="nav nav-tabs sticky sticky-tab-layout">
   <li role="presentation" {% if active_tab == 0 %}class="active"{% endif %}>
     <a href="{% url 'tasks:detail' task.slug %}">Description</a>
   </li>
@@ -28,8 +28,6 @@
   </li>
 {% block extra_in_tab %}{% endblock %}
 </ul>
-
-{% block extra_after_tab %}{% endblock %}
 
 <div class="static-tab-content">
 {% block tab_content %}{% endblock %}

@@ -109,17 +109,7 @@ class Editor {
         {
           "last_submission": "bc0f8d45bdcde5f4dd2ae181c52581e78ad0d5cb",
           "saved_files": {
-            "test.java": "public class test {}",
-            "test2.java": "",
-            "test3.java": "",
-            "test4.java": "",
-            "test5.java": "",
-            "test6.java": "",
-            "test7.java": "",
-            "test8.java": "",
-            "test9.java": "",
-            "test10.java": "",
-            "test11.java": ""
+            "test.java": "public class test {}"
           }
         }
         `);

@@ -1,15 +1,5 @@
 <div id="modular-editor" data-id="{{ editor_id }}">
-<div class="background-color-editor editor-round-top"></div>
-<div class="input-group">
-  <input id="file-name-{{ editor_id }}" type="text" class="form-control border-radius-zero"
-         placeholder="New File" value="{{ file_name }}">
-  <span class="input-group-btn">
-    <button class="btn btn-default alert-danger button-flat border-radius-zero"
-            onclick="editor.removeEditor('{{ editor_id }}')">
-      <span class="glyphicon glyphicon-remove"></span>
-    </button>
-  </span>
-</div>
+<div class="background-color-editor"></div>
 <div class="background-color-editor editor-divider"></div>
 <div class="editor" id="{{ editor_id }}"></div>
 <div class="background-color-editor editor-round-bottom"></div>
