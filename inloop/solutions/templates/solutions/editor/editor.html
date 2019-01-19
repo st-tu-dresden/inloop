@@ -8,24 +8,16 @@
 <li style="float: right;">
   <div class="btn-group">
     <button id="status-button" type="button" class="btn btn-default alert-success button-flat"
-            onclick="editor.save(); blur();" title="Save this solution">
+            onclick="suite.save(); blur();" title="Save this solution">
       <span id="status-button-icon" class="glyphicon glyphicon-floppy-saved"></span>
     </button>
   </div>
 
-  <button id="submit-button" type="button" onclick="editor.upload(); blur();"
+  <button id="submit-button" type="button" onclick="suite.upload(); blur();"
           class="btn btn-default alert-info button-flat" aria-label="Submit">
     <span class="glyphicon glyphicon-equalizer"></span>
     Submit
   </button>
-
-  <div class="btn-group">
-    <button type="button" class="btn btn-default alert-info button-flat"
-            onclick="editor.createNewEmptyEditor(); blur();">
-      <span class="glyphicon glyphicon-plus-sign"></span>
-      New File
-    </button>
-  </div>
 </li>
 {% endif %}
 {% endblock %}
@@ -34,19 +26,20 @@
 {% block tab_content %}
 {% if not task.is_expired %}
 
-<ul class="nav nav-tabs">
-<li><a href="#a">One</a></li>
-<li><a href="#b">Two</a></li>
-<li><a href="#c">Twee</a></li>
-<li><a href="#c">Twee</a></li>
-<li><a href="#c">Twee</a></li>
-<li><a href="#c">Twee</a></li>
-<li><a href="#c">Twee</a></li>
-<li><a href="#c">Twee</a></li>
+<ul id="tab-container" class="nav nav-pills scrollable">
+<li class="active">
+    <a onclick="suite.createNewTab(); blur();">
+        <span class="glyphicon glyphicon-plus-sign"></span>
+    </a>
+</li>
 </ul>
 
-
-<div id="editors"></div>
+<div id="editor-container">
+    <div class="background-color-editor"></div>
+    <div class="background-color-editor editor-divider"></div>
+    <div id="editor" class="editor"></div>
+    <div class="background-color-editor editor-round-bottom"></div>
+</div>
 
 {% else %}
 <p class="alert alert-warning">
@@ -62,14 +55,20 @@
 <script src="{% static 'js/ace/mode-java.js' %}"></script>
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/rusha.min.js' %}"></script>
-<script src="{% static 'js/editor.js' %}"></script>
-<script>
-    let editor = new Editor({
-        csrfToken : "{{ csrf_token }}",
-        modularEditorUrl : "{% url 'solutions:modular-editor' task.slug %}",
-        solutionsEditorUrl : "{% url 'solutions:editor' task.slug %}",
-        solutionsListUrl : "{% url 'solutions:list' task.slug %}",
-    });
-    editor.load();
+<script id="editor-script"
+        src="{% static 'js/editor.js' %}"
+        data-csrf-token="{{ csrf_token }}"
+        data-modular-tab-url="{% url 'solutions:modular-tab' task.slug %}"
+        data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
+        data-solutions-list-url="{% url 'solutions:list' task.slug %}"
+        data-tab-container-id="#tab-container"
+        data-editor-id="editor"
+        data-status-button-background-id="#status-button"
+        data-status-button-icon-id="#status-button-icon"
+        data-css-background-unsaved="alert-danger"
+        data-css-background-saved="alert-success"
+        data-css-icon-unsaved="glyphicon-floppy-unsaved"
+        data-css-icon-saved="glyphicon-floppy-saved"
+        >
 </script>
 {% endblock %}

@@ -1,9 +1,9 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (ModularSolutionEditorFileView, SolutionDetailView,
+from inloop.solutions.views import (SolutionDetailView,
                                     SolutionEditorView, SolutionFileView, SolutionListView,
                                     SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView)
+                                    StaffSolutionDetailView, ModularEditorTabView)
 
 app_name = "solutions"
 urlpatterns = [
@@ -44,8 +44,8 @@ urlpatterns = [
         name='editor'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/modular-editor/$',
-        ModularSolutionEditorFileView.as_view(),
-        name='modular-editor'
+        r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
+        ModularEditorTabView.as_view(),
+        name='modular-tab'
     ),
 ]

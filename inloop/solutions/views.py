@@ -72,16 +72,13 @@ class SolutionEditorView(LoginRequiredMixin, View):
         return JsonResponse({"success": True})
 
 
-class ModularSolutionEditorFileView(LoginRequiredMixin, View):
+class ModularEditorTabView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        editor_id = request.GET.get("editor_id")
-        file_name = request.GET.get("file_name")
-        if not id or not file_name:
-            raise Http404("No id or file_name supplied to modular editor file view.")
-        return TemplateResponse(request, "solutions/editor/modular_editor_file.html", {
-            "task": get_object_or_404(Task.objects.published(), slug=slug),
-            "editor_id": editor_id,
-            "file_name": file_name,
+        tab_id = request.GET.get("tab_id")
+        if not tab_id:
+            raise Http404("No file name supplied to tab view.")
+        return TemplateResponse(request, "solutions/editor/modular_editor_tab.html", {
+            "tab_id": tab_id,
         })
 
 
