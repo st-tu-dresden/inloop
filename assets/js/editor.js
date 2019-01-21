@@ -10,6 +10,7 @@ let TAB_CONTAINER_ID = script.getAttribute("data-tab-container-id");
 let EDITOR_ID = script.getAttribute("data-editor-id");
 let STATUS_BUTTON_BACKGROUND_ID = script.getAttribute("data-status-button-background-id");
 let STATUS_BUTTON_ICON_ID = script.getAttribute("data-status-button-icon-id");
+let STATUS_BUTTON_HINT_ID = script.getAttribute("data-status-button-hint-id");
 let CSS_BACKGROUND_UNSAVED = script.getAttribute("data-css-background-unsaved");
 let CSS_BACKGROUND_SAVED = script.getAttribute("data-css-background-saved");
 let CSS_ICON_UNSAVED = script.getAttribute("data-css-icon-unsaved");
@@ -44,6 +45,7 @@ class StatusButton {
     constructor(isSaved) {
         this.background = $(STATUS_BUTTON_BACKGROUND_ID);
         this.icon = $(STATUS_BUTTON_ICON_ID);
+        this.hint = $(STATUS_BUTTON_HINT_ID);
         this.changeAppearance(isSaved);
     }
 
@@ -52,6 +54,7 @@ class StatusButton {
         this.background.addClass(CSS_BACKGROUND_SAVED);
         this.icon.removeClass(CSS_ICON_UNSAVED);
         this.icon.addClass(CSS_ICON_SAVED);
+        this.hint.prop("title", "No changes detected.");
     }
 
     appearAsUnsaved() {
@@ -59,6 +62,7 @@ class StatusButton {
         this.background.addClass(CSS_BACKGROUND_UNSAVED);
         this.icon.removeClass(CSS_ICON_SAVED);
         this.icon.addClass(CSS_ICON_UNSAVED);
+        this.hint.prop("title", "Changes detected. Save your solution.");
     }
 
     changeAppearance(isSaved) {
@@ -78,13 +82,20 @@ class HashComparator {
         this.hash = hash;
     }
 
+    updateHash(files) {
+        this.hash = this.computeHash(files);
+        statusButton.appearAsSaved();
+    }
+
     computeHash(files) {
         let concatenatedContents = "";
         for (let f of files) {
             concatenatedContents += f.fileContent;
             concatenatedContents += f.fileName;
+            console.log(f.fileContent);
         }
-        return this.rusha.digest(concatenatedContents);
+        let hash = this.rusha.digest(concatenatedContents);
+        return hash;
     }
 
     compareToFiles(files) {
@@ -118,13 +129,16 @@ class Tab {
             }
             container.append(html);
             if (self.onCreateClosure !== undefined) self.onCreateClosure(true);
+            $('[data-toggle="tooltip"]').tooltip();
         })
     }
 
     destroy() {
         let container = $(TAB_CONTAINER_ID);
-        let element = container.find("#" + this.tabId).first();
-        element.remove();
+        container.find("#" + this.tabId).first().remove();
+        container.find("#edit-" + this.tabId).first().remove();
+        container.find("#remove-" + this.tabId).first().remove();
+        fileBuilder.destroy(this.file);
     }
 
     setName(name) {
@@ -133,10 +147,22 @@ class Tab {
 
     appearAsActive() {
         $("#" + this.tabId).addClass("active");
+        let editElement = $("#edit-" + this.tabId);
+        editElement.css("display", "inherit");
+        editElement.addClass("active");
+        let removeElement = $("#remove-" + this.tabId);
+        removeElement.css("display", "inherit");
+        removeElement.addClass("active");
     }
 
     appearAsInactive() {
         $("#" + this.tabId).removeClass("active");
+        let editElement = $("#edit-" + this.tabId);
+        editElement.css("display", "none");
+        editElement.removeClass("active");
+        let removeElement = $("#remove-" + this.tabId);
+        removeElement.css("display", "none");
+        removeElement.removeClass("active");
     }
 
 }
@@ -175,14 +201,18 @@ class FileBuilder {
             if (file.fileName === fileName) {
                 new ModalNotification(
                     "Duplicate Filename",
-                    "This file exists already. Please choose another filename."
+                    "\"" + fileName +  "\" exists already. Please choose another filename or edit the name of the existing file."
                 );
-                return null;
+                return undefined;
             }
         }
         let f = new File(fileName, fileContent);
         this.files.push(f);
         return f;
+    }
+
+    destroy(file) {
+        this.files = this.files.filter(f => f.name !== file.name);
     }
 }
 
@@ -204,7 +234,7 @@ class TabBar {
             if (e.keyCode === 83) {
                 if (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) {
                     e.preventDefault();
-                    self.save();
+                    communicator.save();
                 }
             }
         }, false);
@@ -219,13 +249,15 @@ class TabBar {
     }
 
     createNewTab(file) {
-        if (file === undefined) {
+        let tabId = this.dequeueTabId();
+        let isNewTab = file === undefined;
+        if (isNewTab) {
             file = fileBuilder.build("New.java", "\n");
-            if (file === null) {
+            if (file === undefined) {
                 return;
             }
         }
-        let tabId = this.dequeueTabId();
+        let self = this;
         let tab = new Tab(tabId, file).onCreate(function(success) {
             if (success !== true) {
                 // TODO: Handle failure
@@ -235,9 +267,13 @@ class TabBar {
             file.addSetFileNameListener(function(name) {
                 tab.setName(name);
             });
+            if (isNewTab) {
+                self.activate(tabId);
+            }
         });
         this.tabs.push(tab);
         tab.build();
+        return tab;
     }
 
     activate(tabId) {
@@ -248,6 +284,15 @@ class TabBar {
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
     }
+
+    destroy(tabId) {
+        if (this.activeTab !== undefined) {
+            this.activeTab.appearAsInactive();
+        }
+        this.editor.unbind(this.activeTab.file);
+        this.activeTab.destroy();
+        this.activeTab = undefined;
+    }
 }
 
 
@@ -257,7 +302,7 @@ class Editor {
         return {
             highlightActiveLine: true,
             highlightSelectedWord: true,
-            readOnly: false,
+            readOnly: true,
             cursorStyle: "ace",
             mergeUndoDeltas: true,
             printMargin: 80,
@@ -269,18 +314,17 @@ class Editor {
             enableLiveAutocompletion: true,
             maxLines: Infinity,
             fontFamily: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
-            fontSize: "10.5pt"
+            fontSize: "10.5pt",
+            value: "// Select or create files to continue"
         };
     }
 
     constructor() {
         this.editor = ace.edit(EDITOR_ID);
         if (this.editor === undefined) {
-            if (this.onCreateClosure !== undefined) this.onCreateClosure(false);
             return;
         }
         this.editor.setOptions(Editor.config());
-        if (this.onCreateClosure !== undefined) this.onCreateClosure(true);
     }
 
     addOnChangeListener(closure) {
@@ -289,16 +333,22 @@ class Editor {
 
     bind(file) {
         if (this.editor === undefined) return;
+        this.editor.setReadOnly(false);
         this.editor.removeAllListeners("change");
         let self = this;
-        this.editor.on("change", function() {
-            if (self.onChangeClosure !== undefined) self.onChangeClosure();
-        });
         this.editor.setValue(file.fileContent);
         this.editor.clearSelection();
         this.editor.on("change", function() {
             file.fileContent = self.editor.getValue();
+            if (self.onChangeClosure !== undefined) self.onChangeClosure();
         });
+    }
+
+    unbind(file) {
+        if (this.editor === undefined) return;
+        this.editor.removeAllListeners("change");
+        this.editor.setValue("");
+        this.editor.setReadOnly(true)
     }
 }
 
@@ -311,7 +361,7 @@ class Communicator {
         // TODO: Actually load JSON data
         this.uploadedData = JSON.parse(`
         {
-          "last_submission": "bc0f8d45bdcde5f4dd2ae181c52581e78ad0d5cb",
+          "last_submission": "fdb8da1705ac435e669120369236a8f48fdf68bc",
           "saved_files": {
             "test.java": "public class test {}",
             "A.java": "public class A {}",
@@ -333,6 +383,7 @@ class Communicator {
         // TODO: Implement save
         console.log("TODO: Save not implemented yet!");
         if (completion !== undefined) completion(true);
+        hashComparator.updateHash(fileBuilder.files);
     }
 
     upload(files) {

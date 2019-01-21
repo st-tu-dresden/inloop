@@ -336,7 +336,7 @@ code {
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.03) !important;
 }
 
-.button-flat {
+.flat {
   background-image: none;
 }
 
@@ -390,12 +390,46 @@ code {
   overflow-y: hidden;
   display: -webkit-box;
   display: -moz-box;
-  scrollbar-width: auto;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
 }
 
 .nav.scrollable>li {
   float: none;
-  background-color: #eee;
+  background-color: rgb(245, 245, 245);
   border-radius: 4px;
+}
+
+.nav-pills>li.active>a,
+.nav-pills>li.active>a:focus,
+.nav-pills>li.active>a:hover {
+  float: none;
+  background-color: #3867d6;
+  border-radius: 4px;
+}
+
+.unsaved {
+  background-color: #e74c3c !important;
+  color: #fff;
+}
+
+.unsaved:hover,
+.unsaved:focus {
+  background-color: #c0392b !important;
+  color: #eee;
+}
+
+.saved {
+  background-color: #2ecc71 !important;
+  color: #fff;
+}
+
+.saved:hover,
+.saved:focus {
+  background-color: #27ae60 !important;
+  color: #eee;
+}
+
+.vertical-divider {
+  width: 5px;
+  background-color: rgb(220, 220, 220) !important;
 }

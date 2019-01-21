@@ -1,8 +1,17 @@
 <li id="{{ tab_id }}">
     <a onclick="tabBar.activate({{ tab_id }})" id="label-{{ tab_id }}" href="#">
         New File
-        <span class="badge annotation-badge">
-            <span onclick="console.log({{ tab_id }})" class="glyphicon glyphicon-pencil"></span>
-        </span>
+    </a>
+</li>
+<li id="edit-{{ tab_id }}" style="display: none"
+    data-toggle="tooltip" title="Rename this file." data-placement="auto">
+    <a onclick="tabBar.edit({{ tab_id }})" href="#">
+        <span class="glyphicon glyphicon-pencil"></span>
+    </a>
+</li>
+<li id="remove-{{ tab_id }}" style="display: none"
+    data-toggle="tooltip" title="Remove this file." data-placement="auto">
+    <a onclick="tabBar.destroy({{ tab_id }})" href="#">
+        <span class="glyphicon glyphicon-remove"></span>
     </a>
 </li>

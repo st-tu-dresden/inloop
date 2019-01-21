@@ -3,37 +3,32 @@
 
 {% block title %}Editor{% endblock %}
 
-{% block extra_in_tab %}
-{% if not task.is_expired %}
-<li style="float: right;">
-  <div class="btn-group">
-    <button id="status-button" type="button" class="btn btn-default alert-success button-flat"
-            onclick="suite.save(); blur();" title="Save this solution">
-      <span id="status-button-icon" class="glyphicon glyphicon-floppy-saved"></span>
-    </button>
-  </div>
-
-  <button id="submit-button" type="button" onclick="communicator.upload(files); blur();"
-          class="btn btn-default alert-info button-flat" aria-label="Submit">
-    <span class="glyphicon glyphicon-equalizer"></span>
-    Submit
-  </button>
-</li>
-{% endif %}
-{% endblock %}
-
 
 {% block tab_content %}
 {% if not task.is_expired %}
 
-<ul id="tab-container" class="nav nav-pills scrollable">
-<li class="active">
-    <a onclick="tabBar.createNewTab(); blur();">
-        <span class="glyphicon glyphicon-plus-sign"></span>
-    </a>
-</li>
-</ul>
 
+<ul id="tab-container" class="nav nav-pills scrollable">
+    <li id="status-button-hint" data-toggle="tooltip" title="Save this solution." data-placement="auto">
+      <a id="status-button" href="#" onclick="communicator.save(); blur();">
+          <span id="status-button-icon"
+                class="glyphicon glyphicon-floppy-saved"></span>
+      </a>
+    </li>
+    <li data-toggle="tooltip" title="Save and upload this solution to the checker." data-placement="auto">
+      <a href="#" onclick="communicator.upload(fileBuilder.files); blur();">
+          <span class="glyphicon glyphicon-cloud-upload"></span>
+      </a>
+    </li>
+    <li data-toggle="tooltip" title="Create a new file." data-placement="auto">
+      <a href="#" onclick="tabBar.createNewTab(); blur();">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+      </a>
+    </li>
+    <li class="vertical-divider">
+    </li>
+</ul>
+    
 <div id="editor-container">
     <div class="background-color-editor"></div>
     <div class="background-color-editor editor-divider"></div>
@@ -70,10 +65,16 @@
         data-editor-id="editor"
         data-status-button-background-id="#status-button"
         data-status-button-icon-id="#status-button-icon"
-        data-css-background-unsaved="alert-danger"
-        data-css-background-saved="alert-success"
-        data-css-icon-unsaved="glyphicon-floppy-unsaved"
+        data-status-button-hint-id="#status-button-hint"
+        data-css-background-unsaved="unsaved"
+        data-css-background-saved="saved"
+        data-css-icon-unsaved="glyphicon-floppy-remove"
         data-css-icon-saved="glyphicon-floppy-saved"
         >
+</script>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
 </script>
 {% endblock %}
