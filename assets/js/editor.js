@@ -1,9 +1,11 @@
 // Load data attributes
 let script = document.getElementById("editor-script");
 let MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
+let MODULAR_NOTIFICATION_URL = script.getAttribute("data-modular-notification-url");
 let CSRF_TOKEN = script.getAttribute("data-csrf-token");
 let SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 let SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
+let MODAL_CONTAINER_ID = script.getAttribute("data-modal-container-id");
 let TAB_CONTAINER_ID = script.getAttribute("data-tab-container-id");
 let EDITOR_ID = script.getAttribute("data-editor-id");
 let STATUS_BUTTON_BACKGROUND_ID = script.getAttribute("data-status-button-background-id");
@@ -19,6 +21,22 @@ jQuery.fn.textNodes = function() {
         return (this.nodeType === Node.TEXT_NODE && this.nodeValue.trim() !== "");
     });
 };
+
+
+class ModalNotification {
+    constructor(title, body) {
+        let hook = "modal-notification-hook";
+        $.get(MODULAR_NOTIFICATION_URL, {hook: hook, title: title, body: body}, function(html) {
+            let container = $(MODAL_CONTAINER_ID);
+            if (container === undefined || html === undefined) {
+                return;
+            }
+            container.html(html);
+            let modalContainer = $("#" + hook);
+            modalContainer.modal("show");
+        })
+    }
+}
 
 
 class StatusButton {
@@ -70,17 +88,12 @@ class HashComparator {
     }
 
     compareToFiles(files) {
-        let equal = this.computeHash(files) === this.hash;
-        return equal;
+        return this.computeHash(files) === this.hash;
     }
 }
 
 
 class Tab {
-    static compare(a, b) {
-        return File.compare(a.file, b.file);
-    }
-
     constructor(tabId, file) {
         this.tabId = tabId;
         this.file = file;
@@ -104,25 +117,17 @@ class Tab {
                 return;
             }
             container.append(html);
-            self.showName(self.file.fileName);
             if (self.onCreateClosure !== undefined) self.onCreateClosure(true);
         })
     }
 
     destroy() {
         let container = $(TAB_CONTAINER_ID);
-        let self = container.find("#" + this.tabId).first();
-        self.remove();
+        let element = container.find("#" + this.tabId).first();
+        element.remove();
     }
 
-    reattach() {
-        let container = $(TAB_CONTAINER_ID);
-        let self = container.find("#" + this.tabId).first();
-        self.remove();
-        container.append(self);
-    }
-
-    showName(name) {
+    setName(name) {
         $("#label-" + this.tabId).textNodes().first().replaceWith(name);
     }
 
@@ -133,6 +138,7 @@ class Tab {
     appearAsInactive() {
         $("#" + this.tabId).removeClass("active");
     }
+
 }
 
 
@@ -147,29 +153,51 @@ class File {
         this.fileName = fileName;
         this.fileContent = fileContent;
     }
+
+    addSetFileNameListener(completion) {
+        this.setFileNameListener = completion;
+    }
+
+    setFileName(name) {
+        this.fileName = name;
+        if (this.setFileNameListener !== undefined) this.setFileNameListener(name);
+    }
 }
 
 
-class Suite {
+class FileBuilder {
+    constructor(files) {
+        this.files = files;
+    }
+
+    build(fileName, fileContent) {
+        for (let file of this.files) {
+            if (file.fileName === fileName) {
+                new ModalNotification(
+                    "Duplicate Filename",
+                    "This file exists already. Please choose another filename."
+                );
+                return null;
+            }
+        }
+        let f = new File(fileName, fileContent);
+        this.files.push(f);
+        return f;
+    }
+}
+
+
+class TabBar {
     constructor() {
-        let self = this;
-        this.communicator = new Communicator();
+        this.tabs = [];
         this.editor = new Editor();
-        this.statusButton = new StatusButton(true);
-        this.communicator.load(function(files, hash) {
-            if (files === undefined || hash === undefined) {
-                // TODO: Handle failure
-                return;
-            }
-            self.hashComparator = new HashComparator(hash);
-            self.editor.addOnChangeListener(function() {
-                let equal = self.hashComparator.compareToFiles(files);
-                self.statusButton.changeAppearance(equal);
-            });
-            for (let file of files) {
-                self.createNewTab(file);
-            }
+        this.editor.addOnChangeListener(function() {
+            let equal = hashComparator.compareToFiles(fileBuilder.files);
+            statusButton.changeAppearance(equal);
         });
+        for (let file of fileBuilder.files) {
+            this.createNewTab(file);
+        }
         // Prevent CTRL+S (CMD+S on Mac) and add
         // our custom event handler
         document.addEventListener("keydown", function(e) {
@@ -182,24 +210,6 @@ class Suite {
         }, false);
     }
 
-    files() {
-        let files = this.tabs.map(function(element) {return element.file});
-        files.sort(File.compare);
-        return files;
-    }
-
-    upload() {
-        this.communicator.upload(this.files());
-    }
-
-    save() {
-        this.communicator.save();
-        let files = this.files();
-        this.hashComparator.hash = this.hashComparator.computeHash(files);
-        let equal = this.hashComparator.compareToFiles(files);
-        this.statusButton.changeAppearance(equal);
-    }
-
     dequeueTabId() {
         if (this.tabId === undefined) {
             this.tabId = 0;
@@ -209,30 +219,25 @@ class Suite {
     }
 
     createNewTab(file) {
-        if (this.tabs === undefined) {
-            this.tabs = [];
-        }
         if (file === undefined) {
-            file = new File("New.java", "\n");
+            file = fileBuilder.build("New.java", "\n");
+            if (file === null) {
+                return;
+            }
         }
         let tabId = this.dequeueTabId();
-        let self = this;
         let tab = new Tab(tabId, file).onCreate(function(success) {
             if (success !== true) {
                 // TODO: Handle failure
                 return;
             }
-            self.sortTabs();
+            tab.setName(file.fileName);
+            file.addSetFileNameListener(function(name) {
+                tab.setName(name);
+            });
         });
         this.tabs.push(tab);
         tab.build();
-    }
-
-    sortTabs() {
-        this.tabs.sort(Tab.compare);
-        for (let t of this.tabs) {
-            t.reattach();
-        }
     }
 
     activate(tabId) {
@@ -360,4 +365,16 @@ class Communicator {
 }
 
 
-let suite = new Suite();
+let fileBuilder;
+let statusButton;
+let hashComparator;
+let tabBar;
+let communicator = new Communicator();
+
+communicator.load(function(f, h) {
+    fileBuilder = new FileBuilder(f);
+    hashComparator = new HashComparator(h);
+    let hashIsUpToDate = hashComparator.compareToFiles(fileBuilder.files);
+    statusButton = new StatusButton(hashIsUpToDate);
+    tabBar = new TabBar();
+});

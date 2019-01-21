@@ -82,6 +82,21 @@ class ModularEditorTabView(LoginRequiredMixin, View):
         })
 
 
+class ModularNotificationView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        body = request.GET.get("body")
+        hook = request.GET.get("hook")
+        if not title or not body or not hook:
+            raise Http404("No title or body or hook supplied to notification view.")
+        return TemplateResponse(request, "solutions/editor/modular_notification.html", {
+            "title": title,
+            "body": body,
+            "hook": hook
+        })
+
+
+
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, "solutions/upload_form.html", {

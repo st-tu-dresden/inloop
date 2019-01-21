@@ -13,7 +13,7 @@
     </button>
   </div>
 
-  <button id="submit-button" type="button" onclick="suite.upload(); blur();"
+  <button id="submit-button" type="button" onclick="communicator.upload(files); blur();"
           class="btn btn-default alert-info button-flat" aria-label="Submit">
     <span class="glyphicon glyphicon-equalizer"></span>
     Submit
@@ -28,7 +28,7 @@
 
 <ul id="tab-container" class="nav nav-pills scrollable">
 <li class="active">
-    <a onclick="suite.createNewTab(); blur();">
+    <a onclick="tabBar.createNewTab(); blur();">
         <span class="glyphicon glyphicon-plus-sign"></span>
     </a>
 </li>
@@ -50,17 +50,22 @@
 {% endblock %}
 
 {% block extrabody %}
+<div id="modals"></div>
+
 <script src="{% static 'js/ace/ace.js' %}"></script>
 <script src="{% static 'js/ace/ext-language_tools.js' %}"></script>
 <script src="{% static 'js/ace/mode-java.js' %}"></script>
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/rusha.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script id="editor-script"
         src="{% static 'js/editor.js' %}"
         data-csrf-token="{{ csrf_token }}"
         data-modular-tab-url="{% url 'solutions:modular-tab' task.slug %}"
+        data-modular-notification-url="{% url 'solutions:modular-notification' task.slug %}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
+        data-modal-container-id="#modals"
         data-tab-container-id="#tab-container"
         data-editor-id="editor"
         data-status-button-background-id="#status-button"
