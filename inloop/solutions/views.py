@@ -96,6 +96,21 @@ class ModularNotificationView(LoginRequiredMixin, View):
         })
 
 
+class ModularInputView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        placeholder = request.GET.get("placeholder")
+        hook = request.GET.get("hook")
+        input_hook = request.GET.get("input_hook")
+        if not title or not placeholder or not hook or not input_hook:
+            raise Http404("Insufficient data supplied to input view.")
+        return TemplateResponse(request, "solutions/editor/modular_input_form.html", {
+            "title": title,
+            "placeholder": placeholder,
+            "hook": hook,
+            "input_hook": input_hook
+        })
+
 
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):

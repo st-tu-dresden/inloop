@@ -2,6 +2,7 @@
 let script = document.getElementById("editor-script");
 let MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
 let MODULAR_NOTIFICATION_URL = script.getAttribute("data-modular-notification-url");
+let MODULAR_INPUT_FORM_URL = script.getAttribute("data-modular-input-form-url");
 let CSRF_TOKEN = script.getAttribute("data-csrf-token");
 let SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 let SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
@@ -35,6 +36,37 @@ class ModalNotification {
             container.html(html);
             let modalContainer = $("#" + hook);
             modalContainer.modal("show");
+        })
+    }
+}
+
+
+class ModalInputForm {
+    constructor(title, placeholder, callback) {
+        let hook = "modal-input-form-hook";
+        let inputHook = "modal-input-form-input-hook";
+        $.get(MODULAR_INPUT_FORM_URL, {
+            hook: hook,
+            title: title,
+            input_hook: inputHook,
+            placeholder: placeholder
+        }, function(html) {
+            let container = $(MODAL_CONTAINER_ID);
+            if (container === undefined || html === undefined) {
+                return;
+            }
+            container.html(html);
+            let modalContainer = $("#" + hook);
+            modalContainer.modal("show");
+            let inputElem = $("#" + inputHook);
+            modalContainer.on('shown.bs.modal', function () {
+                inputElem.focus();
+            });
+            modalContainer.on('hidden.bs.modal', function () {
+                if (callback === undefined) return;
+                let input = inputElem.val();
+                callback(input);
+            });
         })
     }
 }
@@ -95,6 +127,7 @@ class HashComparator {
             console.log(f.fileContent);
         }
         let hash = this.rusha.digest(concatenatedContents);
+        console.log(hash);
         return hash;
     }
 
@@ -129,7 +162,6 @@ class Tab {
             }
             container.append(html);
             if (self.onCreateClosure !== undefined) self.onCreateClosure(true);
-            $('[data-toggle="tooltip"]').tooltip();
         })
     }
 
@@ -201,7 +233,9 @@ class FileBuilder {
             if (file.fileName === fileName) {
                 new ModalNotification(
                     "Duplicate Filename",
-                    "\"" + fileName +  "\" exists already. Please choose another filename or edit the name of the existing file."
+                    "\"" + fileName +  "\" exists already. " +
+                    "Please choose another filename or edit the " +
+                    "name of the existing file."
                 );
                 return undefined;
             }
@@ -248,15 +282,22 @@ class TabBar {
         return this.tabId;
     }
 
+    createNewEmptyTab() {
+        let self = this;
+        let modalInputForm = new ModalInputForm(
+            "Choose a name for your new File.",
+            "New.java",
+            function(fileName) {
+                if (fileName === undefined) return;
+                let file = fileBuilder.build(fileName, "\n");
+                if (file === undefined) return;
+                self.createNewTab(file);
+            }
+        );
+    }
+
     createNewTab(file) {
         let tabId = this.dequeueTabId();
-        let isNewTab = file === undefined;
-        if (isNewTab) {
-            file = fileBuilder.build("New.java", "\n");
-            if (file === undefined) {
-                return;
-            }
-        }
         let self = this;
         let tab = new Tab(tabId, file).onCreate(function(success) {
             if (success !== true) {
@@ -267,9 +308,7 @@ class TabBar {
             file.addSetFileNameListener(function(name) {
                 tab.setName(name);
             });
-            if (isNewTab) {
-                self.activate(tabId);
-            }
+            self.activate(tabId);
         });
         this.tabs.push(tab);
         tab.build();
@@ -283,6 +322,20 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
+    }
+
+    edit(tabId) {
+        this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
+        this.activeTab.appearAsActive();
+        let self = this;
+        new ModalInputForm(
+            "Rename " + this.activeTab.file.fileName,
+            "New.java",
+            function(fileName) {
+                self.activeTab.file.fileName = fileName;
+                self.activeTab.setName(fileName);
+            }
+        )
     }
 
     destroy(tabId) {

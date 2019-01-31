@@ -21,14 +21,14 @@
       </a>
     </li>
     <li data-toggle="tooltip" title="Create a new file." data-placement="auto">
-      <a href="#" onclick="tabBar.createNewTab(); blur();">
+      <a href="#" onclick="tabBar.createNewEmptyTab(); blur();">
           <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
     </li>
     <li class="vertical-divider">
     </li>
 </ul>
-    
+
 <div id="editor-container">
     <div class="background-color-editor"></div>
     <div class="background-color-editor editor-divider"></div>
@@ -58,6 +58,7 @@
         data-csrf-token="{{ csrf_token }}"
         data-modular-tab-url="{% url 'solutions:modular-tab' task.slug %}"
         data-modular-notification-url="{% url 'solutions:modular-notification' task.slug %}"
+        data-modular-input-form-url="{% url 'solutions:modular-input-form' task.slug %}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
         data-modal-container-id="#modals"

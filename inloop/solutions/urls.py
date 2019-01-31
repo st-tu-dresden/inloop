@@ -3,7 +3,8 @@ from django.conf.urls import url
 from inloop.solutions.views import (SolutionDetailView,
                                     SolutionEditorView, SolutionFileView, SolutionListView,
                                     SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView, ModularEditorTabView, ModularNotificationView)
+                                    StaffSolutionDetailView, ModularEditorTabView, ModularNotificationView,
+                                    ModularInputView)
 
 app_name = "solutions"
 urlpatterns = [
@@ -48,9 +49,14 @@ urlpatterns = [
         ModularEditorTabView.as_view(),
         name='modular-tab'
     ),
-url(
+    url(
         r'^(?P<slug>[-\w]+)/modular-notification/$',
         ModularNotificationView.as_view(),
         name='modular-notification'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/modular-input-form/$',
+        ModularInputView.as_view(),
+        name='modular-input-form'
     ),
 ]
