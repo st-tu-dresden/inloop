@@ -26,7 +26,7 @@ jQuery.fn.textNodes = function() {
 
 
 class ModalNotification {
-    constructor(title, body) {
+    constructor(title, body, callback) {
         let hook = "modal-notification-hook";
         $.get(MODULAR_NOTIFICATION_URL, {hook: hook, title: title, body: body}, function(html) {
             let container = $(MODAL_CONTAINER_ID);
@@ -36,7 +36,30 @@ class ModalNotification {
             container.html(html);
             let modalContainer = $("#" + hook);
             modalContainer.modal("show");
+            modalContainer.on('hidden.bs.modal', function () {
+                if (callback !== undefined) callback();
+            });
         })
+    }
+}
+
+
+class TryAgainLaterModalNotification extends ModalNotification {
+    constructor(title, callback) {
+        super(title, "Please try again later.", callback);
+    }
+}
+
+
+class DuplicateFileNameModalNotification extends ModalNotification {
+    constructor(fileName, callback) {
+        super(
+            "Duplicate Filename",
+            "\"" + fileName +  "\" exists already. " +
+            "Please choose another filename or edit the " +
+            "name of the existing file.",
+            callback
+        );
     }
 }
 
@@ -72,13 +95,51 @@ class ModalInputForm {
 }
 
 
+class ToolTip {
+
+    constructor(id) {
+        this.elem = $(id);
+        this.runningTimeout = undefined;
+    }
+
+    changeTitle(newTitle) {
+        this.elem.title = newTitle;
+        this.elem.attr("data-original-title", newTitle)
+    }
+
+    show(milliseconds) {
+        if (this.runningTimeout !== undefined) {
+            clearTimeout(this.runningTimeout);
+            this.runningTimeout = undefined;
+        }
+        this.elem.tooltip("show");
+        let self = this;
+        if (milliseconds !== undefined) {
+            self.runningTimeout = setTimeout(function() {
+                self.hide();
+            }, milliseconds);
+        }
+    }
+
+    hide() {
+        this.elem.tooltip("hide");
+    }
+
+}
+
+
 class StatusButton {
 
     constructor(isSaved) {
         this.background = $(STATUS_BUTTON_BACKGROUND_ID);
         this.icon = $(STATUS_BUTTON_ICON_ID);
-        this.hint = $(STATUS_BUTTON_HINT_ID);
-        this.changeAppearance(isSaved);
+        this.hint = new ToolTip(STATUS_BUTTON_HINT_ID);
+        if (isSaved === true) {
+            this.appearAsSaved();
+        } else {
+            this.appearAsUnsaved();
+        }
+        this.isSaved = isSaved;
     }
 
     appearAsSaved() {
@@ -86,7 +147,11 @@ class StatusButton {
         this.background.addClass(CSS_BACKGROUND_SAVED);
         this.icon.removeClass(CSS_ICON_UNSAVED);
         this.icon.addClass(CSS_ICON_SAVED);
-        this.hint.prop("title", "No changes detected.");
+        if (this.isSaved === false) {
+            this.hint.changeTitle("Solution saved!");
+            this.hint.show(2000);
+        }
+        this.isSaved = true;
     }
 
     appearAsUnsaved() {
@@ -94,15 +159,11 @@ class StatusButton {
         this.background.addClass(CSS_BACKGROUND_UNSAVED);
         this.icon.removeClass(CSS_ICON_SAVED);
         this.icon.addClass(CSS_ICON_UNSAVED);
-        this.hint.prop("title", "Changes detected. Save your solution.");
-    }
-
-    changeAppearance(isSaved) {
-        if (isSaved) {
-            this.appearAsSaved();
-        } else {
-            this.appearAsUnsaved();
+        if (this.isSaved === true) {
+            this.hint.changeTitle("Changes detected. Remember to save your solution!");
+            this.hint.show(2000);
         }
+        this.isSaved = false;
     }
 }
 
@@ -116,7 +177,6 @@ class HashComparator {
 
     updateHash(files) {
         this.hash = this.computeHash(files);
-        statusButton.appearAsSaved();
     }
 
     computeHash(files) {
@@ -124,11 +184,8 @@ class HashComparator {
         for (let f of files) {
             concatenatedContents += f.fileContent;
             concatenatedContents += f.fileName;
-            console.log(f.fileContent);
         }
-        let hash = this.rusha.digest(concatenatedContents);
-        console.log(hash);
-        return hash;
+        return this.rusha.digest(concatenatedContents);
     }
 
     compareToFiles(files) {
@@ -173,7 +230,7 @@ class Tab {
         fileBuilder.destroy(this.file);
     }
 
-    setName(name) {
+    rename(name) {
         $("#label-" + this.tabId).textNodes().first().replaceWith(name);
     }
 
@@ -211,15 +268,6 @@ class File {
         this.fileName = fileName;
         this.fileContent = fileContent;
     }
-
-    addSetFileNameListener(completion) {
-        this.setFileNameListener = completion;
-    }
-
-    setFileName(name) {
-        this.fileName = name;
-        if (this.setFileNameListener !== undefined) this.setFileNameListener(name);
-    }
 }
 
 
@@ -228,18 +276,16 @@ class FileBuilder {
         this.files = files;
     }
 
-    build(fileName, fileContent) {
+    contains(fileName) {
         for (let file of this.files) {
-            if (file.fileName === fileName) {
-                new ModalNotification(
-                    "Duplicate Filename",
-                    "\"" + fileName +  "\" exists already. " +
-                    "Please choose another filename or edit the " +
-                    "name of the existing file."
-                );
-                return undefined;
+            if (file.fileName.toLowerCase() === fileName.toLowerCase()) {
+                return true;
             }
         }
+        return false;
+    }
+
+    build(fileName, fileContent) {
         let f = new File(fileName, fileContent);
         this.files.push(f);
         return f;
@@ -252,26 +298,20 @@ class FileBuilder {
 
 
 class TabBar {
-    constructor() {
+    constructor(files) {
         this.tabs = [];
         this.editor = new Editor();
         this.editor.addOnChangeListener(function() {
-            let equal = hashComparator.compareToFiles(fileBuilder.files);
-            statusButton.changeAppearance(equal);
+            let hashIsUpToDate = hashComparator.compareToFiles(files);
+            if (hashIsUpToDate === true) {
+                statusButton.appearAsSaved();
+            } else {
+                statusButton.appearAsUnsaved();
+            }
         });
-        for (let file of fileBuilder.files) {
+        for (let file of files) {
             this.createNewTab(file);
         }
-        // Prevent CTRL+S (CMD+S on Mac) and add
-        // our custom event handler
-        document.addEventListener("keydown", function(e) {
-            if (e.keyCode === 83) {
-                if (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) {
-                    e.preventDefault();
-                    communicator.save();
-                }
-            }
-        }, false);
     }
 
     dequeueTabId() {
@@ -284,11 +324,17 @@ class TabBar {
 
     createNewEmptyTab() {
         let self = this;
-        let modalInputForm = new ModalInputForm(
+        new ModalInputForm(
             "Choose a name for your new File.",
             "New.java",
             function(fileName) {
-                if (fileName === undefined) return;
+                if (fileName === undefined || fileName === "") return;
+                if (fileBuilder.contains(fileName)) {
+                    new DuplicateFileNameModalNotification(fileName, function() {
+                        self.createNewEmptyTab();
+                    });
+                    return;
+                }
                 let file = fileBuilder.build(fileName, "\n");
                 if (file === undefined) return;
                 self.createNewTab(file);
@@ -301,13 +347,9 @@ class TabBar {
         let self = this;
         let tab = new Tab(tabId, file).onCreate(function(success) {
             if (success !== true) {
-                // TODO: Handle failure
                 return;
             }
-            tab.setName(file.fileName);
-            file.addSetFileNameListener(function(name) {
-                tab.setName(name);
-            });
+            tab.rename(file.fileName);
             self.activate(tabId);
         });
         this.tabs.push(tab);
@@ -332,17 +374,24 @@ class TabBar {
             "Rename " + this.activeTab.file.fileName,
             "New.java",
             function(fileName) {
+                if (fileName === undefined || fileName === "") return;
+                if (fileBuilder.contains(fileName)) {
+                    new DuplicateFileNameModalNotification(fileName, function() {
+                        self.edit(tabId);
+                    });
+                    return;
+                }
                 self.activeTab.file.fileName = fileName;
-                self.activeTab.setName(fileName);
+                self.activeTab.rename(fileName);
             }
         )
     }
 
-    destroy(tabId) {
+    destroyActiveTab() {
         if (this.activeTab !== undefined) {
             this.activeTab.appearAsInactive();
         }
-        this.editor.unbind(this.activeTab.file);
+        this.editor.unbind();
         this.activeTab.destroy();
         this.activeTab = undefined;
     }
@@ -397,11 +446,12 @@ class Editor {
         });
     }
 
-    unbind(file) {
+    unbind() {
         if (this.editor === undefined) return;
         this.editor.removeAllListeners("change");
         this.editor.setValue("");
-        this.editor.setReadOnly(true)
+        this.editor.setReadOnly(true);
+        this.editor.off("change");
     }
 }
 
@@ -425,25 +475,26 @@ class Communicator {
         }
         `);
         let files = [];
-        for (let key of Object.keys(this.uploadedData.saved_files)) {
-            let file = new File(key, this.uploadedData.saved_files[key]);
+        for (let key of Object.keys(this.uploadedData["saved_files"])) {
+            let file = new File(key, this.uploadedData["saved_files"][key]);
             files.push(file);
         }
-        completion(files, this.uploadedData.last_submission);
+        completion(files, this.uploadedData["last_submission"]);
     }
 
     save(completion) {
         // TODO: Implement save
         console.log("TODO: Save not implemented yet!");
-        if (completion !== undefined) completion(true);
         hashComparator.updateHash(fileBuilder.files);
+        statusButton.appearAsSaved();
+
+        if (completion !== undefined) completion(true);
     }
 
     upload(files) {
-        let self = this;
         this.save(function(success) {
-            if (!success) {
-                // TODO: Handle failure
+            if (success !== true) {
+                new TryAgainLaterModalNotification("Upload failed.");
                 return;
             }
             let postData = {uploads: {}};
@@ -457,7 +508,7 @@ class Communicator {
                 headers: {"X-CSRFToken": CSRF_TOKEN},
                 datatype: "json",
                 success: function( successResponse ) {
-                    if (successResponse.success) {
+                    if (successResponse.success === true) {
                         window.location.replace(SOLUTIONS_LIST_URL);
                     } else {
                         window.location.replace(SOLUTIONS_EDITOR_URL);
@@ -475,10 +526,21 @@ let hashComparator;
 let tabBar;
 let communicator = new Communicator();
 
-communicator.load(function(f, h) {
-    fileBuilder = new FileBuilder(f);
-    hashComparator = new HashComparator(h);
-    let hashIsUpToDate = hashComparator.compareToFiles(fileBuilder.files);
+communicator.load(function(files, hash) {
+    fileBuilder = new FileBuilder(files);
+    hashComparator = new HashComparator(hash);
+    let hashIsUpToDate = hashComparator.compareToFiles(files);
     statusButton = new StatusButton(hashIsUpToDate);
-    tabBar = new TabBar();
+    tabBar = new TabBar(files);
 });
+
+// Prevent CTRL+S (CMD+S on Mac) and add
+// our custom event handler
+document.addEventListener("keydown", function(e) {
+    if (e.keyCode === 83) {
+        if (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) {
+            e.preventDefault();
+            communicator.save();
+        }
+    }
+}, false);

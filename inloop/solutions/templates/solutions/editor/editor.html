@@ -9,18 +9,21 @@
 
 
 <ul id="tab-container" class="nav nav-pills scrollable">
-    <li id="status-button-hint" data-toggle="tooltip" title="Save this solution." data-placement="auto">
+    <li id="status-button-hint" data-toggle="tooltip" title="Save this solution."
+        data-placement="auto">
       <a id="status-button" href="#" onclick="communicator.save(); blur();">
           <span id="status-button-icon"
                 class="glyphicon glyphicon-floppy-saved"></span>
       </a>
     </li>
-    <li data-toggle="tooltip" title="Save and upload this solution to the checker." data-placement="auto">
+    <li data-toggle="tooltip" title="Save and upload this solution to the checker."
+        data-placement="auto">
       <a href="#" onclick="communicator.upload(fileBuilder.files); blur();">
           <span class="glyphicon glyphicon-cloud-upload"></span>
       </a>
     </li>
-    <li data-toggle="tooltip" title="Create a new file." data-placement="auto">
+    <li data-toggle="tooltip" title="Create a new file."
+        data-placement="auto">
       <a href="#" onclick="tabBar.createNewEmptyTab(); blur();">
           <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
