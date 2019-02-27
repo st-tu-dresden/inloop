@@ -18,6 +18,8 @@ let CSS_ICON_UNSAVED = script.getAttribute("data-css-icon-unsaved");
 let CSS_ICON_SAVED = script.getAttribute("data-css-icon-saved");
 
 
+// Add function to jQuery to parse
+// all nodes containing text
 jQuery.fn.textNodes = function() {
     return this.contents().filter(function() {
         return (this.nodeType === Node.TEXT_NODE && this.nodeValue.trim() !== "");
@@ -25,72 +27,105 @@ jQuery.fn.textNodes = function() {
 };
 
 
-class ModalNotification {
-    constructor(title, body, callback) {
-        let hook = "modal-notification-hook";
-        $.get(MODULAR_NOTIFICATION_URL, {hook: hook, title: title, body: body}, function(html) {
+class Modal {
+    constructor(url, hook, params) {
+        this.url = url;
+        this.hook = hook;
+        this.params = params;
+        this.onHiddenCallbacks = [];
+        this.onShownCallbacks = [];
+    }
+
+    addOnHiddenCallback(callback) {
+        this.onHiddenCallbacks.push(callback);
+    }
+
+    addOnShownCallback(callback) {
+        this.onShownCallbacks.push(callback);
+    }
+
+    load(completion) {
+        let self = this;
+        $.get(this.url, this.params, function(html) {
             let container = $(MODAL_CONTAINER_ID);
             if (container === undefined || html === undefined) {
                 return;
             }
             container.html(html);
-            let modalContainer = $("#" + hook);
-            modalContainer.modal("show");
-            modalContainer.on('hidden.bs.modal', function () {
-                if (callback !== undefined) callback();
+            let modal = $("#" + self.hook);
+            modal.modal("show");
+            modal.on('hidden.bs.modal', function () {
+                for (let callback of self.onHiddenCallbacks) {
+                    callback();
+                }
             });
+            modal.on('shown.bs.modal', function () {
+                for (let callback of self.onShownCallbacks) {
+                    callback();
+                }
+            });
+            if (completion !== undefined) completion(html, container, modal);
         })
+    }
+}
+
+
+class ModalNotification extends Modal {
+    constructor(title, body) {
+        super(MODULAR_NOTIFICATION_URL, "modal-notification-hook", {
+            hook: "modal-notification-hook",
+            title: title,
+            body: body
+        });
     }
 }
 
 
 class TryAgainLaterModalNotification extends ModalNotification {
-    constructor(title, callback) {
-        super(title, "Please try again later.", callback);
+    constructor(title) {
+        super(title, "Please try again later.");
     }
 }
 
 
 class DuplicateFileNameModalNotification extends ModalNotification {
-    constructor(fileName, callback) {
+    constructor(fileName) {
         super(
             "Duplicate Filename",
             "\"" + fileName +  "\" exists already. " +
             "Please choose another filename or edit the " +
-            "name of the existing file.",
-            callback
+            "name of the existing file."
         );
     }
 }
 
 
-class ModalInputForm {
-    constructor(title, placeholder, callback) {
-        let hook = "modal-input-form-hook";
-        let inputHook = "modal-input-form-input-hook";
-        $.get(MODULAR_INPUT_FORM_URL, {
-            hook: hook,
+class ModalInputForm extends Modal {
+    constructor(title, placeholder) {
+        super(MODULAR_INPUT_FORM_URL, "modal-input-form-hook", {
+            hook: "modal-input-form-hook",
             title: title,
-            input_hook: inputHook,
+            input_hook: "modal-input-form-input-hook",
             placeholder: placeholder
-        }, function(html) {
-            let container = $(MODAL_CONTAINER_ID);
-            if (container === undefined || html === undefined) {
-                return;
+        });
+        this.onInputCallbacks = [];
+    }
+
+    addOnInputCallback(callback) {
+        this.onInputCallbacks.push(callback);
+    }
+
+    load(completion) {
+        let self = this;
+        this.addOnShownCallback(function() {
+            $("#modal-input-form-input-hook").focus();
+        });
+        this.addOnHiddenCallback(function() {
+            for (let callback of self.onInputCallbacks) {
+                callback($("#modal-input-form-input-hook").val());
             }
-            container.html(html);
-            let modalContainer = $("#" + hook);
-            modalContainer.modal("show");
-            let inputElem = $("#" + inputHook);
-            modalContainer.on('shown.bs.modal', function () {
-                inputElem.focus();
-            });
-            modalContainer.on('hidden.bs.modal', function () {
-                if (callback === undefined) return;
-                let input = inputElem.val();
-                callback(input);
-            });
-        })
+        });
+        super.load(completion);
     }
 }
 
@@ -324,22 +359,22 @@ class TabBar {
 
     createNewEmptyTab() {
         let self = this;
-        new ModalInputForm(
-            "Choose a name for your new File.",
-            "New.java",
-            function(fileName) {
-                if (fileName === undefined || fileName === "") return;
-                if (fileBuilder.contains(fileName)) {
-                    new DuplicateFileNameModalNotification(fileName, function() {
-                        self.createNewEmptyTab();
-                    });
-                    return;
-                }
-                let file = fileBuilder.build(fileName, "\n");
-                if (file === undefined) return;
-                self.createNewTab(file);
+        let inputForm = new ModalInputForm("Choose a name for your new File.", "New.java");
+        inputForm.addOnInputCallback(function(fileName) {
+            if (fileName === undefined || fileName === "") return;
+            if (fileBuilder.contains(fileName)) {
+                let modal = new DuplicateFileNameModalNotification(fileName);
+                modal.addOnHiddenCallback(function() {
+                    self.createNewEmptyTab();
+                });
+                modal.load();
+                return;
             }
-        );
+            let file = fileBuilder.build(fileName, "\n");
+            if (file === undefined) return;
+            self.createNewTab(file);
+        });
+        inputForm.load();
     }
 
     createNewTab(file) {
@@ -370,21 +405,21 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.activeTab.appearAsActive();
         let self = this;
-        new ModalInputForm(
-            "Rename " + this.activeTab.file.fileName,
-            "New.java",
-            function(fileName) {
-                if (fileName === undefined || fileName === "") return;
-                if (fileBuilder.contains(fileName)) {
-                    new DuplicateFileNameModalNotification(fileName, function() {
-                        self.edit(tabId);
-                    });
-                    return;
-                }
-                self.activeTab.file.fileName = fileName;
-                self.activeTab.rename(fileName);
+        let modalInputForm = new ModalInputForm("Rename " + this.activeTab.file.fileName, "New.java");
+        modalInputForm.addOnInputCallback(function(fileName) {
+            if (fileName === undefined || fileName === "") return;
+            if (fileBuilder.contains(fileName)) {
+                let notification = new DuplicateFileNameModalNotification(fileName);
+                notification.addOnHiddenCallback(function() {
+                    self.edit(tabId);
+                });
+                notification.load();
+                return;
             }
-        )
+            self.activeTab.file.fileName = fileName;
+            self.activeTab.rename(fileName);
+        });
+        modalInputForm.load();
     }
 
     destroyActiveTab() {
@@ -494,7 +529,8 @@ class Communicator {
     upload(files) {
         this.save(function(success) {
             if (success !== true) {
-                new TryAgainLaterModalNotification("Upload failed.");
+                let modal = new TryAgainLaterModalNotification("Upload failed.");
+                modal.load();
                 return;
             }
             let postData = {uploads: {}};
