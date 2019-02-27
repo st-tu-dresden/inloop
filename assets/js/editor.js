@@ -1,8 +1,9 @@
 // Load data attributes
 let script = document.getElementById("editor-script");
 let MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
-let MODULAR_NOTIFICATION_URL = script.getAttribute("data-modular-notification-url");
-let MODULAR_INPUT_FORM_URL = script.getAttribute("data-modular-input-form-url");
+let MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
+let MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
+let MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
 let CSRF_TOKEN = script.getAttribute("data-csrf-token");
 let SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 let SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
@@ -72,7 +73,7 @@ class Modal {
 
 class ModalNotification extends Modal {
     constructor(title, body) {
-        super(MODULAR_NOTIFICATION_URL, "modal-notification-hook", {
+        super(MODAL_NOTIFICATION_URL, "modal-notification-hook", {
             hook: "modal-notification-hook",
             title: title,
             body: body
@@ -102,7 +103,7 @@ class DuplicateFileNameModalNotification extends ModalNotification {
 
 class ModalInputForm extends Modal {
     constructor(title, placeholder) {
-        super(MODULAR_INPUT_FORM_URL, "modal-input-form-hook", {
+        super(MODAL_INPUT_FORM_URL, "modal-input-form-hook", {
             hook: "modal-input-form-hook",
             title: title,
             input_hook: "modal-input-form-input-hook",
@@ -130,8 +131,46 @@ class ModalInputForm extends Modal {
 }
 
 
-class ToolTip {
+class ModalConfirmationForm extends Modal {
+    constructor(title) {
+        super(MODAL_CONFIRMATION_FORM_URL, "modal-confirmation-form-hook", {
+            hook: "modal-confirmation-form-hook",
+            title: title,
+            confirm_button_hook: "modal-confirmation-form-confirm-button-hook",
+            cancel_button_hook: "modal-confirmation-form-cancel-button-hook"
+        });
+        this.onConfirmCallbacks = [];
+        this.onCancelCallbacks = [];
+    }
 
+    addOnConfirmCallback(callback) {
+        this.onConfirmCallbacks.push(callback);
+    }
+
+    addOnCancelCallback(callback) {
+        this.onCancelCallbacks.push(callback);
+    }
+
+    load(completion) {
+        let self = this;
+        super.load(function(html, container, modal) {
+            $("#modal-confirmation-form-confirm-button-hook").click(function() {
+                for (let callback of self.onConfirmCallbacks) {
+                    callback();
+                }
+            });
+            $("#modal-confirmation-form-cancel-button-hook").click(function() {
+                for (let callback of self.onCancelCallbacks) {
+                    callback();
+                }
+            });
+            if (completion !== undefined) completion(html, container, modal);
+        });
+    }
+}
+
+
+class ToolTip {
     constructor(id) {
         this.elem = $(id);
         this.runningTimeout = undefined;
@@ -159,12 +198,10 @@ class ToolTip {
     hide() {
         this.elem.tooltip("hide");
     }
-
 }
 
 
 class StatusButton {
-
     constructor(isSaved) {
         this.background = $(STATUS_BUTTON_BACKGROUND_ID);
         this.icon = $(STATUS_BUTTON_ICON_ID);
@@ -204,10 +241,10 @@ class StatusButton {
 
 
 class HashComparator {
-
     constructor(hash) {
         this.rusha = new Rusha();
         this.hash = hash;
+        this.statusButton = new StatusButton(false);
     }
 
     updateHash(files) {
@@ -223,8 +260,14 @@ class HashComparator {
         return this.rusha.digest(concatenatedContents);
     }
 
-    compareToFiles(files) {
-        return this.computeHash(files) === this.hash;
+    lookForChanges(files) {
+        let equal = this.computeHash(files) === this.hash;
+        if (equal === true) {
+            this.statusButton.appearAsSaved();
+        } else {
+            this.statusButton.appearAsUnsaved();
+        }
+        return equal;
     }
 }
 
@@ -327,7 +370,7 @@ class FileBuilder {
     }
 
     destroy(file) {
-        this.files = this.files.filter(f => f.name !== file.name);
+        this.files = this.files.filter(f => f.fileName !== file.fileName);
     }
 }
 
@@ -337,12 +380,7 @@ class TabBar {
         this.tabs = [];
         this.editor = new Editor();
         this.editor.addOnChangeListener(function() {
-            let hashIsUpToDate = hashComparator.compareToFiles(files);
-            if (hashIsUpToDate === true) {
-                statusButton.appearAsSaved();
-            } else {
-                statusButton.appearAsUnsaved();
-            }
+            hashComparator.lookForChanges(fileBuilder.files);
         });
         for (let file of files) {
             this.createNewTab(file);
@@ -371,6 +409,7 @@ class TabBar {
                 return;
             }
             let file = fileBuilder.build(fileName, "\n");
+            hashComparator.lookForChanges(fileBuilder.files);
             if (file === undefined) return;
             self.createNewTab(file);
         });
@@ -418,23 +457,31 @@ class TabBar {
             }
             self.activeTab.file.fileName = fileName;
             self.activeTab.rename(fileName);
+            hashComparator.lookForChanges(fileBuilder.files);
         });
         modalInputForm.load();
     }
 
     destroyActiveTab() {
-        if (this.activeTab !== undefined) {
-            this.activeTab.appearAsInactive();
-        }
-        this.editor.unbind();
-        this.activeTab.destroy();
-        this.activeTab = undefined;
+        if (this.activeTab === undefined) return;
+        let confirmation = new ModalConfirmationForm(
+            "Are you sure that you want to delete \""
+            + this.activeTab.file.fileName + "\"?"
+        );
+        let self = this;
+        confirmation.addOnConfirmCallback(function() {
+            self.activeTab.appearAsInactive();
+            self.editor.unbind();
+            self.activeTab.destroy();
+            self.activeTab = undefined;
+            hashComparator.lookForChanges(fileBuilder.files);
+        });
+        confirmation.load();
     }
 }
 
 
 class Editor {
-
     static config() {
         return {
             highlightActiveLine: true,
@@ -492,7 +539,6 @@ class Editor {
 
 
 class Communicator {
-
     constructor() {}
 
     load(completion) {
@@ -521,7 +567,7 @@ class Communicator {
         // TODO: Implement save
         console.log("TODO: Save not implemented yet!");
         hashComparator.updateHash(fileBuilder.files);
-        statusButton.appearAsSaved();
+        hashComparator.lookForChanges(fileBuilder.files);
 
         if (completion !== undefined) completion(true);
     }
@@ -557,7 +603,6 @@ class Communicator {
 
 
 let fileBuilder;
-let statusButton;
 let hashComparator;
 let tabBar;
 let communicator = new Communicator();
@@ -565,8 +610,7 @@ let communicator = new Communicator();
 communicator.load(function(files, hash) {
     fileBuilder = new FileBuilder(files);
     hashComparator = new HashComparator(hash);
-    let hashIsUpToDate = hashComparator.compareToFiles(files);
-    statusButton = new StatusButton(hashIsUpToDate);
+    hashComparator.lookForChanges(files);
     tabBar = new TabBar(files);
 });
 

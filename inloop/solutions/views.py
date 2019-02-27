@@ -82,21 +82,21 @@ class ModularEditorTabView(LoginRequiredMixin, View):
         })
 
 
-class ModularNotificationView(LoginRequiredMixin, View):
+class ModalNotificationView(LoginRequiredMixin, View):
     def get(self, request, slug):
         title = request.GET.get("title")
         body = request.GET.get("body")
         hook = request.GET.get("hook")
         if not title or not body or not hook:
             raise Http404("No title or body or hook supplied to notification view.")
-        return TemplateResponse(request, "solutions/editor/modular_notification.html", {
+        return TemplateResponse(request, "solutions/editor/modals/modal_notification.html", {
             "title": title,
             "body": body,
             "hook": hook
         })
 
 
-class ModularInputView(LoginRequiredMixin, View):
+class ModalInputView(LoginRequiredMixin, View):
     def get(self, request, slug):
         title = request.GET.get("title")
         placeholder = request.GET.get("placeholder")
@@ -104,11 +104,27 @@ class ModularInputView(LoginRequiredMixin, View):
         input_hook = request.GET.get("input_hook")
         if not title or not placeholder or not hook or not input_hook:
             raise Http404("Insufficient data supplied to input view.")
-        return TemplateResponse(request, "solutions/editor/modular_input_form.html", {
+        return TemplateResponse(request, "solutions/editor/modals/modal_input_form.html", {
             "title": title,
             "placeholder": placeholder,
             "hook": hook,
             "input_hook": input_hook
+        })
+
+
+class ModalConfirmationView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        hook = request.GET.get("hook")
+        confirm_button_hook = request.GET.get("confirm_button_hook")
+        cancel_button_hook = request.GET.get("cancel_button_hook")
+        if not title or not hook or not confirm_button_hook or not cancel_button_hook:
+            raise Http404("Insufficient data supplied to confirmation view.")
+        return TemplateResponse(request, "solutions/editor/modals/modal_confirmation_form.html", {
+            "title": title,
+            "hook": hook,
+            "confirm_button_hook": confirm_button_hook,
+            "cancel_button_hook": cancel_button_hook
         })
 
 
