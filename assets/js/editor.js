@@ -19,6 +19,25 @@ let CSS_ICON_UNSAVED = script.getAttribute("data-css-icon-unsaved");
 let CSS_ICON_SAVED = script.getAttribute("data-css-icon-saved");
 
 
+// Check for ECMAScript 6 support
+var supportsES6 = function() {
+    try {
+        new Function("(a = 0) => a");
+        return true;
+    }
+    catch (err) {
+        return false;
+    }
+}();
+
+if (!supportsES6) {
+    alert(
+      "Your browser does not support ECMAScript 6." +
+      " Please update or change your browser to use the editor."
+    );
+}
+
+
 // Add function to jQuery to parse
 // all nodes containing text
 jQuery.fn.textNodes = function() {
