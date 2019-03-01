@@ -1,7 +1,10 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
@@ -20,11 +23,116 @@ class SolutionStatusView(LoginRequiredMixin, View):
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
 
 
+class SolutionEditorView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        return TemplateResponse(request, "solutions/editor/editor.html", {
+            "task": get_object_or_404(Task.objects.published(), slug=slug),
+            "active_tab": 1
+        })
+
+    def post(self, request, slug):
+        task = get_object_or_404(Task.objects.published(), slug=slug)
+        failure_response = JsonResponse({"success": False})
+
+        if not request.is_ajax():
+            return failure_response
+
+        if task.is_expired:
+            messages.error(request, "The deadline for this task has passed.")
+            return failure_response
+
+        try:
+            json_data = json.loads(request.body)
+            uploads = json_data["uploads"]
+        # NOTE: JSONDecodeError is only available since Python 3.5
+        except (KeyError, ValueError):
+            return failure_response
+
+        if not uploads:
+            messages.error(request, "You haven't uploaded any files.")
+            return failure_response
+
+        if not all([file_name.endswith(".java") for file_name, _ in uploads.items()]):
+            messages.error(request, "You have uploaded invalid files (allowed: *.java).")
+            return failure_response
+
+        files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
+
+        with transaction.atomic():
+            solution = Solution.objects.create(
+                author=request.user,
+                task=task
+            )
+            SolutionFile.objects.bulk_create([
+                SolutionFile(solution=solution, file=f) for f in files
+            ])
+
+        solution_submitted.send(sender=self.__class__, solution=solution)
+        messages.success(request, "Your solution has been submitted to the checker.")
+        return JsonResponse({"success": True})
+
+
+class ModularEditorTabView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        tab_id = request.GET.get("tab_id")
+        if not tab_id:
+            raise Http404("No file name supplied to tab view.")
+        return TemplateResponse(request, "solutions/editor/modular_editor_tab.html", {
+            "tab_id": tab_id,
+        })
+
+
+class ModalNotificationView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        body = request.GET.get("body")
+        hook = request.GET.get("hook")
+        if not title or not body or not hook:
+            raise Http404("No title or body or hook supplied to notification view.")
+        return TemplateResponse(request, "solutions/editor/modals/modal_notification.html", {
+            "title": title,
+            "body": body,
+            "hook": hook
+        })
+
+
+class ModalInputView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        placeholder = request.GET.get("placeholder")
+        hook = request.GET.get("hook")
+        input_hook = request.GET.get("input_hook")
+        if not title or not placeholder or not hook or not input_hook:
+            raise Http404("Insufficient data supplied to input view.")
+        return TemplateResponse(request, "solutions/editor/modals/modal_input_form.html", {
+            "title": title,
+            "placeholder": placeholder,
+            "hook": hook,
+            "input_hook": input_hook
+        })
+
+
+class ModalConfirmationView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        title = request.GET.get("title")
+        hook = request.GET.get("hook")
+        confirm_button_hook = request.GET.get("confirm_button_hook")
+        cancel_button_hook = request.GET.get("cancel_button_hook")
+        if not title or not hook or not confirm_button_hook or not cancel_button_hook:
+            raise Http404("Insufficient data supplied to confirmation view.")
+        return TemplateResponse(request, "solutions/editor/modals/modal_confirmation_form.html", {
+            "title": title,
+            "hook": hook,
+            "confirm_button_hook": confirm_button_hook,
+            "cancel_button_hook": cancel_button_hook
+        })
+
+
 class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, "solutions/upload_form.html", {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 1
+            'active_tab': 2
         })
 
     def post(self, request, slug):
@@ -69,7 +177,7 @@ class SolutionListView(LoginRequiredMixin, View):
         return TemplateResponse(request, "solutions/solution_list.html", {
             'task': task,
             'solutions': solutions,
-            'active_tab': 2
+            'active_tab': 3
         })
 
 
