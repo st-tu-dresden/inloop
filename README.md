@@ -93,7 +93,7 @@ University of Passau and later at the Karlsruhe Institute of Technology:
 INLOOP is released under GPL version 3.
 
     Copyright (C) 2015-2017 Dominik Muhs and Martin Morgenstern
-    Copyright (C) 2018 Philipp Matthes and Martin Morgenstern
+    Copyright (C) 2018-2019 Philipp Matthes and Martin Morgenstern
     Economic rights: Technische Universität Dresden (Germany)
 
     INLOOP is free software: you can redistribute it and/or modify
