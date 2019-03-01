@@ -1,21 +1,78 @@
 dist: trusty
-language: python
-python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
-services:
-  - docker
-cache:
-  pip: true
-install:
-  - pip install pipenv codacy-coverage
-  - make
-script:
-  - make lint
-  - make coverage
-after_success:
-  - pipenv run coverage xml
-  - python-codacy-coverage
+
+matrix:
+  include:
+    - language: python
+      name: "Python 3.4 Checks"
+      python:
+        - "3.4"
+      services:
+        - docker
+      cache:
+        pip: true
+      install:
+        - pip install pipenv codacy-coverage
+        - make
+      script:
+        - make lint
+        - make coverage
+      after_success:
+        - pipenv run coverage xml
+        - python-codacy-coverage
+
+    - language: python
+      name: "Python 3.5 Checks"
+      python:
+        - "3.5"
+      services:
+        - docker
+      cache:
+        pip: true
+      install:
+        - pip install pipenv codacy-coverage
+        - make
+      script:
+        - make lint
+        - make coverage
+      after_success:
+        - pipenv run coverage xml
+        - python-codacy-coverage
+
+    - language: python
+      name: "Python 3.6 Checks"
+      python:
+        - "3.6"
+      services:
+        - docker
+      cache:
+        pip: true
+      install:
+        - pip install pipenv codacy-coverage
+        - make
+      script:
+        - make lint
+        - make coverage
+      after_success:
+        - pipenv run coverage xml
+        - python-codacy-coverage
+
+    - language: node_js
+      name: "CSS Checks"
+      node_js:
+        - "10"
+      before_script:
+        - npm install -g csslint
+      script:
+        - sh csslint.sh
+
+    - language: node_js
+      name: "JavaScript Checks"
+      node_js:
+        - "10"
+      before_script:
+        - npm install -g jshint
+      script:
+        - sh jshint.sh
+
 notifications:
   email: false

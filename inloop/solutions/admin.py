@@ -47,7 +47,7 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
 class SolutionAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ["css/admin/solutions.css"]}
-        js = ["js/Chart.min.js"]
+        js = ["vendor/js/Chart.min.js"]
 
     change_list_template = "admin/solutions/solutions.html"
     inlines = [SolutionFileInline]
