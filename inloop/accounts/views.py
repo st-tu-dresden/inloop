@@ -1,36 +1,19 @@
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import (PasswordChangeDoneView, PasswordChangeView,
+                                       PasswordResetCompleteView, PasswordResetConfirmView,
+                                       PasswordResetDoneView, PasswordResetView)
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
-from django.views.generic import FormView, TemplateView, View
+from django.views.generic import TemplateView, View
 
 from constance import config
-from password_reset.views import Recover, RecoverDone, Reset, ResetDone
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
                                               RegistrationView as HmacRegistrationView)
 
 from inloop.accounts.forms import SignupForm, StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
-
-
-class PasswordChangeView(LoginRequiredMixin, FormView):
-    form_class = PasswordChangeForm
-    success_url = reverse_lazy("accounts:profile")
-    template_name = "accounts/password_change_form.html"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, "Your password has been updated successfully.")
-        update_session_auth_hash(self.request, form.user)
-        return super().form_valid(form)
 
 
 class ProfileView(LoginRequiredMixin, View):
@@ -72,10 +55,6 @@ class ProfileView(LoginRequiredMixin, View):
         return HttpResponseRedirect(self.success_url)
 
 
-password_change = PasswordChangeView.as_view()
-profile = ProfileView.as_view()
-
-
 class SignupView(HmacRegistrationView):
     template_name = "accounts/signup_form.html"
     form_class = SignupForm
@@ -107,15 +86,36 @@ class ActivationView(HmacActivationView):
         return reverse("accounts:activation_complete")
 
 
+profile = ProfileView.as_view()
+
 activate = ActivationView.as_view()
 activation_complete = TemplateView.as_view(template_name="accounts/activation_complete.html")
 signup = SignupView.as_view()
 signup_closed = TemplateView.as_view(template_name="accounts/signup_closed.html")
 signup_complete = TemplateView.as_view(template_name="accounts/signup_complete.html")
 
-recover = Recover.as_view(success_url_name="accounts:recover_done")
-recover_done = RecoverDone.as_view()
+password_change = PasswordChangeView.as_view(
+    success_url=reverse_lazy("accounts:password_change_done"),
+    template_name="accounts/password_change_form.html"
+)
+password_change_done = PasswordChangeDoneView.as_view(
+    template_name="accounts/password_change_succeeded.html"
+)
 
-# use the contrib.auth form, since it supports the new PASSWORD_VALIDATORS setting
-reset = Reset.as_view(form_class=SetPasswordForm, success_url=reverse_lazy("accounts:reset_done"))
-reset_done = ResetDone.as_view()
+password_reset = PasswordResetView.as_view(
+    success_url=reverse_lazy("accounts:password_reset_done"),
+    subject_template_name="password_reset/recovery_email_subject.txt",
+    email_template_name="password_reset/recovery_email.txt",
+    template_name="password_reset/recovery_form.html"
+)
+password_reset_done = PasswordResetDoneView.as_view(
+    template_name="password_reset/reset_sent.html"
+)
+
+password_reset_confirm = PasswordResetConfirmView.as_view(
+    success_url=reverse_lazy("accounts:password_reset_complete"),
+    template_name="password_reset/reset.html"
+)
+password_reset_complete = PasswordResetCompleteView.as_view(
+    template_name="password_reset/recovery_done.html"
+)

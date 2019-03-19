@@ -1,1 +1,1 @@
-Recover your password on {{ site.domain }}
+Recover your password on {{ domain }}

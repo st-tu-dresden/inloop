@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block content %}
-{% if invalid %}
+{% if not validlink %}
 <div class="center-box-md">
   <p>
     Sorry, this recovery link is invalid. You have to
-    <a href="{% url 'accounts:recover' %}">request a new one</a>.
+    <a href="{% url 'accounts:password_reset' %}">request a new one</a>.
   </p>
 </div>
 {% else %}
