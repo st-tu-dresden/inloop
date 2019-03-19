@@ -14,8 +14,11 @@ urlpatterns = [
     url(r'^profile/$', views.profile, name="profile"),
     url(r'^password/$', views.password_change, name="password_change"),
 
-    url(r'^recover/(?P<signature>.+)/$', views.recover_done, name="recover_done"),
-    url(r'^recover/$', views.recover, name="recover"),
-    url(r'^reset/done/$', views.reset_done, name="reset_done"),
-    url(r'^reset/(?P<token>[\w:-]+)/$', views.reset, name="reset"),
+    url(r'^password_reset/$', views.password_reset, name="password_reset"),
+    url(r'^password_reset_done/', views.password_reset_done, name="password_reset_done"),
+    url(r'^password_reset_confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/'
+        r'(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.password_reset_confirm, name="password_reset_confirm"),
+    url(r'^password_reset_confirm_done/$', views.password_reset_complete,
+        name="password_reset_complete"),
 ]
