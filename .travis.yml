@@ -3,24 +3,6 @@ dist: trusty
 matrix:
   include:
     - language: python
-      name: "Python 3.4 Checks"
-      python:
-        - "3.4"
-      services:
-        - docker
-      cache:
-        pip: true
-      install:
-        - pip install pipenv codacy-coverage
-        - make
-      script:
-        - make lint
-        - make coverage
-      after_success:
-        - pipenv run coverage xml
-        - python-codacy-coverage
-
-    - language: python
       name: "Python 3.5 Checks"
       python:
         - "3.5"
