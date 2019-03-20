@@ -13,16 +13,15 @@ django-environ = "*"
 django-extensions = "*"
 django-password-reset = "*"
 django-redis = "*"
-django-registration = "*"
+django-registration = "<3.0"
 django-widget-tweaks = "*"
-django = "<=1.11.99"
+django = "<1.12"
 huey = "*"
-markdown = "*"
+markdown = "<3.0"
 redis = "*"
 gunicorn = "*"
 "psycopg2" = "*"
 setproctitle = "*"
-typing = {version = "*", markers = "python_version < '3.5'" }
 
 
 [dev-packages]
