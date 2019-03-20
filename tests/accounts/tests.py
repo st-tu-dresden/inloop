@@ -196,3 +196,62 @@ class SignupWorkflowTest(TestCase):
 
         self.assertTrue(self.client.login(username="bob", password="secret"),
                         "Login should succeed after activation")
+
+
+class PasswordRecorverWorkflowTest(SimpleAccountsData, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        site = Site.objects.get_current()
+        site.name = "INLOOP"
+        site.domain = "example.com"
+        site.save()
+
+    def test_password_reset_link_present(self):
+        response = self.client.get(reverse("login"), follow=True)
+        self.assertContains(response, reverse("accounts:password_reset"))
+        response = self.client.get(reverse("accounts:password_reset"))
+        self.assertNotEqual(response.status_code, 404)
+
+    def test_recovery(self):
+        form_data = {"email": self.bob.email}
+        response = self.client.post(
+            reverse("accounts:password_reset"), data=form_data, follow=True
+        )
+        self.assertContains(
+            response,
+            "We've sent an email to you with further "
+            "instructions to recover your account."
+        )
+
+        subject, body = mail.outbox[0].subject, mail.outbox[0].body
+        self.assertEqual(subject, "Recover your password on example.com")
+        self.assertIn("Hello bob,", body)
+        self.assertIn("You (or someone pretending to be you) "
+                      "has requested a password reset on example.com.", body)
+        self.assertIn("The INLOOP team", body)
+
+        link = re.search(
+            r"https?://example\.com/account/password_reset_confirm/"
+            r"(?P<uidb64>[0-9A-Za-z_\-]+)/"
+            r"(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/",
+            body
+        )
+        self.assertIsNotNone(link, "The mail should contain a password reset link")
+
+        url = re.sub(r"https?://example\.com", "", link.group())
+        response = self.client.get(url, follow=True)
+        self.assertContains(response, "Set a new password")
+        self.assertTrue(response.redirect_chain)
+        current_location, status_code = response.redirect_chain[0]
+        self.assertEquals(status_code, 302)
+
+        form_data = {
+            "new_password1": "ji32k7au4a83",
+            "new_password2": "ji32k7au4a83"
+        }
+        response = self.client.post(current_location, data=form_data, follow=True)
+        self.assertContains(response, "Your new password has been saved.")
+
+        self.assertTrue(self.client.login(username="bob", password="ji32k7au4a83"),
+                        "Login should succeed after password reset")
