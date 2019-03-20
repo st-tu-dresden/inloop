@@ -22,7 +22,6 @@ redis = "*"
 gunicorn = "*"
 "psycopg2" = "*"
 setproctitle = "*"
-typing = {version = "*", markers = "python_version < '3.5'" }
 
 
 [dev-packages]
