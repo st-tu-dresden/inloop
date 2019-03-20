@@ -40,6 +40,8 @@ INLOOP requires the following software:
 Using the command line, a development instance can be set up as follows:
 
 1. If you don't have it already, install [pipenv](https://docs.pipenv.org/install/).
+   If you run into trouble, the known "good" versions of the build tools are listed in
+   [build-requirements.txt](build-requirements.txt).
 
 2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
    `./support/scripts/macos_setup.sh` (macOS).

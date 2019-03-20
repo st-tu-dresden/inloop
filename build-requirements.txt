@@ -1,0 +1,3 @@
+pip==19.0.3
+pipenv==2018.11.26
+setuptools==40.8.0

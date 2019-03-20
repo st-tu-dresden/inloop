@@ -11,7 +11,8 @@ matrix:
       cache:
         pip: true
       install:
-        - pip install pipenv codacy-coverage
+        - pip install -r build-requirements.txt
+        - pip install codacy-coverage
         - make
       script:
         - make lint
@@ -29,7 +30,8 @@ matrix:
       cache:
         pip: true
       install:
-        - pip install pipenv codacy-coverage
+        - pip install -r build-requirements.txt
+        - pip install codacy-coverage
         - make
       script:
         - make lint
