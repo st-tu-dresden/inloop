@@ -8,6 +8,7 @@ config["ALLOWED_FILENAME_EXTENSIONS"] = (".java", mark_safe(
     "such as <code>.java, .c, .cpp, .h, .hpp</code>. "
     "Separate multiple filename extensions by commas."
     "Surrounding whitespace will be stripped."
+    "Filename extensions will be treated case insensitive."
 ))
 
 fieldsets = {"General settings": ["ALLOWED_FILENAME_EXTENSIONS"]}

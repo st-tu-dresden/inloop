@@ -36,6 +36,17 @@ class FileNameExtensionValidationTest(TestCase):
         uploads = {}
         self.assertRaises(ValidationError, validate_filenames, uploads)
 
+    def test_case_insensitivity(self):
+        uploads = {
+            "First.java": "public class First {//...}",
+            "Second.JAVA": "public class Second {//...}",
+            "Third.jAvA": "public class Third {//...}"
+        }
+        try:
+            validate_filenames(uploads)
+        except ValidationError:
+            self.fail("Filename validation should be case insensitive")
+
 
 @override_config(ALLOWED_FILENAME_EXTENSIONS="")
 class EmptyAllowedFileNameExtensionsValidationTest(TestCase):
