@@ -39,7 +39,7 @@ urlpatterns = [
         name='upload'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/editor$',
+        r'^(?P<slug>[-\w]+)/editor/$',
         SolutionEditorView.as_view(),
         name='editor'
     ),
