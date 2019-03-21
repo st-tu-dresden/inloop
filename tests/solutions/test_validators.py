@@ -30,11 +30,12 @@ class FileNameExtensionValidationTest(TestCase):
         uploads = {
             "HelloWorld.kt": "class Test {}",
         }
-        self.assertRaises(ValidationError, validate_filenames, uploads)
+        with self.assertRaises(ValidationError):
+            validate_filenames(uploads)
 
     def test_no_uploads(self):
-        uploads = {}
-        self.assertRaises(ValidationError, validate_filenames, uploads)
+        with self.assertRaises(ValidationError):
+            validate_filenames({})
 
     def test_case_insensitivity(self):
         uploads = {
@@ -52,10 +53,11 @@ class FileNameExtensionValidationTest(TestCase):
 class EmptyAllowedFileNameExtensionsValidationTest(TestCase):
     def test_get_allowed_filename_extensions(self):
         filename_extensions = _get_allowed_filename_extensions()
-        self.assertFalse(filename_extensions)
+        self.assertEqual([], filename_extensions)
 
     def test_uploads(self):
         uploads = {
             "HelloWorld.java": "public class HelloWorld {//...}",
         }
-        self.assertRaises(ValidationError, validate_filenames, uploads)
+        with self.assertRaises(ValidationError):
+            validate_filenames(uploads)
