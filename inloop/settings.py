@@ -35,6 +35,14 @@ INTERNAL_IPS = [ip.strip() for ip in env.list("INTERNAL_IPS", default="")]
 SITE_ID = 1
 
 INSTALLED_APPS = [
+    "inloop.accounts",
+    "inloop.common",
+    "inloop.grading",
+    "inloop.solutions",
+    "inloop.tasks",
+    "inloop.testrunner",
+    "inloop.gitload",
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -48,14 +56,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "huey.contrib.djhuey",
     "widget_tweaks",
-
-    "inloop.accounts",
-    "inloop.common",
-    "inloop.grading",
-    "inloop.solutions",
-    "inloop.tasks",
-    "inloop.testrunner",
-    "inloop.gitload",
 ]
 
 MIDDLEWARE = [
