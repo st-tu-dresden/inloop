@@ -198,7 +198,7 @@ class SignupWorkflowTest(TestCase):
                         "Login should succeed after activation")
 
 
-class PasswordRecorverWorkflowTest(SimpleAccountsData, TestCase):
+class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -255,3 +255,6 @@ class PasswordRecorverWorkflowTest(SimpleAccountsData, TestCase):
 
         self.assertTrue(self.client.login(username="bob", password="ji32k7au4a83"),
                         "Login should succeed after password reset")
+
+        response = self.client.get(url, follow=True)
+        self.assertContains(response, "Sorry, this recovery link is invalid.")

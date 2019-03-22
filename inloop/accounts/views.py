@@ -104,18 +104,18 @@ password_change_done = PasswordChangeDoneView.as_view(
 
 password_reset = PasswordResetView.as_view(
     success_url=reverse_lazy("accounts:password_reset_done"),
-    subject_template_name="password_reset/recovery_email_subject.txt",
-    email_template_name="password_reset/recovery_email.txt",
-    template_name="password_reset/recovery_form.html"
+    subject_template_name="password_reset/password_reset_subject.txt",
+    email_template_name="password_reset/password_reset_email.txt",
+    template_name="password_reset/password_reset_form.html"
 )
 password_reset_done = PasswordResetDoneView.as_view(
-    template_name="password_reset/reset_sent.html"
+    template_name="password_reset/password_reset_done.html"
 )
 
 password_reset_confirm = PasswordResetConfirmView.as_view(
     success_url=reverse_lazy("accounts:password_reset_complete"),
-    template_name="password_reset/reset.html"
+    template_name="password_reset/password_reset_confirm.html"
 )
 password_reset_complete = PasswordResetCompleteView.as_view(
-    template_name="password_reset/recovery_done.html"
+    template_name="password_reset/password_reset_complete.html"
 )
