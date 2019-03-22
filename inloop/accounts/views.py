@@ -106,7 +106,9 @@ signup = SignupView.as_view()
 signup_closed = TemplateView.as_view(template_name="accounts/signup_closed.html")
 signup_complete = TemplateView.as_view(template_name="accounts/signup_complete.html")
 
-password_reset = PasswordResetView.as_view(success_url=reverse_lazy("accounts:password_reset_done"))
+password_reset = PasswordResetView.as_view(
+    success_url=reverse_lazy("accounts:password_reset_done"))
 password_reset_done = PasswordResetDoneView.as_view()
-password_reset_confirm = PasswordResetConfirmView.as_view(success_url=reverse_lazy("accounts:password_reset_complete"))
+password_reset_confirm = PasswordResetConfirmView.as_view(
+    success_url=reverse_lazy("accounts:password_reset_complete"))
 password_reset_complete = PasswordResetCompleteView.as_view()
