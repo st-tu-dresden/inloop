@@ -12,9 +12,7 @@ urlpatterns = [
     url(r'^activate/(?P<activation_key>[-:\w]+)/$', views.activate, name="activate"),
 
     url(r'^profile/$', views.profile, name="profile"),
-
-    url(r'^password_change/$', views.password_change, name="password_change"),
-    url(r'^password_change_done/', views.password_change_done, name="password_change_done"),
+    url(r'^password/$', views.password_change, name="password_change"),
 
     url(r'^password_reset/$', views.password_reset, name="password_reset"),
     url(r'^password_reset_done/', views.password_reset_done, name="password_reset_done"),
