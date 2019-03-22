@@ -1,13 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import (PasswordResetCompleteView, PasswordResetConfirmView,
+from django.contrib.auth.views import (PasswordChangeView as DjangoPasswordChangeView,
+                                       PasswordResetCompleteView, PasswordResetConfirmView,
                                        PasswordResetDoneView, PasswordResetView)
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
-from django.views.generic import FormView, TemplateView, View
+from django.views.generic import TemplateView, View
 
 from constance import config
 from registration.backends.hmac.views import (ActivationView as HmacActivationView,
@@ -17,21 +16,14 @@ from inloop.accounts.forms import SignupForm, StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
 
 
-class PasswordChangeView(LoginRequiredMixin, FormView):
-    form_class = PasswordChangeForm
+class PasswordChangeView(DjangoPasswordChangeView):
     success_url = reverse_lazy("accounts:profile")
     template_name = "accounts/password_change_form.html"
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
     def form_valid(self, form):
-        form.save()
+        response = super().form_valid(form)
         messages.success(self.request, "Your password has been updated successfully.")
-        update_session_auth_hash(self.request, form.user)
-        return super().form_valid(form)
+        return response
 
 
 class ProfileView(LoginRequiredMixin, View):
