@@ -55,7 +55,7 @@ class SolutionEditorView(LoginRequiredMixin, View):
             return failure_response
 
         try:
-            validate_filenames(uploads)
+            validate_filenames(uploads.keys())
         except ValidationError as e:
             messages.error(request, e.message)
             return failure_response
@@ -154,7 +154,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
             return redirect_to_upload
 
         try:
-            validate_filenames(uploads)
+            validate_filenames([f.name for f in uploads])
         except ValidationError as e:
             messages.error(request, e.message)
             return redirect_to_upload

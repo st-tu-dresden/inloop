@@ -12,39 +12,37 @@ class FileNameExtensionValidationTest(TestCase):
         filename_extensions = _get_allowed_filename_extensions()
         self.assertEqual([".java", ".b", ".cpp", ".h", ".py"], filename_extensions)
 
-    def test_valid_uploads(self):
-        uploads = {
-            "HelloWorld.java": "public class HelloWorld {//...}",
-            "HelloWorld.b": "+[-[<<[+[--->]-[<<<]]]>>>-]>-.---.>..>.<<<<-.<+.>>>>>.>.<<.<-.",
-            "HelloWorld.cpp": "int main() {//...}",
-            "HelloWorld.h": "",
-            "HelloWorld.py": "print(\"Hello World\")"
-        }
+    def test_valid_filenames(self):
+        filenames = [
+            "HelloWorld.java",
+            "HelloWorld.b",
+            "HelloWorld.cpp",
+            "HelloWorld.h",
+            "HelloWorld.py"
+        ]
         try:
-            validate_filenames(uploads)
+            validate_filenames(filenames)
         except ValidationError as e:
             self.fail("Filename validation should succeed on the "
                       "given files. ({})".format(e.message))
 
-    def test_invalid_uploads(self):
-        uploads = {
-            "HelloWorld.kt": "class Test {}",
-        }
+    def test_invalid_filenames(self):
+        filenames = ["HelloWorld.kt"]
         with self.assertRaises(ValidationError):
-            validate_filenames(uploads)
+            validate_filenames(filenames)
 
-    def test_no_uploads(self):
+    def test_no_filenames(self):
         with self.assertRaises(ValidationError):
-            validate_filenames({})
+            validate_filenames([])
 
     def test_case_insensitivity(self):
-        uploads = {
-            "First.java": "public class First {//...}",
-            "Second.JAVA": "public class Second {//...}",
-            "Third.jAvA": "public class Third {//...}"
-        }
+        filenames = [
+            "First.java",
+            "Second.JAVA",
+            "Third.jAvA"
+        ]
         try:
-            validate_filenames(uploads)
+            validate_filenames(filenames)
         except ValidationError:
             self.fail("Filename validation should be case insensitive")
 
@@ -55,9 +53,7 @@ class EmptyAllowedFileNameExtensionsValidationTest(TestCase):
         filename_extensions = _get_allowed_filename_extensions()
         self.assertEqual([], filename_extensions)
 
-    def test_uploads(self):
-        uploads = {
-            "HelloWorld.java": "public class HelloWorld {//...}",
-        }
+    def test_filenames(self):
+        filenames = ["HelloWorld.java"]
         with self.assertRaises(ValidationError):
-            validate_filenames(uploads)
+            validate_filenames(filenames)
