@@ -15,22 +15,22 @@ class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):
         super().setUpTestData()
         cls.failed_solution_alice = Solution.objects.create(
             author=cls.alice,
-            task=cls.task,
+            task=cls.task_fibonacci,
             passed=False,
         )
         cls.failed_solution_bob = Solution.objects.create(
             author=cls.bob,
-            task=cls.task,
+            task=cls.task_fibonacci,
             passed=False,
         )
         cls.passed_solution_alice = Solution.objects.create(
             author=cls.alice,
-            task=cls.task,
+            task=cls.task_fibonacci,
             passed=True,
         )
         cls.passed_solution_bob = Solution.objects.create(
             author=cls.bob,
-            task=cls.task,
+            task=cls.task_fibonacci,
             passed=True,
         )
 

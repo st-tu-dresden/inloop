@@ -48,7 +48,7 @@ class SolutionsModelTest(SolutionsData, TestCase):
         """
         delayed_solution = Solution.objects.create(
             author=self.bob,
-            task=self.task,
+            task=self.task_fibonacci,
             passed=False,
         )
         # Simulate that the solution was submitted one hour ago.
