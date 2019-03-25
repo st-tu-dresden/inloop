@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 
 from inloop.grading.copypasta import jplag_check
+from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import SolutionFile
 
 from tests.grading.mixins import PlagiatedSolutionsData
@@ -80,7 +81,8 @@ class TemporaryMediaRootTestCase(TestCase):
         super().tearDownClass()
 
 
-@tag("slow")
+# TODO
+# @tag("slow")
 class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -98,25 +100,51 @@ class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaR
         with TemporaryDirectory() as path:
             output = jplag_check(
                 users=[self.alice, self.bob],
-                tasks=[self.task],
+                tasks=[self.task_fibonacci],
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
-        self.assertTrue(self.passed_solution_bob in output)
-        self.assertTrue(self.passed_solution_alice in output)
+        self.assertIn(self.passed_solution_bob, output)
+        self.assertIn(self.passed_solution_alice, output)
+
+        detected_plagiarisms = DetectedPlagiarism.objects.all()
+        flagged_solutions = [p.solution for p in detected_plagiarisms]
+        self.assertIn(self.passed_solution_bob, flagged_solutions)
+        self.assertIn(self.passed_solution_alice, flagged_solutions)
 
     def test_jplag_check_without_resultdir(self):
         """JPlag check should return the right results also without result_dir."""
         output = jplag_check(
             users=[self.alice, self.bob],
-            tasks=[self.task],
+            tasks=[self.task_fibonacci],
             min_similarity=100,
         )
-        self.assertTrue(self.passed_solution_bob in output)
-        self.assertTrue(self.passed_solution_alice in output)
+        self.assertIn(self.passed_solution_bob, output)
+        self.assertIn(self.passed_solution_alice, output)
+
+    def test_specific_users(self):
+        """Verify that only the given users are checked."""
+        output = jplag_check(
+            users=[self.alice],
+            tasks=[self.task_fibonacci],
+            min_similarity=100,
+        )
+        self.assertNotIn(self.passed_solution_bob, output)
+        self.assertNotIn(self.passed_solution_alice, output)
+
+    def test_specific_tasks(self):
+        """Verify that only the given tasks are checked."""
+        output = jplag_check(
+            users=[self.alice, self.bob],
+            tasks=[self.task_leetspeak],
+            min_similarity=100,
+        )
+        self.assertNotIn(self.passed_solution_bob, output)
+        self.assertNotIn(self.passed_solution_alice, output)
 
 
-@tag("slow")
+# TODO
+# @tag("slow")
 class JPlagMinorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -134,15 +162,16 @@ class JPlagMinorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRoo
         with TemporaryDirectory() as path:
             output = jplag_check(
                 users=[self.alice, self.bob],
-                tasks=[self.task],
+                tasks=[self.task_fibonacci],
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
-        self.assertTrue(self.passed_solution_bob in output)
-        self.assertTrue(self.passed_solution_alice in output)
+        self.assertIn(self.passed_solution_bob, output)
+        self.assertIn(self.passed_solution_alice, output)
 
 
-@tag("slow")
+# TODO
+# @tag("slow")
 class JPlagMajorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -165,9 +194,36 @@ class JPlagMajorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRoo
         with TemporaryDirectory() as path:
             output = jplag_check(
                 users=[self.alice, self.bob],
-                tasks=[self.task],
+                tasks=[self.task_fibonacci],
                 min_similarity=1,
                 result_dir=Path(path).joinpath("jplag")
             )
-        self.assertTrue(self.passed_solution_bob not in output)
-        self.assertTrue(self.passed_solution_alice not in output)
+        self.assertNotIn(self.passed_solution_bob, output)
+        self.assertNotIn(self.passed_solution_alice, output)
+
+
+# TODO
+# @tag("slow")
+class JPlagFailedSolutionDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+    def setUp(self):
+        super().setUp()
+        self.solution_file_bob = SolutionFile.objects.create(
+            solution=self.failed_solution_bob,
+            file=SimpleUploadedFile('FibonacciBob.java', FIBONACCI_ITERATIVE.encode())
+        )
+        self.solution_file_alice = SolutionFile.objects.create(
+            solution=self.failed_solution_alice,
+            file=SimpleUploadedFile('FibonacciAlice.java', FIBONACCI_ITERATIVE.encode())
+        )
+
+    def test_failed_solution_detection(self):
+        """Validate that failed solutions are not taken into account."""
+        with TemporaryDirectory() as path:
+            output = jplag_check(
+                users=[self.alice, self.bob],
+                tasks=[self.task_fibonacci],
+                min_similarity=1,
+                result_dir=Path(path).joinpath("jplag")
+            )
+        self.assertNotIn(self.failed_solution_bob, output)
+        self.assertNotIn(self.failed_solution_alice, output)

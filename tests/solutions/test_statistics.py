@@ -59,7 +59,7 @@ class StatisticsTest(SolutionsData, TestCase):
         hotspots_b = dict(self.statistics_both.hotspots)
         hotspots_f = dict(self.statistics_failed_only.hotspots)
         hotspots_p = dict(self.statistics_passed_only.hotspots)
-        task_title = self.task.title
+        task_title = self.task_fibonacci.title
         self.assertTrue(task_title in hotspots_b)
         self.assertTrue(task_title in hotspots_f)
         self.assertTrue(task_title in hotspots_p)
