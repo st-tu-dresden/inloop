@@ -117,7 +117,7 @@ class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaR
 
 
 @tag("slow")
-class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+class JPlagMinorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -129,8 +129,8 @@ class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TemporaryMed
             file=SimpleUploadedFile('FibonacciAlice.java', FIBONACCI_ITERATIVE_SHORTENED.encode())
         )
 
-    def test_comment_variation_detection(self):
-        """Validate that simple code variations are still recognized as plagiarisms."""
+    def test_minor_variation_detection(self):
+        """Validate that minor code variations are still recognized as plagiarisms."""
         with TemporaryDirectory() as path:
             output = jplag_check(
                 users=[self.alice, self.bob],
@@ -138,6 +138,36 @@ class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TemporaryMed
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
-            print(output)
         self.assertTrue(self.passed_solution_bob in output)
         self.assertTrue(self.passed_solution_alice in output)
+
+
+@tag("slow")
+class JPlagMajorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+    def setUp(self):
+        super().setUp()
+        self.solution_file_bob = SolutionFile.objects.create(
+            solution=self.passed_solution_bob,
+            file=SimpleUploadedFile('FibonacciBob.java', FIBONACCI_ITERATIVE.encode())
+        )
+        self.solution_file_alice = SolutionFile.objects.create(
+            solution=self.passed_solution_alice,
+            file=SimpleUploadedFile('FibonacciAlice.java', FIBONACCI_RECURSIVE.encode())
+        )
+
+    def test_major_variation_detection(self):
+        """
+        Validate that major code variations are not recognized as plagiarisms.
+
+        Since both submissions are completely distinct, they should be
+        less than 1% similar, according to JPlag.
+        """
+        with TemporaryDirectory() as path:
+            output = jplag_check(
+                users=[self.alice, self.bob],
+                tasks=[self.task],
+                min_similarity=1,
+                result_dir=Path(path).joinpath("jplag")
+            )
+        self.assertTrue(self.passed_solution_bob not in output)
+        self.assertTrue(self.passed_solution_alice not in output)
