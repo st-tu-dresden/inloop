@@ -66,15 +66,22 @@ public class Fibonacci {
 TEST_MEDIA_ROOT = mkdtemp()
 
 
-@tag("slow")
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
-class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TestCase):
+class TemporaryMediaRootTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if not os.path.isdir(TEST_MEDIA_ROOT):
             os.makedirs(TEST_MEDIA_ROOT)
 
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
+
+
+@tag("slow")
+class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -108,21 +115,9 @@ class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TestCase):
         self.assertTrue(self.passed_solution_bob in output)
         self.assertTrue(self.passed_solution_alice in output)
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(TEST_MEDIA_ROOT)
-        super().tearDownClass()
-
 
 @tag("slow")
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
-class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        if not os.path.isdir(TEST_MEDIA_ROOT):
-            os.makedirs(TEST_MEDIA_ROOT)
-
+class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -143,10 +138,6 @@ class JPlagPlagiarismVariationDetectionTest(PlagiatedSolutionsData, TestCase):
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
+            print(output)
         self.assertTrue(self.passed_solution_bob in output)
         self.assertTrue(self.passed_solution_alice in output)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(TEST_MEDIA_ROOT)
-        super().tearDownClass()
