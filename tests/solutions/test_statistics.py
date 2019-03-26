@@ -10,9 +10,11 @@ from tests.solutions.mixins import SolutionsData
 class StatisticsTest(SolutionsData, TestCase):
     def setUp(self):
         super().setUp()
-        self.statistics_both = Statistics([self.passed_solution, self.failed_solution], "%Y-%m-%d")
-        self.statistics_passed_only = Statistics([self.passed_solution], "%Y-%m-%d")
-        self.statistics_failed_only = Statistics([self.failed_solution], "%Y-%m-%d")
+        self.statistics_both = Statistics(
+            [self.passed_solution_alice, self.failed_solution_alice], "%Y-%m-%d"
+        )
+        self.statistics_passed_only = Statistics([self.passed_solution_alice], "%Y-%m-%d")
+        self.statistics_failed_only = Statistics([self.failed_solution_alice], "%Y-%m-%d")
 
     def test_single_date_range(self):
         date = datetime.now()
@@ -41,8 +43,8 @@ class StatisticsTest(SolutionsData, TestCase):
             self.assertTrue(str(e), msg)
 
     def test_passed_after(self):
-        self.assertEqual(self.statistics_both.passed_after, [(1, 1)])
-        self.assertEqual(self.statistics_passed_only.passed_after, [(1, 1)])
+        self.assertEqual(self.statistics_both.passed_after, [(2, 1)])
+        self.assertEqual(self.statistics_passed_only.passed_after, [(2, 1)])
         self.assertEqual(self.statistics_failed_only.passed_after, [])
 
     def test_passed(self):
@@ -59,7 +61,7 @@ class StatisticsTest(SolutionsData, TestCase):
         hotspots_b = dict(self.statistics_both.hotspots)
         hotspots_f = dict(self.statistics_failed_only.hotspots)
         hotspots_p = dict(self.statistics_passed_only.hotspots)
-        task_title = self.task_fibonacci.title
+        task_title = self.published_task1.title
         self.assertTrue(task_title in hotspots_b)
         self.assertTrue(task_title in hotspots_f)
         self.assertTrue(task_title in hotspots_p)
@@ -74,11 +76,11 @@ class StatisticsTest(SolutionsData, TestCase):
         self.assertEqual(value_p['failed_submissions'], 0)
 
     def test_submission_dates(self):
-        submission_date_failed = self.failed_solution.submission_date
+        submission_date_failed = self.failed_solution_alice.submission_date
         submission_date_failed_formatted = submission_date_failed.strftime(
             self.statistics_both.date_format
         )
-        submission_date_passed = self.passed_solution.submission_date
+        submission_date_passed = self.passed_solution_alice.submission_date
         submission_date_passed_formatted = submission_date_passed.strftime(
             self.statistics_both.date_format
         )

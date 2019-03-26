@@ -11,8 +11,8 @@ from tests.solutions.mixins import SolutionsData
 class SolutionsModelTest(SolutionsData, TestCase):
     def test_precondition(self):
         """Verify there are no results before checking."""
-        self.assertEqual(self.failed_solution.testresult_set.count(), 0)
-        self.assertFalse(self.failed_solution.passed)
+        self.assertEqual(self.failed_solution_alice.testresult_set.count(), 0)
+        self.assertFalse(self.failed_solution_alice.passed)
 
     def test_get_upload_path(self):
         """Test the upload path for solution files."""
@@ -38,8 +38,8 @@ class SolutionsModelTest(SolutionsData, TestCase):
 
         # Both failed_solution and passed_solution were not checked yet
         # so their status should be pending
-        self.assertEqual(self.failed_solution.status(), "pending")
-        self.assertEqual(self.passed_solution.status(), "pending")
+        self.assertEqual(self.failed_solution_alice.status(), "pending")
+        self.assertEqual(self.passed_solution_alice.status(), "pending")
 
     def test_solution_lost_status(self):
         """
@@ -48,7 +48,7 @@ class SolutionsModelTest(SolutionsData, TestCase):
         """
         delayed_solution = Solution.objects.create(
             author=self.bob,
-            task=self.task_fibonacci,
+            task=self.published_task1,
             passed=False,
         )
         # Simulate that the solution was submitted one hour ago.
