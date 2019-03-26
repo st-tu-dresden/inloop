@@ -3,14 +3,17 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, tag
 
+from inloop.grading.copypasta import jplag_check
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
-from inloop.solutions.models import Solution
+from inloop.solutions.models import Solution, SolutionFile
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.grading.mixins import DetectedPlagiarismData, DetectedVetoCounteredPlagiarismData
+from tests.grading.test_jplag import TemporaryMediaRootTestCase
 from tests.solutions.mixins import SolutionsData
 from tests.tasks.mixins import TaskData
 
@@ -130,3 +133,59 @@ class BonusPointsExportTimingTest(SimpleAccountsData, TaskData, BonusPointsTestC
         merged_file_contents = "".join(file_contents)
 
         self.assertNotIn("alice", merged_file_contents)
+
+
+@tag("slow")
+class BonusPointsExportPlagiarismTimingTest(
+    SolutionsData, TemporaryMediaRootTestCase, BonusPointsTestCase
+):
+    def test_use_only_most_recent_plagiarism_test(self):
+        """Validate that only the most recent plagiarism test is used."""
+        self.plagiated_solution_file_bob = SolutionFile.objects.create(
+            solution=self.passed_solution_bob,
+            file=SimpleUploadedFile("Test.java", "class Test {void test(int n) {}}".encode())
+        )
+        self.plagiated_solution_file_alice = SolutionFile.objects.create(
+            solution=self.passed_solution_alice,
+            file=SimpleUploadedFile("Test.java", "class Test {void test(int n) {}}".encode())
+        )
+        with TemporaryDirectory() as path:
+            jplag_check(
+                users=[self.alice, self.bob],
+                tasks=[self.passed_solution_bob.task],
+                min_similarity=100,
+                result_dir=Path(path).joinpath("jplag")
+            )
+
+        stdout, file_contents, path = self.export_bonuspoints(
+            self.passed_solution_bob.task.category.name, datetime.now()
+        )
+
+        self.assertIn("Successfully created {}".format(path), stdout)
+        self.assertEqual(len(file_contents), 2)
+
+        merged_file_contents = "".join(file_contents)
+
+        self.assertIn("alice", merged_file_contents)
+        self.assertIn("bob", merged_file_contents)
+
+        with TemporaryDirectory() as path:
+            output = jplag_check(
+                users=[self.alice, self.bob],
+                tasks=[self.passed_solution_bob.task],
+                min_similarity=0.1,
+                result_dir=Path(path).joinpath("jplag")
+            )
+            print(output)
+
+        stdout, file_contents, path = self.export_bonuspoints(
+            self.passed_solution_bob.task.category.name, datetime.now()
+        )
+
+        self.assertIn("Successfully created {}".format(path), stdout)
+        self.assertEqual(len(file_contents), 0)
+
+        merged_file_contents = "".join(file_contents)
+
+        self.assertNotIn("alice", merged_file_contents)
+        self.assertNotIn("bob", merged_file_contents)
