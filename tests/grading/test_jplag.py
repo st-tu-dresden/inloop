@@ -80,8 +80,7 @@ class TemporaryMediaRootTestCase(TestCase):
         super().tearDownClass()
 
 
-# TODO
-# @tag("slow")
+@tag("slow")
 class JPlagSimplePlagiarismDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -142,8 +141,7 @@ class JPlagSimplePlagiarismDetectionTest(SolutionsData, TemporaryMediaRootTestCa
         self.assertNotIn(self.passed_solution_alice, output)
 
 
-# TODO
-# @tag("slow")
+@tag("slow")
 class JPlagMinorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -169,8 +167,7 @@ class JPlagMinorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase
         self.assertIn(self.passed_solution_alice, output)
 
 
-# TODO
-# @tag("slow")
+@tag("slow")
 class JPlagMajorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -201,8 +198,7 @@ class JPlagMajorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase
         self.assertNotIn(self.passed_solution_alice, output)
 
 
-# TODO
-# @tag("slow")
+@tag("slow")
 class JPlagFailedSolutionDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
