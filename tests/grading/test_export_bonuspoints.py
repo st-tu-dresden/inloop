@@ -1,13 +1,13 @@
-import re
 from datetime import datetime, timedelta
 from io import StringIO
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from django.core.management import call_command
-from django.test import TestCase, tag
+from django.test import TestCase
 
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
+
 from tests.solutions.mixins import SolutionsData
 
 
@@ -52,4 +52,3 @@ class BonuspointsExportTest(SolutionsData, TestCase):
 
         self.assertNotIn(",,alice,alice@example.org,,,1\n", file_contents)
         self.assertNotIn(",,bob,bob@example.org,,,1\n", file_contents)
-

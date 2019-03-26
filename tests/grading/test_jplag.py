@@ -9,6 +9,7 @@ from django.test import TestCase, override_settings, tag
 from inloop.grading.copypasta import jplag_check
 from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import SolutionFile
+
 from tests.solutions.mixins import SolutionsData
 
 FIBONACCI_ITERATIVE = """
