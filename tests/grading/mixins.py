@@ -9,7 +9,7 @@ from tests.accounts.mixins import SimpleAccountsData
 from tests.solutions.mixins import SimpleTaskData
 
 
-class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):
+class SimpleSolutionsData(SimpleAccountsData, SimpleTaskData):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -35,7 +35,7 @@ class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):
         )
 
 
-class PlagiarismTestData(PlagiatedSolutionsData):
+class PlagiarismTestData(SimpleSolutionsData):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()

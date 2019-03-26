@@ -10,7 +10,7 @@ from inloop.grading.copypasta import jplag_check
 from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import SolutionFile
 
-from tests.grading.mixins import PlagiatedSolutionsData
+from tests.grading.mixins import SimpleSolutionsData
 
 FIBONACCI_ITERATIVE = """
 public class Fibonacci {
@@ -83,7 +83,7 @@ class TemporaryMediaRootTestCase(TestCase):
 
 # TODO
 # @tag("slow")
-class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+class JPlagSimplePlagiarismDetectionTest(SimpleSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -145,7 +145,7 @@ class JPlagSimplePlagiarismDetectionTest(PlagiatedSolutionsData, TemporaryMediaR
 
 # TODO
 # @tag("slow")
-class JPlagMinorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+class JPlagMinorVariationDetectionTest(SimpleSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -172,7 +172,7 @@ class JPlagMinorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRoo
 
 # TODO
 # @tag("slow")
-class JPlagMajorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+class JPlagMajorVariationDetectionTest(SimpleSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.solution_file_bob = SolutionFile.objects.create(
@@ -204,7 +204,7 @@ class JPlagMajorVariationDetectionTest(PlagiatedSolutionsData, TemporaryMediaRoo
 
 # TODO
 # @tag("slow")
-class JPlagFailedSolutionDetectionTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
+class JPlagFailedSolutionDetectionTest(SimpleSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.solution_file_bob = SolutionFile.objects.create(
