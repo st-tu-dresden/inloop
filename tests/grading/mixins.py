@@ -26,3 +26,19 @@ class DetectedPlagiarismData(PlagiarismTestData):
             test=cls.plagiarism_test,
             solution=cls.passed_solution_bob,
         )
+
+
+class DetectedVetoCounteredPlagiarismData(PlagiarismTestData):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.detected_plagiarism_alice_with_veto = DetectedPlagiarism.objects.create(
+            test=cls.plagiarism_test,
+            veto=True,
+            solution=cls.passed_solution_alice,
+        )
+        cls.detected_plagiarism_bob_with_veto = DetectedPlagiarism.objects.create(
+            test=cls.plagiarism_test,
+            veto=True,
+            solution=cls.passed_solution_bob,
+        )
