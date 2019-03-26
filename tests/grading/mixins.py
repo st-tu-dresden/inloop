@@ -3,6 +3,7 @@ Mixins for setting up test plagiarism test data.
 """
 
 from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
+
 from tests.solutions.mixins import SolutionsData
 
 
