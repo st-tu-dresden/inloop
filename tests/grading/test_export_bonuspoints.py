@@ -27,7 +27,7 @@ class BonusPointsTestCase(TestCase):
             args = [category_name, date.strftime("%Y-%m-%d"), output_path]
             call_command(tud_export_bonuspoints_csv.Command(), *args, stdout=stdout)
 
-            with open(output_path, "r") as f:
+            with open(str(output_path), "r") as f:
                 return stdout.getvalue(), f.readlines(), output_path
 
 
