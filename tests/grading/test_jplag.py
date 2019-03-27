@@ -12,78 +12,19 @@ from inloop.solutions.models import SolutionFile
 
 from tests.solutions.mixins import FailedSolutionsData, PassedSolutionsData
 
-FIBONACCI_ITERATIVE = """
-public class Fibonacci {
-    // Iterative solution
-    public static int fib(final int x) {
-    if (x < 0) {
-        throw new IllegalArgumentException("x must be greater than or equal zero");
-    }
+directory = os.path.dirname(os.path.realpath(__file__))
 
-    int a = 0;
-    int b = 1;
+with open("{}/samples/FibonacciIterative.java".format(directory), "r") as f:
+    FIBONACCI_ITERATIVE = f.read()
 
-    for (int i = 0; i < x; i++) {
-        int sum = a + b;
-        a = b;
-        b = sum;
-    }
+with open("{}/samples/FibonacciIterativeSlightlyChanged.java".format(directory), "r") as f:
+    FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED = f.read()
 
-    return a;
-    }
+with open("{}/samples/FibonacciIterativeShortened.java".format(directory), "r") as f:
+    FIBONACCI_ITERATIVE_SHORTENED = f.read()
 
-    /*
-     * This comment is just here for testing purposes.
-     */
-}
-"""
-
-FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED = """
-public class Fibonacci {
-    // Iterative solution, slightly changed
-    public static int fib(final int x) {
-        if (x < 0) throw new IllegalArgumentException();
-        long a = 0;
-        long b = 1;
-        for (long i = 0; i < x; i++) {
-            long sum = a + b;
-            a = b;
-            b = sum;
-        }
-        return a;
-    }
-
-    private static void nothing() {
-        for (;;) {int a = 0;}
-    }
-}
-"""
-
-FIBONACCI_ITERATIVE_SHORTENED = """
-public class Fibonacci {
-    public static int fib(final int x) {
-        if (x < 0) throw new IllegalArgumentException("x must be greater than or equal zero");
-        int a = 0;
-        int b = 1;
-        for (int i = 0; i < x; i++) {
-            int sum = a + b;
-            a = b;
-            b = sum;
-        }
-        return a;
-    }
-}
-"""
-
-FIBONACCI_RECURSIVE = """
-public class Fibonacci {
-    // Recursive solution
-    public static int fib(int x) {
-        if (x < 2) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-}
-"""
+with open("{}/samples/FibonacciRecursive.java".format(directory), "r") as f:
+    FIBONACCI_RECURSIVE = f.read()
 
 TEST_MEDIA_ROOT = mkdtemp()
 

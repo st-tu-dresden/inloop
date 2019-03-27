@@ -1,4 +1,5 @@
 public class Fibonacci {
+    // Iterative solution
     public static int fib(final int x) {
     if (x < 0) {
         throw new IllegalArgumentException("x must be greater than or equal zero");
@@ -17,6 +18,6 @@ public class Fibonacci {
     }
 
     /*
-     * This string is just here for testing purposes.
+     * This comment is just here for testing purposes.
      */
 }
