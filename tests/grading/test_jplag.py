@@ -10,7 +10,7 @@ from inloop.grading.copypasta import jplag_check
 from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import SolutionFile
 
-from tests.solutions.mixins import SolutionsData
+from tests.solutions.mixins import FailedSolutionsData, PassedSolutionsData
 
 FIBONACCI_ITERATIVE = """
 public class Fibonacci {
@@ -35,6 +35,27 @@ public class Fibonacci {
     /*
      * This comment is just here for testing purposes.
      */
+}
+"""
+
+FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED = """
+public class Fibonacci {
+    // Iterative solution, slightly changed
+    public static int fib(final int x) {
+        if (x < 0) throw new IllegalArgumentException();
+        long a = 0;
+        long b = 1;
+        for (long i = 0; i < x; i++) {
+            long sum = a + b;
+            a = b;
+            b = sum;
+        }
+        return a;
+    }
+
+    private static void nothing() {
+        for (;;) {int a = 0;}
+    }
 }
 """
 
@@ -82,7 +103,7 @@ class TemporaryMediaRootTestCase(TestCase):
 
 
 @tag("slow")
-class JPlagSimplePlagiarismDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
+class JPlagSimplePlagiarismDetectionTest(PassedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -143,7 +164,7 @@ class JPlagSimplePlagiarismDetectionTest(SolutionsData, TemporaryMediaRootTestCa
 
 
 @tag("slow")
-class JPlagMinorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
+class JPlagMinorVariationDetectionTest(PassedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.plagiated_solution_file_bob = SolutionFile.objects.create(
@@ -169,7 +190,7 @@ class JPlagMinorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase
 
 
 @tag("slow")
-class JPlagMajorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
+class JPlagMajorVariationDetectionTest(PassedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
         self.solution_file_bob = SolutionFile.objects.create(
@@ -200,15 +221,16 @@ class JPlagMajorVariationDetectionTest(SolutionsData, TemporaryMediaRootTestCase
 
 
 @tag("slow")
-class JPlagFailedSolutionDetectionTest(SolutionsData, TemporaryMediaRootTestCase):
-    def setUp(self):
-        super().setUp()
-        self.solution_file_bob = SolutionFile.objects.create(
-            solution=self.failed_solution_bob,
+class JPlagFailedSolutionDetectionTest(FailedSolutionsData, TemporaryMediaRootTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.solution_file_bob = SolutionFile.objects.create(
+            solution=cls.failed_solution_bob,
             file=SimpleUploadedFile('FibonacciBob.java', FIBONACCI_ITERATIVE.encode())
         )
-        self.solution_file_alice = SolutionFile.objects.create(
-            solution=self.failed_solution_alice,
+        cls.solution_file_alice = SolutionFile.objects.create(
+            solution=cls.failed_solution_alice,
             file=SimpleUploadedFile('FibonacciAlice.java', FIBONACCI_ITERATIVE.encode())
         )
 

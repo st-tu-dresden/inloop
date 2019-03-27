@@ -13,8 +13,9 @@ from inloop.solutions.models import Solution, SolutionFile
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.grading.mixins import DetectedPlagiarismData, DetectedVetoCounteredPlagiarismData
-from tests.grading.test_jplag import TemporaryMediaRootTestCase
-from tests.solutions.mixins import SolutionsData
+from tests.grading.test_jplag import (FIBONACCI_ITERATIVE, FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED,
+                                      TemporaryMediaRootTestCase)
+from tests.solutions.mixins import PassedSolutionsData, SolutionsData
 from tests.tasks.mixins import TaskData
 
 
@@ -137,25 +138,31 @@ class BonusPointsExportTimingTest(SimpleAccountsData, TaskData, BonusPointsTestC
 
 @tag("slow")
 class BonusPointsExportPlagiarismTimingTest(
-    SolutionsData, TemporaryMediaRootTestCase, BonusPointsTestCase
+    PassedSolutionsData, TemporaryMediaRootTestCase, BonusPointsTestCase
 ):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.plagiated_solution_file_bob = SolutionFile.objects.create(
+            solution=cls.passed_solution_bob,
+            file=SimpleUploadedFile("Test.java", FIBONACCI_ITERATIVE.encode())
+        )
+        cls.plagiated_solution_file_alice = SolutionFile.objects.create(
+            solution=cls.passed_solution_alice,
+            file=SimpleUploadedFile("Test.java", FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED.encode())
+        )
+
     def test_use_only_most_recent_plagiarism_test(self):
         """Validate that only the most recent plagiarism test is used."""
-        self.plagiated_solution_file_bob = SolutionFile.objects.create(
-            solution=self.passed_solution_bob,
-            file=SimpleUploadedFile("Test.java", "class Test {void test(int n) {}}".encode())
-        )
-        self.plagiated_solution_file_alice = SolutionFile.objects.create(
-            solution=self.passed_solution_alice,
-            file=SimpleUploadedFile("Test.java", "class Test {void test(int n) {}}".encode())
-        )
         with TemporaryDirectory() as path:
-            jplag_check(
+            output = jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.passed_solution_bob.task],
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
+            # Output should be empty
+            self.assertFalse(output)
 
         stdout, file_contents, path = self.export_bonuspoints(
             self.passed_solution_bob.task.category.name, datetime.now()
@@ -173,10 +180,11 @@ class BonusPointsExportPlagiarismTimingTest(
             output = jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.passed_solution_bob.task],
-                min_similarity=0.1,
+                min_similarity=1,
                 result_dir=Path(path).joinpath("jplag")
             )
-            print(output)
+            # Output should detect plagiarisms
+            self.assertTrue(output)
 
         stdout, file_contents, path = self.export_bonuspoints(
             self.passed_solution_bob.task.category.name, datetime.now()
