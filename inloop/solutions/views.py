@@ -2,6 +2,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.http import Http404, JsonResponse
@@ -14,6 +15,7 @@ from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_fro
                                                      xml_strings_from_testoutput)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
+from inloop.solutions.validators import validate_filenames
 from inloop.tasks.models import Task
 
 
@@ -52,8 +54,10 @@ class SolutionEditorView(LoginRequiredMixin, View):
             messages.error(request, "You haven't uploaded any files.")
             return failure_response
 
-        if not all([file_name.endswith(".java") for file_name, _ in uploads.items()]):
-            messages.error(request, "You have uploaded invalid files (allowed: *.java).")
+        try:
+            validate_filenames(uploads.keys())
+        except ValidationError as e:
+            messages.error(request, e.message)
             return failure_response
 
         files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
@@ -149,8 +153,10 @@ class SolutionUploadView(LoginRequiredMixin, View):
             messages.error(request, "You haven't uploaded any files.")
             return redirect_to_upload
 
-        if not all([f.name.endswith(".java") for f in uploads]):
-            messages.error(request, "You have uploaded invalid files (allowed: *.java).")
+        try:
+            validate_filenames([f.name for f in uploads])
+        except ValidationError as e:
+            messages.error(request, e.message)
             return redirect_to_upload
 
         with transaction.atomic():

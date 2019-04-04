@@ -20,8 +20,8 @@ config["EMAIL_ERROR_MESSAGE"] = ("", mark_safe(
 ))
 
 fieldsets = {
-    "Signup form settings": ("SIGNUP_ALLOWED", "EMAIL_PATTERN",
-                             "EMAIL_HELP_TEXT", "EMAIL_ERROR_MESSAGE")
+    "Signup form settings": ["SIGNUP_ALLOWED", "EMAIL_PATTERN",
+                             "EMAIL_HELP_TEXT", "EMAIL_ERROR_MESSAGE"]
 }
 
 fields = {
