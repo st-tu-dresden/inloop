@@ -151,7 +151,7 @@ def exec_jplag(min_similarity, root_path, result_path):
     args += ["jplag.JPlag"]
     args += ["-vl"]
     args += ["-l", "java17"]
-    args += ["-m", str(min_similarity)]
+    args += ["-m", "{}%".format(min_similarity)]
     args += ["-r", str(result_path)]
     args += [str(root_path)]
     return subprocess.check_output(args, stderr=subprocess.DEVNULL, universal_newlines=True)
