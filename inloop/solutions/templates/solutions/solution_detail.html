@@ -114,16 +114,17 @@
 
   <div role="tabpanel" class="tab-pane" id="files">
     {% if files %}
-    <div class="list-group">
-    {% for file in files %}
-      <a class="list-group-item" href="{% url 'solutions:showfile' file.id %}">
-        <h4 class="list-group-item-heading">{{ file.name }}</h4>
-        <p class="list-group-item-text">{{ file.size|filesizeformat }}</p>
-      </a>
-    {% endfor %}
-    </div>
+      <div class="list-group">
+      {% for file in files %}
+        <a class="list-group-item" href="{% url 'solutions:showfile' file.id %}">
+          <h4 class="list-group-item-heading">{{ file.name }}</h4>
+          <p class="list-group-item-text">{{ file.size|filesizeformat }}</p>
+        </a>
+      {% endfor %}
+      </div>
+      <button class="btn btn-default" onclick="alert('download')">Download all files</button>
     {% else %}
-    <p>No files to show here.</p>
+      <p>No files to show here.</p>
     {% endif %}
   </div><!-- /#files -->
 
