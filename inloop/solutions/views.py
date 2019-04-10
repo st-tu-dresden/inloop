@@ -1,4 +1,5 @@
 import json
+import zipfile
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 from os.path import basename
@@ -188,19 +189,22 @@ class SolutionDownloadView(LoginRequiredMixin, View):
                 scoped_id=solution.scoped_id,
                 task=solution.task.underscored_title
             ))
-            with ZipFile(zip_path, 'w') as zip_file:
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
                 for solution_file in solution.solutionfile_set.all():
-                    zip_file.write(
+                    archive.write(
                         filename=solution_file.absolute_path,
-                        arcname=solution_file.relative_path
+                        arcname=solution_file.name
                     )
-                for file in zip_file.filelist:
-                    file.create_system = 0
+                # Mark the files as having been created on Windows so that
+                # Unix permissions are not inferred as 0000
+                for f in archive.filelist:
+                    f.create_system = 0
 
-                response = HttpResponse(zip_file, content_type="application/zip")
-                attachment = "attachment; filename=%s" % basename(zip_file.filename)
-                response["Content-Disposition"] = attachment
-                return response
+            with open(archive.filename, "rb") as source:
+                response = HttpResponse(source, content_type="application/zip")
+            attachment = "attachment; filename=%s" % basename(archive.filename)
+        response["Content-Disposition"] = attachment
+        return response
 
 
 class SolutionListView(LoginRequiredMixin, View):
