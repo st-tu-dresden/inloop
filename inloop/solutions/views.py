@@ -1,9 +1,9 @@
 import json
-import zipfile
-
-import os
+from tempfile import TemporaryDirectory
+from zipfile import ZipFile
 from os.path import basename
 
+import os
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
@@ -182,25 +182,25 @@ class SolutionDownloadView(LoginRequiredMixin, View):
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = Solution.objects.get(id=solution_id)
-        filenames = [f.absolute_path for f in solution.solutionfile_set.all()]
-
-        for n in filenames:
-            print(n)
-
-        with zipfile.ZipFile(
-            "Solution_{scoped_id}_{user}_{task}.zip".format(
+        with TemporaryDirectory() as tmpdir:
+            zip_path = os.path.join(tmpdir, "Solution_{scoped_id}_{task}.zip".format(
+                tmpdir=tmpdir,
                 scoped_id=solution.scoped_id,
-                user=request.user,
-                task=solution.task
-            ), 'w'
-        ) as zip_file:
-            for file in filenames:
-                zip_file.write(file)
+                task=solution.task.underscored_title
+            ))
+            with ZipFile(zip_path, 'w') as zip_file:
+                for solution_file in solution.solutionfile_set.all():
+                    zip_file.write(
+                        filename=solution_file.absolute_path,
+                        arcname=solution_file.relative_path
+                    )
+                for file in zip_file.filelist:
+                    file.create_system = 0
 
-            response = HttpResponse(zip_file, content_type="application/zip")
-            attachment = "attachment; filename=%s" % basename(zip_file.filename)
-        response["Content-Disposition"] = attachment
-        return response
+                response = HttpResponse(zip_file, content_type="application/zip")
+                attachment = "attachment; filename=%s" % basename(zip_file.filename)
+                response["Content-Disposition"] = attachment
+                return response
 
 
 class SolutionListView(LoginRequiredMixin, View):
