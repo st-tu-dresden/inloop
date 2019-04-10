@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
-from inloop.solutions.models import Solution, SolutionFile
+from inloop.solutions.models import Solution, SolutionFile, create_archive_async
 from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
                                                      xml_strings_from_testoutput)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
@@ -183,11 +183,15 @@ class SolutionDownloadView(LoginRequiredMixin, View):
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = Solution.objects.get(id=solution_id)
-        solution.create_archive()
-        response = HttpResponse(solution.archive, content_type="application/zip")
-        attachment = "attachment; filename=%s" % basename(solution.archive.name)
-        response["Content-Disposition"] = attachment
-        return response
+        if solution.archive:
+            response = HttpResponse(solution.archive, content_type="application/zip")
+            attachment = "attachment; filename=%s" % basename(solution.archive.name)
+            response["Content-Disposition"] = attachment
+            return response
+
+        create_archive_async(solution)
+        messages.success(request, "Your zip file is being generated. Please come back later.")
+        return redirect("solutions:detail", slug=solution.task.slug, scoped_id=solution.scoped_id)
 
 
 class SolutionListView(LoginRequiredMixin, View):

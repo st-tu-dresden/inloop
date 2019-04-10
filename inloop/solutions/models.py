@@ -3,6 +3,7 @@ import string
 import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from huey.contrib.djhuey import db_task
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -45,6 +46,33 @@ def get_solution_upload_path(solution, filename):
     })
 
 
+@db_task()
+def create_archive_async(solution):
+    if solution.archive:
+        return
+    with TemporaryDirectory() as tmpdir:
+        filename = "Solution_{scoped_id}_{task}.zip".format(
+            tmpdir=tmpdir,
+            scoped_id=solution.scoped_id,
+            task=solution.task.underscored_title
+        )
+        zip_path = os.path.join(tmpdir, filename)
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
+            for solution_file in solution.solutionfile_set.all():
+                archive.write(
+                    filename=solution_file.absolute_path,
+                    arcname=solution_file.name
+                )
+            # Mark the files as having been created on Windows so that
+            # Unix permissions are not inferred as 0000
+            for f in archive.filelist:
+                f.create_system = 0
+
+        with open(archive.filename, "rb") as zip_data, atomic():
+            solution.archive = SimpleUploadedFile(filename, zip_data.read())
+            solution.save()
+
+
 class Solution(models.Model):
     """
     Represents the user uploaded files.
@@ -85,31 +113,6 @@ class Solution(models.Model):
 
     def get_absolute_url(self):
         return reverse("solutions:staffdetail", kwargs={'id': self.id})
-
-    def create_archive(self):
-        if self.archive:
-            return
-        with TemporaryDirectory() as tmpdir:
-            filename = "Solution_{scoped_id}_{task}.zip".format(
-                tmpdir=tmpdir,
-                scoped_id=self.scoped_id,
-                task=self.task.underscored_title
-            )
-            zip_path = os.path.join(tmpdir, filename)
-            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-                for solution_file in self.solutionfile_set.all():
-                    archive.write(
-                        filename=solution_file.absolute_path,
-                        arcname=solution_file.name
-                    )
-                # Mark the files as having been created on Windows so that
-                # Unix permissions are not inferred as 0000
-                for f in archive.filelist:
-                    f.create_system = 0
-
-            with open(archive.filename, "rb") as zip_data:
-                self.archive = SimpleUploadedFile(filename, zip_data.read())
-        self.save()
 
     def status(self):
         """
