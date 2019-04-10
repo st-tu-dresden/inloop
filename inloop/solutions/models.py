@@ -1,8 +1,11 @@
 import os
 import string
+import zipfile
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_delete
@@ -22,19 +25,22 @@ def hash32(obj):
     return hash_chars[hash(str(obj)) % 32]
 
 
-def get_upload_path(obj, filename):
+def get_upload_path(solution_file, filename):
+    return get_solution_upload_path(solution_file.solution, filename)
+
+
+def get_solution_upload_path(solution, filename):
     """
-    Return an upload file path.
+    Return an upload file path for a solution.
 
     All files related to a specific solution will share a common base directory.
     """
-    s = obj.solution
     return "solutions/{year}/{slug}/{hash}/{id}/{filename}".format_map({
-        "year": s.submission_date.year,
-        "slug": s.task.slug,
+        "year": solution.submission_date.year,
+        "slug": solution.task.slug,
         # another "random" level to avoid too many files per slug directory
-        "hash": hash32(s.author),
-        "id": s.id,
+        "hash": hash32(solution.author),
+        "id": solution.id,
         "filename": filename
     })
 
@@ -60,6 +66,8 @@ class Solution(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
 
+    archive = models.FileField(upload_to=get_solution_upload_path, blank=True)
+
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
 
@@ -77,6 +85,31 @@ class Solution(models.Model):
 
     def get_absolute_url(self):
         return reverse("solutions:staffdetail", kwargs={'id': self.id})
+
+    def create_archive(self):
+        if self.archive:
+            return
+        with TemporaryDirectory() as tmpdir:
+            filename = "Solution_{scoped_id}_{task}.zip".format(
+                tmpdir=tmpdir,
+                scoped_id=self.scoped_id,
+                task=self.task.underscored_title
+            )
+            zip_path = os.path.join(tmpdir, filename)
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
+                for solution_file in self.solutionfile_set.all():
+                    archive.write(
+                        filename=solution_file.absolute_path,
+                        arcname=solution_file.name
+                    )
+                # Mark the files as having been created on Windows so that
+                # Unix permissions are not inferred as 0000
+                for f in archive.filelist:
+                    f.create_system = 0
+
+            with open(archive.filename, "rb") as zip_data:
+                self.archive = SimpleUploadedFile(filename, zip_data.read())
+        self.save()
 
     def status(self):
         """

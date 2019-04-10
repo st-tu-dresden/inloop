@@ -183,26 +183,9 @@ class SolutionDownloadView(LoginRequiredMixin, View):
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = Solution.objects.get(id=solution_id)
-        with TemporaryDirectory() as tmpdir:
-            zip_path = os.path.join(tmpdir, "Solution_{scoped_id}_{task}.zip".format(
-                tmpdir=tmpdir,
-                scoped_id=solution.scoped_id,
-                task=solution.task.underscored_title
-            ))
-            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-                for solution_file in solution.solutionfile_set.all():
-                    archive.write(
-                        filename=solution_file.absolute_path,
-                        arcname=solution_file.name
-                    )
-                # Mark the files as having been created on Windows so that
-                # Unix permissions are not inferred as 0000
-                for f in archive.filelist:
-                    f.create_system = 0
-
-            with open(archive.filename, "rb") as source:
-                response = HttpResponse(source, content_type="application/zip")
-            attachment = "attachment; filename=%s" % basename(archive.filename)
+        solution.create_archive()
+        response = HttpResponse(solution.archive, content_type="application/zip")
+        attachment = "attachment; filename=%s" % basename(solution.archive.name)
         response["Content-Disposition"] = attachment
         return response
 
