@@ -249,11 +249,12 @@ class SolutionDetailView(LoginRequiredMixin, View):
             checkstyle_data = None
 
         context = {
-            'solution': solution,
-            'result': result,
-            'testsuites': testsuites,
-            'checkstyle_data': checkstyle_data,
-            'files': solution.solutionfile_set.all(),
+            "solution": solution,
+            "result": result,
+            "testsuites": testsuites,
+            "checkstyle_data": checkstyle_data,
+            "files": solution.solutionfile_set.all(),
+            "archive": solution.archive
         }
         context.update(self.get_context_data())
 

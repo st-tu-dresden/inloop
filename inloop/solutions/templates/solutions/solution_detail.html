@@ -122,9 +122,9 @@
         </a>
       {% endfor %}
 
-      {% if download_link %}
+      {% if archive %}
       <a class="list-group-item list-group-item-success"
-         href="{{ download_link }}">
+         href="{% url 'solutions:download' solution.id %}">
         <span class="glyphicon glyphicon-file"></span> Download solution archive
       </a>
       {% else %}
