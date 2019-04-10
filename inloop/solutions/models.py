@@ -48,6 +48,9 @@ def get_solution_upload_path(solution, filename):
 
 @db_task()
 def create_archive_async(solution):
+    """
+    Create zip archive of all files associated with a solution asynchronously.
+    """
     if solution.archive:
         return
     with TemporaryDirectory() as tmpdir:
