@@ -3,7 +3,6 @@ import string
 import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from huey.contrib.djhuey import db_task
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,6 +13,8 @@ from django.db.transaction import atomic
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+
+from huey.contrib.djhuey import db_task
 
 from inloop.tasks.models import Task
 

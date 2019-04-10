@@ -1,9 +1,10 @@
 from django.conf.urls import url
 
 from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
-                                    ModularEditorTabView, SolutionDetailView, SolutionEditorView,
-                                    SolutionFileView, SolutionListView, SolutionStatusView,
-                                    SolutionUploadView, StaffSolutionDetailView, SolutionDownloadView)
+                                    ModularEditorTabView, SolutionDetailView,
+                                    SolutionDownloadView, SolutionEditorView, SolutionFileView,
+                                    SolutionListView, SolutionStatusView, SolutionUploadView,
+                                    StaffSolutionDetailView)
 
 app_name = "solutions"
 urlpatterns = [

@@ -1,16 +1,12 @@
 import json
-import zipfile
-from tempfile import TemporaryDirectory
-from zipfile import ZipFile
 from os.path import basename
 
-import os
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.http import Http404, JsonResponse, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
