@@ -1,11 +1,15 @@
 import json
+import zipfile
+
+import os
+from os.path import basename
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
@@ -171,6 +175,32 @@ class SolutionUploadView(LoginRequiredMixin, View):
         solution_submitted.send(sender=self.__class__, solution=solution)
         messages.success(request, "Your solution has been submitted to the checker.")
         return redirect("solutions:list", slug=slug)
+
+
+class SolutionDownloadView(LoginRequiredMixin, View):
+    def get(self, request, solution_id):
+        if not solution_id:
+            raise Http404("No solution id was supplied.")
+        solution = Solution.objects.get(id=solution_id)
+        filenames = [f.absolute_path for f in solution.solutionfile_set.all()]
+
+        for n in filenames:
+            print(n)
+
+        with zipfile.ZipFile(
+            "Solution_{scoped_id}_{user}_{task}.zip".format(
+                scoped_id=solution.scoped_id,
+                user=request.user,
+                task=solution.task
+            ), 'w'
+        ) as zip_file:
+            for file in filenames:
+                zip_file.write(file)
+
+            response = HttpResponse(zip_file, content_type="application/zip")
+            attachment = "attachment; filename=%s" % basename(zip_file.filename)
+        response["Content-Disposition"] = attachment
+        return response
 
 
 class SolutionListView(LoginRequiredMixin, View):

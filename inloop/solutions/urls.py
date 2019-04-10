@@ -3,7 +3,7 @@ from django.conf.urls import url
 from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
                                     ModularEditorTabView, SolutionDetailView, SolutionEditorView,
                                     SolutionFileView, SolutionListView, SolutionStatusView,
-                                    SolutionUploadView, StaffSolutionDetailView)
+                                    SolutionUploadView, StaffSolutionDetailView, SolutionDownloadView)
 
 app_name = "solutions"
 urlpatterns = [
@@ -37,6 +37,11 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/upload$',
         SolutionUploadView.as_view(),
         name='upload'
+    ),
+    url(
+        r'^(?P<solution_id>[-\w]+)/download$',
+        SolutionDownloadView.as_view(),
+        name='download'
     ),
     url(
         r'^(?P<slug>[-\w]+)/editor$',

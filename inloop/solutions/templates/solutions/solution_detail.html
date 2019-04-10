@@ -121,8 +121,20 @@
           <p class="list-group-item-text">{{ file.size|filesizeformat }}</p>
         </a>
       {% endfor %}
+
+      {% if download_link %}
+      <a class="list-group-item list-group-item-success"
+         href="{{ download_link }}">
+        <span class="glyphicon glyphicon-file"></span> Download solution archive
+      </a>
+      {% else %}
+      <a class="list-group-item list-group-item-success"
+         href="{% url 'solutions:download' solution.id %}">
+        <span class="glyphicon glyphicon-file"></span> Create downloadable solution archive
+      </a>
+      {% endif %}
+
       </div>
-      <button class="btn btn-default" onclick="alert('download')">Download all files</button>
     {% else %}
       <p>No files to show here.</p>
     {% endif %}
