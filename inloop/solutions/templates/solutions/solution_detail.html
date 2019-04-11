@@ -122,15 +122,16 @@
         </a>
       {% endfor %}
 
-      {% if archive %}
+      {% if solution.archive %}
       <a class="list-group-item list-group-item-success"
          href="{% url 'solutions:download' solution.id %}">
-        <span class="glyphicon glyphicon-file"></span> Download solution archive
+        Click here to download your solution as zip archive.
       </a>
       {% else %}
-      <a class="list-group-item list-group-item-info"
-         href="{% url 'solutions:download' solution.id %}">
-        <span class="glyphicon glyphicon-file"></span> Create downloadable solution archive
+      <a class="list-group-item list-group-item-info" href="#"
+         id="archive-download-bar" onclick="createArchive()">
+        Click here to create a downloadable zip archive for this solution.
+        <span class="glyphicon spinner float-right"></span>
       </a>
       {% endif %}
 
@@ -239,4 +240,14 @@
 <script src="{% static 'vendor/js/prism.js' %}"></script>
 <script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
 <script src="{% static 'vendor/js/prism-line-numbers.min.js' %}"></script>
+{% if not solution.archive %}
+<script src="{% static 'vendor/js/jquery.refresh.js' %}"></script>
+<script id="archive-status-script"
+        data-csrf-token="{{ csrf_token }}"
+        data-download-bar-id="#archive-download-bar"
+        data-download-url="{% url 'solutions:download' solution.id %}"
+        data-create-archive-url="{% url 'solutions:create-archive' solution.id %}"
+        data-archive-availability-url="{% url 'solutions:archive-availability' solution.id %}"
+        src="{% static 'js/archive-status.js' %}"></script>
+{% endif %}
 {% endblock %}

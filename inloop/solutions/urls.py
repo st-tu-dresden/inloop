@@ -2,9 +2,10 @@ from django.conf.urls import url
 
 from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
                                     ModularEditorTabView, SolutionDetailView,
-                                    SolutionDownloadView, SolutionEditorView, SolutionFileView,
+                                    SolutionEditorView, SolutionFileView,
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView)
+                                    StaffSolutionDetailView, SolutionArchiveAvailabilityView,
+                                    SolutionArchiveDownloadView, CreateArchiveView)
 
 app_name = "solutions"
 urlpatterns = [
@@ -15,9 +16,19 @@ urlpatterns = [
         name='staffdetail'
     ),
     url(
-        r'^(?P<id>[\d]+)/status$',
+        r'^(?P<id>[\d]+)/solution-status$',
         SolutionStatusView.as_view(),
-        name='status'
+        name='solution-status'
+    ),
+    url(
+        r'^(?P<solution_id>[\d]+)/archive-availability$',
+        SolutionArchiveAvailabilityView.as_view(),
+        name='archive-availability'
+    ),
+    url(
+        r'^(?P<solution_id>[\d]+)/create-archive$',
+        CreateArchiveView.as_view(),
+        name='create-archive'
     ),
     url(
         r'^file/(?P<pk>[\d]+)/$',
@@ -41,7 +52,7 @@ urlpatterns = [
     ),
     url(
         r'^(?P<solution_id>[-\w]+)/download$',
-        SolutionDownloadView.as_view(),
+        SolutionArchiveDownloadView.as_view(),
         name='download'
     ),
     url(

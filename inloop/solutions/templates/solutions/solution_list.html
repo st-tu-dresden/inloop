@@ -9,7 +9,7 @@
 {% for solution in solutions %}
   <a class="list-group-item" href="{% url 'solutions:detail' solution.task.slug solution.scoped_id %}">
 
-    <div class="solutionstatus">
+    <div class="solution-status">
       <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
     </div>
 
@@ -31,5 +31,5 @@
 {% block extrabody %}
 <script src="{% static 'vendor/js/jquery.timeago.js' %}"></script>
 <script src="{% static 'vendor/js/jquery.refresh.js' %}"></script>
-<script src="{% static 'js/solutionstatus.js' %}"></script>
+<script src="{% static 'js/solution-status.js' %}"></script>
 {% endblock %}
