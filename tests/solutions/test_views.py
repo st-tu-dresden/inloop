@@ -1,8 +1,16 @@
-from django.test import TestCase
+import shutil
+import zipfile
+from tempfile import mkdtemp, TemporaryDirectory
+
+import os
+import io
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.encoding import force_text
 
-from inloop.solutions.models import Solution
+from inloop.solutions.models import Solution, SolutionFile, create_archive_async
+from inloop.testrunner.models import TestResult, TestOutput
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.tasks.mixins import TaskData
@@ -10,6 +18,7 @@ from tests.tasks.mixins import TaskData
 
 class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
     def setUp(self):
+        super().setUp()
         self.solution = Solution.objects.create(author=self.bob, task=self.published_task1)
 
     def test_pending_state(self):
@@ -29,6 +38,7 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
 
 class SolutionDetailViewRedirectTest(TaskData, SimpleAccountsData, TestCase):
     def setUp(self):
+        super().setUp()
         self.solution = Solution.objects.create(author=self.bob, task=self.published_task1)
 
     def test_unchecked_solution_redirects(self):
@@ -46,4 +56,97 @@ class SolutionDetailViewRedirectTest(TaskData, SimpleAccountsData, TestCase):
         }))
 
 
+TEST_MEDIA_ROOT = mkdtemp()
 
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not os.path.isdir(TEST_MEDIA_ROOT):
+            os.makedirs(TEST_MEDIA_ROOT)
+
+    def setUp(self):
+        super().setUp()
+        self.solution = Solution.objects.create(
+            author=self.bob,
+            task=self.published_task1,
+            passed=False
+        )
+        self.test_result = TestResult.objects.create(
+            solution=self.solution,
+            stdout="STDOUT Output",
+            stderr="STDERR Output",
+            return_code=0,
+            time_taken=0.0,
+        )
+        self.solution_file = SolutionFile.objects.create(
+            solution=self.solution,
+            file=SimpleUploadedFile("Fun.java", "public class Fun {}".encode())
+        )
+        self.solution.passed = self.test_result.is_success()
+        self.solution.save()
+
+    def get_view(self):
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        response = self.client.get(reverse("solutions:detail", kwargs={
+            "slug": self.solution.task.slug, "scoped_id": self.solution.scoped_id
+        }), follow=True)
+        self.assertEqual(response.status_code, 200)
+        return response
+
+    def test_overview(self):
+        """Test overview tab in solution detail view."""
+        response = self.get_view()
+        self.assertContains(response, "Congratulations, your solution passed all tests.")
+
+    def test_files_and_archive(self):
+        """Test files tab and archive creation in solution detail view."""
+        response = self.get_view()
+        self.assertContains(response, "Fun.java")
+        self.assertContains(response, "Create downloadable solution archive")
+
+        # Simulate archive creation
+        create_archive_async(self.solution)
+
+        response = self.get_view()
+        self.assertContains(response, "Download solution archive")
+
+        # Download archive
+        response = self.client.get(reverse("solutions:download", kwargs={
+            "solution_id": self.solution.id
+        }), follow=True)
+        self.assertEqual(response.status_code, 200)
+        in_memory_file = io.BytesIO(response.content)
+        with zipfile.ZipFile(in_memory_file) as zip_file:
+            self.assertEqual(zip_file.namelist(), ["Fun.java"])
+            self.assertIsNone(zip_file.testzip())
+            with TemporaryDirectory() as tmp_dir:
+                zip_file.extractall(tmp_dir)
+                for _, dirs, files in os.walk(tmp_dir):
+                    self.assertIn("Fun.java", files)
+                with open(os.path.join(tmp_dir, "Fun.java"), "r") as f:
+                    self.assertEqual(f.read(), "public class Fun {}")
+
+    def test_console_output(self):
+        """Test console output tab in solution detail view."""
+        response = self.get_view()
+        self.assertContains(response, "STDERR Output")
+        self.assertContains(response, "STDOUT Output")
+
+    def test_unit_tests(self):
+        """test unit tests tab in solution detail view."""
+        response = self.get_view()
+        self.assertContains(response, "Nothing to show here.")
+
+    def tearDown(self):
+        # Remove solution and associated objects
+        # to ensure clean environment for each test
+        self.solution.delete()
+        super().tearDown()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
