@@ -1,16 +1,16 @@
+import io
+import os
 import shutil
 import zipfile
-from tempfile import mkdtemp, TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 
-import os
-import io
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings, tag
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.encoding import force_text
 
 from inloop.solutions.models import Solution, SolutionFile, create_archive_async
-from inloop.testrunner.models import TestResult, TestOutput
+from inloop.testrunner.models import TestResult
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.tasks.mixins import TaskData
