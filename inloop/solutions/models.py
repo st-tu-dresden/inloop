@@ -14,7 +14,8 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
-from huey.contrib.djhuey import db_task
+from huey.contrib.djhuey import db_task, lock_task
+from huey.exceptions import TaskLockedException
 
 from inloop.tasks.models import Task
 
@@ -54,27 +55,31 @@ def create_archive_async(solution):
     """
     if solution.archive:
         return
-    with TemporaryDirectory() as tmpdir:
-        filename = "Solution_{scoped_id}_{task}.zip".format(
-            tmpdir=tmpdir,
-            scoped_id=solution.scoped_id,
-            task=solution.task.underscored_title
-        )
-        zip_path = os.path.join(tmpdir, filename)
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-            for solution_file in solution.solutionfile_set.all():
-                archive.write(
-                    filename=solution_file.absolute_path,
-                    arcname=solution_file.name
+    try:
+        with lock_task(solution.id):
+            with TemporaryDirectory() as tmpdir:
+                filename = "Solution_{scoped_id}_{task}.zip".format(
+                    tmpdir=tmpdir,
+                    scoped_id=solution.scoped_id,
+                    task=solution.task.underscored_title
                 )
-            # Mark the files as having been created on Windows so that
-            # Unix permissions are not inferred as 0000
-            for f in archive.filelist:
-                f.create_system = 0
+                zip_path = os.path.join(tmpdir, filename)
+                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
+                    for solution_file in solution.solutionfile_set.all():
+                        archive.write(
+                            filename=solution_file.absolute_path,
+                            arcname=solution_file.name
+                        )
+                    # Mark the files as having been created on Windows so that
+                    # Unix permissions are not inferred as 0000
+                    for f in archive.filelist:
+                        f.create_system = 0
 
-        with open(archive.filename, "rb") as zip_data, atomic():
-            solution.archive = SimpleUploadedFile(filename, zip_data.read())
-            solution.save()
+                with open(archive.filename, "rb") as zip_data, atomic():
+                    solution.archive = SimpleUploadedFile(filename, zip_data.read())
+                    solution.save()
+    except TaskLockedException:
+        return
 
 
 class Solution(models.Model):
