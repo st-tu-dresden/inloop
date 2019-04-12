@@ -105,13 +105,19 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
         """Test files tab and archive creation in solution detail view."""
         response = self.get_view()
         self.assertContains(response, "Fun.java")
-        self.assertContains(response, "Create downloadable solution archive")
+        self.assertContains(
+            response,
+            "Click here to create a downloadable zip archive for this solution."
+        )
 
         # Simulate archive creation
         create_archive_async(self.solution)
 
         response = self.get_view()
-        self.assertContains(response, "Download solution archive")
+        self.assertContains(
+            response,
+            "Click here to download your solution as a zip archive."
+        )
 
         # Download archive
         response = self.client.get(reverse("solutions:download", kwargs={

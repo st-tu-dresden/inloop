@@ -1,11 +1,11 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
-                                    ModularEditorTabView, SolutionDetailView,
-                                    SolutionEditorView, SolutionFileView,
+from inloop.solutions.views import (CreateArchiveView, ModalConfirmationView, ModalInputView,
+                                    ModalNotificationView, ModularEditorTabView,
+                                    SolutionArchiveAvailabilityView, SolutionArchiveDownloadView,
+                                    SolutionDetailView, SolutionEditorView, SolutionFileView,
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView, SolutionArchiveAvailabilityView,
-                                    SolutionArchiveDownloadView, CreateArchiveView)
+                                    StaffSolutionDetailView)
 
 app_name = "solutions"
 urlpatterns = [
