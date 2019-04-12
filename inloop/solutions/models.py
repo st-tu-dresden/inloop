@@ -65,8 +65,8 @@ def create_archive_async(solution):
             with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
                 for solution_file in solution.solutionfile_set.all():
                     archive.write(
-                        filename=solution_file.absolute_path,
-                        arcname=solution_file.name
+                        filename=str(solution_file.absolute_path),
+                        arcname=str(solution_file.name)
                     )
                 # Mark the files as having been created on Windows so that
                 # Unix permissions are not inferred as 0000
