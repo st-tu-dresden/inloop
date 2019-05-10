@@ -18,7 +18,8 @@ class SimpleTaskData:
         cls.task = Task.objects.create(
             pubdate="2000-01-01 00:00Z",
             category_id=1337,
-            title="Fibonacci"
+            title="Fibonacci",
+            slug="task"
         )
 
 
