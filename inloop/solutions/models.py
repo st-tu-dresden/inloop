@@ -47,6 +47,8 @@ def get_solution_upload_path(solution, filename):
     })
 
 
+
+
 @db_task()
 def create_archive_async(solution):
     """
@@ -68,10 +70,6 @@ def create_archive_async(solution):
                         filename=str(solution_file.absolute_path),
                         arcname=str(solution_file.name)
                     )
-                # Mark the files as having been created on Windows so that
-                # Unix permissions are not inferred as 0000
-                for f in archive.filelist:
-                    f.create_system = 0
 
             with open(archive.filename, "rb") as zip_data, atomic():
                 solution.archive = SimpleUploadedFile(filename, zip_data.read())
