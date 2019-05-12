@@ -47,8 +47,6 @@ def get_solution_upload_path(solution, filename):
     })
 
 
-
-
 @db_task()
 def create_archive_async(solution):
     """
