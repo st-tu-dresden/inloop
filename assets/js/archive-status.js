@@ -7,7 +7,6 @@ let CREATE_ARCHIVE_URL = script.getAttribute("data-create-archive-url");
 let ARCHIVE_AVAILABILITY_URL = script.getAttribute("data-archive-availability-url");
 
 let spinner = $(".spinner");
-spinner.hide();
 
 function changeDownloadBarText(text) {
     // Only override the parent's text, so that our

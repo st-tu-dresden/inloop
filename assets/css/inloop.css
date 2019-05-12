@@ -167,7 +167,7 @@ code {
 /* @end */
 
 .spinner {
-  display: inline-block;
+  display: none;
   float: right;
   vertical-align: middle;
   font-size: 20px;
