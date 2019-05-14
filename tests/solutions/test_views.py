@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.encoding import force_text
 
-from inloop.solutions.models import Solution, SolutionFile, create_archive_async
+from inloop.solutions.models import Solution, SolutionFile, create_archive
 from inloop.testrunner.models import TestResult
 
 from tests.accounts.mixins import SimpleAccountsData
@@ -89,7 +89,6 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
         self.solution.save()
 
     def get_view(self):
-        self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.client.get(reverse("solutions:detail", kwargs={
             "slug": self.solution.task.slug, "scoped_id": self.solution.scoped_id
         }), follow=True)
@@ -98,26 +97,19 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
 
     def test_overview(self):
         """Test overview tab in solution detail view."""
+        self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.get_view()
         self.assertContains(response, "Congratulations, your solution passed all tests.")
-
-    def test_files_and_archive(self):
-        """Test files tab and archive creation in solution detail view."""
-        response = self.get_view()
         self.assertContains(response, "Fun.java")
         self.assertContains(
             response,
             "Click here to create a downloadable zip archive for this solution."
         )
 
-        # Simulate archive creation
-        create_archive_async(self.solution)
-
-        response = self.get_view()
-        self.assertContains(
-            response,
-            "Click here to download your solution as a zip archive."
-        )
+    def test_files_and_archive(self):
+        """Test files tab and archive creation in solution detail view."""
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        create_archive(self.solution)
 
         # Download archive
         response = self.client.get(reverse("solutions:download", kwargs={
@@ -125,24 +117,25 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
         }), follow=True)
         self.assertEqual(response.status_code, 200)
         in_memory_file = io.BytesIO(response.content)
-        with zipfile.ZipFile(in_memory_file) as zip_file:
+        with zipfile.ZipFile(in_memory_file) as zip_file, TemporaryDirectory() as tmp_dir:
             self.assertEqual(zip_file.namelist(), ["Fun.java"])
             self.assertIsNone(zip_file.testzip())
-            with TemporaryDirectory() as tmp_dir:
-                zip_file.extractall(tmp_dir)
-                for _, dirs, files in os.walk(tmp_dir):
-                    self.assertIn("Fun.java", files)
-                with open(os.path.join(tmp_dir, "Fun.java"), "r") as f:
-                    self.assertEqual(f.read(), "public class Fun {}")
+            zip_file.extractall(tmp_dir)
+            for _, dirs, files in os.walk(tmp_dir):
+                self.assertIn("Fun.java", files)
+            with open(os.path.join(tmp_dir, "Fun.java"), "r") as f:
+                self.assertEqual(f.read(), "public class Fun {}")
 
     def test_console_output(self):
         """Test console output tab in solution detail view."""
+        self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.get_view()
         self.assertContains(response, "STDERR Output")
         self.assertContains(response, "STDOUT Output")
 
     def test_unit_tests(self):
         """test unit tests tab in solution detail view."""
+        self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.get_view()
         self.assertContains(response, "Nothing to show here.")
 
