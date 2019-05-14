@@ -1,3 +1,5 @@
+var createArchive;
+
 $(document).ready(function() {
     // Load data attributes
     let script = document.getElementById("archive-status-script");
@@ -151,7 +153,7 @@ $(document).ready(function() {
     }
 
 
-    function createArchive() {
+    createArchive = function () {
         let downloadBarFactory = new DownloadBarFactory();
         $.ajax({
             url: CREATE_ARCHIVE_URL,
