@@ -1,24 +1,27 @@
-from functools import wraps
+"""Decorators for test methods."""
 
-from django.contrib.auth.models import User
+from functools import wraps
 
 
 def assert_login(username, password):
     """
-    Supply a decorator that verifies successful
-    login before any subsequent test operations.
+    Decorator that adds an asserted login with the given credentials
+    at the beginning of the decorated test method.
+
+    Usage:
+        @assert_login("bob", "secret")
+        def test_xyz(self):
+            # self.client is now logged in
+            ...
+
+    The decorated method must be in a subclass of django.test.TestCase.
     """
-    def inner(method):
-        @wraps(inner)
-        def wrapper(test):
-            if not User.objects.filter(username=username).exists():
-                test.fail("There is no user with the username: {}".format(username))
-            test.assertTrue(
-                test.client.login(username=username, password=password),
-                "Login failed for the given username and password: ({}, {})".format(
-                    username, password
-                )
-            )
-            method(test)
+    def decorator(decorated_method):
+        @wraps(decorated_method)
+        def wrapper(self):
+            if not self.client.login(username=username, password=password):
+                raise AssertionError("Could not login with %s" % {'username': username,
+                                                                  'password': password})
+            return decorated_method(self)
         return wrapper
-    return inner
+    return decorator
