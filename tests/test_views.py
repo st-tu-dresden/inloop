@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from tests.accounts.mixins import SimpleAccountsData
+from tests.decorators import assert_login
 
 
 class ProtectedLogoutTest(SimpleAccountsData, TestCase):
@@ -11,8 +12,8 @@ class ProtectedLogoutTest(SimpleAccountsData, TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 405)
 
+    @assert_login("bob", "secret")
     def test_logout(self):
-        self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.client.post(reverse("logout"))
         self.assertRedirects(response, reverse("home"))
         self.assertNotIn(SESSION_KEY, self.client.session)
