@@ -3,11 +3,39 @@ Mixins for setting up test plagiarism test data.
 """
 
 from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
+from inloop.solutions.models import Solution
 
-from tests.solutions.mixins import SolutionsData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.solutions.mixins import SimpleTaskData
 
 
-class PlagiarismTestData(SolutionsData):
+class PlagiatedSolutionsData(SimpleAccountsData, SimpleTaskData):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.failed_solution_alice = Solution.objects.create(
+            author=cls.alice,
+            task=cls.task,
+            passed=False,
+        )
+        cls.failed_solution_bob = Solution.objects.create(
+            author=cls.bob,
+            task=cls.task,
+            passed=False,
+        )
+        cls.passed_solution_alice = Solution.objects.create(
+            author=cls.alice,
+            task=cls.task,
+            passed=True,
+        )
+        cls.passed_solution_bob = Solution.objects.create(
+            author=cls.bob,
+            task=cls.task,
+            passed=True,
+        )
+
+
+class PlagiarismTestData(PlagiatedSolutionsData):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -28,7 +56,7 @@ class DetectedPlagiarismData(PlagiarismTestData):
         )
 
 
-class DetectedVetoCounteredPlagiarismData(PlagiarismTestData):
+class DetectedPlagiarismVetoData(PlagiarismTestData):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
