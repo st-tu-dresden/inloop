@@ -12,11 +12,9 @@ from inloop.grading.management.commands import tud_export_bonuspoints_csv
 from inloop.solutions.models import Solution, SolutionFile
 
 from tests.accounts.mixins import SimpleAccountsData
-from tests.grading.mixins import DetectedPlagiarismData, DetectedVetoCounteredPlagiarismData
-from tests.grading.test_jplag import (FIBONACCI_ITERATIVE, FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED,
-                                      TemporaryMediaRootTestCase)
-from tests.solutions.mixins import PassedSolutionsData, SolutionsData
-from tests.tasks.mixins import TaskData
+from tests.grading.mixins import DetectedPlagiarismData, DetectedPlagiarismVetoData
+from tests.grading.test_jplag import FIBONACCI, TemporaryMediaRootTestCase
+from tests.solutions.mixins import PassedSolutionsData, SimpleTaskData, SolutionsData
 
 
 class BonusPointsTestCase(TestCase):
@@ -36,16 +34,15 @@ class BonusPointsExportTest(SolutionsData, BonusPointsTestCase):
     def test_export_bonus_points(self):
         """Validate that bonus points are exported correctly."""
         stdout, file_contents, path = self.export_bonuspoints(
-            self.published_task1.category.name, datetime(1970, 1, 1)
+            self.task.category.name, datetime(1970, 1, 1)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
-        self.assertEqual(len(file_contents), 2)
+        self.assertEqual(len(file_contents), 1)
 
         merged_file_contents = "".join(file_contents)
 
         self.assertIn(",,alice,alice@example.org,,,1", merged_file_contents)
-        self.assertIn(",,bob,bob@example.org,,,1", merged_file_contents)
 
 
 class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCase):
@@ -55,7 +52,7 @@ class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPoi
         suppressed during bonus points calculation.
         """
         stdout, file_contents, path = self.export_bonuspoints(
-            self.published_task1.category.name, datetime(1970, 1, 1)
+            self.task.category.name, datetime(1970, 1, 1)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
@@ -68,7 +65,7 @@ class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPoi
 
 
 class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(
-    DetectedVetoCounteredPlagiarismData, BonusPointsTestCase
+    DetectedPlagiarismVetoData, BonusPointsTestCase
 ):
     def test_export_with_active_veto(self):
         """
@@ -76,7 +73,7 @@ class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(
         not suppressed if they contain an active veto.
         """
         stdout, file_contents, path = self.export_bonuspoints(
-            self.published_task1.category.name, datetime(1970, 1, 1)
+            self.task.category.name, datetime(1970, 1, 1)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
@@ -88,18 +85,18 @@ class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(
         self.assertIn(",,bob,bob@example.org,,,1", merged_file_contents)
 
 
-class BonusPointsExportTimingTest(SimpleAccountsData, TaskData, BonusPointsTestCase):
+class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPointsTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.passed_solution_1 = Solution.objects.create(
             author=cls.alice,
-            task=cls.published_task1,
+            task=cls.task,
             passed=True,
         )
         cls.passed_solution_2 = Solution.objects.create(
             author=cls.alice,
-            task=cls.published_task1,
+            task=cls.task,
             passed=True,
         )
 
@@ -109,7 +106,7 @@ class BonusPointsExportTimingTest(SimpleAccountsData, TaskData, BonusPointsTestC
         is taken into account for bonus points calculation.
         """
         stdout, file_contents, path = self.export_bonuspoints(
-            self.published_task1.category.name, datetime.now()
+            self.task.category.name, datetime.now()
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
@@ -125,7 +122,7 @@ class BonusPointsExportTimingTest(SimpleAccountsData, TaskData, BonusPointsTestC
         bonus points calculation.
         """
         stdout, file_contents, path = self.export_bonuspoints(
-            self.published_task1.category.name, datetime.now() + timedelta(days=1337)
+            self.task.category.name, datetime.now() + timedelta(days=1337)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
@@ -145,11 +142,11 @@ class BonusPointsExportPlagiarismTimingTest(
         super().setUpTestData()
         cls.plagiated_solution_file_bob = SolutionFile.objects.create(
             solution=cls.passed_solution_bob,
-            file=SimpleUploadedFile("Test.java", FIBONACCI_ITERATIVE.encode())
+            file=SimpleUploadedFile("Test.java", FIBONACCI.encode())
         )
         cls.plagiated_solution_file_alice = SolutionFile.objects.create(
             solution=cls.passed_solution_alice,
-            file=SimpleUploadedFile("Test.java", FIBONACCI_ITERATIVE_SLIGHTLY_CHANGED.encode())
+            file=SimpleUploadedFile("Test.java", FIBONACCI.encode())
         )
 
     def test_use_only_most_recent_plagiarism_test(self):
