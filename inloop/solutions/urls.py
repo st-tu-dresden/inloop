@@ -16,9 +16,9 @@ urlpatterns = [
         name='staffdetail'
     ),
     url(
-        r'^(?P<id>[\d]+)/solution-status$',
+        r'^(?P<id>[\d]+)/status$',
         SolutionStatusView.as_view(),
-        name='solution-status'
+        name='solution_status'
     ),
     url(
         r'^(?P<solution_id>[\d]+)/archive-availability$',
