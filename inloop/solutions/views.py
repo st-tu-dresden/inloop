@@ -176,7 +176,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
         return redirect("solutions:list", slug=slug)
 
 
-class CreateArchiveView(LoginRequiredMixin, View):
+class NewSolutionArchiveView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
             raise Http404("No solution id was supplied.")
@@ -190,7 +190,7 @@ class CreateArchiveView(LoginRequiredMixin, View):
         return JsonResponse({"status": "initiated"})
 
 
-class SolutionArchiveAvailabilityView(LoginRequiredMixin, View):
+class SolutionArchiveStatusView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
             raise Http404("No solution id was supplied.")

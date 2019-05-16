@@ -5,9 +5,9 @@ $(document).ready(function() {
     let script = document.getElementById("archive-status-script");
     let CSRF_TOKEN = document.getElementById("data-csrf-token");
     let DOWNLOAD_BAR_ID = script.getAttribute("data-download-bar-id");
-    let DOWNLOAD_URL = script.getAttribute("data-download-url");
-    let CREATE_ARCHIVE_URL = script.getAttribute("data-create-archive-url");
-    let ARCHIVE_AVAILABILITY_URL = script.getAttribute("data-archive-availability-url");
+    let SOLUTION_ARCHIVE_DOWNLOAD_URL = script.getAttribute("data-solution-archive-download-url");
+    let SOLUTION_ARCHIVE_NEW_URL = script.getAttribute("data-solution-archive-new-url");
+    let SOLUTION_ARCHIVE_STATUS_URL = script.getAttribute("data-solution-archive-status-url");
 
     class DownloadBar {
         get text() {
@@ -124,7 +124,7 @@ $(document).ready(function() {
 
         prepare() {
             super.prepare();
-            this.elem.attr("href", DOWNLOAD_URL);
+            this.elem.attr("href", SOLUTION_ARCHIVE_DOWNLOAD_URL);
             this.elem.attr("onClick", "");
         }
     }
@@ -156,7 +156,7 @@ $(document).ready(function() {
     createArchive = function () {
         let downloadBarFactory = new DownloadBarFactory();
         $.ajax({
-            url: CREATE_ARCHIVE_URL,
+            url: SOLUTION_ARCHIVE_NEW_URL,
             type: "get",
             headers: {"X-CSRFToken": CSRF_TOKEN},
             datatype: "json",
@@ -165,7 +165,7 @@ $(document).ready(function() {
 
                 // Listen for archive status changes
                 $(this).refreshJSON("activate", {
-                    url: ARCHIVE_AVAILABILITY_URL,
+                    url: SOLUTION_ARCHIVE_STATUS_URL,
                     interval: 5000,
                     success: function(data) {
                         if (data.status !== "available") return;

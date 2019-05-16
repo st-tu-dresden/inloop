@@ -245,9 +245,9 @@
 <script id="archive-status-script"
         data-csrf-token="{{ csrf_token }}"
         data-download-bar-id="#archive-download-bar"
-        data-download-url="{% url 'solutions:download' solution.id %}"
-        data-create-archive-url="{% url 'solutions:create-archive' solution.id %}"
-        data-archive-availability-url="{% url 'solutions:archive-availability' solution.id %}"
+        data-solution-archive-download-url="{% url 'solutions:archive_download' solution.id %}"
+        data-solution-archive-new-url="{% url 'solutions:archive_new' solution.id %}"
+        data-solution-archive-status-url="{% url 'solutions:archive_status' solution.id %}"
         src="{% static 'js/archive-status.js' %}"></script>
 {% endif %}
 {% endblock %}

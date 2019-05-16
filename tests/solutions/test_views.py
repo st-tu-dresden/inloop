@@ -112,7 +112,7 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
         create_archive(self.solution)
 
         # Download archive
-        response = self.client.get(reverse("solutions:download", kwargs={
+        response = self.client.get(reverse("solutions:archive_download", kwargs={
             "solution_id": self.solution.id
         }), follow=True)
         self.assertEqual(response.status_code, 200)

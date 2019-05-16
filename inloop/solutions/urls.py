@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (CreateArchiveView, ModalConfirmationView, ModalInputView,
-                                    ModalNotificationView, ModularEditorTabView,
-                                    SolutionArchiveAvailabilityView, SolutionArchiveDownloadView,
+from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
+                                    ModularEditorTabView, NewSolutionArchiveView,
+                                    SolutionArchiveDownloadView, SolutionArchiveStatusView,
                                     SolutionDetailView, SolutionEditorView, SolutionFileView,
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView)
@@ -18,17 +18,22 @@ urlpatterns = [
     url(
         r'^(?P<id>[\d]+)/status$',
         SolutionStatusView.as_view(),
-        name='solution_status'
+        name='status'
     ),
     url(
-        r'^(?P<solution_id>[\d]+)/archive-availability$',
-        SolutionArchiveAvailabilityView.as_view(),
-        name='archive-availability'
+        r'^(?P<solution_id>[\d]+)/archive/status$',
+        SolutionArchiveStatusView.as_view(),
+        name='archive_status'
     ),
     url(
-        r'^(?P<solution_id>[\d]+)/create-archive$',
-        CreateArchiveView.as_view(),
-        name='create-archive'
+        r'^(?P<solution_id>[\d]+)/archive/new$',
+        NewSolutionArchiveView.as_view(),
+        name='archive_new'
+    ),
+    url(
+        r'^(?P<solution_id>[-\w]+)/archive/download$',
+        SolutionArchiveDownloadView.as_view(),
+        name='archive_download'
     ),
     url(
         r'^file/(?P<pk>[\d]+)/$',
@@ -49,11 +54,6 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/upload$',
         SolutionUploadView.as_view(),
         name='upload'
-    ),
-    url(
-        r'^(?P<solution_id>[-\w]+)/download$',
-        SolutionArchiveDownloadView.as_view(),
-        name='download'
     ),
     url(
         r'^(?P<slug>[-\w]+)/editor$',
