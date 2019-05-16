@@ -153,28 +153,35 @@ $(document).ready(function() {
     }
 
 
+    class Endpoint {
+        static get(url, callback) {
+            $.ajax({
+                url: url,
+                type: "get",
+                headers: {"X-CSRFToken": CSRF_TOKEN},
+                datatype: "json",
+                success: callback
+            })
+        }
+    }
+
+
     createArchive = function () {
         let downloadBarFactory = new DownloadBarFactory();
-        $.ajax({
-            url: SOLUTION_ARCHIVE_NEW_URL,
-            type: "get",
-            headers: {"X-CSRFToken": CSRF_TOKEN},
-            datatype: "json",
-            success: function(data) {
-                downloadBarFactory.produce(data.status);
+        Endpoint.get(SOLUTION_ARCHIVE_NEW_URL, function(data) {
+            downloadBarFactory.produce(data.status);
 
-                // Listen for archive status changes
-                $(this).refreshJSON("activate", {
-                    url: SOLUTION_ARCHIVE_STATUS_URL,
-                    interval: 5000,
-                    success: function(data) {
-                        if (data.status !== "available") return;
-                        $(this).refreshJSON("deactivate");
+            // Listen for archive status changes
+            $(this).refreshJSON("activate", {
+                url: SOLUTION_ARCHIVE_STATUS_URL,
+                interval: 5000,
+                success: function(data) {
+                    if (data.status !== "available") return;
+                    $(this).refreshJSON("deactivate");
 
-                        downloadBarFactory.produce(data.status);
-                    }
-                })
-            }
+                    downloadBarFactory.produce(data.status);
+                }
+            });
         });
     }
 
