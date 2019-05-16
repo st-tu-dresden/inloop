@@ -1,8 +1,6 @@
-import io
 import os
 import shutil
-import zipfile
-from tempfile import TemporaryDirectory, mkdtemp
+from tempfile import mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -106,8 +104,8 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
             "Click here to create a downloadable zip archive for this solution."
         )
 
-    def test_files_and_archive(self):
-        """Test files tab and archive creation in solution detail view."""
+    def test_archive_download(self):
+        """Test archive download in solution detail view."""
         self.assertTrue(self.client.login(username="bob", password="secret"))
         create_archive(self.solution)
 
@@ -116,15 +114,6 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
             "solution_id": self.solution.id
         }), follow=True)
         self.assertEqual(response.status_code, 200)
-        in_memory_file = io.BytesIO(response.content)
-        with zipfile.ZipFile(in_memory_file) as zip_file, TemporaryDirectory() as tmp_dir:
-            self.assertEqual(zip_file.namelist(), ["Fun.java"])
-            self.assertIsNone(zip_file.testzip())
-            zip_file.extractall(tmp_dir)
-            for _, dirs, files in os.walk(tmp_dir):
-                self.assertIn("Fun.java", files)
-            with open(os.path.join(tmp_dir, "Fun.java"), "r") as f:
-                self.assertEqual(f.read(), "public class Fun {}")
 
     def test_console_output(self):
         """Test console output tab in solution detail view."""
