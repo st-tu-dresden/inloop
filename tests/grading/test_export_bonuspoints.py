@@ -41,9 +41,13 @@ class BonusPointsExportTest(SolutionsData, BonusPointsTestCase):
         self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 1)
 
-        merged_file_contents = "".join(file_contents)
+        rows = "".join(file_contents).strip().split(",")
 
-        self.assertIn(",,alice,alice@example.org,,,1", merged_file_contents)
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("1", rows, "The user alice should get 1 bonus point")
+        self.assertNotIn("0", rows, "No user should get 0 bonus points")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
 class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCase):
@@ -92,10 +96,15 @@ class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, BonusPointsTestCas
         self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 2)
 
-        merged_file_contents = "".join(file_contents)
+        rows = "".join(file_contents).strip().split(",")
 
-        self.assertIn(",,alice,alice@example.org,,,1", merged_file_contents)
-        self.assertIn(",,bob,bob@example.org,,,1", merged_file_contents)
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("bob", rows)
+        self.assertIn("bob@example.org", rows)
+        self.assertIn("1", rows, "Each user should get 1 bonus point")
+        self.assertNotIn("0", rows, "No user should get 0 bonus points")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
 class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPointsTestCase):
