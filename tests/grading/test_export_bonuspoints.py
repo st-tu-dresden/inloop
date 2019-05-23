@@ -13,7 +13,7 @@ from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import Solution, SolutionFile
 
 from tests.accounts.mixins import SimpleAccountsData
-from tests.grading.mixins import DetectedPlagiarismData
+from tests.grading.mixins import DetectedPlagiarismData, PlagiarismTestData
 from tests.grading.test_jplag import FIBONACCI, TemporaryMediaRootTestCase
 from tests.solutions.mixins import PassedSolutionsData, SimpleTaskData, SolutionsData
 
@@ -65,7 +65,7 @@ class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCas
         self.assertNotIn("bob", merged_file_contents)
 
 
-class PlagiarismVetoBonusPointsExportTest(BonusPointsTestCase):
+class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, BonusPointsTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
