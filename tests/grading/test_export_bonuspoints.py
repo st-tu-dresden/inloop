@@ -46,7 +46,7 @@ class BonusPointsExportTest(SolutionsData, BonusPointsTestCase):
         self.assertIn(",,alice,alice@example.org,,,1", merged_file_contents)
 
 
-class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCase):
+class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCase):
     def test_export_with_detected_plagiarisms(self):
         """
         Validate that solutions with detected plagiarisms are
@@ -65,7 +65,7 @@ class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPoi
         self.assertNotIn("bob", merged_file_contents)
 
 
-class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(BonusPointsTestCase):
+class PlagiarismVetoBonusPointsExportTest(BonusPointsTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
