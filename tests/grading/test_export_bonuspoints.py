@@ -3,60 +3,135 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.test import TestCase, tag
+from django.test import TestCase
 
-from inloop.grading.copypasta import jplag_check
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
-from inloop.grading.models import DetectedPlagiarism
-from inloop.solutions.models import Solution, SolutionFile
+from inloop.grading.models import DetectedPlagiarism, get_ripoff_tasks_for_user
+from inloop.grading.tud import calculate_grades, points_for_completed_tasks
+from inloop.solutions.models import Solution
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.grading.mixins import DetectedPlagiarismData, PlagiarismTestData
-from tests.grading.test_jplag import FIBONACCI, TemporaryMediaRootTestCase
+from tests.grading.test_jplag import TemporaryMediaRootTestCase
 from tests.solutions.mixins import PassedSolutionsData, SimpleTaskData, SolutionsData
 
 
-class BonusPointsTestCase(TestCase):
-    def export_bonuspoints(self, category_name, date):
-        """Conveniently execute the bonus points export management command."""
-        stdout = StringIO()
-        with TemporaryDirectory() as path:
-            output_path = Path(path).joinpath("output")
-            args = [category_name, date.strftime("%Y-%m-%d"), output_path]
-            call_command(tud_export_bonuspoints_csv.Command(), *args, stdout=stdout)
+def export_bonuspoints(category_name, date, zeroes=False):
+    """Conveniently execute the bonus points export management command."""
+    stdout = StringIO()
+    with TemporaryDirectory() as path:
+        output_path = Path(path).joinpath("output")
+        args = [category_name, date.strftime("%Y-%m-%d"), output_path]
+        call_command(
+            tud_export_bonuspoints_csv.Command(), *args, stdout=stdout, zeroes=zeroes
+        )
 
-            with open(str(output_path), "r") as f:
-                return stdout.getvalue(), f.readlines(), output_path
+        with open(str(output_path), "r") as f:
+            return stdout.getvalue(), f.readlines(), output_path
 
 
-class BonusPointsExportTest(SolutionsData, BonusPointsTestCase):
+class RipoffFetchingTest(DetectedPlagiarismData, TestCase):
+    def test_get_ripoff_tasks_for_user(self):
+        """
+        Validate that ripoff tasks for a
+        given user are fetched correctly.
+        """
+        task_ids = get_ripoff_tasks_for_user(self.alice)
+        self.assertIn(self.task.id, task_ids)
+
+
+class BasicBonuspointCalculationTest(SolutionsData, TestCase):
+    """Test basic functionality behind bonus point calculation."""
+
+    def test_calculate_grades(self):
+        """
+        Verify that grades are computed correctly
+        according to a given grading function.
+        """
+        def preferred_grading(user):
+            if user == self.alice:
+                return 1000
+            return 0
+        for row in calculate_grades([self.alice, self.bob], preferred_grading):
+            if row[2] == self.alice.username:
+                self.assertEqual(row[-1], 1000)
+            if row[2] == self.bob.username:
+                self.assertEqual(row[-1], 0)
+
+    def test_points_for_completed_tasks(self):
+        """
+        Verify that bonus points are awarded to
+        legitimate solutions.
+        """
+        points_for_alice = points_for_completed_tasks(
+            self.category.name,
+            datetime(1970, 1, 1),
+            10
+        )(self.alice)
+        self.assertEqual(points_for_alice, 1)
+
+    def test_no_points_for_completed_tasks(self):
+        """
+        Verify that the maximum bonus point
+        amount is taken into account.
+        """
+        points_for_alice = points_for_completed_tasks(
+            self.category.name,
+            datetime(1970, 1, 1),
+            0
+        )(self.alice)
+        self.assertEqual(points_for_alice, 0)
+
+
+class BonusPointsExportTest(SolutionsData, TestCase):
     def test_export_bonus_points(self):
         """Validate that bonus points are exported correctly."""
-        stdout, file_contents, path = self.export_bonuspoints(
+        stdout, file_contents, path = export_bonuspoints(
             self.task.category.name, datetime(1970, 1, 1)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 1)
 
-        rows = "".join(file_contents).strip().split(",")
+        rows = "".join(file_contents)
 
         self.assertIn("alice", rows)
         self.assertIn("alice@example.org", rows)
         self.assertIn("1", rows, "The user alice should get 1 bonus point")
-        self.assertNotIn("0", rows, "No user should get 0 bonus points")
+        self.assertNotIn("0", rows, "Users with 0 bonus points should be excluded")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
+
+    def test_export_bonus_points_with_zeroes(self):
+        """
+        Validate that it is possible to include users without
+        achieved bonuspoints in the bonuspoints export.
+        """
+        stdout, file_contents, path = export_bonuspoints(
+            self.task.category.name, datetime(1970, 1, 1), zeroes=True
+        )
+
+        self.assertIn("Successfully created {}".format(path), stdout)
+        self.assertEqual(len(file_contents), 2)
+
+        rows = "".join(file_contents)
+
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("bob", rows)
+        self.assertIn("bob@example.org", rows)
+        self.assertIn("1", rows, "The user alice should get 1 bonus point")
+        self.assertIn("0", rows, "The user bob should get no bonus points")
         self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
-class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCase):
+class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, TestCase):
     def test_export_with_detected_plagiarisms(self):
         """
         Validate that solutions with detected plagiarisms are
         suppressed during bonus points calculation.
         """
-        stdout, file_contents, path = self.export_bonuspoints(
+        stdout, file_contents, path = export_bonuspoints(
             self.task.category.name, datetime(1970, 1, 1)
         )
 
@@ -69,7 +144,7 @@ class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, BonusPointsTestCas
         self.assertNotIn("bob", merged_file_contents)
 
 
-class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, BonusPointsTestCase):
+class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -89,14 +164,14 @@ class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, BonusPointsTestCas
         Validate that solutions with detected plagiarisms are
         not suppressed if they contain an active veto.
         """
-        stdout, file_contents, path = self.export_bonuspoints(
+        stdout, file_contents, path = export_bonuspoints(
             self.task.category.name, datetime(1970, 1, 1)
         )
 
         self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 2)
 
-        rows = "".join(file_contents).strip().split(",")
+        rows = "".join(file_contents)
 
         self.assertIn("alice", rows)
         self.assertIn("alice@example.org", rows)
@@ -107,7 +182,7 @@ class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, BonusPointsTestCas
         self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
-class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPointsTestCase):
+class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -127,7 +202,7 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPoint
         Validate that only the most recent passed solution
         is taken into account for bonus points calculation.
         """
-        stdout, file_contents, path = self.export_bonuspoints(
+        stdout, file_contents, path = export_bonuspoints(
             self.task.category.name, datetime.now()
         )
 
@@ -143,7 +218,7 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPoint
         Validate that start_date is taken into account for
         bonus points calculation.
         """
-        stdout, file_contents, path = self.export_bonuspoints(
+        stdout, file_contents, path = export_bonuspoints(
             self.task.category.name, datetime.now() + timedelta(days=1337)
         )
 
@@ -155,60 +230,13 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, BonusPoint
         self.assertNotIn("alice", merged_file_contents)
 
 
-@tag("slow")
 class BonusPointsExportPlagiarismTimingTest(
-    PassedSolutionsData, TemporaryMediaRootTestCase, BonusPointsTestCase
+    PassedSolutionsData, TemporaryMediaRootTestCase, TestCase
 ):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.plagiated_solution_file_bob = SolutionFile.objects.create(
-            solution=cls.passed_solution_bob,
-            file=SimpleUploadedFile("Test.java", FIBONACCI.encode())
-        )
-        cls.plagiated_solution_file_alice = SolutionFile.objects.create(
-            solution=cls.passed_solution_alice,
-            file=SimpleUploadedFile("Test.java", FIBONACCI.encode())
-        )
-
-    def _jplag_check(self):
-        with TemporaryDirectory() as path:
-            return jplag_check(
-                users=[self.alice, self.bob],
-                tasks=[self.passed_solution_bob.task],
-                min_similarity=100,
-                result_dir=Path(path).joinpath("jplag")
-            )
-
     def test_use_only_most_recent_plagiarism_test(self):
-        """Validate that only the most recent plagiarism test is used."""
-        output = self._jplag_check()
-        # Output should be empty
-        self.assertFalse(output)
+        """
+        Validate that only the most recent plagiarism test
+        is used for bonuspoints calculation.
+        """
 
-        stdout, file_contents, path = self.export_bonuspoints(
-            self.passed_solution_bob.task.category.name, datetime.now()
-        )
-
-        self.assertIn("Successfully created {}".format(path), stdout)
-        self.assertEqual(len(file_contents), 2)
-
-        merged_file_contents = "".join(file_contents)
-
-        self.assertIn("alice", merged_file_contents)
-        self.assertIn("bob", merged_file_contents)
-
-        output = self._jplag_check()
-        self.assertTrue(output)
-
-        stdout, file_contents, path = self.export_bonuspoints(
-            self.passed_solution_bob.task.category.name, datetime.now()
-        )
-
-        self.assertIn("Successfully created {}".format(path), stdout)
-        self.assertEqual(len(file_contents), 0)
-
-        merged_file_contents = "".join(file_contents)
-
-        self.assertNotIn("alice", merged_file_contents)
-        self.assertNotIn("bob", merged_file_contents)
+        # TODO
