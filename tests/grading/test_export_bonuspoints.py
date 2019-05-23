@@ -149,17 +149,20 @@ class BonusPointsExportPlagiarismTimingTest(
             file=SimpleUploadedFile("Test.java", FIBONACCI.encode())
         )
 
-    def test_use_only_most_recent_plagiarism_test(self):
-        """Validate that only the most recent plagiarism test is used."""
+    def _jplag_check(self):
         with TemporaryDirectory() as path:
-            output = jplag_check(
+            return jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.passed_solution_bob.task],
                 min_similarity=100,
                 result_dir=Path(path).joinpath("jplag")
             )
-            # Output should be empty
-            self.assertFalse(output)
+
+    def test_use_only_most_recent_plagiarism_test(self):
+        """Validate that only the most recent plagiarism test is used."""
+        output = self._jplag_check()
+        # Output should be empty
+        self.assertFalse(output)
 
         stdout, file_contents, path = self.export_bonuspoints(
             self.passed_solution_bob.task.category.name, datetime.now()
@@ -173,15 +176,8 @@ class BonusPointsExportPlagiarismTimingTest(
         self.assertIn("alice", merged_file_contents)
         self.assertIn("bob", merged_file_contents)
 
-        with TemporaryDirectory() as path:
-            output = jplag_check(
-                users=[self.alice, self.bob],
-                tasks=[self.passed_solution_bob.task],
-                min_similarity=1,
-                result_dir=Path(path).joinpath("jplag")
-            )
-            # Output should detect plagiarisms
-            self.assertTrue(output)
+        output = self._jplag_check()
+        self.assertTrue(output)
 
         stdout, file_contents, path = self.export_bonuspoints(
             self.passed_solution_bob.task.category.name, datetime.now()
