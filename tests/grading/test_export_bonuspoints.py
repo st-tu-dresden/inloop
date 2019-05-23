@@ -9,10 +9,11 @@ from django.test import TestCase, tag
 
 from inloop.grading.copypasta import jplag_check
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
+from inloop.grading.models import DetectedPlagiarism
 from inloop.solutions.models import Solution, SolutionFile
 
 from tests.accounts.mixins import SimpleAccountsData
-from tests.grading.mixins import DetectedPlagiarismData, DetectedPlagiarismVetoData
+from tests.grading.mixins import DetectedPlagiarismData
 from tests.grading.test_jplag import FIBONACCI, TemporaryMediaRootTestCase
 from tests.solutions.mixins import PassedSolutionsData, SimpleTaskData, SolutionsData
 
@@ -64,9 +65,21 @@ class PlagiarismInfluencedBonusPointsExportTest(DetectedPlagiarismData, BonusPoi
         self.assertNotIn("bob", merged_file_contents)
 
 
-class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(
-    DetectedPlagiarismVetoData, BonusPointsTestCase
-):
+class PlagiarismInfluencedVetoCounteredBonusPointsExportTest(BonusPointsTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.detected_plagiarism_alice_with_veto = DetectedPlagiarism.objects.create(
+            test=cls.plagiarism_test,
+            veto=True,
+            solution=cls.passed_solution_alice,
+        )
+        cls.detected_plagiarism_bob_with_veto = DetectedPlagiarism.objects.create(
+            test=cls.plagiarism_test,
+            veto=True,
+            solution=cls.passed_solution_bob,
+        )
+
     def test_export_with_active_veto(self):
         """
         Validate that solutions with detected plagiarisms are
