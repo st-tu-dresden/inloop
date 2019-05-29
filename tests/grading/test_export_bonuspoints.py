@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
 from inloop.grading.management.commands.tud_export_bonuspoints_csv import filter_zeroes
-from inloop.grading.models import DetectedPlagiarism, get_ripoff_tasks_for_user
+from inloop.grading.models import DetectedPlagiarism, get_ripoff_tasks_for_user, PlagiarismTest
 from inloop.grading.tud import calculate_grades, points_for_completed_tasks
 from inloop.solutions.models import Solution
 
@@ -247,7 +247,7 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, TestCase):
 
 
 class BonusPointsExportPlagiarismTimingTest(
-    PassedSolutionsData, TemporaryMediaRootTestCase, TestCase
+    PassedSolutionsData, TemporaryMediaRootTestCase
 ):
     def test_use_only_most_recent_plagiarism_test(self):
         """
@@ -255,4 +255,21 @@ class BonusPointsExportPlagiarismTimingTest(
         is used for bonuspoints calculation.
         """
 
-        # TODO
+        stdout, file_contents, path = export_bonuspoints(
+            self.published_task1.category.name, datetime.now()
+        )
+        rows = "".join(file_contents)
+
+        self.assertIn("alice", rows)
+        self.assertIn("bob", rows)
+
+        test = PlagiarismTest.objects.create()
+        DetectedPlagiarism.objects.create(test=test, solution=self.passed_solution_bob)
+
+        stdout, file_contents, path = export_bonuspoints(
+            self.published_task1.category.name, datetime.now()
+        )
+        rows = "".join(file_contents)
+
+        self.assertIn("alice", rows)
+        self.assertNotIn("bob", rows, "Bob should get no bonus for his plagiated solution!")
