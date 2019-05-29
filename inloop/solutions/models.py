@@ -1,8 +1,8 @@
+import io
 import os
 import string
 import zipfile
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -53,22 +53,21 @@ def create_archive(solution):
     """
     if solution.archive:
         return
-    with TemporaryDirectory() as tmpdir:
-        filename = "Solution_{scoped_id}_{task}.zip".format(
-            scoped_id=solution.scoped_id,
-            task=solution.task.underscored_title
-        )
-        zip_path = os.path.join(tmpdir, filename)
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-            for solution_file in solution.solutionfile_set.all():
-                archive.write(
-                    filename=str(solution_file.absolute_path),
-                    arcname=str(solution_file.name)
-                )
-
-            with open(archive.filename, "rb") as zip_data:
-                solution.archive = SimpleUploadedFile(filename, zip_data.read())
-                solution.save()
+    stream = io.BytesIO()
+    stream.name = "Solution_{scoped_id}_{task}.zip".format(
+        scoped_id=solution.scoped_id,
+        task=solution.task.underscored_title
+    )
+    with zipfile.ZipFile(stream, mode='w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for solution_file in solution.solutionfile_set.all():
+            archive.write(
+                filename=str(solution_file.absolute_path),
+                arcname=str(solution_file.name)
+            )
+    solution.archive = SimpleUploadedFile(
+        stream.name, stream.getvalue()
+    )
+    solution.save()
 
 
 @db_task()
