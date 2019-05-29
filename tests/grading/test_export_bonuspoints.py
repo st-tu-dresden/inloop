@@ -7,6 +7,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
+from inloop.grading.management.commands.tud_export_bonuspoints_csv import filter_zeroes
 from inloop.grading.models import DetectedPlagiarism, get_ripoff_tasks_for_user
 from inloop.grading.tud import calculate_grades, points_for_completed_tasks
 from inloop.solutions.models import Solution
@@ -82,6 +83,21 @@ class BasicBonuspointCalculationTest(SolutionsData, TestCase):
             0
         )(self.alice)
         self.assertEqual(points_for_alice, 0)
+
+    def test_filter_zeroes(self):
+        """
+        Verify that zeroes are filtered in case the
+        --zeroes argument is not passed to the
+        management command.
+        """
+        mocked_grade_sequence = [
+            (None, None, "Alice", None, 0),
+            (None, None, "Bob", None, 1),
+            (None, None, "Charles", None, -1),
+        ]
+        filtered_grade_sequence = list(filter_zeroes(mocked_grade_sequence))
+        self.assertNotIn((None, None, "Alice", None, 0), filtered_grade_sequence)
+        self.assertEqual(len(filtered_grade_sequence), 2)
 
 
 class BonusPointsExportTest(SolutionsData, TestCase):
