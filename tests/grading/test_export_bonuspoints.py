@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from inloop.grading.management.commands import tud_export_bonuspoints_csv
 from inloop.grading.management.commands.tud_export_bonuspoints_csv import filter_zeroes
-from inloop.grading.models import DetectedPlagiarism, get_ripoff_tasks_for_user, PlagiarismTest
+from inloop.grading.models import DetectedPlagiarism, PlagiarismTest, get_ripoff_tasks_for_user
 from inloop.grading.tud import calculate_grades, points_for_completed_tasks
 from inloop.solutions.models import Solution
 
