@@ -1,5 +1,3 @@
-var createArchive;
-
 $(document).ready(function() {
     // Load data attributes
     let script = document.getElementById("archive-status-script");
@@ -166,7 +164,7 @@ $(document).ready(function() {
     }
 
 
-    createArchive = function () {
+    window.createArchive = function () {
         let downloadBarFactory = new DownloadBarFactory();
         Endpoint.get(SOLUTION_ARCHIVE_NEW_URL, function(data) {
             downloadBarFactory.produce(data.status);
