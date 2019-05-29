@@ -66,9 +66,9 @@ def create_archive(solution):
                     arcname=str(solution_file.name)
                 )
 
-        with open(archive.filename, "rb") as zip_data:
-            solution.archive = SimpleUploadedFile(filename, zip_data.read())
-            solution.save()
+            with open(archive.filename, "rb") as zip_data:
+                solution.archive = SimpleUploadedFile(filename, zip_data.read())
+                solution.save()
 
 
 @db_task()
