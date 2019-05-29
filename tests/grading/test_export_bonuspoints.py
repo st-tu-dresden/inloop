@@ -31,7 +31,7 @@ def export_bonuspoints(category_name, date, zeroes=False):
             return stdout.getvalue(), f.readlines(), output_path
 
 
-class RipoffFetchingTest(DetectedPlagiarismData, TestCase):
+class RipoffTest(DetectedPlagiarismData, TestCase):
     def test_get_ripoff_tasks_for_user(self):
         """
         Validate that ripoff tasks for a
