@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from inloop.solutions.models import (Solution, SolutionFile, create_archive_async,
-                                     get_solution_upload_path, get_upload_path)
+                                     get_archive_upload_path, get_upload_path)
 
 from tests.solutions.mixins import SolutionsData
 
@@ -19,40 +19,6 @@ class SolutionsModelTest(SolutionsData, TestCase):
         """Verify there are no results before checking."""
         self.assertEqual(self.failed_solution.testresult_set.count(), 0)
         self.assertFalse(self.failed_solution.passed)
-
-    def test_get_upload_path(self):
-        """
-        Test the upload path for:
-            - solution files
-            - archives associated with a particular solution
-        """
-
-        # Create a mock solution to check its
-        # computed upload path
-        mock = Mock()
-        mock.solution.submission_date.year = "1970"
-        mock.solution.task.slug = "here-be-dragons"
-        mock.solution.author = "Mr. Mustermann"
-        mock.solution.id = "123456"
-
-        upload_path = get_upload_path(mock, "Fibonacci.java")
-        self.assertTrue(upload_path.startswith("solutions"))
-        self.assertTrue(upload_path.endswith("Fibonacci.java"))
-
-        tokens = upload_path.split("/")
-        for token in ["1970", "here-be-dragons", "123456"]:
-            self.assertTrue(token in tokens)
-
-        upload_path_associated_archive = get_solution_upload_path(
-            mock.solution,
-            "archive.zip"
-        )
-        # Validate that an associated archive is stored
-        # to the same directory as the solution files themselves
-        self.assertEqual(
-            os.path.dirname(os.path.abspath(upload_path)),
-            os.path.dirname(os.path.abspath(upload_path_associated_archive))
-        )
 
     def test_solution_default_status(self):
         """Verify that the default status of a solution is pending."""
@@ -77,6 +43,42 @@ class SolutionsModelTest(SolutionsData, TestCase):
         mocked_time = timezone.now() - timezone.timedelta(hours=1)
         delayed_solution.submission_date = mocked_time
         self.assertEqual(delayed_solution.status(), "lost")
+
+
+class SolutionsFileUploadTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # Create a mock solution to check its
+        # computed upload path
+        cls.mock = Mock()
+        cls.mock.solution.submission_date.year = "1970"
+        cls.mock.solution.task.slug = "here-be-dragons"
+        cls.mock.solution.author = "Mr. Mustermann"
+        cls.mock.solution.id = "123456"
+
+    def test_get_upload_path(self):
+        """Test the upload path for solution files."""
+
+        upload_path = get_upload_path(self.mock, "Fibonacci.java")
+        self.assertTrue(upload_path.startswith("solutions"))
+        self.assertTrue(upload_path.endswith("Fibonacci.java"))
+
+        tokens = upload_path.split("/")
+        for token in ["1970", "here-be-dragons", "123456"]:
+            self.assertTrue(token in tokens)
+
+    def test_get_archive_upload_path(self):
+        """
+        Test the upload path for archives
+        associated with a particular solution.
+        """
+        upload_path = get_archive_upload_path(
+            self.mock.solution, "Fibonacci.zip"
+        )
+
+        self.assertTrue(upload_path.startswith("archives"))
+        self.assertTrue(upload_path.endswith("Fibonacci.zip"))
 
 
 JAVA_EXAMPLE_1 = """

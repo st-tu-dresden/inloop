@@ -27,24 +27,32 @@ def hash32(obj):
     return hash_chars[hash(str(obj)) % 32]
 
 
-def get_upload_path(solution_file, filename):
-    return get_solution_upload_path(solution_file.solution, filename)
-
-
-def get_solution_upload_path(solution, filename):
+def get_upload_path(obj, filename):
     """
-    Return an upload file path for a solution.
-
+    Return an upload file path.
     All files related to a specific solution will share a common base directory.
     """
+    s = obj.solution
     return "solutions/{year}/{slug}/{hash}/{id}/{filename}".format_map({
-        "year": solution.submission_date.year,
-        "slug": solution.task.slug,
+        "year": s.submission_date.year,
+        "slug": s.task.slug,
         # another "random" level to avoid too many files per slug directory
-        "hash": hash32(solution.author),
-        "id": solution.id,
+        "hash": hash32(s.author),
+        "id": s.id,
         "filename": filename
     })
+
+
+def get_archive_upload_path(solution, filename):
+    """
+    Return an upload file path of the archive
+    generated from a given solution.
+    """
+    return "archives/{author}/{id}/{filename}".format(
+        author=solution.author,
+        id=solution.id,
+        filename=filename
+    )
 
 
 def create_archive(solution):
@@ -100,7 +108,7 @@ class Solution(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
 
-    archive = models.FileField(upload_to=get_solution_upload_path, blank=True)
+    archive = models.FileField(upload_to=get_archive_upload_path, blank=True)
 
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
