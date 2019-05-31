@@ -65,7 +65,7 @@ def create_archive(solution):
                 arcname=str(solution_file.name)
             )
     solution.archive = SimpleUploadedFile(
-        stream.name, stream.getvalue()
+        name=stream.name, content=stream.getvalue(), content_type="application/zip"
     )
     solution.save()
 
