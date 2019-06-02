@@ -10,6 +10,7 @@
 [![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
 [![Coverage Badge](https://api.codacy.com/project/badge/Coverage/2be604ceedf14603a56e165dfe1cae5a)](https://www.codacy.com/app/martinmo/inloop)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2be604ceedf14603a56e165dfe1cae5a)](https://www.codacy.com/app/martinmo/inloop)
+[![Open Source Helpers](https://www.codetriage.com/st-tu-dresden/inloop/badges/users.svg)](https://www.codetriage.com/st-tu-dresden/inloop)
 
 INLOOP, the *INteractive Learning center for Object-Oriented Programming*, is a Python web
 application to manage online programming courses, powered by Git, Django and Docker:
