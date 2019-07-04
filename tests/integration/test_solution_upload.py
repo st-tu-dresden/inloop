@@ -3,10 +3,13 @@ import shutil
 from tempfile import mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings
+from django.test import override_settings, TestCase
 from django.urls import reverse
 
-from inloop.tasks.models import Category
+from inloop.accounts.forms import User
+from inloop.solutions.models import SolutionFile, Solution
+from inloop.tasks.models import Category, Task
+from inloop.testrunner.models import TestResult, TestOutput
 
 from tests.integration.tools import MessageTestCase
 from tests.solutions.mixins import SolutionsData
@@ -87,9 +90,6 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         self.assertIn("Fibonacci1.java", file_names)
         self.assertIn("Fibonacci2.java", file_names)
 
-    def test_displayed_media(self):
-        """Validate that static and dynamic media is displayed correctly."""
-
     def test_invalid_solutions_fail(self):
         """Validate that invalid solutions fail."""
 
@@ -99,6 +99,64 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
     def test_zip_download(self):
         """Test wether zips can be downloaded."""
 
+
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class SolutionDetailViewTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not os.path.isdir(TEST_MEDIA_ROOT):
+            os.makedirs(TEST_MEDIA_ROOT)
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(id=1337, name="Category 1")
+        cls.task = Task.objects.create(
+            pubdate="2000-01-01 00:00Z",
+            category=cls.category,
+            title="Fibonacci",
+            slug="task"
+        )
+        cls.bob = User.objects.create_user(
+            username="bob",
+            email="bob@example.org",
+            password="secret"
+        )
+        cls.solution = Solution.objects.create(author=cls.bob, task=cls.task, passed=True)
+        cls.solution_file = SolutionFile.objects.create(
+            solution=cls.solution,
+            file=SimpleUploadedFile('Fibonacci.java', FIBONACCI.encode())
+        )
+        cls.test_result = TestResult.objects.create(
+            solution=cls.solution,
+            stdout="This is the STDOUT output.",
+            stderr="This is the STDERR output.",
+            return_code=0,
+            time_taken=1.0
+        )
+        cls.test_output = TestOutput.objects.create(result=cls.test_result, name="", output="")
+
+    def setUp(self):
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        self.url = reverse("solutions:detail", kwargs={
+            "slug": self.task.slug, "scoped_id": self.solution.scoped_id
+        })
+        super().setUp()
+
+    def test_displayed_media(self):
+        """Validate that static and dynamic media is displayed correctly."""
+
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Congratulations, your solution passed all tests.")
+        self.assertContains(response, "Fibonacci.java")
 
 
     @classmethod
