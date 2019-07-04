@@ -108,7 +108,7 @@ class Solution(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
 
-    archive = models.FileField(upload_to=get_archive_upload_path, blank=True)
+    archive = models.FileField(upload_to=get_archive_upload_path, blank=True, null=True)
 
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)
