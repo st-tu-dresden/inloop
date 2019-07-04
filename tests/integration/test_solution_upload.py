@@ -50,7 +50,6 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        # FIXME: Remove this line after rebase with master (merged with #244 in PR #279)
         cls.category = Category.objects.create(id=1337, name="Category 1")
 
     def setUp(self):
