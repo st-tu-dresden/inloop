@@ -3,13 +3,13 @@ import shutil
 from tempfile import mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from inloop.accounts.forms import User
-from inloop.solutions.models import SolutionFile, Solution
+from inloop.solutions.models import Solution, SolutionFile
 from inloop.tasks.models import Category, Task
-from inloop.testrunner.models import TestResult, TestOutput
+from inloop.testrunner.models import TestOutput, TestResult
 
 from tests.integration.tools import MessageTestCase
 from tests.solutions.mixins import SolutionsData
@@ -99,8 +99,6 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
     def test_zip_download(self):
         """Test wether zips can be downloaded."""
 
-
-
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(TEST_MEDIA_ROOT)
@@ -157,7 +155,6 @@ class SolutionDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Congratulations, your solution passed all tests.")
         self.assertContains(response, "Fibonacci.java")
-
 
     @classmethod
     def tearDownClass(cls):
