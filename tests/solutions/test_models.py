@@ -107,10 +107,6 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
             solution=self.passed_solution,
             file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
         )
-        self.solution_file_passed_1_duplicate = SolutionFile.objects.create(
-            solution=self.passed_solution,
-            file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
-        )
         self.solution_file_passed_2 = SolutionFile.objects.create(
             solution=self.passed_solution,
             file=SimpleUploadedFile("Example2.java", JAVA_EXAMPLE_2)
@@ -120,10 +116,6 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
             file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
         )
         self.solution_file_failed_2 = SolutionFile.objects.create(
-            solution=self.failed_solution,
-            file=SimpleUploadedFile("Example2.java", JAVA_EXAMPLE_2)
-        )
-        self.solution_file_failed_2_duplicate = SolutionFile.objects.create(
             solution=self.failed_solution,
             file=SimpleUploadedFile("Example2.java", JAVA_EXAMPLE_2)
         )
@@ -141,27 +133,10 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
                 self.assertIn("Example1.java", zip_file.namelist())
                 self.assertIn("Example2.java", zip_file.namelist())
 
-                # Duplicate files should be packed as well and renamed beforehand
-                self.assertEqual(3, len(zip_file.namelist()))
-                duplicate_filenames = [
-                    n for n in zip_file.namelist()
-                    if n != "Example1.java" and n != "Example2.java"
-                ]
-                self.assertEqual(1, len(duplicate_filenames))
-                duplicate_filename = duplicate_filenames[0]
-                self.assertTrue(
-                    "Example1" in duplicate_filename or "Example2" in duplicate_filename
-                )
-
                 with zip_file.open("Example1.java") as f:
                     self.assertEqual(f.read(), JAVA_EXAMPLE_1)
                 with zip_file.open("Example2.java") as f:
                     self.assertEqual(f.read(), JAVA_EXAMPLE_2)
-                with zip_file.open(duplicate_filename) as f:
-                    contents = f.read()
-                    self.assertTrue(
-                        contents == JAVA_EXAMPLE_1 or contents == JAVA_EXAMPLE_2
-                    )
 
                 with TemporaryDirectory() as tmp_dir:
                     # Test extraction to expose erroneous packaging
@@ -169,19 +144,12 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
                     for _, dirs, files in os.walk(tmp_dir):
                         self.assertIn("Example1.java", files)
                         self.assertIn("Example2.java", files)
-                        self.assertIn(duplicate_filename, files)
-                        self.assertEqual(3, len(files))
+                        self.assertEqual(2, len(files))
 
                         # The inherited folder structure should be flat
                         self.assertFalse(dirs)
 
                 self.assertIsNone(zip_file.testzip())
-
-                # Validate that the generated archive has a descriptive name
-                self.assertIn(self.task.underscored_title, zip_file.filename)
-                self.assertIn(str(solution.scoped_id), zip_file.filename)
-                self.assertIn(".zip", zip_file.filename)
-                self.assertIn("Solution", zip_file.filename)
 
     @classmethod
     def tearDownClass(cls):
