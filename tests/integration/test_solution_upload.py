@@ -82,31 +82,8 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
             item for sublist in list(l for _, _, l in os.walk(TEST_MEDIA_ROOT))
             for item in sublist
         ]
-        self.assertIn("Fibonacci.java", file_names)
-
-    def test_solution_upload_robustness(self):
-        """
-        Test robustness of the solution upload with a great number of
-        identical files.
-        """
-        files = [
-            SimpleUploadedFile("Fibonacci.java", "class Fibonacci {}".encode()) for _ in range(100)
-        ]
-        response = self.client.post(self.url, data={
-            "uploads": files
-        }, follow=True)
-        self.assertResponseContainsMessage(
-            "Your solution has been submitted to the checker.",
-            self.Levels.SUCCESS,
-            response
-        )
-        # Extract all files in media root
-        file_names = [
-            item for sublist in list(l for _, _, l in os.walk(TEST_MEDIA_ROOT))
-            for item in sublist
-        ]
-        for f in files:
-            self.assertIn(f.name, file_names)
+        self.assertIn("Fibonacci1.java", file_names)
+        self.assertIn("Fibonacci2.java", file_names)
 
     @classmethod
     def tearDownClass(cls):
