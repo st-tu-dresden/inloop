@@ -58,6 +58,7 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         self.url = reverse("solutions:upload", kwargs={"slug": self.task.slug})
 
     def test_solution_upload_without_files(self):
+        """Validate that if no files were uploaded, a meaningful message is emitted."""
         response = self.client.post(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertResponseContainsMessage(
@@ -67,6 +68,7 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         )
 
     def test_solution_upload_with_multiple_files(self):
+        """Test the solution upload."""
         file_1 = SimpleUploadedFile("Fibonacci1.java", "class Fibonacci1 {}".encode())
         file_2 = SimpleUploadedFile("Fibonacci2.java", "class Fibonacci2 {}".encode())
         response = self.client.post(self.url, data={
@@ -84,6 +86,20 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         ]
         self.assertIn("Fibonacci1.java", file_names)
         self.assertIn("Fibonacci2.java", file_names)
+
+    def test_displayed_media(self):
+        """Validate that static and dynamic media is displayed correctly."""
+
+    def test_invalid_solutions_fail(self):
+        """Validate that invalid solutions fail."""
+
+    def test_valid_solutions_succeed(self):
+        """Validate that valid solutions succeed."""
+
+    def test_zip_download(self):
+        """Test wether zips can be downloaded."""
+
+
 
     @classmethod
     def tearDownClass(cls):
