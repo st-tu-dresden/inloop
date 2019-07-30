@@ -6,6 +6,12 @@ ifndef TRAVIS
 override TESTOPTS += --exclude-tag=slow
 endif
 
+# The default TMPDIR on macOS, /var/folders/..., cannot
+# be exported from macOS to Docker, but /tmp can.
+ifeq ($(shell uname -s),Darwin)
+override TESTENV += TMPDIR=/tmp
+endif
+
 init:
 	pipenv install --dev
 	docker build -t $(IMAGE) tests/testrunner
