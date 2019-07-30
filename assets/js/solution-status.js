@@ -5,7 +5,7 @@ $(document).ready(function() {
     interval: 5000,
     success: function(data) {
       $(this).attr("class", "glyphicon solution-" + data.status);
-      if (data.status != "pending") {
+      if (data.status !== "pending") {
         $(this).refreshJSON("deactivate");
       }
     }

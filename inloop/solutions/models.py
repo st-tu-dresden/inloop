@@ -1,8 +1,11 @@
+import io
 import os
 import string
+import zipfile
 from pathlib import Path
 
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_delete
@@ -10,6 +13,8 @@ from django.db.transaction import atomic
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+
+from huey.contrib.djhuey import db_task, lock_task
 
 from inloop.tasks.models import Task
 
@@ -25,7 +30,6 @@ def hash32(obj):
 def get_upload_path(obj, filename):
     """
     Return an upload file path.
-
     All files related to a specific solution will share a common base directory.
     """
     s = obj.solution
@@ -37,6 +41,50 @@ def get_upload_path(obj, filename):
         "id": s.id,
         "filename": filename
     })
+
+
+def get_archive_upload_path(solution, filename):
+    """
+    Return an upload file path of the archive
+    generated from a given solution.
+    """
+    return "archives/{author}/{id}/{filename}".format(
+        author=solution.author,
+        id=solution.id,
+        filename=filename
+    )
+
+
+def create_archive(solution):
+    """
+    Create zip archive of all files associated with a solution.
+    """
+    if solution.archive:
+        return
+    stream = io.BytesIO()
+    stream.name = "Solution_{scoped_id}_{task}.zip".format(
+        scoped_id=solution.scoped_id,
+        task=solution.task.underscored_title
+    )
+    with zipfile.ZipFile(stream, mode='w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for solution_file in solution.solutionfile_set.all():
+            archive.write(
+                filename=str(solution_file.absolute_path),
+                arcname=str(solution_file.name)
+            )
+    solution.archive = SimpleUploadedFile(
+        name=stream.name, content=stream.getvalue(), content_type="application/zip"
+    )
+    solution.save()
+
+
+@db_task()
+def create_archive_async(solution):
+    """
+    Create zip archive of all files associated with a solution asynchronously.
+    """
+    with lock_task(solution.id):
+        create_archive(solution)
 
 
 class Solution(models.Model):
@@ -59,6 +107,8 @@ class Solution(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     passed = models.BooleanField(default=False)
+
+    archive = models.FileField(upload_to=get_archive_upload_path, blank=True, null=True)
 
     # time after a solution without a CheckerResult is regarded as lost
     TIMEOUT = timezone.timedelta(minutes=5)

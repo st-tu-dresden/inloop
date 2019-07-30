@@ -1,16 +1,19 @@
 import json
+from os.path import basename
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.generic import DetailView, View
 
-from inloop.solutions.models import Solution, SolutionFile
+from huey.exceptions import TaskLockedException
+
+from inloop.solutions.models import Solution, SolutionFile, create_archive_async
 from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
                                                      xml_strings_from_testoutput)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
@@ -22,7 +25,7 @@ from inloop.tasks.models import Task
 class SolutionStatusView(LoginRequiredMixin, View):
     def get(self, request, id):
         solution = get_object_or_404(Solution, pk=id, author=request.user)
-        return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
+        return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
 
 class SolutionEditorView(LoginRequiredMixin, View):
@@ -173,6 +176,43 @@ class SolutionUploadView(LoginRequiredMixin, View):
         return redirect("solutions:list", slug=slug)
 
 
+class NewSolutionArchiveView(LoginRequiredMixin, View):
+    def get(self, request, solution_id):
+        if not solution_id:
+            raise Http404("No solution id was supplied.")
+        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        if solution.archive:
+            return JsonResponse({"status": "available"})
+        try:
+            create_archive_async(solution)
+        except TaskLockedException:
+            return JsonResponse({"status": "already running"})
+        return JsonResponse({"status": "initiated"})
+
+
+class SolutionArchiveStatusView(LoginRequiredMixin, View):
+    def get(self, request, solution_id):
+        if not solution_id:
+            raise Http404("No solution id was supplied.")
+        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        if solution.archive:
+            return JsonResponse({"status": "available"})
+        return JsonResponse({"status": "unavailable"})
+
+
+class SolutionArchiveDownloadView(LoginRequiredMixin, View):
+    def get(self, request, solution_id):
+        if not solution_id:
+            raise Http404("No solution id was supplied.")
+        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        if solution.archive:
+            response = HttpResponse(solution.archive, content_type="application/zip")
+            attachment = "attachment; filename=%s" % basename(solution.archive.name)
+            response["Content-Disposition"] = attachment
+            return response
+        return redirect("solutions:detail", slug=solution.task.slug, scoped_id=solution.scoped_id)
+
+
 class SolutionListView(LoginRequiredMixin, View):
     def get(self, request, slug):
         task = get_object_or_404(Task.objects.published(), slug=slug)
@@ -232,11 +272,12 @@ class SolutionDetailView(LoginRequiredMixin, View):
             checkstyle_data = None
 
         context = {
-            'solution': solution,
-            'result': result,
-            'testsuites': testsuites,
-            'checkstyle_data': checkstyle_data,
-            'files': solution.solutionfile_set.all(),
+            "solution": solution,
+            "result": result,
+            "testsuites": testsuites,
+            "checkstyle_data": checkstyle_data,
+            "files": solution.solutionfile_set.all(),
+            "requested_archive": kwargs.get("requested_archive")
         }
         context.update(self.get_context_data())
 
