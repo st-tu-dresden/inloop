@@ -31,11 +31,11 @@ application to manage online programming courses, powered by Git, Django and Doc
 INLOOP requires the following software:
 
 * Debian 8+ or Ubuntu 16.04+, macOS 10.11+ (for development only)
-* Python 3.5 or 3.6
+* Python 3.5, 3.6 or 3.7
 * Docker 1.10+ ([Docker setup](docs/docker_setup.md) **!!!**)
 * Redis 2.6+
 * Git 2.3+ ([workarounds for older Git versions](docs/git_troubleshouting.md))
-* PostgreSQL 9.3+ (for production deployment, not needed for development)
+* PostgreSQL 9.3+
 
 Using the command line, a development instance can be set up as follows:
 
@@ -47,6 +47,9 @@ Using the command line, a development instance can be set up as follows:
    `./support/scripts/macos_setup.sh` (macOS).
 
 3. Run `make init` and `make loaddb` to bootstrap your local development environment.
+   For macOS, you'll need to `export LDFLAGS="-L/usr/local/opt/openssl/lib"` and
+   `export CPPFLAGS="-I/usr/local/opt/openssl/include"` before running `make init`,
+   otherwise the build of the `psycopg2` library will fail.
 
 4. Start and monitor the development web server and huey workers with `pipenv run honcho start`.
 
