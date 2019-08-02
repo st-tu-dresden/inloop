@@ -5,7 +5,7 @@ from inloop.solutions.views import (ModalConfirmationView, ModalInputView, Modal
                                     SolutionArchiveDownloadView, SolutionArchiveStatusView,
                                     SolutionDetailView, SolutionEditorView, SolutionFileView,
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView)
+                                    StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
 
 app_name = "solutions"
 urlpatterns = [
@@ -79,5 +79,15 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/modal-confirmation-form/$',
         ModalConfirmationView.as_view(),
         name='modal-confirmation-form'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/checkpoints/save/$',
+        save_checkpoint,
+        name='save-checkpoint'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/checkpoints/last/$',
+        get_last_checkpoint,
+        name='get-last-checkpoint'
     ),
 ]

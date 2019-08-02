@@ -206,3 +206,52 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     if instance.file and os.path.isfile(instance.file.path):
         os.remove(instance.file.path)
+
+
+class Checkpoint(models.Model):
+    """
+    Represents an editor checkpoint.
+
+    After the user saves his solution in the online code editor,
+    a checkpoint is created. This checkpoint can be used to restore
+    the last workstate in the online code editor.
+    """
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    md5 = models.CharField(
+        "MD5 Hash of all associated checkpoint files", max_length=40
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    class Manager(models.Manager):
+        def create_checkpoint(self, json_data, task, user):
+            md5 = json_data.get("md5")
+            files = json_data.get("files")
+            if md5 is None or files is None or len(md5) != 40:
+                raise ValueError("Invalid JSON")
+
+            with atomic():
+                checkpoint = self.create(
+                    author=user, task=task, md5=md5
+                )
+                CheckpointFile.objects.bulk_create([
+                    CheckpointFile(checkpoint=checkpoint, name=name, contents=contents)
+                    for name, contents in files.items()
+                ])
+            return checkpoint
+
+    objects = Manager()
+
+
+class CheckpointFile(models.Model):
+    """Represents a single file as part of a checkpoint."""
+    checkpoint = models.ForeignKey(Checkpoint, on_delete=models.CASCADE)
+    name = models.TextField()
+    contents = models.TextField()
+
+    class Meta:
+        ordering = ["name"]
