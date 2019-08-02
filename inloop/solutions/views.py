@@ -2,6 +2,7 @@ import json
 from os.path import basename
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -13,7 +14,7 @@ from django.views.generic import DetailView, View
 
 from huey.exceptions import TaskLockedException
 
-from inloop.solutions.models import Solution, SolutionFile, create_archive_async
+from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
 from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
                                                      xml_strings_from_testoutput)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
@@ -309,3 +310,49 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["solution"] = self.object.solution
         return context
+
+
+@login_required
+def get_last_checkpoint(request, slug):
+    if not request.is_ajax():
+        return JsonResponse({"success": False})
+
+    task = get_object_or_404(Task.objects.published(), slug=slug)
+
+    checkpoints = Checkpoint.objects.filter(author=request.user, task=task)
+    if not checkpoints.exists():
+        return JsonResponse({"success": True, "checkpoint": None})
+
+    last_checkpoint = checkpoints.last()
+    checkpoint_files = dict()
+    for checkpoint_file in last_checkpoint.checkpointfile_set.all():
+        checkpoint_files[checkpoint_file.name] = checkpoint_file.contents
+
+    return JsonResponse({
+        "success": True,
+        "checkpoint": {
+            "md5": str(last_checkpoint.md5),
+            "files": checkpoint_files,
+        }
+    })
+
+
+@login_required
+def save_checkpoint(request, slug):
+    if not request.is_ajax() or not request.method == "POST":
+        return JsonResponse({"success": False})
+
+    task = get_object_or_404(Task.objects.published(), slug=slug)
+
+    data = request.POST.get("checkpoint")
+    if data is None:
+        return JsonResponse({"success": False})
+
+    # Load nested data from json
+    data = json.loads(data)
+    try:
+        Checkpoint.objects.create_checkpoint(data, task, request.user)
+    except ValueError:
+        return JsonResponse({"success": False})
+
+    return JsonResponse({"success": True})
