@@ -519,7 +519,7 @@ class Editor {
             enableLiveAutocompletion: true,
             maxLines: Infinity,
             fontFamily: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
-            fontSize: "10.5pt",
+            fontSize: "16px",
             value: "// Select or create files to continue"
         };
     }
