@@ -1,11 +1,19 @@
+import os
+import shutil
+import zipfile
+from tempfile import TemporaryDirectory, mkdtemp
 from unittest.mock import Mock
 
-from django.test import TestCase
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from inloop.solutions.models import Solution, get_upload_path
+from inloop.solutions.models import (Checkpoint, Solution, SolutionFile, create_archive_async,
+                                     get_archive_upload_path, get_upload_path)
 
-from tests.solutions.mixins import SolutionsData
+from tests.accounts.mixins import SimpleAccountsData
+from tests.solutions.mixins import SimpleTaskData, SolutionsData
 
 
 class SolutionsModelTest(SolutionsData, TestCase):
@@ -13,25 +21,6 @@ class SolutionsModelTest(SolutionsData, TestCase):
         """Verify there are no results before checking."""
         self.assertEqual(self.failed_solution.testresult_set.count(), 0)
         self.assertFalse(self.failed_solution.passed)
-
-    def test_get_upload_path(self):
-        """Test the upload path for solution files."""
-
-        # Create a mock solution to check its
-        # computed upload path
-        mock = Mock()
-        mock.solution.submission_date.year = "1970"
-        mock.solution.task.slug = "here-be-dragons"
-        mock.solution.author = "Mr. Mustermann"
-        mock.solution.id = "123456"
-
-        upload_path = get_upload_path(mock, "Fibonacci.java")
-        self.assertTrue(upload_path.startswith("solutions"))
-        self.assertTrue(upload_path.endswith("Fibonacci.java"))
-
-        tokens = upload_path.split("/")
-        for token in ["1970", "here-be-dragons", "123456"]:
-            self.assertTrue(token in tokens)
 
     def test_solution_default_status(self):
         """Verify that the default status of a solution is pending."""
@@ -56,3 +45,208 @@ class SolutionsModelTest(SolutionsData, TestCase):
         mocked_time = timezone.now() - timezone.timedelta(hours=1)
         delayed_solution.submission_date = mocked_time
         self.assertEqual(delayed_solution.status(), "lost")
+
+
+class SolutionsFileUploadTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # Create a mock solution to check its
+        # computed upload path
+        cls.mock = Mock()
+        cls.mock.solution.submission_date.year = "1970"
+        cls.mock.solution.task.slug = "here-be-dragons"
+        cls.mock.solution.author = "Mr. Mustermann"
+        cls.mock.solution.id = "123456"
+
+    def test_get_upload_path(self):
+        """Test the upload path for solution files."""
+
+        upload_path = get_upload_path(self.mock, "Fibonacci.java")
+        self.assertTrue(upload_path.startswith("solutions"))
+        self.assertTrue(upload_path.endswith("Fibonacci.java"))
+
+        tokens = upload_path.split("/")
+        for token in ["1970", "here-be-dragons", "123456"]:
+            self.assertTrue(token in tokens)
+
+    def test_get_archive_upload_path(self):
+        """
+        Test the upload path for archives
+        associated with a particular solution.
+        """
+        upload_path = get_archive_upload_path(
+            self.mock.solution, "Fibonacci.zip"
+        )
+
+        self.assertTrue(upload_path.startswith("archives"))
+        self.assertTrue(upload_path.endswith("Fibonacci.zip"))
+
+
+JAVA_EXAMPLE_1 = """
+public class Example {
+    //...
+}
+""".encode()
+
+JAVA_EXAMPLE_2 = "".encode()
+
+
+TEST_MEDIA_ROOT = mkdtemp()
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class SolutionsModelArchiveTest(SolutionsData, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not os.path.isdir(TEST_MEDIA_ROOT):
+            os.makedirs(TEST_MEDIA_ROOT)
+
+    def setUp(self):
+        super().setUp()
+        self.solution_file_passed_1 = SolutionFile.objects.create(
+            solution=self.passed_solution,
+            file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
+        )
+        self.solution_file_passed_2 = SolutionFile.objects.create(
+            solution=self.passed_solution,
+            file=SimpleUploadedFile("Example2.java", JAVA_EXAMPLE_2)
+        )
+        self.solution_file_failed_1 = SolutionFile.objects.create(
+            solution=self.failed_solution,
+            file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
+        )
+        self.solution_file_failed_2 = SolutionFile.objects.create(
+            solution=self.failed_solution,
+            file=SimpleUploadedFile("Example2.java", JAVA_EXAMPLE_2)
+        )
+
+    def test_archive_creation(self):
+        """Test archive creation for solutions."""
+        for solution in [self.passed_solution, self.failed_solution]:
+            self.assertFalse(solution.archive)
+
+            create_archive_async(solution)
+
+            self.assertTrue(solution.archive)
+            self.assertTrue(zipfile.is_zipfile(solution.archive.path))
+            with zipfile.ZipFile(solution.archive.path) as zip_file:
+                self.assertIn("Example1.java", zip_file.namelist())
+                self.assertIn("Example2.java", zip_file.namelist())
+
+                with zip_file.open("Example1.java") as f:
+                    self.assertEqual(f.read(), JAVA_EXAMPLE_1)
+                with zip_file.open("Example2.java") as f:
+                    self.assertEqual(f.read(), JAVA_EXAMPLE_2)
+
+                with TemporaryDirectory() as tmp_dir:
+                    # Test extraction to expose erroneous packaging
+                    zip_file.extractall(tmp_dir)
+                    for _, dirs, files in os.walk(tmp_dir):
+                        self.assertIn("Example1.java", files)
+                        self.assertIn("Example2.java", files)
+                        self.assertEqual(2, len(files))
+
+                        # The inherited folder structure should be flat
+                        self.assertFalse(dirs)
+
+                self.assertIsNone(zip_file.testzip())
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
+
+
+class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.valid_md5_hash = "fdb8da1705ac435e669120369236a8f48fdf68bc"
+        cls.invalid_md5_hash = "fdb8da1705ac435e669120369236a8f48fdf68bcFFFFFFF"
+        cls.valid_json_data_list = [
+            {
+                "md5": cls.valid_md5_hash,
+                "files": {
+                    "Hello.java": "class Hello {}",
+                    "Test.java": "\n",
+                },
+            },
+            {
+                "md5": cls.valid_md5_hash,
+                "files": {},
+            },
+        ]
+        cls.invalid_json_data_list = [
+            {
+                "files": {
+                    "Test.java": "class Test {}",
+                },
+            },
+            {},
+            {
+                "md5": cls.invalid_md5_hash,
+                "files": {
+                    "Test.java": "class Test {}",
+                },
+            },
+            {
+                "md5": cls.valid_md5_hash,
+            },
+        ]
+
+    def test_valid_json(self):
+        """Verify that checkpoint creation succeeds valid json data."""
+
+        for json_data in self.valid_json_data_list:
+            checkpoint = Checkpoint.objects.create_checkpoint(
+                json_data=json_data,
+                task=self.task,
+                user=self.alice,
+            )
+            self.assertIsNotNone(checkpoint)
+
+    def test_invalid_json(self):
+        """Verify that checkpoint creation fails predictably on invalid json data."""
+
+        for json_data in self.invalid_json_data_list:
+            try:
+                Checkpoint.objects.create_checkpoint(
+                    json_data=json_data,
+                    task=self.task,
+                    user=self.alice,
+                )
+            except ValueError:
+                pass
+            else:
+                self.fail(
+                    "Checkpoint creation on data {} should fail.".format(json_data)
+                )
+
+    def test_files(self):
+        """Verify that checkpoint files are created correctly."""
+
+        files = {"Hello.java": "class Hello {}", "Hello2.java": "class Hello {}"}
+        json_data = {"md5": self.valid_md5_hash, "files": files}
+        checkpoint = Checkpoint.objects.create_checkpoint(
+            json_data=json_data, task=self.task, user=self.alice,
+        )
+        self.assertEqual(checkpoint.checkpointfile_set.count(), 2)
+        for name, contents in files.items():
+            try:
+                checkpoint.checkpointfile_set.get(
+                    name=name, contents=contents
+                )
+            except (ObjectDoesNotExist, MultipleObjectsReturned):
+                self.fail("File should exist once")
+
+    def test_duplicated_files(self):
+        """Test checkpoint creation behaviour when files are duplicated."""
+
+        files = {"Hello.java": "class Hello {}", "Hello.java": "class Hello {}"}
+        json_data = {"md5": self.valid_md5_hash, "files": files}
+        checkpoint = Checkpoint.objects.create_checkpoint(
+            json_data=json_data, task=self.task, user=self.alice,
+        )
+        self.assertEqual(checkpoint.checkpointfile_set.count(), 1)

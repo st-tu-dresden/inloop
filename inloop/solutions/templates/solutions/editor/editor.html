@@ -66,6 +66,8 @@
         data-modal-confirmation-form-url="{% url 'solutions:modal-confirmation-form' task.slug %}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
+        data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
+        data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}"
         data-modal-container-id="#modals"
         data-tab-container-id="#tab-container"
         data-editor-id="editor"

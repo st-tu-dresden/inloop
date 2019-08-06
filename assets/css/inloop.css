@@ -126,7 +126,7 @@ code {
 }
 
 /* @begin solution list view styles */
-.solutionstatus {
+.solution-status {
   display: inline-block;
   float: right;
   vertical-align: middle;
@@ -165,6 +165,21 @@ code {
   to { transform: rotate(360deg); }
 }
 /* @end */
+
+.spinner {
+  display: none;
+  float: right;
+  vertical-align: middle;
+  font-size: 20px;
+  animation-name: spin;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.spinner:before {
+  content: "\e019";
+}
 
 /* @begin progressbar styles */
 .tasks-progressbar-col {

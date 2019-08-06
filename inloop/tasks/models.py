@@ -118,6 +118,14 @@ class Task(models.Model):
         """Return the title with anything between parentheses removed."""
         return re.sub(r'\(.*?\)', '', self.title)
 
+    @property
+    def underscored_title(self):
+        """
+        Return a sluggable title for this task
+        with all whitespace replaced by underscores.
+        """
+        return self.sluggable_title.replace(" ", "_")
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.sluggable_title)
         super().save(*args, **kwargs)

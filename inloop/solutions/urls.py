@@ -1,9 +1,11 @@
 from django.conf.urls import url
 
 from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
-                                    ModularEditorTabView, SolutionDetailView, SolutionEditorView,
-                                    SolutionFileView, SolutionListView, SolutionStatusView,
-                                    SolutionUploadView, StaffSolutionDetailView)
+                                    ModularEditorTabView, NewSolutionArchiveView,
+                                    SolutionArchiveDownloadView, SolutionArchiveStatusView,
+                                    SolutionDetailView, SolutionEditorView, SolutionFileView,
+                                    SolutionListView, SolutionStatusView, SolutionUploadView,
+                                    StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
 
 app_name = "solutions"
 urlpatterns = [
@@ -17,6 +19,21 @@ urlpatterns = [
         r'^(?P<id>[\d]+)/status$',
         SolutionStatusView.as_view(),
         name='status'
+    ),
+    url(
+        r'^(?P<solution_id>[\d]+)/archive/status$',
+        SolutionArchiveStatusView.as_view(),
+        name='archive_status'
+    ),
+    url(
+        r'^(?P<solution_id>[\d]+)/archive/new$',
+        NewSolutionArchiveView.as_view(),
+        name='archive_new'
+    ),
+    url(
+        r'^(?P<solution_id>[-\w]+)/archive/download$',
+        SolutionArchiveDownloadView.as_view(),
+        name='archive_download'
     ),
     url(
         r'^file/(?P<pk>[\d]+)/$',
@@ -62,5 +79,15 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/modal-confirmation-form/$',
         ModalConfirmationView.as_view(),
         name='modal-confirmation-form'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/checkpoints/save/$',
+        save_checkpoint,
+        name='save-checkpoint'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/checkpoints/last/$',
+        get_last_checkpoint,
+        name='get-last-checkpoint'
     ),
 ]

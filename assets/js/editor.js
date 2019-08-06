@@ -4,6 +4,8 @@ let MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
 let MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
 let MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
 let MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
+let SAVE_CHECKPOINT_URL = script.getAttribute("data-save-checkpoint-url");
+let GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-url");
 let CSRF_TOKEN = script.getAttribute("data-csrf-token");
 let SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 let SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
@@ -266,8 +268,8 @@ class HashComparator {
         this.statusButton = new StatusButton(false);
     }
 
-    updateHash(files) {
-        this.hash = this.computeHash(files);
+    updateHash(hash) {
+        this.hash = hash;
     }
 
     computeHash(files) {
@@ -561,34 +563,59 @@ class Communicator {
     constructor() {}
 
     load(completion) {
-        // TODO: Actually load JSON data
-        this.uploadedData = JSON.parse(`
-        {
-          "last_submission": "fdb8da1705ac435e669120369236a8f48fdf68bc",
-          "saved_files": {
-            "test.java": "public class test {}",
-            "A.java": "public class A {}",
-            "B.java": "public class B {}",
-            "Z.java": "public class Z {}",
-            "C.java": "public class C {}"
-          }
-        }
-        `);
-        let files = [];
-        for (let key of Object.keys(this.uploadedData["saved_files"])) {
-            let file = new File(key, this.uploadedData["saved_files"][key]);
-            files.push(file);
-        }
-        completion(files, this.uploadedData["last_submission"]);
+        $.ajax({
+            url: GET_LAST_CHECKPOINT_URL,
+            type: "get",
+            headers: {"X-CSRFToken": CSRF_TOKEN},
+            datatype: "json",
+            success: function(response) {
+                if (response.success !== true) {
+                    // Return empty files and empty hash
+                    completion([], "");
+                } else {
+                    let checkpoint = response.checkpoint;
+                    if (checkpoint === null) {
+                        // Return empty files and empty hash
+                        completion([], "");
+                    } else {
+                        let md5 = checkpoint.md5;
+                        let files = checkpoint.files;
+                        let editorFiles = [];
+                        for (let key of Object.keys(files)) {
+                            editorFiles.push(new File(key, files[key]));
+                        }
+                        completion(editorFiles, md5);
+                    }
+                }
+            }
+        });
     }
 
     save(completion) {
-        // TODO: Implement save
-        console.log("TODO: Save not implemented yet!");
-        hashComparator.updateHash(fileBuilder.files);
-        hashComparator.lookForChanges(fileBuilder.files);
-
-        if (completion !== undefined) completion(true);
+        let files = {};
+        for (let file of fileBuilder.files) {
+            files[file.fileName] = file.fileContent;
+        }
+        let md5 = hashComparator.computeHash(fileBuilder.files);
+        $.ajax({
+            url: SAVE_CHECKPOINT_URL,
+            type: "post",
+            headers: {"X-CSRFToken": CSRF_TOKEN},
+            datatype: "json",
+            data: {checkpoint: JSON.stringify({
+                files: files,
+                md5: md5,
+            })},
+            success: function(response) {
+                if (response.success === true) {
+                    hashComparator.updateHash(md5);
+                    hashComparator.lookForChanges(fileBuilder.files);
+                    if (completion !== undefined) completion(true);
+                } else {
+                    if (completion !== undefined) completion(false);
+                }
+            }
+        });
     }
 
     upload(files) {
