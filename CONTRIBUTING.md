@@ -74,6 +74,9 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
   * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
   * Use the [W3C Validator][w3c-validator] to verify that the output of processed templates is
     valid HTML5.
+* JavaScript:
+  * Docstrings must follow the [JSDoc documentation specifications][jsdoc].
+  
 
 
 ### Commit messages
@@ -96,3 +99,4 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [w3c-validator]: https://validator.w3.org/
 [slugify]: https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.text.slugify
+[jsdoc]: https://devdocs.io/jsdoc/
