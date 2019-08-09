@@ -115,6 +115,18 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
         }), follow=True)
         self.assertEqual(response.status_code, 200)
 
+    def test_archive_access(self):
+        """Verify that a user cannot download other users' solution archives."""
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        create_archive(self.solution)
+
+        # Because the solution was created by bob, alice
+        # should not be able to access his archive
+        response = self.client.get(reverse("solutions:archive_download", kwargs={
+            "solution_id": self.solution.id
+        }), follow=True)
+        self.assertEqual(response.status_code, 404)
+
     def test_console_output(self):
         """Test console output tab in solution detail view."""
         self.assertTrue(self.client.login(username="bob", password="secret"))
