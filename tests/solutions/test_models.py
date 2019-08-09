@@ -9,7 +9,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from inloop.solutions.models import (Checkpoint, Solution, SolutionFile, create_archive_async,
+from inloop.solutions.models import (Checkpoint, Solution, SolutionFile,
+                                     create_archive, create_archive_async,
                                      get_archive_upload_path, get_upload_path)
 
 from tests.accounts.mixins import SimpleAccountsData
@@ -93,6 +94,53 @@ JAVA_EXAMPLE_2 = "".encode()
 
 
 TEST_MEDIA_ROOT = mkdtemp()
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class SolutionSignalsTest(SimpleAccountsData, SimpleTaskData, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not os.path.isdir(TEST_MEDIA_ROOT):
+            os.makedirs(TEST_MEDIA_ROOT)
+
+    def setUp(self):
+        super().setUp()
+        self.solution = Solution.objects.create(
+            author=self.alice,
+            task=self.task,
+            passed=True,
+        )
+        self.solution_file = SolutionFile.objects.create(
+            solution=self.solution,
+            file=SimpleUploadedFile("Example1.java", JAVA_EXAMPLE_1)
+        )
+
+    def test_archive_post_delete(self):
+        """
+        Validate that solution archives are deleted correctly
+        after the corresponding solution was deleted.
+        """
+        create_archive(self.solution)
+        archive_path = self.solution.archive.path
+        self.assertTrue(os.path.isfile(archive_path))
+        self.solution.delete()
+        self.assertFalse(os.path.isfile(archive_path))
+
+    def test_solution_file_post_delete(self):
+        """
+        Validate that solution files are deleted correctly
+        after the corresponding solution was deleted.
+        """
+        solution_file_path = self.solution_file.absolute_path
+        self.assertTrue(solution_file_path.is_file())
+        self.solution.delete()
+        self.assertFalse(solution_file_path.is_file())
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
