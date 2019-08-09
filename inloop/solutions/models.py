@@ -164,6 +164,15 @@ class Solution(models.Model):
         return "Solution #%d" % self.id
 
 
+@receiver(post_delete, sender=Solution, dispatch_uid="delete_solutionfile")
+def auto_delete_archive_on_delete(sender, instance, **kwargs):
+    """
+    Removes archive from filesystem when corresponding Solution object is deleted.
+    """
+    if instance.archive and os.path.isfile(instance.archive.path):
+        os.remove(instance.archive.path)
+
+
 class SolutionFile(models.Model):
     """Represents a single file as part of a solution."""
 
