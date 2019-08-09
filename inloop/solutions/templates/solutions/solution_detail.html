@@ -124,7 +124,7 @@
 
       {% if solution.archive %}
       <a class="list-group-item list-group-item-success"
-         href="{% url 'solutions:download' solution.id %}">
+         href="{% url 'solutions:archive_download' solution.id %}">
         Click here to download your solution as a zip archive.
       </a>
       {% else %}
