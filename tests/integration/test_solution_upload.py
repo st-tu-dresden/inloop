@@ -3,7 +3,7 @@ import shutil
 from tempfile import mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 
 from inloop.accounts.forms import User
@@ -42,18 +42,12 @@ public class Fibonacci {
 TEST_MEDIA_ROOT = mkdtemp()
 
 
+@tag("slow")
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class SolutionUploadTest(SolutionsData, MessageTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(TEST_MEDIA_ROOT):
-            os.makedirs(TEST_MEDIA_ROOT)
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.category = Category.objects.create(id=1337, name="Category 1")
 
     def setUp(self):
         super().setUp()
