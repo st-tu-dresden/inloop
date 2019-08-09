@@ -24,11 +24,8 @@ def export_bonuspoints(category_name, date, zeroes=False):
     with TemporaryDirectory() as path:
         output_path = Path(path).joinpath("output")
         args = [category_name, date.strftime("%Y-%m-%d"), output_path]
-        call_command(
-            tud_export_bonuspoints_csv.Command(), *args, stdout=stdout, zeroes=zeroes
-        )
-
-        with open(str(output_path), "r") as f:
+        call_command(tud_export_bonuspoints_csv.Command(), *args, stdout=stdout, zeroes=zeroes)
+        with output_path.open(mode="r") as f:
             return stdout.getvalue(), f.readlines(), output_path
 
 
