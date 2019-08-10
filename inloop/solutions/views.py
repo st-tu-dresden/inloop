@@ -4,7 +4,7 @@ from os.path import basename
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.http import Http404, HttpResponse, JsonResponse
@@ -15,9 +15,7 @@ from django.views.generic import DetailView, View
 from huey.exceptions import TaskLockedException
 
 from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
-from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
-                                                     xml_strings_from_testoutput)
-from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
+from inloop.solutions.prettyprint.generators import CheckstyleAlertGenerator, JUnitAlertGenerator
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
 from inloop.tasks.models import Task
@@ -256,28 +254,31 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
         result = solution.testresult_set.last()
 
-        xml_reports_junit = checkeroutput_filter(result.testoutput_set)
-        testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
+        try:
+            junit_xml = result.testoutput_set.get(
+                name__startswith="TEST-",
+                name__endswith=".xml"
+            ).output
+            junit_alerts = list(iter(JUnitAlertGenerator(junit_xml)))
+        except ObjectDoesNotExist:
+            junit_alerts = None
 
-        xml_strings_checkstyle = xml_strings_from_testoutput(
-            testoutput_set=result.testoutput_set,
-            startswith="checkstyle_errors",
-            endswith=".xml"
-        )
-
-        if xml_strings_checkstyle:
-            checkstyle_context = context_from_xml_strings(
-                xml_strings=xml_strings_checkstyle, filter_keys=[])
-            checkstyle_data = CheckstyleData(checkstyle_context, solution.solutionfile_set.all())
-        else:
-            checkstyle_data = None
+        try:
+            checkstyle_xml = result.testoutput_set.get(
+                name="checkstyle_errors.xml"
+            ).output
+            checkstyle_alerts = list(iter(
+                CheckstyleAlertGenerator(checkstyle_xml, list(solution.solutionfile_set.all()))
+            ))
+        except ObjectDoesNotExist:
+            checkstyle_alerts = None
 
         context = {
             "solution": solution,
             "result": result,
-            "testsuites": testsuites,
-            "checkstyle_data": checkstyle_data,
             "files": solution.solutionfile_set.all(),
+            "checkstyle_alerts": checkstyle_alerts,
+            "junit_alerts": junit_alerts,
             "requested_archive": kwargs.get("requested_archive")
         }
         context.update(self.get_context_data())
