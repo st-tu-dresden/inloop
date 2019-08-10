@@ -1,0 +1,34 @@
+<div class="bottom-spaced">
+  <h4 class="inline">{{ model.name }} (passed {{ model.passed }} of {{ model.tests }})</h4>
+  {% if model.system_out %}
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#stdout-{{ model.name }}">
+      <code class="inline">System.out</code>
+    </a>
+  {% endif %}
+  {% if model.system_err %}
+    <a class="disguised" href="#" data-toggle="collapse" data-target="#stderr-{{ model.name }}">
+      <code class="inline">System.err</code>
+    </a>
+  {% endif %}
+  </div>
+
+  {% if model.system_out %}
+  <div class="collapse" id="stdout-{{ model.name }}">
+    <h5><code>System.out</code> contains:</h5>
+    <pre class="console-output"><code>{{ model.system_out }}</code></pre>
+  </div>
+  {% endif %}
+  {% if model.system_err %}
+  <div class="collapse" id="stderr-{{ model.name }}">
+    <h5><code>System.err</code> contains:</h5>
+    <pre class="console-output"><code>{{ model.system_err }}</code></pre>
+  </div>
+  {% endif %}
+
+  <ul class="testcase-list">
+
+  {% for alert in model.components %}
+    {{ alert.rendered }}
+  {% endfor %}
+
+  </ul>

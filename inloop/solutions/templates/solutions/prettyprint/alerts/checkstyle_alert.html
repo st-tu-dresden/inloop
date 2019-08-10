@@ -1,0 +1,13 @@
+<div class="panel panel-{{ model.severity }} bottom-spaced">
+  <div class="panel-heading">
+    <h1 class="panel-title">
+      {{ model.file.file_name }} - {{ model.description }}
+    </h1>
+  </div>
+  <div class="panel-body" style="padding: 0px;">
+  <pre class="line-numbers codehilite"
+       data-start="{{ model.highlighted_line.line_number }}"
+       style="margin-bottom: 0px; z-index: 0; border: none;"
+  ><code class="language-java">{{ model.highlighted_line.line_contents }}</code></pre>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<li class="bottom-spaced">
+
+  {% if not model.failures and not model.errors %}
+
+    <h5 class="testcase-name inline">
+      <span class="glyphicon glyphicon-ok text-success"></span>
+      <code>{{ model.description }}()</code> passed
+    </h5>
+
+  {% else %}
+
+    {% for failure in model.failures %}
+
+      <a class="disguised" href="#" data-toggle="collapse"
+         data-target="#stacktrace-failure-{{ forloop.counter }}">
+        <h5 class="inline">
+          <span class="glyphicon glyphicon-remove text-danger"></span>
+          <code>{{ model.description }}()</code> failed: {{ failure.message }}
+        </h5>
+      </a>
+      <div class="collapse" id="stacktrace-failure-{{ forloop.counter }}">
+        {% if failure.stacktrace %}
+          {% spaceless %}
+          <pre class="console-output stacktrace">
+            <code>{{ failure.stacktrace }}</code>
+          </pre>
+          {% endspaceless %}
+        {% endif %}
+      </div>
+
+    {% endfor %}
+
+    {% for error in model.errors %}
+
+      <a class="disguised" href="#" data-toggle="collapse"
+         data-target="#stacktrace-error-{{ forloop.counter }}">
+        <h5 class="inline">
+          <span class="glyphicon glyphicon-remove text-danger"></span>
+          <code>{{ model.description }}()</code> errored: {{ error.message }}
+        </h5>
+      </a>
+      <div class="collapse" id="stacktrace-error-{{ forloop.counter }}">
+        {% if error.stacktrace %}
+          {% spaceless %}
+          <pre class="console-output stacktrace">
+            <code>{{ error.stacktrace }}</code>
+          </pre>
+          {% endspaceless %}
+        {% endif %}
+      </div>
+
+    {% endfor %}
+
+  {% endif %}
+
+</li>
