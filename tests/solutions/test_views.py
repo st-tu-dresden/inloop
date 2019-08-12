@@ -3,7 +3,7 @@ import shutil
 from tempfile import mkdtemp
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.encoding import force_text
 
@@ -57,6 +57,7 @@ class SolutionDetailViewRedirectTest(TaskData, SimpleAccountsData, TestCase):
 TEST_MEDIA_ROOT = mkdtemp()
 
 
+@tag("slow")
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
     @classmethod
