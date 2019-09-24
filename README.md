@@ -50,7 +50,7 @@ Using the command line, a development instance can be set up as follows:
 
 3. On macOS, please run:
 
-           export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS" and
+           export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS"
            export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
 
    (This is necessary to build the `psycopg2` library.)
