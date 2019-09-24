@@ -1,3 +1,4 @@
+
         ___       ___       ___       ___       ___       ___
        /\  \     /\__\     /\__\     /\  \     /\  \     /\  \
       _\:\  \   /:| _|_   /:/  /    /::\  \   /::\  \   /::\  \
@@ -5,6 +6,7 @@
      \::/\/__/ \/|::/  / \:\  \    \:\/:/  / \:\/:/  / \/\::/  /
       \:\__\     |:/  /   \:\__\    \::/  /   \::/  /     \/__/
        \/__/     \/__/     \/__/     \/__/     \/__/
+
 
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=master)](https://travis-ci.org/st-tu-dresden/inloop)
@@ -46,14 +48,18 @@ Using the command line, a development instance can be set up as follows:
 2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
    `./support/scripts/macos_setup.sh` (macOS).
 
-3. Run `make init` and `make loaddb` to bootstrap your local development environment.
-   For macOS, you'll need to `export LDFLAGS="-L/usr/local/opt/openssl/lib"` and
-   `export CPPFLAGS="-I/usr/local/opt/openssl/include"` before running `make init`,
-   otherwise the build of the `psycopg2` library will fail.
+3. On macOS, please run:
 
-4. Start and monitor the development web server and huey workers with `pipenv run honcho start`.
+           export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS" and
+           export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
 
-5. The previous step prints the address and port number of the local webserver that was started.
+   (This is necessary to build the `psycopg2` library.)
+
+4. Run `make init` and `make loaddb` to bootstrap your local development environment.
+
+5. Start and monitor the development web server and huey workers with `pipenv run honcho start`.
+
+6. The previous step prints the address and port number of the local webserver that was started.
    You can immediately log in using the demo user accounts *admin* and *student* with the password
    *secret*.
 
