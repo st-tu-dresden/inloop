@@ -9,8 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from inloop.solutions.models import (Checkpoint, Solution, SolutionFile,
-                                     create_archive, create_archive_async,
+from inloop.solutions.models import (Checkpoint, Solution, SolutionFile, create_archive,
                                      get_archive_upload_path, get_upload_path)
 
 from tests.accounts.mixins import SimpleAccountsData
@@ -175,7 +174,7 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
         for solution in [self.passed_solution, self.failed_solution]:
             self.assertFalse(solution.archive)
 
-            create_archive_async(solution)
+            create_archive(solution)
 
             self.assertTrue(solution.archive)
             self.assertTrue(zipfile.is_zipfile(solution.archive.path))

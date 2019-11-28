@@ -8,7 +8,6 @@ matrix:
         - "3.5"
       services:
         - docker
-        - redis-server
       cache:
         pip: true
       install:
@@ -28,7 +27,6 @@ matrix:
         - "3.6"
       services:
         - docker
-        - redis-server
       cache:
         pip: true
       install:
