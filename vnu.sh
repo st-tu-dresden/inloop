@@ -1,24 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/sh
+#
+# Runs the vnu html validator if activated, idles otherwise.
+#
 
-function fail {
-    printf "%s\n" "$1" >&2
+die() {
+    echo "Error: $@" >&2
     exit 1
 }
 
-if [[ ${HTMLVALIDATOR_ENABLED} = 1 ]]; then
-    if [[ -z ${HTMLVALIDATOR_VNU_CLASSPATH} ]]; then
-        fail "The vnu validator is enabled, but no classpath was given."
-    fi
+if [ "$VALIDATE_HTML" = "1" ]; then
+    [ -z "$VNU_JAR" ]  && die "The vnu validator is enabled, but no .jar file was given."
+    [ -z "$VNU_PORT" ] && die "The vnu validator is enabled, but no port was given."
 
-    if [[ -z ${HTMLVALIDATOR_VNU_PORT} ]]; then
-        fail "The vnu validator is enabled, but no port was given."
-    fi
-
-    java -cp ${HTMLVALIDATOR_VNU_CLASSPATH} nu.validator.servlet.Main ${HTMLVALIDATOR_VNU_PORT}
-
-    exit $?
-else
-    echo "The vnu validator can be enabled by setting the corresponding env variable."
-    # Sleep forever to prevent other workers from exiting
-    while true; do sleep 86400; done
+    exec java -Dnu.validator.servlet.bind-address=127.0.0.1 \
+        -cp "$VNU_JAR" nu.validator.servlet.Main "$VNU_PORT"
 fi
+
+echo "HTML validation not active, export VALIDATE_HTML=1 to enable it"
+read _exit  # for honcho, waits infinitely for input

@@ -80,8 +80,8 @@ if DEBUG and env.bool("DJDT", default=False):
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
     ROOT_URLCONF = "inloop.debug_urls"
 
-if DEBUG and env.bool("HTMLVALIDATOR_ENABLED", default=False):
-    HTMLVALIDATOR_VNU_PORT = env.str("HTMLVALIDATOR_VNU_PORT", default=None)
+if DEBUG and env.bool("VALIDATE_HTML", default=False):
+    HTMLVALIDATOR_VNU_PORT = env.str("VNU_PORT", default=None)
     if not HTMLVALIDATOR_VNU_PORT:
         raise ValueError(
             "The vnu validator is enabled, but no port was given. Please "
