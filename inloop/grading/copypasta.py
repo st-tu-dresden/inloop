@@ -17,7 +17,7 @@ from huey.contrib.djhuey import db_task
 from inloop.grading.models import save_plagiarism_set
 from inloop.solutions.models import Solution
 
-LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
+LINE_REGEX = re.compile(r'Comparing (.*?)-(.*?): (\d+\.\d+)')
 
 
 @db_task()
@@ -103,7 +103,7 @@ def get_last_solutions(users, task):
             # escape hyphens in usernames with an unused (since
             # disallowed) character, otherwise the usernames cannot
             # be extracted from the jplag output
-            last_solutions[user.username.replace("-", "$")] = last_solution
+            last_solutions[user.username.replace('-', '$')] = last_solution
     return last_solutions
 
 
@@ -146,12 +146,12 @@ def exec_jplag(min_similarity, root_path, result_path):
     """
     Execute the JPlag Java program with the given parameters and return its output.
     """
-    args = ["java"]
-    args += ["-cp", settings.JPLAG_JAR_PATH]
-    args += ["jplag.JPlag"]
-    args += ["-vl"]
-    args += ["-l", "java17"]
-    args += ["-m", "{}%".format(min_similarity)]
-    args += ["-r", str(result_path)]
+    args = ['java']
+    args += ['-cp', settings.JPLAG_JAR_PATH]
+    args += ['jplag.JPlag']
+    args += ['-vl']
+    args += ['-l', 'java17']
+    args += ['-m', '{}%'.format(min_similarity)]
+    args += ['-r', str(result_path)]
     args += [str(root_path)]
     return subprocess.check_output(args, stderr=subprocess.DEVNULL, universal_newlines=True)

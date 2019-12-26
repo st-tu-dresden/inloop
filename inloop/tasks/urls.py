@@ -3,7 +3,7 @@ from django.conf.urls import url
 from inloop.tasks import views
 from inloop.tasks.views import TaskDetailView
 
-app_name = "tasks"
+app_name = 'tasks'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^category/(?P<slug>[-\w]+)/$', views.category, name='category'),

@@ -10,9 +10,9 @@ from tests.solutions.mixins import SolutionsData
 class StatisticsTest(SolutionsData, TestCase):
     def setUp(self):
         super().setUp()
-        self.statistics_both = Statistics([self.passed_solution, self.failed_solution], "%Y-%m-%d")
-        self.statistics_passed_only = Statistics([self.passed_solution], "%Y-%m-%d")
-        self.statistics_failed_only = Statistics([self.failed_solution], "%Y-%m-%d")
+        self.statistics_both = Statistics([self.passed_solution, self.failed_solution], '%Y-%m-%d')
+        self.statistics_passed_only = Statistics([self.passed_solution], '%Y-%m-%d')
+        self.statistics_failed_only = Statistics([self.failed_solution], '%Y-%m-%d')
 
     def test_single_date_range(self):
         date = datetime.now()
@@ -30,7 +30,7 @@ class StatisticsTest(SolutionsData, TestCase):
         self.assertTrue(test_date in date_range)
 
     def test_statistics_empty_constructor(self):
-        msg = "Error should give a description."
+        msg = 'Error should give a description.'
         try:
             Statistics(solutions=None)
         except ValueError as e:

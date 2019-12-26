@@ -9,16 +9,16 @@ from django.urls import reverse
 from django.utils.text import mark_safe
 
 INCOMPLETE_HINT = (
-    "Your user profile is incomplete. To ensure we can award bonus points to you, please "
-    "set your name and matriculation number on <a href=\"%s\">My Profile</a>."
+    'Your user profile is incomplete. To ensure we can award bonus points to you, please '
+    'set your name and matriculation number on <a href="%s">My Profile</a>.'
 )
 
 
-@receiver(user_logged_in, dispatch_uid="complete_profile_hint")
+@receiver(user_logged_in, dispatch_uid='complete_profile_hint')
 def complete_profile_hint(sender, user, request, **kwargs):
     """Show logged in users a hint if they do not have a complete profile."""
     if not user_profile_complete(user):
-        message = mark_safe(INCOMPLETE_HINT % reverse("accounts:profile"))
+        message = mark_safe(INCOMPLETE_HINT % reverse('accounts:profile'))
         # fail_silently needs to be set for unit tests using RequestFactory
         messages.warning(request, message, fail_silently=True)
 
@@ -41,7 +41,7 @@ class Course(models.Model):
 
 
 def default_course():
-    course, _ = Course.objects.get_or_create(name="Other")
+    course, _ = Course.objects.get_or_create(name='Other')
     return course.id
 
 
@@ -49,12 +49,12 @@ class StudentDetails(models.Model):
     """Associate additional data to the user account."""
 
     class Meta:
-        verbose_name_plural = "Student details"
+        verbose_name_plural = 'Student details'
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     matnum = models.CharField(
-        blank=True, verbose_name="Matriculation number", max_length=20, validators=[
-            RegexValidator(r'^[0-9]*$', "Please enter a numeric value or leave the field blank.")
+        blank=True, verbose_name='Matriculation number', max_length=20, validators=[
+            RegexValidator(r'^[0-9]*$', 'Please enter a numeric value or leave the field blank.')
         ]
     )
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)

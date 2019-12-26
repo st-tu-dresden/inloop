@@ -42,7 +42,7 @@ public class Fibonacci {
 TEST_MEDIA_ROOT = mkdtemp()
 
 
-@tag("slow")
+@tag('slow')
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class SolutionUploadTest(SolutionsData, MessageTestCase):
     @classmethod
@@ -51,8 +51,8 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
 
     def setUp(self):
         super().setUp()
-        self.assertTrue(self.client.login(username="bob", password="secret"))
-        self.url = reverse("solutions:upload", kwargs={"slug": self.task.slug})
+        self.assertTrue(self.client.login(username='bob', password='secret'))
+        self.url = reverse('solutions:upload', kwargs={'slug': self.task.slug})
 
     def test_solution_upload_without_files(self):
         """Validate that if no files were uploaded, a meaningful message is emitted."""
@@ -66,13 +66,13 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
 
     def test_solution_upload_with_multiple_files(self):
         """Test the solution upload."""
-        file_1 = SimpleUploadedFile("Fibonacci1.java", "class Fibonacci1 {}".encode())
-        file_2 = SimpleUploadedFile("Fibonacci2.java", "class Fibonacci2 {}".encode())
+        file_1 = SimpleUploadedFile('Fibonacci1.java', 'class Fibonacci1 {}'.encode())
+        file_2 = SimpleUploadedFile('Fibonacci2.java', 'class Fibonacci2 {}'.encode())
         response = self.client.post(self.url, data={
-            "uploads": [file_1, file_2]
+            'uploads': [file_1, file_2]
         }, follow=True)
         self.assertResponseContainsMessage(
-            "Your solution has been submitted to the checker.",
+            'Your solution has been submitted to the checker.',
             self.Levels.SUCCESS,
             response
         )
@@ -81,8 +81,8 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
             item for sublist in list(l for _, _, l in os.walk(TEST_MEDIA_ROOT))
             for item in sublist
         ]
-        self.assertIn("Fibonacci1.java", file_names)
-        self.assertIn("Fibonacci2.java", file_names)
+        self.assertIn('Fibonacci1.java', file_names)
+        self.assertIn('Fibonacci2.java', file_names)
 
     def test_invalid_solutions_fail(self):
         """Validate that invalid solutions fail."""
@@ -109,17 +109,17 @@ class SolutionDetailViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.category = Category.objects.create(id=1337, name="Category 1")
+        cls.category = Category.objects.create(id=1337, name='Category 1')
         cls.task = Task.objects.create(
-            pubdate="2000-01-01 00:00Z",
+            pubdate='2000-01-01 00:00Z',
             category=cls.category,
-            title="Fibonacci",
-            slug="task"
+            title='Fibonacci',
+            slug='task'
         )
         cls.bob = User.objects.create_user(
-            username="bob",
-            email="bob@example.org",
-            password="secret"
+            username='bob',
+            email='bob@example.org',
+            password='secret'
         )
         cls.solution = Solution.objects.create(author=cls.bob, task=cls.task, passed=True)
         cls.solution_file = SolutionFile.objects.create(
@@ -128,17 +128,17 @@ class SolutionDetailViewTest(TestCase):
         )
         cls.test_result = TestResult.objects.create(
             solution=cls.solution,
-            stdout="This is the STDOUT output.",
-            stderr="This is the STDERR output.",
+            stdout='This is the STDOUT output.',
+            stderr='This is the STDERR output.',
             return_code=0,
             time_taken=1.0
         )
-        cls.test_output = TestOutput.objects.create(result=cls.test_result, name="", output="")
+        cls.test_output = TestOutput.objects.create(result=cls.test_result, name='', output='')
 
     def setUp(self):
-        self.assertTrue(self.client.login(username="bob", password="secret"))
-        self.url = reverse("solutions:detail", kwargs={
-            "slug": self.task.slug, "scoped_id": self.solution.scoped_id
+        self.assertTrue(self.client.login(username='bob', password='secret'))
+        self.url = reverse('solutions:detail', kwargs={
+            'slug': self.task.slug, 'scoped_id': self.solution.scoped_id
         })
         super().setUp()
 
@@ -147,8 +147,8 @@ class SolutionDetailViewTest(TestCase):
 
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Congratulations, your solution passed all tests.")
-        self.assertContains(response, "Fibonacci.java")
+        self.assertContains(response, 'Congratulations, your solution passed all tests.')
+        self.assertContains(response, 'Fibonacci.java')
 
     @classmethod
     def tearDownClass(cls):

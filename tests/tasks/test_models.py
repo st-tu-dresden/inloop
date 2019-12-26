@@ -11,11 +11,11 @@ from tests.tasks.mixins import TaskData
 class TaskTests(SimpleAccountsData, TaskData, TestCase):
     def test_slugify_on_save(self):
         task = Task.objects.create(
-            title="Some Task III (winter term 2010/2011)",
+            title='Some Task III (winter term 2010/2011)',
             category=self.category1,
             pubdate=timezone.now()
         )
-        self.assertEqual(task.slug, "some-task-iii")
+        self.assertEqual(task.slug, 'some-task-iii')
 
     def test_is_published(self):
         self.assertTrue(self.published_task1.is_published)
@@ -35,23 +35,23 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
 
 class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
     def test_slugify_on_save(self):
-        category = Category.objects.create(name="Test category")
-        self.assertEqual(category.slug, "test-category")
+        category = Category.objects.create(name='Test category')
+        self.assertEqual(category.slug, 'test-category')
 
     def test_completion_info_initial(self):
         for user in [self.bob, self.alice]:
             self.assertDictEqual(self.category1.completion_info(user), {
-                "num_completed": 0,
-                "num_published": 2,
-                "is_completed": False,
-                "progress": 0
+                'num_completed': 0,
+                'num_published': 2,
+                'is_completed': False,
+                'progress': 0
             })
         for user in [self.bob, self.alice]:
             self.assertDictEqual(self.category2.completion_info(user), {
-                "num_completed": 0,
-                "num_published": 0,
-                "is_completed": True,
-                "progress": 0
+                'num_completed': 0,
+                'num_published': 0,
+                'is_completed': True,
+                'progress': 0
             })
 
     def test_completion_info(self):
@@ -61,10 +61,10 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
 
         for user in [self.bob, self.alice]:
             self.assertDictEqual(self.category1.completion_info(user), {
-                "num_completed": 1,
-                "num_published": 2,
-                "is_completed": False,
-                "progress": 50
+                'num_completed': 1,
+                'num_published': 2,
+                'is_completed': False,
+                'progress': 50
             })
 
         for _ in range(2):
@@ -73,10 +73,10 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
 
         for user in [self.bob, self.alice]:
             self.assertDictEqual(self.category1.completion_info(user), {
-                "num_completed": 2,
-                "num_published": 2,
-                "is_completed": True,
-                "progress": 100
+                'num_completed': 2,
+                'num_published': 2,
+                'is_completed': True,
+                'progress': 100
             })
 
 

@@ -20,7 +20,7 @@ def get_user_data(user):
         matnum = user.studentdetails.matnum
         course = user.studentdetails.course
     except ObjectDoesNotExist:
-        matnum = course = ""
+        matnum = course = ''
     if not user.last_name:
         first_name, last_name = guess_name_from_email(user.email)
     else:
@@ -32,13 +32,13 @@ def guess_name_from_email(email):
     """
     Try to guess first and last name from email and return it as a tuple.
     """
-    name, domain = email.split("@", 1)
-    if domain != "mailbox.tu-dresden.de":
-        return "", ""
-    first_name, last_name = name.split(".", 1)
-    first_name = first_name.replace("_", " ")
-    last_name = last_name.replace("_", " ")
-    last_name = re.sub(r"[1-9]$", "", last_name)
+    name, domain = email.split('@', 1)
+    if domain != 'mailbox.tu-dresden.de':
+        return '', ''
+    first_name, last_name = name.split('.', 1)
+    first_name = first_name.replace('_', ' ')
+    last_name = last_name.replace('_', ' ')
+    last_name = re.sub(r'[1-9]$', '', last_name)
     return capwords(first_name), capwords(last_name)
 
 

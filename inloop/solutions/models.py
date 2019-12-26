@@ -33,13 +33,13 @@ def get_upload_path(obj, filename):
     All files related to a specific solution will share a common base directory.
     """
     s = obj.solution
-    return "solutions/{year}/{slug}/{hash}/{id}/{filename}".format_map({
-        "year": s.submission_date.year,
-        "slug": s.task.slug,
+    return 'solutions/{year}/{slug}/{hash}/{id}/{filename}'.format_map({
+        'year': s.submission_date.year,
+        'slug': s.task.slug,
         # another "random" level to avoid too many files per slug directory
-        "hash": hash32(s.author),
-        "id": s.id,
-        "filename": filename
+        'hash': hash32(s.author),
+        'id': s.id,
+        'filename': filename
     })
 
 
@@ -48,7 +48,7 @@ def get_archive_upload_path(solution, filename):
     Return an upload file path of the archive
     generated from a given solution.
     """
-    return "archives/{author}/{id}/{filename}".format(
+    return 'archives/{author}/{id}/{filename}'.format(
         author=solution.author,
         id=solution.id,
         filename=filename
@@ -62,7 +62,7 @@ def create_archive(solution):
     if solution.archive:
         return
     stream = io.BytesIO()
-    stream.name = "Solution_{scoped_id}_{task}.zip".format(
+    stream.name = 'Solution_{scoped_id}_{task}.zip'.format(
         scoped_id=solution.scoped_id,
         task=solution.task.underscored_title
     )
@@ -73,7 +73,7 @@ def create_archive(solution):
                 arcname=str(solution_file.name)
             )
     solution.archive = SimpleUploadedFile(
-        name=stream.name, content=stream.getvalue(), content_type="application/zip"
+        name=stream.name, content=stream.getvalue(), content_type='application/zip'
     )
     solution.save()
 
@@ -97,11 +97,11 @@ class Solution(models.Model):
     """
 
     scoped_id = models.PositiveIntegerField(
-        help_text="Solution id unique for task and author",
+        help_text='Solution id unique for task and author',
         editable=False
     )
     submission_date = models.DateTimeField(
-        help_text="When was the solution submitted?",
+        help_text='When was the solution submitted?',
         auto_now_add=True
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -114,19 +114,19 @@ class Solution(models.Model):
     TIMEOUT = timezone.timedelta(minutes=5)
 
     class Meta:
-        unique_together = ("author", "scoped_id", "task")
-        index_together = ["author", "scoped_id", "task"]
+        unique_together = ('author', 'scoped_id', 'task')
+        index_together = ['author', 'scoped_id', 'task']
 
     @property
     def path(self):
         # derive the directory from the first associated SolutionFile
         solution_file = self.solutionfile_set.first()
         if not solution_file:
-            raise AssertionError("Empty solution: %r" % self)
+            raise AssertionError('Empty solution: %r' % self)
         return solution_file.absolute_path.parent
 
     def get_absolute_url(self):
-        return reverse("solutions:staffdetail", kwargs={'id': self.id})
+        return reverse('solutions:staffdetail', kwargs={'id': self.id})
 
     def status(self):
         """
@@ -144,27 +144,27 @@ class Solution(models.Model):
         if result:
             return result.status()
         if self.submission_date + self.TIMEOUT < timezone.now():
-            return "lost"
-        return "pending"
+            return 'lost'
+        return 'pending'
 
     @atomic
     def save(self, *args, **kwargs):
         if not self.scoped_id:
             current_max = Solution.objects.filter(
                 author=self.author, task=self.task
-            ).aggregate(Max("scoped_id"))["scoped_id__max"]
+            ).aggregate(Max('scoped_id'))['scoped_id__max']
             self.scoped_id = (current_max or 0) + 1
         return super().save(*args, **kwargs)
 
     def __repr__(self):
-        return "<%s: id=%r author=%r task=%r>" % \
+        return '<%s: id=%r author=%r task=%r>' %\
             (self.__class__.__name__, self.id, str(self.author), str(self.task))
 
     def __str__(self):
-        return "Solution #%d" % self.id
+        return 'Solution #%d' % self.id
 
 
-@receiver(post_delete, sender=Solution, dispatch_uid="delete_solutionfile")
+@receiver(post_delete, sender=Solution, dispatch_uid='delete_solutionfile')
 def auto_delete_archive_on_delete(sender, instance, **kwargs):
     """
     Removes archive from filesystem when corresponding Solution object is deleted.
@@ -208,7 +208,7 @@ class SolutionFile(models.Model):
         return self.name
 
 
-@receiver(post_delete, sender=SolutionFile, dispatch_uid="delete_solutionfile")
+@receiver(post_delete, sender=SolutionFile, dispatch_uid='delete_solutionfile')
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Removes file from filesystem when corresponding Solution object is deleted.
@@ -228,20 +228,20 @@ class Checkpoint(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     md5 = models.CharField(
-        "MD5 Hash of all associated checkpoint files", max_length=40
+        'MD5 Hash of all associated checkpoint files', max_length=40
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["created_at"]
+        ordering = ['created_at']
 
     class Manager(models.Manager):
         def create_checkpoint(self, json_data, task, user):
-            md5 = json_data.get("md5")
-            files = json_data.get("files")
+            md5 = json_data.get('md5')
+            files = json_data.get('files')
             if md5 is None or files is None or len(md5) != 40:
-                raise ValueError("Invalid JSON")
+                raise ValueError('Invalid JSON')
 
             with atomic():
                 checkpoint = self.create(
@@ -263,4 +263,4 @@ class CheckpointFile(models.Model):
     contents = models.TextField()
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']

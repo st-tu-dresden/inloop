@@ -2,20 +2,20 @@
 from inloop.settings import *   # noqa isort:skip
 
 HUEY = {
-    "always_eager": True,
+    'always_eager': True,
 }
 
 PASSWORD_HASHERS = [
     # speed up tests involving user authentication
-    "django.contrib.auth.hashers.SHA1PasswordHasher",
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
 ]
 
 AUTH_PASSWORD_VALIDATORS = []
 
-CONSTANCE_BACKEND = "tests.backends.ConstanceDictBackend"
+CONSTANCE_BACKEND = 'tests.backends.ConstanceDictBackend'
 
 INSTALLED_APPS += [     # noqa
-    "tests.context_processors",
+    'tests.context_processors',
 ]
 
 # force tests which do not use @override_settings to fail

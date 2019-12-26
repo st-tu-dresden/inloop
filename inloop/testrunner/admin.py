@@ -21,8 +21,8 @@ class TestResultAdmin(admin.ModelAdmin):
     exclude = ['passed', 'time_taken', 'solution']
 
     def linked_solution(self, obj):
-        link = reverse("admin:solutions_solution_change", args=[obj.solution_id])
+        link = reverse('admin:solutions_solution_change', args=[obj.solution_id])
         return '<a href="%s">%s</a>' % (link, obj.solution)
 
     linked_solution.allow_tags = True
-    linked_solution.short_description = "Solution"
+    linked_solution.short_description = 'Solution'

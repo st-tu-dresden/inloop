@@ -15,32 +15,32 @@ def filter_zeroes(grade_seq):
 
 
 class Command(BaseCommand):
-    help = "Write a CSV sheet with points based on completed tasks in a category."
+    help = 'Write a CSV sheet with points based on completed tasks in a category.'
 
     def add_arguments(self, parser):
-        parser.add_argument("category_name", help="Name of the category to base points on")
-        parser.add_argument("start_date", help="Start date for considered solutions (YYYY-mm-dd)")
-        parser.add_argument("csv_file", help="File to write the CSV sheet to")
-        parser.add_argument("--zeroes", help="Include zero point entries", action="store_true")
+        parser.add_argument('category_name', help='Name of the category to base points on')
+        parser.add_argument('start_date', help='Start date for considered solutions (YYYY-mm-dd)')
+        parser.add_argument('csv_file', help='File to write the CSV sheet to')
+        parser.add_argument('--zeroes', help='Include zero point entries', action='store_true')
 
     def handle(self, *args, **options):
-        start_date = datetime.strptime(options["start_date"], "%Y-%m-%d")
-        self.stdout.write("Evaluating bonus points for solutions after %s" % start_date)
+        start_date = datetime.strptime(options['start_date'], '%Y-%m-%d')
+        self.stdout.write('Evaluating bonus points for solutions after %s' % start_date)
 
         users = User.objects.filter(is_staff=False)
-        gradefunc = points_for_completed_tasks(options["category_name"], start_date, 10)
+        gradefunc = points_for_completed_tasks(options['category_name'], start_date, 10)
         grades = calculate_grades(users, gradefunc)
 
-        if not options["zeroes"]:
+        if not options['zeroes']:
             grades = filter_zeroes(grades)
 
         # we guessed some names and can't sort at the database layer
         grades = list(grades)
         grades.sort()
 
-        with open(options["csv_file"], mode="w", newline="") as csv_file:
+        with open(options['csv_file'], mode='w', newline='') as csv_file:
             writer = csv.writer(csv_file)
             for row in grades:
                 writer.writerow(row)
 
-        self.stdout.write(self.style.SUCCESS("Successfully created %s" % options["csv_file"]))
+        self.stdout.write(self.style.SUCCESS('Successfully created %s' % options['csv_file']))

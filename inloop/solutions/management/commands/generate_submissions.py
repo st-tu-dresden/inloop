@@ -16,17 +16,17 @@ file_dir = Path(__file__).resolve().parent
 
 
 class Command(BaseCommand):
-    help = "Generate submissions for demo purposes."
+    help = 'Generate submissions for demo purposes.'
 
-    dateformat = "%d.%m.%Y"
-    help_text_safe_dateformat = "dd.mm.YYYY"
+    dateformat = '%d.%m.%Y'
+    help_text_safe_dateformat = 'dd.mm.YYYY'
 
     def create_users(self, number):
         users = []
         for i in range(number):
-            username = "GeneratedUser{}".format(i)
-            email = "generated-user-{}@example.com".format(i)
-            password = "secret"
+            username = 'GeneratedUser{}'.format(i)
+            email = 'generated-user-{}@example.com'.format(i)
+            password = 'secret'
             user, _ = User.objects.get_or_create(
                 username=username, email=email, password=password
             )
@@ -50,46 +50,46 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--start_date",
-            help="Start date (Format: {})".format(self.help_text_safe_dateformat),
+            '--start_date',
+            help='Start date (Format: {})'.format(self.help_text_safe_dateformat),
             default=(datetime.now() - timedelta(days=365)).strftime(self.dateformat),
         )
         parser.add_argument(
-            "--end_date",
-            help="End date (Format: {})".format(self.help_text_safe_dateformat),
+            '--end_date',
+            help='End date (Format: {})'.format(self.help_text_safe_dateformat),
             default=datetime.now().strftime(self.dateformat),
         )
         parser.add_argument(
-            "--solutions_number",
-            help="Number of solutions to generate",
+            '--solutions_number',
+            help='Number of solutions to generate',
             type=int,
             default=1000
         )
         parser.add_argument(
-            "--users_number",
-            help="Number of users to generate",
+            '--users_number',
+            help='Number of users to generate',
             type=int,
             default=10
         )
         parser.add_argument(
-            "--force",
-            help="Immediately perform submission creation without prompt",
+            '--force',
+            help='Immediately perform submission creation without prompt',
             default=False
         )
 
     def handle(self, *args, **options):
-        start_date = make_aware(datetime.strptime(options["start_date"], self.dateformat))
-        end_date = make_aware(datetime.strptime(options["end_date"], self.dateformat))
-        solutions_number = options["solutions_number"]
-        users_number = options["users_number"]
-        verbosity = options["verbosity"]
-        force = options["force"]
+        start_date = make_aware(datetime.strptime(options['start_date'], self.dateformat))
+        end_date = make_aware(datetime.strptime(options['end_date'], self.dateformat))
+        solutions_number = options['solutions_number']
+        users_number = options['users_number']
+        verbosity = options['verbosity']
+        force = options['force']
         if start_date > end_date:
-            raise ValueError("Start date should be before end date.")
+            raise ValueError('Start date should be before end date.')
         if not Task.objects.exists():
-            raise ValueError("There are no tasks available.")
+            raise ValueError('There are no tasks available.')
         if not force:
-            if input("This will create user accounts and solutions. Continue? (y/n)") != "y":
+            if input('This will create user accounts and solutions. Continue? (y/n)') != 'y':
                 return
         with atomic():
             users = self.create_users(users_number)
@@ -102,5 +102,5 @@ class Command(BaseCommand):
                     user, task, start_date, end_date
                 ))
         if verbosity > 0:
-            self.stdout.write("Successfully created {} users.".format(len(users)))
-            self.stdout.write("Successfully created {} solutions.".format(len(all_solutions)))
+            self.stdout.write('Successfully created {} users.'.format(len(users)))
+            self.stdout.write('Successfully created {} solutions.'.format(len(all_solutions)))

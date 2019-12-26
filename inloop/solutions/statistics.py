@@ -4,9 +4,9 @@ from itertools import groupby
 
 
 class Statistics:
-    def __init__(self, solutions, date_format="%Y-%m-%d"):
+    def __init__(self, solutions, date_format='%Y-%m-%d'):
         if not solutions:
-            raise ValueError("Solutions should not be empty!")
+            raise ValueError('Solutions should not be empty!')
         self.solutions = solutions
         self.date_format = date_format
 

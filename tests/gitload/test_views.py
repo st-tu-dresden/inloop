@@ -17,71 +17,71 @@ class SignatureTest(TestCase):
 
     def test_compute_signature_bytes(self):
         self.assertEqual(
-            compute_signature(b"foo", key=b"secret"),
-            "sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2"
+            compute_signature(b'foo', key=b'secret'),
+            'sha1=9baed91be7f58b57c824b60da7cb262b2ecafbd2'
         )
 
 
-@patch("inloop.gitload.views.load_tasks_async")
+@patch('inloop.gitload.views.load_tasks_async')
 @override_config(
     # path must be non-empty, but should not be accessed
     # during this test because the function is a mock
-    GITLOAD_URL="file:///nonexistent/path/to/repo.git",
-    GITLOAD_BRANCH="master"
+    GITLOAD_URL='file:///nonexistent/path/to/repo.git',
+    GITLOAD_BRANCH='master'
 )
 class WebhookHandlerTest(TestCase):
     FACTORY = RequestFactory()
     KEY = force_bytes(GITHUB_KEY)
 
     def test_get_not_allowed(self, mock):
-        request = self.FACTORY.get("/")
+        request = self.FACTORY.get('/')
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 405)
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_valid_signature(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.FACTORY.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
-        request.META["HTTP_X_GITHUB_EVENT"] = "push"
+        request = self.FACTORY.post('/', data=data, content_type='application/json')
+        request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
+        request.META['HTTP_X_GITHUB_EVENT'] = 'push'
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mock.call_count, 1)
 
     def test_push_with_invalid_signature(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.FACTORY.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = "invalid"
-        request.META["HTTP_X_GITHUB_EVENT"] = "push"
+        request = self.FACTORY.post('/', data=data, content_type='application/json')
+        request.META['HTTP_X_HUB_SIGNATURE'] = 'invalid'
+        request.META['HTTP_X_GITHUB_EVENT'] = 'push'
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(b"invalid" in response.content.lower())
+        self.assertTrue(b'invalid' in response.content.lower())
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_event_not_push(self, mock):
         data = b'{"ref": "refs/heads/master"}'
-        request = self.FACTORY.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
-        request.META["HTTP_X_GITHUB_EVENT"] = "ping"
+        request = self.FACTORY.post('/', data=data, content_type='application/json')
+        request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
+        request.META['HTTP_X_GITHUB_EVENT'] = 'ping'
         response = webhook_handler(request)
-        self.assertContains(response, "Event ignored")
+        self.assertContains(response, 'Event ignored')
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_ref_not_master(self, mock):
         data = b'{"ref": "refs/heads/develop"}'
-        request = self.FACTORY.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
-        request.META["HTTP_X_GITHUB_EVENT"] = "push"
+        request = self.FACTORY.post('/', data=data, content_type='application/json')
+        request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
+        request.META['HTTP_X_GITHUB_EVENT'] = 'push'
         response = webhook_handler(request)
-        self.assertContains(response, "Event ignored")
+        self.assertContains(response, 'Event ignored')
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_invalid_json(self, mock):
         data = b'<xml-is-not-json/>'
-        request = self.FACTORY.post("/", data=data, content_type="application/json")
-        request.META["HTTP_X_HUB_SIGNATURE"] = compute_signature(data, self.KEY)
-        request.META["HTTP_X_GITHUB_EVENT"] = "push"
+        request = self.FACTORY.post('/', data=data, content_type='application/json')
+        request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
+        request.META['HTTP_X_GITHUB_EVENT'] = 'push'
         response = webhook_handler(request)
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(b"malformed" in response.content.lower())
+        self.assertTrue(b'malformed' in response.content.lower())
         self.assertEqual(mock.call_count, 0)

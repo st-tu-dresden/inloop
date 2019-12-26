@@ -40,7 +40,7 @@ public class Fibonacci {
 TEST_MEDIA_ROOT = mkdtemp()
 
 
-@tag("slow")
+@tag('slow')
 class JPlagCheckTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def setUp(self):
         super().setUp()
@@ -60,7 +60,7 @@ class JPlagCheckTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
                 users=[self.alice, self.bob],
                 tasks=[self.task],
                 min_similarity=100,
-                result_dir=Path(path).joinpath("jplag")
+                result_dir=Path(path).joinpath('jplag')
             )
         self.assertTrue(self.passed_solution_bob in output)
         self.assertTrue(self.passed_solution_alice in output)
@@ -88,10 +88,10 @@ class JPlagCheckTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
     def test_specific_tasks(self):
         """Verify that only the given tasks are checked."""
         task_without_solutions = Task.objects.create(
-            pubdate="2000-01-01 00:00Z",
+            pubdate='2000-01-01 00:00Z',
             category_id=123456,
-            title="Task without solutions",
-            system_name="task-without-solutions"
+            title='Task without solutions',
+            system_name='task-without-solutions'
         )
         output = jplag_check(
             users=[self.alice, self.bob],
@@ -103,7 +103,7 @@ class JPlagCheckTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
         task_without_solutions.delete()
 
 
-@tag("slow")
+@tag('slow')
 class JPlagFailedSolutionDetectionTest(FailedSolutionsData, TemporaryMediaRootTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -124,7 +124,7 @@ class JPlagFailedSolutionDetectionTest(FailedSolutionsData, TemporaryMediaRootTe
                 users=[self.alice, self.bob],
                 tasks=[self.published_task1],
                 min_similarity=1,
-                result_dir=Path(path).joinpath("jplag")
+                result_dir=Path(path).joinpath('jplag')
             )
         self.assertNotIn(self.failed_solution_bob, output)
         self.assertNotIn(self.failed_solution_alice, output)
