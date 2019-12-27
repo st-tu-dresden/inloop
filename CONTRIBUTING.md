@@ -72,11 +72,11 @@ high that such a branch will be hard to integrate into `master`. Divide and conq
     use reStructured Text style comments.
 * HTML (Django templates):
   * Don't use XML style empty tags (good: `<br>`, bad: `<br />`).
-  * Use the [W3C Validator][w3c-validator] to verify that the output of processed templates is
+  * Use the [W3C Nu validator][nu-validator] to verify that the output of processed templates is
     valid HTML5.
 * JavaScript:
   * Docstrings must follow the [JSDoc documentation specifications][jsdoc].
-  
+
 
 
 ### Commit messages
@@ -97,6 +97,6 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[w3c-validator]: https://validator.w3.org/
+[nu-validator]: https://validator.w3.org/nu/
 [slugify]: https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.text.slugify
 [jsdoc]: https://devdocs.io/jsdoc/
