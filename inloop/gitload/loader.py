@@ -36,7 +36,7 @@ def load_task(task_file):
         with task_file.open() as fp:
             update_or_create(task_dir, meta, fp.read())
     except KeyError as e:
-        raise InvalidTask('%s: missing required field %s' % (task_dir.name, e))
+        raise InvalidTask(f'{task_dir.name}: missing required field {e}')
 
 
 def update_or_create(task_dir, meta, task_text):
@@ -55,6 +55,6 @@ def parse_metafile(task_dir):
         with task_dir.joinpath('meta.json').open() as fp:
             return json.load(fp)
     except JSONDecodeError as e:
-        raise InvalidTask('%s: malformed meta.json (%s)' % (task_dir.name, e))
+        raise InvalidTask(f'{task_dir.name}: malformed meta.json ({e})')
     except FileNotFoundError:
-        raise InvalidTask('%s: missing meta.json' % task_dir.name)
+        raise InvalidTask(f'{task_dir.name}: missing meta.json')

@@ -10,6 +10,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         site = Site.objects.get_current()
-        url = 'http(s)://%s%s' % (site.domain, reverse('gitload:webhook_handler'))
-        self.stdout.write('Endpoint: %s' % url)
-        self.stdout.write('Secret:   %s' % GITHUB_KEY)
+        url = f"http(s)://{site.domain}{reverse('gitload:webhook_handler')}"
+        self.stdout.write(f'Endpoint: {url}')
+        self.stdout.write(f'Secret:   {GITHUB_KEY}')

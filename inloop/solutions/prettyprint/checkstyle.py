@@ -24,7 +24,7 @@ class CheckstyleData:
         self.total_issues = self.total_warnings + self.total_errors
 
     def __repr__(self):
-        return '<CheckstyleDict {}>'.format(self.files)
+        return f'<CheckstyleDict {self.files}>'
 
 
 def extract_items_by_key(*, data, key):

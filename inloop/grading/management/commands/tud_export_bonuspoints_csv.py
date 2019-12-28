@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_date = datetime.strptime(options['start_date'], '%Y-%m-%d')
-        self.stdout.write('Evaluating bonus points for solutions after %s' % start_date)
+        self.stdout.write(f'Evaluating bonus points for solutions after {start_date}')
 
         users = User.objects.filter(is_staff=False)
         gradefunc = points_for_completed_tasks(options['category_name'], start_date, 10)

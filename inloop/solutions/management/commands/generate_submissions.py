@@ -24,8 +24,8 @@ class Command(BaseCommand):
     def create_users(self, number):
         users = []
         for i in range(number):
-            username = 'GeneratedUser{}'.format(i)
-            email = 'generated-user-{}@example.com'.format(i)
+            username = f'GeneratedUser{i}'
+            email = f'generated-user-{i}@example.com'
             password = 'secret'
             user, _ = User.objects.get_or_create(
                 username=username, email=email, password=password
@@ -51,12 +51,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--start_date',
-            help='Start date (Format: {})'.format(self.help_text_safe_dateformat),
+            help=f'Start date (Format: {self.help_text_safe_dateformat})',
             default=(datetime.now() - timedelta(days=365)).strftime(self.dateformat),
         )
         parser.add_argument(
             '--end_date',
-            help='End date (Format: {})'.format(self.help_text_safe_dateformat),
+            help=f'End date (Format: {self.help_text_safe_dateformat})',
             default=datetime.now().strftime(self.dateformat),
         )
         parser.add_argument(
@@ -102,5 +102,5 @@ class Command(BaseCommand):
                     user, task, start_date, end_date
                 ))
         if verbosity > 0:
-            self.stdout.write('Successfully created {} users.'.format(len(users)))
-            self.stdout.write('Successfully created {} solutions.'.format(len(all_solutions)))
+            self.stdout.write(f'Successfully created {len(users)} users.')
+            self.stdout.write(f'Successfully created {len(all_solutions)} solutions.')

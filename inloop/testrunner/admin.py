@@ -22,7 +22,7 @@ class TestResultAdmin(admin.ModelAdmin):
 
     def linked_solution(self, obj):
         link = reverse('admin:solutions_solution_change', args=[obj.solution_id])
-        return '<a href="%s">%s</a>' % (link, obj.solution)
+        return f'<a href="{link}">{obj.solution}</a>'
 
     linked_solution.allow_tags = True
     linked_solution.short_description = 'Solution'

@@ -45,7 +45,7 @@ class Repository:
         """Synchronize files with a remote source (optional)."""
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.path_s)
+        return f'{self.__class__.__name__}({self.path_s!r})'
 
 
 _GIT_ENVIRON = os.environ.copy()
@@ -80,7 +80,7 @@ class GitRepository(Repository):
         self.git('remote', 'set-url', 'origin', self.url)
         self.git('fetch', '--quiet', '--depth=1', 'origin', '+refs/heads/*:refs/remotes/origin/*')
         self.git('stash', '-u')
-        self.git('reset', '--hard', 'origin/%s' % self.branch)
+        self.git('reset', '--hard', f'origin/{self.branch}')
 
     def initialize(self):
         """Initialize the git clone for this repository."""

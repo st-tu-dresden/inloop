@@ -72,7 +72,7 @@ class TestResult(models.Model):
     is_success.short_description = 'Successful'
 
     def runtime(self):
-        return '%.2f' % self.time_taken
+        return f'{self.time_taken:.2f}'
 
     runtime.admin_order_field = 'time_taken'
     runtime.short_description = 'Runtime (seconds)'
@@ -91,7 +91,7 @@ class TestResult(models.Model):
             (self.__class__.__name__, self.solution_id, self.return_code)
 
     def __str__(self):
-        return 'Result #%s' % self.id
+        return f'Result #{self.id}'
 
 
 class TestOutput(models.Model):

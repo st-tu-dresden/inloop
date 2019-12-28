@@ -48,11 +48,7 @@ def get_archive_upload_path(solution, filename):
     Return an upload file path of the archive
     generated from a given solution.
     """
-    return 'archives/{author}/{id}/{filename}'.format(
-        author=solution.author,
-        id=solution.id,
-        filename=filename
-    )
+    return f'archives/{solution.author}/{solution.id}/{filename}'
 
 
 def create_archive(solution):
@@ -62,10 +58,7 @@ def create_archive(solution):
     if solution.archive:
         return
     stream = io.BytesIO()
-    stream.name = 'Solution_{scoped_id}_{task}.zip'.format(
-        scoped_id=solution.scoped_id,
-        task=solution.task.underscored_title
-    )
+    stream.name = f'Solution_{solution.scoped_id}_{solution.task.underscored_title}.zip'
     with zipfile.ZipFile(stream, mode='w', compression=zipfile.ZIP_DEFLATED) as archive:
         for solution_file in solution.solutionfile_set.all():
             archive.write(
@@ -122,7 +115,7 @@ class Solution(models.Model):
         # derive the directory from the first associated SolutionFile
         solution_file = self.solutionfile_set.first()
         if not solution_file:
-            raise AssertionError('Empty solution: %r' % self)
+            raise AssertionError(f'Empty solution: {self!r}')
         return solution_file.absolute_path.parent
 
     def get_absolute_url(self):
@@ -161,7 +154,7 @@ class Solution(models.Model):
             (self.__class__.__name__, self.id, str(self.author), str(self.task))
 
     def __str__(self):
-        return 'Solution #%d' % self.id
+        return f'Solution #{self.id:d}'
 
 
 @receiver(post_delete, sender=Solution, dispatch_uid='delete_solutionfile')
@@ -201,8 +194,8 @@ class SolutionFile(models.Model):
 
     @property
     def contents(self):
-        with self.absolute_path.open() as f:
-            return f.read()
+        with open(self.absolute_path) as stream:
+            return stream.read()
 
     def __str__(self):
         return self.name

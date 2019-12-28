@@ -12,7 +12,7 @@ from inloop.solutions.models import Solution
 def zipfile_upload_path(test, filename):
     """Return upload file paths for the PlagiarismTest.zip_file field."""
     timestamp = test.created_at.strftime('%Y%m%d-%H%M')
-    return 'plagiarism_tests/jplag-results-%s.zip' % timestamp
+    return f'plagiarism_tests/jplag-results-{timestamp}.zip'
 
 
 class PlagiarismTest(models.Model):
@@ -21,7 +21,7 @@ class PlagiarismTest(models.Model):
     zip_file = models.FileField(upload_to=zipfile_upload_path, null=True)
 
     def __str__(self):
-        return 'Plagiarism test #{}'.format(self.id)
+        return f'Plagiarism test #{self.id}'
 
     @property
     def all_detected_plagiarisms(self):
@@ -50,7 +50,7 @@ class DetectedPlagiarism(models.Model):
     veto = models.BooleanField(default=False, help_text='Cancel this detection')
 
     def __str__(self):
-        return 'solution #%d' % self.solution_id
+        return f'solution #{self.solution_id:d}'
 
 
 def get_ripoff_tasks_for_user(user):

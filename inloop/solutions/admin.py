@@ -32,11 +32,11 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         winter_start = datetime(2018, 10, 1, tzinfo=tzinfo_cest)
 
         for year in range(first_solution.submission_date.year, now().year + 1):
-            semesters.append(('Summer {}'.format(year), {
+            semesters.append((f'Summer {year}', {
                 self.lookup_kwarg_since: str(summer_start.replace(year)),
                 self.lookup_kwarg_until: str(winter_start.replace(year))
             }))
-            semesters.append(('Winter {}/{}'.format(year, year + 1), {
+            semesters.append((f'Winter {year}/{year + 1}', {
                 self.lookup_kwarg_since: str(winter_start.replace(year)),
                 self.lookup_kwarg_until: str(summer_start.replace(year=year + 1))
             }))
@@ -65,7 +65,7 @@ class SolutionAdmin(admin.ModelAdmin):
     readonly_fields = ['task', 'submission_date', 'task', 'author', 'passed']
 
     def site_link(self, obj):
-        return '<a href="%s">%s details</a>' % (obj.get_absolute_url(), obj)
+        return f'<a href="{obj.get_absolute_url()}">{obj} details</a>'
 
     def changelist_view(self, request, extra_context=None):
         """Filter admin view by the selected viewport filter."""

@@ -66,9 +66,9 @@ class DockerTestRunner:
         Tests if the given path is absolute and a directory, raises ValueError otherwise.
         """
         if not isabs(path):
-            raise ValueError('not an absolute path: %s' % path)
+            raise ValueError(f'not an absolute path: {path}')
         if not isdir(path):
-            raise ValueError('not a directory: %s' % path)
+            raise ValueError(f'not a directory: {path}')
 
     def check_task(self, task_name, input_path):
         """
@@ -133,10 +133,10 @@ class DockerTestRunner:
             '--net=none',
             '--hostname=localhost',
             '--memory=%s' % self.config.get('memory', '256m'),
-            '--volume=%s:/checker/input:ro' % input_path,
-            '--volume=%s:/checker/output' % output_path,
+            f'--volume={input_path}:/checker/input:ro',
+            f'--volume={output_path}:/checker/output',
             '--tmpfs=/checker/scratch:size=%s' % self.config.get('fssize', '32m'),
-            '--name=%s' % ctr_id,
+            f'--name={ctr_id}',
             self.image_name,
             task_name
         ]

@@ -81,7 +81,7 @@ if DEBUG and env.bool('DJDT', default=False):
     ROOT_URLCONF = 'inloop.debug_urls'
 
 if DEBUG and env.bool('VALIDATE_HTML', default=False):
-    HTMLVALIDATOR_VNU_URL = 'http://localhost:{}/'.format(env.int('VNU_PORT'))
+    HTMLVALIDATOR_VNU_URL = f"http://localhost:{env.int('VNU_PORT')}/"
     HTMLVALIDATOR_ENABLED = True
     HTMLVALIDATOR_OUTPUT = 'stdout'
     MIDDLEWARE.append('htmlvalidator.middleware.HTMLValidator')
