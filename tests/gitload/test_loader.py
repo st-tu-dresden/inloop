@@ -52,8 +52,8 @@ class TaskLoadTest(TestCase):
 
     def test_load_task_with_incomplete_meta(self):
         with self.assertRaises(InvalidTask) as context:
-            load_task(TESTREPO_PATH.joinpath('task3_invalid'))
-        self.assertIn('missing required field title', str(context.exception))
+            load_task(TESTREPO_PATH.joinpath('task3_invalid/task.md'))
+        self.assertIn("missing required field 'title'", str(context.exception))
 
     def test_parse_missing_metafile(self):
         with self.assertRaises(InvalidTask) as context:
