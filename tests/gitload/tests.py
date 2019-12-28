@@ -38,7 +38,7 @@ class GitRepositoryTest(TestCase):
         self.assertEqual(b'', self.run_command('git status -s'))
 
     def get_path(self, name):
-        return Path(self.tmpdir.name).joinpath(name)
+        return Path(self.tmpdir.name, name)
 
     def run_command(self, command):
         return check_output(command.split(), cwd=self.tmpdir.name)
