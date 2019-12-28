@@ -4,7 +4,6 @@ Classes dealing with task repositories and their synchronization.
 
 import os
 import subprocess
-from contextlib import suppress
 from pathlib import Path
 
 
@@ -84,8 +83,7 @@ class GitRepository(Repository):
 
     def initialize(self):
         """Initialize the git clone for this repository."""
-        with suppress(FileExistsError):  # mimics Path.mkdir(exist_ok=True)
-            self.path.mkdir(parents=True)
+        self.path.mkdir(parents=True, exist_ok=True)
         self.git('clone', '--quiet', '--depth=1', '--branch', self.branch, self.url, '.')
 
     def git(self, *args):
