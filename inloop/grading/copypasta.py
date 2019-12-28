@@ -66,7 +66,7 @@ def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_d
             plagiarism_set.update(jplag_check_task(users, task, min_similarity, path))
         save_plagiarism_set(plagiarism_set, str(path))
         if result_dir:
-            copytree(str(path), str(result_dir))
+            copytree(src=path, dst=result_dir)
         return plagiarism_set
 
 
@@ -122,7 +122,7 @@ def prepare_directories(root_path, last_solutions):
                 File2.java
     """
     for username, last_solution in last_solutions.items():
-        copytree(str(last_solution.path), str(root_path.joinpath(username)))
+        copytree(src=last_solution.path, dst=root_path.joinpath(username))
 
 
 def parse_output(output, min_similarity, last_solutions):

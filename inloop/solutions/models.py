@@ -62,8 +62,8 @@ def create_archive(solution):
     with ZipFile(stream, mode='w', compression=ZIP_DEFLATED) as zipfile:
         for solution_file in solution.solutionfile_set.all():
             zipfile.write(
-                filename=str(solution_file.absolute_path),
-                arcname=str(solution_file.name)
+                filename=solution_file.absolute_path,
+                arcname=solution_file.name
             )
     solution.archive = SimpleUploadedFile(
         name=stream.name, content=stream.getvalue(), content_type='application/zip'
