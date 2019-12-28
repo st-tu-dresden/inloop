@@ -48,8 +48,7 @@ class SolutionEditorView(LoginRequiredMixin, View):
             return failure_response
 
         try:
-            # TODO: drop decode() once we require Python >= 3.6
-            json_data = json.loads(request.body.decode())
+            json_data = json.loads(request.body)
             uploads = json_data['uploads']
         except (KeyError, json.JSONDecodeError):
             return failure_response

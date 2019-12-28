@@ -5,7 +5,6 @@ from json import JSONDecodeError
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.utils.crypto import constant_time_compare, force_bytes
-from django.utils.text import force_text
 from django.views.decorators.csrf import csrf_exempt
 
 from constance import config
@@ -30,7 +29,7 @@ def safe_json_load(request):
     expected = compute_signature(request.body, force_bytes(GITHUB_KEY))
     if not constant_time_compare(signature, expected):
         raise InvalidSignature
-    return json.loads(force_text(request.body))
+    return json.loads(request.body)
 
 
 @csrf_exempt
