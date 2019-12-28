@@ -49,8 +49,8 @@ class PlagiarismTestsAdmin(PlagiarismAdmin):
             msg = 'The selected test has no downloadable zip file.'
             self.message_user(request, msg, messages.WARNING)
             return None
-        with open(zip_file.path, 'rb') as source:
-            response = HttpResponse(source, content_type='application/zip')
+        with open(zip_file.path, mode='rb') as stream:
+            response = HttpResponse(stream, content_type='application/zip')
         attachment = 'attachment; filename=%s' % basename(zip_file.path)
         response['Content-Disposition'] = attachment
         return response

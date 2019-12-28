@@ -55,12 +55,12 @@ class JPlagCheckTest(PlagiatedSolutionsData, TemporaryMediaRootTestCase):
 
     def test_jplag_check_with_resultdir(self):
         """JPlag check should return the right results when given a result_dir."""
-        with TemporaryDirectory() as path:
+        with TemporaryDirectory() as tmpdir:
             output = jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.task],
                 min_similarity=100,
-                result_dir=Path(path).joinpath('jplag')
+                result_dir=Path(tmpdir, 'jplag')
             )
         self.assertTrue(self.passed_solution_bob in output)
         self.assertTrue(self.passed_solution_alice in output)
@@ -119,12 +119,12 @@ class JPlagFailedSolutionDetectionTest(FailedSolutionsData, TemporaryMediaRootTe
 
     def test_failed_solution_detection(self):
         """Validate that failed solutions are not taken into account."""
-        with TemporaryDirectory() as path:
+        with TemporaryDirectory() as tmpdir:
             output = jplag_check(
                 users=[self.alice, self.bob],
                 tasks=[self.published_task1],
                 min_similarity=1,
-                result_dir=Path(path).joinpath('jplag')
+                result_dir=Path(tmpdir, 'jplag')
             )
         self.assertNotIn(self.failed_solution_bob, output)
         self.assertNotIn(self.failed_solution_alice, output)

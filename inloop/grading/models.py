@@ -63,8 +63,8 @@ def get_ripoff_tasks_for_user(user):
 def save_plagiarism_set(plagiarism_set, result_dir):
     """Save the detected plagiarisms and zip file to the database."""
     path_to_zip = make_archive(result_dir, 'zip', result_dir)
-    with open(path_to_zip, 'rb') as zip_data:
-        zip_file = SimpleUploadedFile('jplag_test.zip', zip_data.read())
+    with open(path_to_zip, mode='rb') as stream:
+        zip_file = SimpleUploadedFile('jplag_test.zip', stream.read())
     test = PlagiarismTest.objects.create(zip_file=zip_file)
     DetectedPlagiarism.objects.bulk_create([
         DetectedPlagiarism(test=test, solution=solution) for solution in plagiarism_set

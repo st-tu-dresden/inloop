@@ -7,8 +7,8 @@ from inloop.solutions.prettyprint.checkstyle import (context_from_xml_strings,
 
 from . import SAMPLES_PATH
 
-with SAMPLES_PATH.joinpath('checkstyle.xml').open() as fp:
-    CHECKSTYLE_SAMPLE_XML = fp.read()
+with open(SAMPLES_PATH / 'checkstyle.xml') as stream:
+    CHECKSTYLE_SAMPLE_XML = stream.read()
 
 CHECKSTYLE_SAMPLE_DATA = [{
     'version': '8.9'

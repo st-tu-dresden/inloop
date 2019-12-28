@@ -1,8 +1,8 @@
 import os
 import shutil
-import zipfile
 from tempfile import TemporaryDirectory, mkdtemp
 from unittest.mock import Mock
+from zipfile import ZipFile, is_zipfile
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -177,20 +177,20 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
             create_archive(solution)
 
             self.assertTrue(solution.archive)
-            self.assertTrue(zipfile.is_zipfile(solution.archive.path))
-            with zipfile.ZipFile(solution.archive.path) as zip_file:
-                self.assertIn('Example1.java', zip_file.namelist())
-                self.assertIn('Example2.java', zip_file.namelist())
+            self.assertTrue(is_zipfile(solution.archive.path))
+            with ZipFile(solution.archive.path) as zipfile:
+                self.assertIn('Example1.java', zipfile.namelist())
+                self.assertIn('Example2.java', zipfile.namelist())
 
-                with zip_file.open('Example1.java') as f:
-                    self.assertEqual(f.read(), JAVA_EXAMPLE_1)
-                with zip_file.open('Example2.java') as f:
-                    self.assertEqual(f.read(), JAVA_EXAMPLE_2)
+                with zipfile.open('Example1.java') as stream:
+                    self.assertEqual(stream.read(), JAVA_EXAMPLE_1)
+                with zipfile.open('Example2.java') as stream:
+                    self.assertEqual(stream.read(), JAVA_EXAMPLE_2)
 
-                with TemporaryDirectory() as tmp_dir:
+                with TemporaryDirectory() as tmpdir:
                     # Test extraction to expose erroneous packaging
-                    zip_file.extractall(tmp_dir)
-                    for _, dirs, files in os.walk(tmp_dir):
+                    zipfile.extractall(tmpdir)
+                    for _, dirs, files in os.walk(tmpdir):
                         self.assertIn('Example1.java', files)
                         self.assertIn('Example2.java', files)
                         self.assertEqual(2, len(files))
@@ -198,7 +198,7 @@ class SolutionsModelArchiveTest(SolutionsData, TestCase):
                         # The inherited folder structure should be flat
                         self.assertFalse(dirs)
 
-                self.assertIsNone(zip_file.testzip())
+                self.assertIsNone(zipfile.testzip())
 
     @classmethod
     def tearDownClass(cls):

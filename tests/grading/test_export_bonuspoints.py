@@ -21,12 +21,12 @@ from tests.tools import TemporaryMediaRootTestCase
 def export_bonuspoints(category_name, date, zeroes=False):
     """Conveniently execute the bonus points export management command."""
     stdout = StringIO()
-    with TemporaryDirectory() as path:
-        output_path = Path(path).joinpath('output')
+    with TemporaryDirectory() as tmpdir:
+        output_path = Path(tmpdir, 'output')
         args = [category_name, date.strftime('%Y-%m-%d'), output_path]
         call_command(tud_export_bonuspoints_csv.Command(), *args, stdout=stdout, zeroes=zeroes)
-        with output_path.open(mode='r') as f:
-            return stdout.getvalue(), f.readlines(), output_path
+        with open(output_path) as stream:
+            return stdout.getvalue(), stream.readlines(), output_path
 
 
 class RipoffTest(DetectedPlagiarismData, TestCase):

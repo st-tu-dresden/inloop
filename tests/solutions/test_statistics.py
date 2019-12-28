@@ -31,14 +31,12 @@ class StatisticsTest(SolutionsData, TestCase):
 
     def test_statistics_empty_constructor(self):
         msg = 'Error should give a description.'
-        try:
+        with self.assertRaises(ValueError) as context:
             Statistics(solutions=None)
-        except ValueError as e:
-            self.assertTrue(str(e), msg)
-        try:
-            Statistics(solutions=list())
-        except ValueError as e:
-            self.assertTrue(str(e), msg)
+        self.assertTrue(str(context.exception), msg)
+        with self.assertRaises(ValueError) as context:
+            Statistics(solutions=[])
+        self.assertTrue(str(context.exception), msg)
 
     def test_passed_after(self):
         self.assertEqual(self.statistics_both.passed_after, [(1, 1)])

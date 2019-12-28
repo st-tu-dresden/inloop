@@ -51,16 +51,16 @@ class TaskLoadTest(TestCase):
         self.assertEqual(0, len(Task.objects.all()))
 
     def test_load_task_with_incomplete_meta(self):
-        with self.assertRaises(InvalidTask) as cm:
+        with self.assertRaises(InvalidTask) as context:
             load_task(TESTREPO_PATH.joinpath('task3_invalid'))
-            self.assertIn('missing required field title', str(cm.exception))
+        self.assertIn('missing required field title', str(context.exception))
 
     def test_parse_missing_metafile(self):
-        with self.assertRaises(InvalidTask) as cm:
+        with self.assertRaises(InvalidTask) as context:
             parse_metafile(TESTREPO_PATH.joinpath('task4_invalid'))
-            self.assertIn('missing meta.json', str(cm.exception))
+        self.assertIn('missing meta.json', str(context.exception))
 
     def test_parse_invalid_metafile(self):
-        with self.assertRaises(InvalidTask) as cm:
+        with self.assertRaises(InvalidTask) as context:
             parse_metafile(TESTREPO_PATH.joinpath('task5_invalid'))
-            self.assertIn('malformed meta.json', str(cm.exception))
+        self.assertIn('malformed meta.json', str(context.exception))

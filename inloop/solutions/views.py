@@ -61,8 +61,8 @@ class SolutionEditorView(LoginRequiredMixin, View):
 
         try:
             validate_filenames(uploads.keys())
-        except ValidationError as e:
-            messages.error(request, e.message)
+        except ValidationError as error:
+            messages.error(request, error.message)
             return failure_response
 
         files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
@@ -160,8 +160,8 @@ class SolutionUploadView(LoginRequiredMixin, View):
 
         try:
             validate_filenames([f.name for f in uploads])
-        except ValidationError as e:
-            messages.error(request, e.message)
+        except ValidationError as error:
+            messages.error(request, error.message)
             return redirect_to_upload
 
         with transaction.atomic():

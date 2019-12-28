@@ -4,10 +4,10 @@ from inloop.solutions.prettyprint import junit
 
 from . import SAMPLES_PATH
 
-with SAMPLES_PATH.joinpath('TEST-TaxiTest.xml').open() as fp:
-    JUNIT_SAMPLE_XML = fp.read()
-with SAMPLES_PATH.joinpath('billion_laughs.xml').open() as fp:
-    MALICIOUS_XML = fp.read()
+with open(SAMPLES_PATH / 'TEST-TaxiTest.xml') as stream:
+    JUNIT_SAMPLE_XML = stream.read()
+with open(SAMPLES_PATH / 'billion_laughs.xml') as stream:
+    MALICIOUS_XML = stream.read()
 
 
 class JUnitXMLTests(TestCase):

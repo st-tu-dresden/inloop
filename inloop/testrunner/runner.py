@@ -2,11 +2,11 @@ import logging
 import os
 import signal
 import subprocess
-import tempfile
 import time
 import uuid
 from collections import namedtuple
 from os.path import isabs, isdir, isfile, join, normpath, realpath
+from tempfile import TemporaryDirectory
 
 LOG = logging.getLogger(__name__)
 
@@ -19,8 +19,8 @@ def collect_files(path):
     retval = dict()
     files = [f for f in os.listdir(path) if isfile(join(path, f))]
     for filename in files:
-        with open(join(path, filename), encoding='utf-8') as f:
-            retval[filename] = f.read()
+        with open(join(path, filename)) as stream:
+            retval[filename] = stream.read()
     return retval
 
 
@@ -87,7 +87,7 @@ class DockerTestRunner:
         # inside the container. To allow users other than root to write outputs, we create
         # a world-writable subdirectory called "storage" (because a world-writable mount
         # point would have security implications).
-        with tempfile.TemporaryDirectory() as output_path:
+        with TemporaryDirectory() as output_path:
             # Resolve symbolic links:
             # On OS X, TMPDIR is set to some random subdir of /var/folders, which
             # resolves to /private/var/folders. Docker for Mac only accepts the

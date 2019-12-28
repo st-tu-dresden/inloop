@@ -12,5 +12,5 @@ class RegexSyntaxValidator:
     def __call__(self, regex):
         try:
             re.compile(regex, self.flags)
-        except Exception as exc:
-            raise ValidationError('Invalid regex: %s' % exc.args[0])
+        except re.error as error:
+            raise ValidationError(f'Invalid regex: {error}')

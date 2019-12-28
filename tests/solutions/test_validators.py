@@ -20,11 +20,7 @@ class FileNameExtensionValidationTest(TestCase):
             'HelloWorld.h',
             'HelloWorld.py'
         ]
-        try:
-            validate_filenames(filenames)
-        except ValidationError as e:
-            self.fail('Filename validation should succeed on the '
-                      'given files. ({})'.format(e.message))
+        validate_filenames(filenames)
 
     def test_invalid_filenames(self):
         filenames = ['HelloWorld.kt']

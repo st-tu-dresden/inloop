@@ -22,8 +22,8 @@ def load_tasks(repository):
     for task_file in repository.find_files('*/task.md'):
         try:
             load_task(task_file)
-        except InvalidTask as e:
-            LOG.error('%s', e)
+        except InvalidTask as error:
+            LOG.error('%s', error)
     repository_loaded.send(__name__, repository=repository)
 
 
@@ -33,10 +33,10 @@ def load_task(task_file):
     if meta.get('disabled'):
         return
     try:
-        with task_file.open() as fp:
-            update_or_create(task_dir, meta, fp.read())
-    except KeyError as e:
-        raise InvalidTask(f'{task_dir.name}: missing required field {e}')
+        with open(task_file) as stream:
+            update_or_create(task_dir, meta, stream.read())
+    except KeyError as key:
+        raise InvalidTask(f'{task_dir.name}: missing required field {key}')
 
 
 def update_or_create(task_dir, meta, task_text):
@@ -52,9 +52,9 @@ def update_or_create(task_dir, meta, task_text):
 
 def parse_metafile(task_dir):
     try:
-        with task_dir.joinpath('meta.json').open() as fp:
-            return json.load(fp)
-    except JSONDecodeError as e:
-        raise InvalidTask(f'{task_dir.name}: malformed meta.json ({e})')
+        with open(task_dir / 'meta.json') as stream:
+            return json.load(stream)
+    except JSONDecodeError as error:
+        raise InvalidTask(f'{task_dir.name}: malformed meta.json ({error})')
     except FileNotFoundError:
         raise InvalidTask(f'{task_dir.name}: missing meta.json')

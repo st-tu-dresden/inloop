@@ -1,8 +1,8 @@
-import io
 import os
 import string
-import zipfile
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -57,11 +57,11 @@ def create_archive(solution):
     """
     if solution.archive:
         return
-    stream = io.BytesIO()
+    stream = BytesIO()
     stream.name = f'Solution_{solution.scoped_id}_{solution.task.underscored_title}.zip'
-    with zipfile.ZipFile(stream, mode='w', compression=zipfile.ZIP_DEFLATED) as archive:
+    with ZipFile(stream, mode='w', compression=ZIP_DEFLATED) as zipfile:
         for solution_file in solution.solutionfile_set.all():
-            archive.write(
+            zipfile.write(
                 filename=str(solution_file.absolute_path),
                 arcname=str(solution_file.name)
             )
