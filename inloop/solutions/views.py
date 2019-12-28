@@ -51,8 +51,7 @@ class SolutionEditorView(LoginRequiredMixin, View):
             # TODO: drop decode() once we require Python >= 3.6
             json_data = json.loads(request.body.decode())
             uploads = json_data['uploads']
-        # NOTE: JSONDecodeError is only available since Python 3.5
-        except (KeyError, ValueError):
+        except (KeyError, json.JSONDecodeError):
             return failure_response
 
         if not uploads:

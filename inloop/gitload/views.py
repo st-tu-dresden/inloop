@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+from json import JSONDecodeError
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.utils.crypto import constant_time_compare, force_bytes
@@ -11,11 +12,6 @@ from constance import config
 
 from inloop.gitload.secrets import GITHUB_KEY
 from inloop.gitload.tasks import load_tasks_async
-
-try:
-    from json import JSONDecodeError
-except ImportError:
-    JSONDecodeError = ValueError
 
 
 class InvalidSignature(Exception):
