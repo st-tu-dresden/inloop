@@ -7,7 +7,7 @@ from inloop.solutions.views import (ModalConfirmationView, ModalInputView, Modal
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
 
-app_name = "solutions"
+app_name = 'solutions'
 urlpatterns = [
     # we assume that there will be no task slugs consisting entirely of digits
     url(

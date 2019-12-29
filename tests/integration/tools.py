@@ -19,7 +19,7 @@ class MessageTestCase(TestCase):
                 return
         msg = self._formatMessage(
             msg,
-            "The given response did not contain a message "
-            "with text \"{}\" and level \"{}\"".format(text, level)
+            'The given response did not contain a message '
+            'with text "{}" and level "{}"'.format(text, level)
         )
         raise self.failureException(msg)

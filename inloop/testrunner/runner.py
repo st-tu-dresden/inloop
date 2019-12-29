@@ -2,11 +2,11 @@ import logging
 import os
 import signal
 import subprocess
-import tempfile
 import time
 import uuid
 from collections import namedtuple
 from os.path import isabs, isdir, isfile, join, normpath, realpath
+from tempfile import TemporaryDirectory
 
 LOG = logging.getLogger(__name__)
 
@@ -19,13 +19,13 @@ def collect_files(path):
     retval = dict()
     files = [f for f in os.listdir(path) if isfile(join(path, f))]
     for filename in files:
-        with open(join(path, filename), encoding="utf-8") as f:
-            retval[filename] = f.read()
+        with open(join(path, filename)) as stream:
+            retval[filename] = stream.read()
     return retval
 
 
-TestOutput = namedtuple("TestOutput", "rc stdout stderr duration files")
-TestOutput.__doc__ = "Container type wrapping the outputs of a test run."
+TestOutput = namedtuple('TestOutput', 'rc stdout stderr duration files')
+TestOutput.__doc__ = 'Container type wrapping the outputs of a test run.'
 
 
 class DockerTestRunner:
@@ -66,9 +66,9 @@ class DockerTestRunner:
         Tests if the given path is absolute and a directory, raises ValueError otherwise.
         """
         if not isabs(path):
-            raise ValueError("not an absolute path: %s" % path)
+            raise ValueError(f'not an absolute path: {path}')
         if not isdir(path):
-            raise ValueError("not a directory: %s" % path)
+            raise ValueError(f'not a directory: {path}')
 
     def check_task(self, task_name, input_path):
         """
@@ -87,7 +87,7 @@ class DockerTestRunner:
         # inside the container. To allow users other than root to write outputs, we create
         # a world-writable subdirectory called "storage" (because a world-writable mount
         # point would have security implications).
-        with tempfile.TemporaryDirectory() as output_path:
+        with TemporaryDirectory() as output_path:
             # Resolve symbolic links:
             # On OS X, TMPDIR is set to some random subdir of /var/folders, which
             # resolves to /private/var/folders. Docker for Mac only accepts the
@@ -96,7 +96,7 @@ class DockerTestRunner:
             self.ensure_absolute_dir(output_path)
 
             os.chmod(output_path, mode=0o755)
-            storage_dir = join(output_path, "storage")
+            storage_dir = join(output_path, 'storage')
             os.mkdir(storage_dir)
             os.chmod(storage_dir, mode=0o1777)
 
@@ -114,7 +114,7 @@ class DockerTestRunner:
         path1 = normpath(path1)
         path2 = normpath(path2)
         if path1.startswith(path2) or path2.startswith(path1):
-            raise ValueError("a mountpoint must not be a subdirectory of another mountpoint")
+            raise ValueError('a mountpoint must not be a subdirectory of another mountpoint')
 
     def communicate(self, task_name, input_path, output_path):
         """
@@ -126,29 +126,29 @@ class DockerTestRunner:
         # otherwise each Ant Junit batch test takes about 5 seconds on Alpine
         # Linux based images (Ant tries to resolve the container's hostname).
         args = [
-            "docker",
-            "run",
-            "--rm",
-            "--read-only",
-            "--net=none",
-            "--hostname=localhost",
-            "--memory=%s" % self.config.get("memory", "256m"),
-            "--volume=%s:/checker/input:ro" % input_path,
-            "--volume=%s:/checker/output" % output_path,
-            "--tmpfs=/checker/scratch:size=%s" % self.config.get("fssize", "32m"),
-            "--name=%s" % ctr_id,
+            'docker',
+            'run',
+            '--rm',
+            '--read-only',
+            '--net=none',
+            '--hostname=localhost',
+            '--memory=%s' % self.config.get('memory', '256m'),
+            f'--volume={input_path}:/checker/input:ro',
+            f'--volume={output_path}:/checker/output',
+            '--tmpfs=/checker/scratch:size=%s' % self.config.get('fssize', '32m'),
+            f'--name={ctr_id}',
             self.image_name,
             task_name
         ]
 
-        LOG.debug("Popen args: %s", args)
+        LOG.debug('Popen args: %s', args)
 
         proc = subprocess.Popen(
             args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
         try:
-            stdout, stderr = proc.communicate(timeout=self.config.get("timeout", 30))
+            stdout, stderr = proc.communicate(timeout=self.config.get('timeout', 30))
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             # kills the client
@@ -157,16 +157,16 @@ class DockerTestRunner:
             rc = signal.SIGKILL
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
-            LOG.debug("removing timed out container %s", ctr_id)
-            subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
+            LOG.debug('removing timed out container %s', ctr_id)
+            subprocess.call(['docker', 'rm', '--force', str(ctr_id)], stdout=subprocess.DEVNULL)
 
-        stderr = stderr.decode("utf-8", errors="replace")
-        stdout = stdout.decode("utf-8", errors="replace")
+        stderr = stderr.decode('utf-8', errors='replace')
+        stdout = stdout.decode('utf-8', errors='replace')
 
-        LOG.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
+        LOG.debug('container %s: rc=%r stdout=%r stderr=%r', ctr_id, rc, stdout, stderr)
 
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
-            LOG.error("docker failure (rc=%d): %s", rc, stderr)
+            LOG.error('docker failure (rc=%d): %s', rc, stderr)
 
         return rc, stdout, stderr

@@ -7,8 +7,8 @@ from inloop.solutions.prettyprint.checkstyle import (context_from_xml_strings,
 
 from . import SAMPLES_PATH
 
-with SAMPLES_PATH.joinpath("checkstyle.xml").open() as fp:
-    CHECKSTYLE_SAMPLE_XML = fp.read()
+with open(SAMPLES_PATH / 'checkstyle.xml') as stream:
+    CHECKSTYLE_SAMPLE_XML = stream.read()
 
 CHECKSTYLE_SAMPLE_DATA = [{
     'version': '8.9'
@@ -73,10 +73,10 @@ class CheckstyleXMLTests(TestCase):
             xml_strings=[CHECKSTYLE_SAMPLE_XML], filter_keys=[])
 
     def test_extract(self):
-        data = extract_items_by_key(data=CHECKSTYLE_SAMPLE_DATA, key="file")
+        data = extract_items_by_key(data=CHECKSTYLE_SAMPLE_DATA, key='file')
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["tag"], "file")
-        self.assertEqual(len(data[0]["children"]), 3)
+        self.assertEqual(data[0]['tag'], 'file')
+        self.assertEqual(len(data[0]['children']), 3)
 
     def test_to_dict(self):
         element_tree = ElementTree.fromstring(CHECKSTYLE_SAMPLE_XML)
@@ -84,14 +84,14 @@ class CheckstyleXMLTests(TestCase):
         dictionary2 = element_tree_to_dict(element_tree, filter_keys=None)
         for dictionary in [dictionary1, dictionary2]:
             self.assertTrue(isinstance(dictionary, dict))
-            self.assertEqual(dictionary["tag"], "checkstyle")
-            self.assertTrue(len(dictionary["children"]) > 0)
-            self.assertEqual(dictionary["attrib"]["version"], "8.9")
+            self.assertEqual(dictionary['tag'], 'checkstyle')
+            self.assertTrue(len(dictionary['children']) > 0)
+            self.assertEqual(dictionary['attrib']['version'], '8.9')
 
     def test_extract_none(self):
         data1 = extract_items_by_key(data=None, key=None)
         data2 = extract_items_by_key(data=CHECKSTYLE_SAMPLE_DATA, key=None)
-        data3 = extract_items_by_key(data=None, key="file")
+        data3 = extract_items_by_key(data=None, key='file')
         for data in [data1, data2, data3]:
             self.assertEqual(data, [])
 

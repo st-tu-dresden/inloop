@@ -26,10 +26,10 @@ from inloop.tasks.models import Category, Task
 def index(request):
     categories = [
         (category, category.completion_info(request.user))
-        for category in Category.objects.order_by("display_order", "name")
+        for category in Category.objects.order_by('display_order', 'name')
     ]
-    return TemplateResponse(request, "tasks/index.html", {
-        "categories": categories,
+    return TemplateResponse(request, 'tasks/index.html', {
+        'categories': categories,
     })
 
 
@@ -37,10 +37,10 @@ def index(request):
 def category(request, slug):
     category = get_object_or_404(Category, slug=slug)
     tasks = category.task_set.published().completed_by_values(
-        request.user, "pubdate"
+        request.user, 'pubdate'
     )
     unpublished_tasks = category.task_set.unpublished().completed_by_values(
-        request.user, "pubdate"
+        request.user, 'pubdate'
     )
     have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(request, 'tasks/category.html', {
@@ -58,10 +58,10 @@ def serve_attachment(request, slug, path):
 
     Access is granted exclusively to whitelisted subdirectories.
     """
-    if re.search("^(images|attachments)/", path) is None:
+    if re.search('^(images|attachments)/', path) is None:
         raise PermissionDenied
 
-    if ".." in unquote(path):
+    if '..' in unquote(path):
         raise PermissionDenied
 
     # translate the slug into the internal task name
@@ -86,6 +86,6 @@ class TaskDetailView(LoginRequiredMixin, View):
             raise Http404
 
         if slug_or_name != task.slug:
-            return HttpResponseRedirect(reverse("tasks:detail", args=[task.slug]))
+            return HttpResponseRedirect(reverse('tasks:detail', args=[task.slug]))
 
-        return TemplateResponse(request, "tasks/detail.html", {"task": task, "active_tab": 0})
+        return TemplateResponse(request, 'tasks/detail.html', {'task': task, 'active_tab': 0})

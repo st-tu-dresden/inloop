@@ -41,18 +41,18 @@ class PlagiarismTestsAdmin(PlagiarismAdmin):
         Fetch the stored JPlag zip file and return it as a download.
         """
         if len(queryset) != 1:
-            msg = "You can only download one zip file at a time."
+            msg = 'You can only download one zip file at a time.'
             self.message_user(request, msg, messages.WARNING)
             return None
         zip_file = queryset[0].zip_file
         if not zip_file:
-            msg = "The selected test has no downloadable zip file."
+            msg = 'The selected test has no downloadable zip file.'
             self.message_user(request, msg, messages.WARNING)
             return None
-        with open(zip_file.path, "rb") as source:
-            response = HttpResponse(source, content_type="application/zip")
-        attachment = "attachment; filename=%s" % basename(zip_file.path)
-        response["Content-Disposition"] = attachment
+        with open(zip_file.path, mode='rb') as stream:
+            response = HttpResponse(stream, content_type='application/zip')
+        attachment = 'attachment; filename=%s' % basename(zip_file.path)
+        response['Content-Disposition'] = attachment
         return response
 
-    download_jplag_zip.short_description = "Download JPlag output as zip"
+    download_jplag_zip.short_description = 'Download JPlag output as zip'

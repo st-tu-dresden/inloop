@@ -10,9 +10,9 @@ from tests.solutions.mixins import SolutionsData
 class StatisticsTest(SolutionsData, TestCase):
     def setUp(self):
         super().setUp()
-        self.statistics_both = Statistics([self.passed_solution, self.failed_solution], "%Y-%m-%d")
-        self.statistics_passed_only = Statistics([self.passed_solution], "%Y-%m-%d")
-        self.statistics_failed_only = Statistics([self.failed_solution], "%Y-%m-%d")
+        self.statistics_both = Statistics([self.passed_solution, self.failed_solution], '%Y-%m-%d')
+        self.statistics_passed_only = Statistics([self.passed_solution], '%Y-%m-%d')
+        self.statistics_failed_only = Statistics([self.failed_solution], '%Y-%m-%d')
 
     def test_single_date_range(self):
         date = datetime.now()
@@ -30,15 +30,13 @@ class StatisticsTest(SolutionsData, TestCase):
         self.assertTrue(test_date in date_range)
 
     def test_statistics_empty_constructor(self):
-        msg = "Error should give a description."
-        try:
+        msg = 'Error should give a description.'
+        with self.assertRaises(ValueError) as context:
             Statistics(solutions=None)
-        except ValueError as e:
-            self.assertTrue(str(e), msg)
-        try:
-            Statistics(solutions=list())
-        except ValueError as e:
-            self.assertTrue(str(e), msg)
+        self.assertTrue(str(context.exception), msg)
+        with self.assertRaises(ValueError) as context:
+            Statistics(solutions=[])
+        self.assertTrue(str(context.exception), msg)
 
     def test_passed_after(self):
         self.assertEqual(self.statistics_both.passed_after, [(1, 1)])

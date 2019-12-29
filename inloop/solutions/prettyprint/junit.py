@@ -20,9 +20,9 @@ def checkeroutput_filter(queryset):
     a specific pattern.
     """
     return queryset.filter(
-        name__startswith="TEST-",
-        name__endswith=".xml"
-    ).values_list("output", flat=True)
+        name__startswith='TEST-',
+        name__endswith='.xml'
+    ).values_list('output', flat=True)
 
 
 def xml_to_dict(xml_report):
@@ -32,18 +32,18 @@ def xml_to_dict(xml_report):
 
 def testsuite_to_dict(testsuite):
     """Return a dict representation of the given <testsuite/> Element."""
-    if testsuite.tag != "testsuite":
-        raise ValueError("The root tag must be a <testsuite/>.")
+    if testsuite.tag != 'testsuite':
+        raise ValueError('The root tag must be a <testsuite/>.')
     ts = dict(testsuite.attrib)
-    for key in ["failures", "errors"]:
+    for key in ['failures', 'errors']:
         ts[key] = int(ts.get(key, 0))
-    ts["testcases"] = [
-        testcase_to_dict(testcase) for testcase in testsuite.findall("testcase")
+    ts['testcases'] = [
+        testcase_to_dict(testcase) for testcase in testsuite.findall('testcase')
     ]
-    ts["total"] = len(ts["testcases"])
-    ts["passed"] = ts["total"] - ts["failures"] - ts["errors"]
-    ts["system_out"] = get_text_safe(testsuite.find("system-out"))
-    ts["system_err"] = get_text_safe(testsuite.find("system-err"))
+    ts['total'] = len(ts['testcases'])
+    ts['passed'] = ts['total'] - ts['failures'] - ts['errors']
+    ts['system_out'] = get_text_safe(testsuite.find('system-out'))
+    ts['system_err'] = get_text_safe(testsuite.find('system-err'))
     return ts
 
 
@@ -57,10 +57,10 @@ def get_text_safe(element):
 def testcase_to_dict(testcase):
     """Return a dict representation of the given <testcase/> Element."""
     testcase_dict = dict(testcase.attrib)
-    for tag in ["failure", "error"]:
+    for tag in ['failure', 'error']:
         element = testcase.find(tag)
         if element is not None:
             element_dict = dict(element.attrib)
-            element_dict["stacktrace"] = element.text
+            element_dict['stacktrace'] = element.text
             testcase_dict[tag] = element_dict
     return testcase_dict

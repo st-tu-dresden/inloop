@@ -37,25 +37,25 @@ class SignupForm(RegistrationFormUniqueEmail):
             # re.compile() succeeds. If it fails to compile now, there must be some
             # serious error which we can't fix here and it's better to crash.
             regex = re.compile(pattern, re.VERBOSE)
-            if not regex.search(self.cleaned_data["email"]):
+            if not regex.search(self.cleaned_data['email']):
                 raise ValidationError(markdown(config.EMAIL_ERROR_MESSAGE))
         return super().clean_email()
 
     def clean_username(self):
         """Ensure no duplicate user names exist, using case-insensitive comparison."""
-        username = self.cleaned_data.get("username")
+        username = self.cleaned_data.get('username')
         if User.objects.filter(username__iexact=username):
-            raise forms.ValidationError("A user with that username already exists.")
+            raise forms.ValidationError('A user with that username already exists.')
         return username
 
 
 class StudentDetailsForm(forms.ModelForm):
     class Meta:
         model = StudentDetails
-        fields = ["matnum", "course"]
+        fields = ['matnum', 'course']
 
 
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name"]
+        fields = ['first_name', 'last_name']

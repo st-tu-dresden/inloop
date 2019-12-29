@@ -11,7 +11,7 @@ class RegexSyntaxValidatorTest(TestCase):
 
     def test_invalid_regex(self):
         with self.assertRaises(ValidationError):
-            self.validate("a+*")
+            self.validate('a+*')
 
     def test_valid_regex(self):
-        self.validate("valid regex")
+        self.validate('valid regex')

@@ -6,9 +6,9 @@ from django.db import migrations
 
 
 def populate_scoped_ids(apps, schema_editor):
-    User = apps.get_model("auth.User")
-    Solution = apps.get_model("solutions.Solution")
-    Task = apps.get_model("tasks.Task")
+    User = apps.get_model('auth.User')
+    Solution = apps.get_model('solutions.Solution')
+    Task = apps.get_model('tasks.Task')
 
     # ugly, but it works!
     for user in User.objects.all():

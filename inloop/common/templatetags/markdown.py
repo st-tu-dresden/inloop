@@ -17,11 +17,11 @@ from markdown import Markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
 
 register = Library()
-convert = Markdown(output_format="html5", extensions=[
-    "markdown.extensions.toc",
-    "markdown.extensions.smarty",
-    "markdown.extensions.fenced_code",
-    "markdown.extensions.tables",
+convert = Markdown(output_format='html5', extensions=[
+    'markdown.extensions.toc',
+    'markdown.extensions.smarty',
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.tables',
     CodeHiliteExtension(use_pygments=False)
 ]).convert
 

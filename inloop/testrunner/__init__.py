@@ -1,1 +1,1 @@
-default_app_config = "inloop.testrunner.apps.TestRunnerConfig"
+default_app_config = 'inloop.testrunner.apps.TestRunnerConfig'

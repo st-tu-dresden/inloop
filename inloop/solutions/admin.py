@@ -16,7 +16,7 @@ class SolutionFileInline(admin.StackedInline):
 class SemesterFieldListFilter(admin.DateFieldListFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.title = "semester"
+        self.title = 'semester'
         self.links = self.generate_links()
 
     def generate_links(self):
@@ -32,11 +32,11 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
         winter_start = datetime(2018, 10, 1, tzinfo=tzinfo_cest)
 
         for year in range(first_solution.submission_date.year, now().year + 1):
-            semesters.append(("Summer {}".format(year), {
+            semesters.append((f'Summer {year}', {
                 self.lookup_kwarg_since: str(summer_start.replace(year)),
                 self.lookup_kwarg_until: str(winter_start.replace(year))
             }))
-            semesters.append(("Winter {}/{}".format(year, year + 1), {
+            semesters.append((f'Winter {year}/{year + 1}', {
                 self.lookup_kwarg_since: str(winter_start.replace(year)),
                 self.lookup_kwarg_until: str(summer_start.replace(year=year + 1))
             }))
@@ -46,10 +46,10 @@ class SemesterFieldListFilter(admin.DateFieldListFilter):
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
     class Media:
-        css = {"all": ["css/admin/solutions.css"]}
-        js = ["vendor/js/Chart.min.js"]
+        css = {'all': ['css/admin/solutions.css']}
+        js = ['vendor/js/Chart.min.js']
 
-    change_list_template = "admin/solutions/solutions.html"
+    change_list_template = 'admin/solutions/solutions.html'
     inlines = [SolutionFileInline]
     list_display = ['id', 'author', 'task', 'submission_date', 'passed', 'site_link']
     list_filter = [
@@ -65,17 +65,17 @@ class SolutionAdmin(admin.ModelAdmin):
     readonly_fields = ['task', 'submission_date', 'task', 'author', 'passed']
 
     def site_link(self, obj):
-        return '<a href="%s">%s details</a>' % (obj.get_absolute_url(), obj)
+        return f'<a href="{obj.get_absolute_url()}">{obj} details</a>'
 
     def changelist_view(self, request, extra_context=None):
         """Filter admin view by the selected viewport filter."""
         solutions = Solution.objects.filter(**request.GET.dict())
         extra = {}
         if solutions:
-            extra["statistics"] = Statistics(solutions)
+            extra['statistics'] = Statistics(solutions)
         if extra_context is not None:
             extra.update(extra_context)
         return super().changelist_view(request, extra_context=extra)
 
     site_link.allow_tags = True
-    site_link.short_description = "View on site"
+    site_link.short_description = 'View on site'

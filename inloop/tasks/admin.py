@@ -28,7 +28,7 @@ class TaskAdmin(PlagiarismAdmin):
         Admin action which starts a plagiarism check on the selected tasks.
         """
         jplag_check_async(users=User.objects.all(), tasks=queryset)
-        msg = "The JPlag check has been started, please check the PlagiarismTests page."
+        msg = 'The JPlag check has been started, please check the PlagiarismTests page.'
         self.message_user(request, msg, messages.SUCCESS)
 
     jplag_check_tasks.short_description = 'Check selected tasks for plagiarism'
@@ -48,7 +48,7 @@ class CategoryAdmin(PlagiarismAdmin):
         """
         tasks = Task.objects.filter(category__in=queryset)
         jplag_check_async(users=User.objects.all(), tasks=tasks)
-        msg = "The JPlag check has been started, please check the PlagiarismTests page."
+        msg = 'The JPlag check has been started, please check the PlagiarismTests page.'
         self.message_user(request, msg, messages.SUCCESS)
 
     jplag_check_category.short_description = 'Check selected categories for plagiarism'

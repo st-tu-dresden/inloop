@@ -57,8 +57,8 @@ class TestResult(models.Model):
     """
     solution = models.ForeignKey(Solution, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    stdout = models.TextField(default="")
-    stderr = models.TextField(default="")
+    stdout = models.TextField(default='')
+    stderr = models.TextField(default='')
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
 
@@ -69,29 +69,29 @@ class TestResult(models.Model):
         return self.return_code == 0
 
     is_success.boolean = True
-    is_success.short_description = "Successful"
+    is_success.short_description = 'Successful'
 
     def runtime(self):
-        return "%.2f" % self.time_taken
+        return f'{self.time_taken:.2f}'
 
-    runtime.admin_order_field = "time_taken"
-    runtime.short_description = "Runtime (seconds)"
+    runtime.admin_order_field = 'time_taken'
+    runtime.short_description = 'Runtime (seconds)'
 
     def status(self):
         if self.return_code == 0:
-            return "success"
+            return 'success'
         if self.return_code == signal.SIGKILL:
-            return "killed"
+            return 'killed'
         if self.return_code in (125, 126, 127):
-            return "error"
-        return "failure"
+            return 'error'
+        return 'failure'
 
     def __repr__(self):
-        return "<%s: solution_id=%r return_code=%r>" % \
+        return '<%s: solution_id=%r return_code=%r>' %\
             (self.__class__.__name__, self.solution_id, self.return_code)
 
     def __str__(self):
-        return "Result #%s" % self.id
+        return f'Result #{self.id}'
 
 
 class TestOutput(models.Model):

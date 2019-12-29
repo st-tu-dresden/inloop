@@ -5,26 +5,26 @@ class CheckstyleData:
 
     def __init__(self, checkstyle_context, solution_files):
         if checkstyle_context is None:
-            raise ValueError("Checkstyle context must not be empty!")
+            raise ValueError('Checkstyle context must not be empty!')
         if solution_files is None:
-            raise ValueError("Solution files must not be empty!")
+            raise ValueError('Solution files must not be empty!')
 
-        self.files = extract_items_by_key(data=checkstyle_context, key="file")
+        self.files = extract_items_by_key(data=checkstyle_context, key='file')
         self.files = assign_sources_to_files(self.files, solution_files)
         self.files = assign_code_to_errors(self.files)
         self.files = assign_grouped_errors(self.files)
         self.files = remove_input_path(self.files)
 
         self.total_errors = sum(
-            [len(file["checkstyle_errors"]) for file in self.files]
+            [len(file['checkstyle_errors']) for file in self.files]
         )
         self.total_warnings = sum(
-            [len(file["checkstyle_warnings"]) for file in self.files]
+            [len(file['checkstyle_warnings']) for file in self.files]
         )
         self.total_issues = self.total_warnings + self.total_errors
 
     def __repr__(self):
-        return "<CheckstyleDict {}>".format(self.files)
+        return f'<CheckstyleDict {self.files}>'
 
 
 def extract_items_by_key(*, data, key):
@@ -44,8 +44,8 @@ def extract_items_by_key(*, data, key):
     values = []
     if isinstance(data, dict):
         try:
-            tag = data["tag"]
-            children = data["children"]
+            tag = data['tag']
+            children = data['children']
         except KeyError:
             return values
         if tag == key:
@@ -75,7 +75,7 @@ def xml_strings_from_testoutput(*, testoutput_set, startswith, endswith):
         name__startswith=startswith,
         name__endswith=endswith
     )
-    flattened_set = filtered_set.values_list("output", flat=True)
+    flattened_set = filtered_set.values_list('output', flat=True)
     return flattened_set
 
 
@@ -123,10 +123,10 @@ def element_tree_to_dict(tree, filter_keys):
     else:
         children = tree.getchildren()
     return {
-        "tag": tree.tag,
-        "attrib": tree.attrib,
-        "text": tree.text,
-        "children": [
+        'tag': tree.tag,
+        'attrib': tree.attrib,
+        'text': tree.text,
+        'children': [
             element_tree_to_dict(child, filter_keys)
             for child in children
         ],
@@ -145,12 +145,12 @@ def assign_sources_to_files(checkstyle_files, solution_files):
         list: The checkstyle_files with assigned source code.
     """
     for f in checkstyle_files:
-        file_paths = f["attrib"]["name"].split("/")
+        file_paths = f['attrib']['name'].split('/')
         if file_paths:
             file_name = file_paths[-1]
             for solution_file in solution_files:
                 if solution_file.name == file_name:
-                    f["source"] = solution_file.contents
+                    f['source'] = solution_file.contents
                     break
     return checkstyle_files
 
@@ -167,13 +167,13 @@ def assign_code_to_errors(checkstyle_files):
         list: The checkstyle_files list with assigned code lines.
     """
     for f in checkstyle_files:
-        source_split = f["source"].splitlines()
+        source_split = f['source'].splitlines()
         # Insert empty code line on top to match Checkstyle output
         # since the 1st code line is the line in source_split
         # with the index 0. We shift the list by 1.
-        source_split.insert(0, "\n")
-        for error in [e for e in f["children"] if e["tag"] == "error"]:
-            error["code"] = source_split[int(error["attrib"]["line"])]
+        source_split.insert(0, '\n')
+        for error in [e for e in f['children'] if e['tag'] == 'error']:
+            error['code'] = source_split[int(error['attrib']['line'])]
     return checkstyle_files
 
 
@@ -189,18 +189,18 @@ def assign_grouped_errors(checkstyle_files):
         list: The checkstyle_files with grouped errors.
     """
     for f in checkstyle_files:
-        f["checkstyle_errors"] = [
-            e for e in f["children"] if e["attrib"]["severity"] == "error"
+        f['checkstyle_errors'] = [
+            e for e in f['children'] if e['attrib']['severity'] == 'error'
         ]
-        f["checkstyle_warnings"] = [
-            e for e in f["children"] if e["attrib"]["severity"] == "warning"
+        f['checkstyle_warnings'] = [
+            e for e in f['children'] if e['attrib']['severity'] == 'warning'
         ]
-        f["total_checkstyle_errors"] = len(f["checkstyle_errors"])
-        f["total_checkstyle_warnings"] = len(f["checkstyle_warnings"])
+        f['total_checkstyle_errors'] = len(f['checkstyle_errors'])
+        f['total_checkstyle_warnings'] = len(f['checkstyle_warnings'])
     return checkstyle_files
 
 
-def remove_input_path(checkstyle_files, input_path="/checker/input/"):
+def remove_input_path(checkstyle_files, input_path='/checker/input/'):
     """
     Removes the input path from the checkstyle_files list.
 
@@ -212,5 +212,5 @@ def remove_input_path(checkstyle_files, input_path="/checker/input/"):
         list: The checkstyle_files with modified input paths.
     """
     for f in checkstyle_files:
-        f["attrib"]["name"] = f["attrib"]["name"].replace(input_path, "")
+        f['attrib']['name'] = f['attrib']['name'].replace(input_path, '')
     return checkstyle_files
