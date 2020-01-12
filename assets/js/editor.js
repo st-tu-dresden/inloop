@@ -707,7 +707,7 @@ class TabBar {
      */
     createNewEmptyTab() {
         let self = this;
-        let inputForm = new ModalInputForm("Choose a name for your new File.", "New.java");
+        let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
         inputForm.addOnInputCallback(function(fileName) {
             if (fileName === undefined || fileName === "") return;
             if (fileBuilder.contains(fileName)) {
