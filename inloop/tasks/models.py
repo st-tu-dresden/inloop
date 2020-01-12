@@ -45,15 +45,15 @@ class TaskQuerySet(models.QuerySet):
     def not_completed_by(self, user):
         return self.exclude(id__in=self.completed_by(user).values('id'))
 
-    def completed_by_values(self, user, sort_field):
-        qs = self.order_by(sort_field)
+    def completed_by_values(self, user, *, order_by):
+        qs = self.order_by(order_by)
         qs1 = qs.completed_by(user).annotate(completed=Value(True, BooleanField()))
         qs2 = qs.not_completed_by(user).annotate(completed=Value(False, BooleanField()))
-        reverse = sort_field.startswith('-')
-        sort_field = sort_field.lstrip('-')
+        reverse = order_by.startswith('-')
+        order_by = order_by.lstrip('-')
 
         def keyfunc(task):
-            return getattr(task, sort_field)
+            return getattr(task, order_by)
 
         return sorted(itertools.chain(qs1, qs2), key=keyfunc, reverse=reverse)
 
