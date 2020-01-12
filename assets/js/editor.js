@@ -707,7 +707,7 @@ class TabBar {
      */
     createNewEmptyTab() {
         let self = this;
-        let inputForm = new ModalInputForm("Choose a name for your new File.", "New.java");
+        let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
         inputForm.addOnInputCallback(function(fileName) {
             if (fileName === undefined || fileName === "") return;
             if (fileBuilder.contains(fileName)) {
@@ -720,7 +720,7 @@ class TabBar {
                 modal.load();
                 return;
             }
-            let file = fileBuilder.build(fileName, "\n");
+            let file = fileBuilder.build(fileName, "");
             hashComparator.lookForChanges(fileBuilder.files);
             if (file === undefined) return;
             self.createNewTab(file);
@@ -763,6 +763,7 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
+        $("#editor textarea").focus();
     }
 
     /**
@@ -861,8 +862,8 @@ class Editor {
             mode: "ace/mode/java",
             newLineMode: "auto",
             tabSize: 4,
-            enableBasicAutocompletion: true,
-            enableLiveAutocompletion: true,
+            enableBasicAutocompletion: false,
+            enableLiveAutocompletion: false,
             maxLines: Infinity,
             fontFamily: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
             fontSize: "10.5pt",
