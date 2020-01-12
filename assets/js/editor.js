@@ -763,6 +763,7 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
+        $("#editor textarea").focus();
     }
 
     /**
