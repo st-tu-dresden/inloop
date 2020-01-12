@@ -422,6 +422,15 @@ code {
   border-radius: 4px;
 }
 
+/*
+ * Fix tooltip flickering issue in the editor tab bar, caused
+ * by a li + li sibling rule in bootstrap.css. That sibling rule
+ * doesn't apply when the tooltip is dynamically inserted as a
+ * <div> element between the <li> elements.
+ */
+.nav-pills li             { margin-left: 2px; }
+.nav-pills li:first-child { margin-left: 0; }
+
 .unsaved {
   background-color: #e74c3c !important;
   color: #fff;
