@@ -22,6 +22,7 @@ class TaskAdmin(PlagiarismAdmin):
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title', )}
     actions = ['jplag_check_tasks']
+    ordering = ['pubdate', 'deadline', 'title']
 
     def jplag_check_tasks(self, request, queryset):
         """

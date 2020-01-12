@@ -77,7 +77,7 @@ class Task(models.Model):
     """Represents the tasks that are presented to the user to solve."""
 
     class Meta:
-        ordering = ['deadline', 'pubdate', 'title']
+        ordering = ['title']
 
     # mandatory fields
     title = models.CharField(max_length=100, help_text='Task title')
