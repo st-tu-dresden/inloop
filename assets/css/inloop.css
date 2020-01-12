@@ -408,15 +408,15 @@ code {
   padding-bottom: 16px;
 }
 
-.nav.scrollable>li {
+.nav.scrollable > li {
   float: none;
   background-color: rgb(245, 245, 245);
   border-radius: 4px;
 }
 
-.nav-pills>li.active>a,
-.nav-pills>li.active>a:focus,
-.nav-pills>li.active>a:hover {
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:focus,
+.nav-pills > li.active > a:hover {
   float: none;
   background-color: #3867d6;
   border-radius: 4px;
