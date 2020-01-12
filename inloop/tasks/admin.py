@@ -11,11 +11,11 @@ User = get_user_model()
 @admin.register(Task)
 class TaskAdmin(PlagiarismAdmin):
     fieldsets = [(None, {
-        'fields': ['title', 'category']
+        'fields': ['slug', 'title', 'category']
     }), ('Date Information', {
         'fields': ['pubdate', 'deadline']
     }), ('Content', {
-        'fields': ['description', 'slug']
+        'fields': ['description']
     })]
     list_display = ['title', 'category', 'pubdate', 'deadline']
     list_filter = ['pubdate', 'deadline', 'category']
