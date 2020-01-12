@@ -720,7 +720,7 @@ class TabBar {
                 modal.load();
                 return;
             }
-            let file = fileBuilder.build(fileName, "\n");
+            let file = fileBuilder.build(fileName, "");
             hashComparator.lookForChanges(fileBuilder.files);
             if (file === undefined) return;
             self.createNewTab(file);
