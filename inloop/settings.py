@@ -79,7 +79,7 @@ if DEBUG:
     if env.bool('DJDT', default=False):
         INSTALLED_APPS.append('debug_toolbar')
         MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
-        ROOT_URLCONF = 'inloop.debug_urls'
+        ROOT_URLCONF = 'inloop.urls_debug'
     if env.bool('VALIDATE_HTML', default=False):
         HTMLVALIDATOR_VNU_URL = f"http://localhost:{env.int('VNU_PORT')}/"
         HTMLVALIDATOR_ENABLED = True
