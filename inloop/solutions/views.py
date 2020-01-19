@@ -29,7 +29,57 @@ class SolutionStatusView(LoginRequiredMixin, View):
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
 
 
-class SolutionEditorView(LoginRequiredMixin, View):
+class SolutionSubmissionView(LoginRequiredMixin, View):
+
+    class Error(ValueError):
+        pass
+
+    def get_task(self, slug):
+        try:
+            task = Task.objects.published().get(slug=slug)
+        except Task.DoesNotExist:
+            raise SolutionSubmissionView.Error(
+                'This task does not exist.'
+            )
+        if task.is_expired:
+            raise SolutionSubmissionView.Error(
+                'The deadline for this task has passed.'
+            )
+
+        return task
+
+    def submit(self, files, author, task):
+        if not files:
+            raise SolutionSubmissionView.Error(
+                "You haven't uploaded any files."
+            )
+
+        try:
+            validate_filenames([f.name for f in files])
+        except ValidationError as e:
+            raise SolutionSubmissionView.Error(
+                str(e)
+            )
+
+        with transaction.atomic():
+            solution = Solution.objects.create(author=author, task=task)
+            SolutionFile.objects.bulk_create([
+                SolutionFile(solution=solution, file=f) for f in files
+            ])
+
+        solution_submitted.send(sender=self.__class__, solution=solution)
+
+
+class SolutionEditorView(SolutionSubmissionView):
+
+    class JsonFailureResponse(JsonResponse):
+        def __init__(self):
+            super().__init__({'success': False})
+
+    class JsonSuccessResponse(JsonResponse):
+        def __init__(self):
+            super().__init__({'success': True})
+
     def get(self, request, slug):
         return TemplateResponse(request, 'solutions/editor/editor.html', {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
@@ -37,46 +87,53 @@ class SolutionEditorView(LoginRequiredMixin, View):
         })
 
     def post(self, request, slug):
-        task = get_object_or_404(Task.objects.published(), slug=slug)
-        failure_response = JsonResponse({'success': False})
-
         if not request.is_ajax():
-            return failure_response
+            return SolutionEditorView.JsonFailureResponse()
 
-        if task.is_expired:
-            messages.error(request, 'The deadline for this task has passed.')
-            return failure_response
+        try:
+            task = self.get_task(slug)
+        except SolutionSubmissionView.Error as e:
+            messages.error(request, e)
+            return SolutionEditorView.JsonFailureResponse()
 
         try:
             json_data = json.loads(request.body)
-            uploads = json_data['uploads']
-        except (KeyError, json.JSONDecodeError):
-            return failure_response
+        except json.JSONDecodeError:
+            return SolutionEditorView.JsonFailureResponse()
 
-        if not uploads:
-            messages.error(request, "You haven't uploaded any files.")
-            return failure_response
-
-        try:
-            validate_filenames(uploads.keys())
-        except ValidationError as error:
-            messages.error(request, error.message)
-            return failure_response
-
+        uploads = json_data.get('uploads', {})
         files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
 
-        with transaction.atomic():
-            solution = Solution.objects.create(
-                author=request.user,
-                task=task
-            )
-            SolutionFile.objects.bulk_create([
-                SolutionFile(solution=solution, file=f) for f in files
-            ])
+        try:
+            self.submit(files, request.user, task)
+        except SolutionSubmissionView.Error as e:
+            messages.error(request, str(e))
+            return SolutionEditorView.JsonFailureResponse()
 
-        solution_submitted.send(sender=self.__class__, solution=solution)
         messages.success(request, 'Your solution has been submitted to the checker.')
-        return JsonResponse({'success': True})
+        return SolutionEditorView.JsonSuccessResponse()
+
+
+class SolutionUploadView(SolutionSubmissionView):
+    def get(self, request, slug):
+        return TemplateResponse(request, 'solutions/upload_form.html', {
+            'task': get_object_or_404(Task.objects.published(), slug=slug),
+            'active_tab': 2
+        })
+
+    def post(self, request, slug):
+        task = self.get_task(slug)
+
+        files = request.FILES.getlist('uploads', default=[])
+
+        try:
+            self.submit(files, request.user, task)
+        except SolutionEditorView.Error as e:
+            messages.error(request, str(e))
+            return redirect('solutions:upload', slug=slug)
+
+        messages.success(request, 'Your solution has been submitted to the checker.')
+        return redirect('solutions:list', slug=slug)
 
 
 class ModularEditorTabView(LoginRequiredMixin, View):
@@ -133,47 +190,6 @@ class ModalConfirmationView(LoginRequiredMixin, View):
             'confirm_button_hook': confirm_button_hook,
             'cancel_button_hook': cancel_button_hook
         })
-
-
-class SolutionUploadView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        return TemplateResponse(request, 'solutions/upload_form.html', {
-            'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 2
-        })
-
-    def post(self, request, slug):
-        task = get_object_or_404(Task.objects.published(), slug=slug)
-        redirect_to_upload = redirect('solutions:upload', slug=slug)
-
-        if task.is_expired:
-            messages.error(request, 'The deadline for this task has passed.')
-            return redirect_to_upload
-
-        uploads = request.FILES.getlist('uploads')
-
-        if not uploads:
-            messages.error(request, "You haven't uploaded any files.")
-            return redirect_to_upload
-
-        try:
-            validate_filenames([f.name for f in uploads])
-        except ValidationError as error:
-            messages.error(request, error.message)
-            return redirect_to_upload
-
-        with transaction.atomic():
-            solution = Solution.objects.create(
-                author=request.user,
-                task=task
-            )
-            SolutionFile.objects.bulk_create([
-                SolutionFile(solution=solution, file=upload) for upload in uploads
-            ])
-
-        solution_submitted.send(sender=self.__class__, solution=solution)
-        messages.success(request, 'Your solution has been submitted to the checker.')
-        return redirect('solutions:list', slug=slug)
 
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
