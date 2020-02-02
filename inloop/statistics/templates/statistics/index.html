@@ -1,0 +1,101 @@
+{% load static %}
+
+{% if user and user.is_superuser or user.is_staff %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="Philipp Matthes, template based on the work of Mark Otto, Jacob Thornton, and Bootstrap contributors">
+
+  <title>{% block title_head %}Statistics{% endblock %}</title>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'statistics/vendor/css/bootstrap.4.4.min.css' %}">
+
+  {% block extrahead %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Statistics</a>
+  <button class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbar-toggler"
+          aria-controls="navbar-toggler"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbar-toggler">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <a class="nav-link"
+           onclick="window.submissionsHistogram.load()"
+           href="#">
+          Submissions Histogram
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link"
+           onclick="window.attemptsHistogram.load()"
+           href="#">
+          Attempts Histogram
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <main id="main-window" role="main" class="col-lg-12 px-4">
+      <div class="d-flex flex-row justify-content-center align-items-center"
+           style="min-height: 90vh;">
+        <img height="200" width="200" alt="Statistics Icon" style="opacity: 0.1"
+             src="{% static 'statistics/img/statistics.svg' %}">
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'statistics/vendor/js/jquery.min.js' %}"></script>
+<script src="{% static 'statistics/vendor/js/bootstrap.4.4.min.js' %}"></script>
+<script src="{% static 'statistics/vendor/js/moment.min.js' %}"></script>
+<script src="{% static 'statistics/vendor/js/Chart.min.js' %}"></script>
+
+<script src="{% static 'statistics/js/datetools.js' %}"></script>
+
+<script src="{% static 'statistics/js/attempts.histogram.js' %}"></script>
+<script src="{% static 'statistics/js/submissions.histogram.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  (function configureModules() {
+    const querysetLimit = 10000;
+
+    window.attemptsHistogram.configure(
+      "{% url 'statistics:attempts_histogram' %}",
+      "{% url 'statistics:attempts_histogram_api' %}",
+      "{{ csrf_token }}",
+      querysetLimit
+    );
+    window.submissionsHistogram.configure(
+      "{% url 'statistics:submissions_histogram' %}",
+      "{% url 'statistics:submissions_histogram_api' %}",
+      "{{ csrf_token }}",
+      querysetLimit
+    );
+  })();
+});
+</script>
+
+</body>
+
+</html>
+{% else %}
+You are not allowed to watch this page.
+{% endif %}
