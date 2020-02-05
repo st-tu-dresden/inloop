@@ -91,12 +91,38 @@ branch will be hard to integrate into `master`. Divide and conquer!
 
 ### Commit messages
 
-We care about a [usable Git history][good-commits1] and are picky about [well-formed commit
-messages][good-commits2]. Put as much effort into your commit messages as into your code,
-other people will appreciate it.
+Rules (courtesy of [Chris Beams][good-commits1]):
 
-Pull requests containing [unhelpful commit messages][ugly-commits] won't be accepted.
+1. Separate subject from body with a blank line
+2. Limit the subject line to 50 characters
+3. Capitalize the subject line
+4. Do not end the subject line with a period
+5. Use the imperative mood in the subject line
+6. Wrap the body at 72 characters
+7. Use the body to explain _what_ and _why_ (not _how_)
 
+Model message (based on [Tim Pope's][good-commits2]):
+
+    Capitalized, short (50 chars or less) summary
+
+    More detailed explanatory text, if necessary.  Wrap it to about 72
+    characters or so.  In some contexts, the first line is treated as the
+    subject of an email and the rest of the text as the body.  The blank
+    line separating the summary from the body is critical (unless you omit
+    the body entirely); tools like rebase can get confused if you run the
+    two together.
+
+    - Bullet points are possible, too
+    - Another bullet point
+
+    Fixes: #123
+    See also: #456, #789
+
+For example, take a look at the following commits in our repo:
+
+- https://github.com/st-tu-dresden/inloop/commit/8ec193045b69842894c43b1e956e8b900fbd8623
+- https://github.com/st-tu-dresden/inloop/commit/c8ff40c207c8b7d101eaa084642bfe194dd6dd9b
+- https://github.com/st-tu-dresden/inloop/commit/a808cc0422bffe621191d3166c597fcffd4886d2
 
 
 [django-testing]: https://docs.djangoproject.com/en/stable/topics/testing/
@@ -104,7 +130,6 @@ Pull requests containing [unhelpful commit messages][ugly-commits] won't be acce
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 [google-style]: https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings
 [gh-flow]: https://guides.github.com/introduction/flow/
-[ugly-commits]: http://stopwritingramblingcommitmessages.com/
 [good-commits1]: http://chris.beams.io/posts/git-commit/
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [nu-validator]: https://validator.w3.org/nu/
