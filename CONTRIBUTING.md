@@ -84,9 +84,17 @@ branch will be hard to integrate into `master`. Divide and conquer!
   * Use the [W3C Nu validator][nu-validator] to verify that the output of processed templates is
     valid HTML5.
 * JavaScript:
+  * New code should use modern JavaScript, a.k.a. _ECMAScript 2015_ or _ES6_.
+    * Start JS files with `"use strict";`.
+    * Write classes with the `class` syntax.
+    * Prefer `let` over `var`, use `const` whenever possible.
+    * Use arrow function expressions where appropriate.
+  * Use the new APIs: Promise API, Fetch API, etc.
+  * Avoid deep nesting.
+  * Avoid polluting the global namespace (`window`).
   * Avoid inline scripts (i.e., inside `<script>` tags).
+  * Don't use jQuery if there's an easy JS-native way to do it.
   * Docstrings must follow the [JSDoc documentation specifications][jsdoc].
-
 
 
 ### Commit messages
