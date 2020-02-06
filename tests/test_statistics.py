@@ -14,7 +14,7 @@ from inloop.statistics.validators import (ALLOWED_TRUNCATOR_IDENTIFIERS, ISOFORM
                                           get_optional_bool, get_optional_int,
                                           get_optional_timestamp,
                                           get_optional_truncator_identifier)
-from inloop.statistics.views import bad_json_request, queryset_limit_reached
+from inloop.statistics.views import bad_request, queryset_limit_reached
 from inloop.tasks.models import Category, Task
 
 User = get_user_model()
@@ -144,11 +144,10 @@ class ValidatorTest(TestCase):
                 self.fail(f'get_optional_truncator_identifier should accept {repr(valid_value)}')
 
 
-class BadJsonRequestTest(TestCase):
-    def test_bad_json_request(self):
-        """Test the bad json request response."""
+class BadRequestTest(TestCase):
+    def test_bad_request(self):
         reason = 'test_reason'
-        response = bad_json_request(reason=reason)
+        response = bad_request(reason)
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         content = response.content.decode()
         try:

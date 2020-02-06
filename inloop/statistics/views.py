@@ -14,7 +14,7 @@ from inloop.statistics.validators import (get_optional_bool, get_optional_int,
                                           get_optional_truncator_identifier)
 
 
-def bad_json_request(reason: str = 'Malformed JSON') -> JsonResponse:
+def bad_request(reason: str) -> JsonResponse:
     """
     Return a Json Response to indicate a bad json request.
 
@@ -84,7 +84,7 @@ class SubmissionsHistogramJsonView(AdminView):
             category_id = get_optional_int('category_id', request.GET)
             granularity = get_optional_truncator_identifier('granularity', request.GET)
         except ValidationError as e:
-            return bad_json_request(reason=e.message)
+            return bad_request(e.message)
 
         truncator = functions.Trunc('submission_date', granularity)
 
@@ -141,9 +141,9 @@ class AttemptsHistogramJsonView(AdminView):
             queryset_limit = get_optional_int('queryset_limit', request.GET)
             task_id = get_optional_int('task_id', request.GET)
         except ValidationError as e:
-            return bad_json_request(reason=e.message)
+            return bad_request(e.message)
         if task_id is None:
-            return bad_json_request(reason='The parameter task_id must be supplied.')
+            return bad_request('The parameter task_id must be supplied.')
 
         queryset = Solution.objects \
             .filter(passed=True, task_id=task_id) \
