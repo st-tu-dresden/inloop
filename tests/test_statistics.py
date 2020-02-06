@@ -69,7 +69,7 @@ class TruncatorAvailabilityTest(TestCase):
         )
 
     def test_allowed_truncator_identifiers(self):
-        """Validate, that all allowed truncator identifiers are supported by the backend."""
+        """Validate that all allowed truncator identifiers are supported by the backend."""
         field_name = 'submission_date'
         for identifier in ALLOWED_TRUNCATOR_IDENTIFIERS:
             trunc = functions.Trunc(field_name, identifier)
@@ -85,7 +85,7 @@ class TruncatorAvailabilityTest(TestCase):
 class ValidatorTest(TestCase):
     def test_get_optional_timestamp(self):
         """Test the timestamp validator."""
-        self.assertIsNone(get_optional_timestamp('inexistent_key', {}))
+        self.assertIsNone(get_optional_timestamp('nonexistent_key', {}))
         with self.assertRaises(ValidationError):
             get_optional_timestamp('date', {
                 'date': '2020-01-01T00:00:00.000Z invalid appended text'
@@ -100,7 +100,7 @@ class ValidatorTest(TestCase):
 
     def test_get_optional_int(self):
         """Test the integer validator."""
-        self.assertIsNone(get_optional_int('inexistent_key', {}))
+        self.assertIsNone(get_optional_int('nonexistent_key', {}))
         with self.assertRaises(ValidationError):
             get_optional_int('int', {
                 'int': 'undefined'
@@ -115,7 +115,7 @@ class ValidatorTest(TestCase):
 
     def test_get_optional_bool(self):
         """Test the boolean validator."""
-        self.assertIsNone(get_optional_bool('inexistent_key', {}))
+        self.assertIsNone(get_optional_bool('nonexistent_key', {}))
         with self.assertRaises(ValidationError):
             get_optional_bool('bool', {
                 'bool': 'undefined'
@@ -129,8 +129,8 @@ class ValidatorTest(TestCase):
                 self.fail(f'get_optional_bool should accept {repr(valid_value)}')
 
     def test_get_optional_truncator_identifier(self):
-        """Test the optinoal truncator identifier validator."""
-        self.assertIsNone(get_optional_truncator_identifier('inexistent_key', {}))
+        """Test the optional truncator identifier validator."""
+        self.assertIsNone(get_optional_truncator_identifier('nonexistent_key', {}))
         with self.assertRaises(ValidationError):
             get_optional_truncator_identifier('truncator', {
                 'truncator': 'lightyears'
@@ -214,22 +214,22 @@ class SubmissionsHistogramJsonViewTest(TestCase):
         except NoReverseMatch as e:
             self.fail(e)
 
-    def test_bad_json_request(self):
-        """Test the view's response to a malformed json request."""
+    def test_bad_request(self):
+        """Test the view's response to a bad request."""
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {'from_timestamp': '😈'}, follow=True)
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_queryset_limit_reached(self):
-        """Test the views' response to crossing the queryset limit."""
+        """Test the view's response to exceeding the queryset limit."""
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {'queryset_limit': 0}, follow=True)
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_histogram(self):
         """
-        Validate, that the histogram is formed
-        correctly, when all parameters are supplied.
+        Validate that the histogram is formed
+        correctly when all parameters are supplied.
         """
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {
@@ -321,8 +321,8 @@ class AttemptsHistogramJsonViewTest(TestCase):
 
     def test_histogram(self):
         """
-        Validate, that the histogram is formed
-        correctly, when all parameters are supplied.
+        Validate that the histogram is formed
+        correctly when all parameters are supplied.
         """
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {

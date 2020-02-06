@@ -16,9 +16,9 @@ from inloop.statistics.validators import (get_optional_bool, get_optional_int,
 
 def bad_request(reason: str) -> JsonResponse:
     """
-    Return a Json Response to indicate a bad json request.
+    Return a JsonResponse to indicate a bad json request.
 
-    The returned Json Response has the HTTP response code 403 and
+    The returned JsonResponse has the HTTP response code 400 and
     contains a configurable reason, which can be taken for error handling.
     """
     return JsonResponse({'reason': reason}, status=HTTPStatus.BAD_REQUEST)
@@ -29,12 +29,12 @@ def queryset_limit_reached(
     reason: str = 'Queryset limit reached'
 ) -> JsonResponse:
     """
-    Return a Json Response to indicate, that the queryset limit was reached.
+    Return a JsonResponse to indicate that the queryset limit was reached.
 
     Depending on the request and the number of objects in the database,
     the number of objects returned in a response can be very big.
     To avoid transmission of a very big number of objects, a view can
-    return this response to indicate to the client, that a arbitrary
+    return this response to indicate to the client that an arbitrary
     object limit was reached, so that the client can react accordingly.
     """
     return JsonResponse({
@@ -47,7 +47,7 @@ class AdminView(UserPassesTestMixin, LoginRequiredMixin, View):
     """Provide a base view with superuser and staff restricted access."""
 
     def test_func(self) -> bool:
-        """Validate, that the user is logged in as staff or superuser."""
+        """Validate that the user is logged in as staff or superuser."""
         if not self.request.user:
             raise Http404()
         if not self.request.user.is_superuser and not self.request.user.is_staff:
@@ -71,7 +71,7 @@ class SubmissionsHistogramJsonView(AdminView):
         supplied as GET parameters. Validate these parameters first and
         filter the queryset of all solutions based on the parameters.
         Use an SQL truncator to create buckets and
-        return a Json Response with the mapped histogram.
+        return a JsonResponse with the mapped histogram.
 
         It is possible to pass a queryset limit to
         avoid computation of too many objects.
@@ -132,7 +132,7 @@ class AttemptsHistogramJsonView(AdminView):
         The number of trials until the first passed solution
         is computed through the minimum scoped id of all passed
         solutions for each user. Group these values into buckets
-        and return a Json Response with the mapped histogram.
+        and return a JsonResponse with the mapped histogram.
 
         It is possible to pass a queryset limit to
         avoid computation of too many objects.
