@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'inloop.tasks',
     'inloop.testrunner',
     'inloop.gitload',
+    'inloop.statistics',
 
     'django.contrib.admin',
     'django.contrib.auth',
