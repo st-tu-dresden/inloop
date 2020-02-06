@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
 from inloop.solutions.models import Solution
+from inloop.statistics.validators import (ALLOWED_TRUNCATOR_IDENTIFIERS, ISOFORMAT_REGEX,
+                                          get_optional_bool, get_optional_int,
+                                          get_optional_timestamp,
+                                          get_optional_truncator_identifier)
+from inloop.statistics.views import bad_json_request, queryset_limit_reached
 from inloop.tasks.models import Category, Task
-
-from .validators import (ALLOWED_TRUNCATOR_IDENTIFIERS, ISOFORMAT_REGEX,
-                         get_optional_bool, get_optional_int, get_optional_timestamp,
-                         get_optional_truncator_identifier)
-from .views import bad_json_request, queryset_limit_reached
 
 User = get_user_model()
 
