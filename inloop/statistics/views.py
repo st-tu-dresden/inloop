@@ -83,8 +83,8 @@ class SubmissionsHistogramJsonView(AdminView):
             passed = get_optional_bool('passed', request.GET)
             category_id = get_optional_int('category_id', request.GET)
             granularity = get_optional_truncator_identifier('granularity', request.GET)
-        except ValidationError as e:
-            return bad_request(e.message)
+        except ValidationError as error:
+            return bad_request(error.message)
 
         truncator = functions.Trunc('submission_date', granularity)
 
@@ -140,8 +140,8 @@ class AttemptsHistogramJsonView(AdminView):
         try:
             queryset_limit = get_optional_int('queryset_limit', request.GET)
             task_id = get_optional_int('task_id', request.GET)
-        except ValidationError as e:
-            return bad_request(e.message)
+        except ValidationError as error:
+            return bad_request(error.message)
         if task_id is None:
             return bad_request('The parameter task_id must be supplied.')
 

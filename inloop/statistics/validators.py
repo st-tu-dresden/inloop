@@ -24,7 +24,7 @@ def get_optional_timestamp(key_name: str, data: dict) -> Optional[str]:
         return parameter
     raise ValidationError(
         f'Timestamp parameter "{key_name}" was supplied '
-        f'with the value {repr(parameter)} but is not in valid iso format.'
+        f'with the value {parameter!r} but is not in valid iso format.'
     )
 
 
@@ -38,18 +38,15 @@ def get_optional_bool(key_name: str, data: dict) -> Optional[bool]:
     if isinstance(parameter, bool):
         return parameter
     if isinstance(parameter, int):
-        if parameter == 1:
-            return True
-        if parameter == 0:
-            return False
+        return bool(parameter)
     if isinstance(parameter, str):
-        if parameter == "true" or parameter == "True":
+        if parameter.lower() == "true":
             return True
-        if parameter == "false" or parameter == "False":
+        if parameter.lower() == "false":
             return False
     raise ValidationError(
         f'Boolean parameter "{key_name}" was supplied '
-        f'with the value {repr(parameter)} but is not a boolean value.'
+        f'with the value {parameter!r} but is not a boolean value.'
     )
 
 
@@ -69,7 +66,7 @@ def get_optional_int(key_name: str, data: dict) -> Optional[int]:
             pass
     raise ValidationError(
         f'Integer parameter "{key_name}" was supplied '
-        f'with the value {repr(parameter)} but is not an integer value.'
+        f'with the value {parameter!r} but is not an integer value.'
     )
 
 
@@ -87,6 +84,6 @@ def get_optional_truncator_identifier(key_name: str, data: dict) -> Optional[str
         return truncator_identifier
     raise ValidationError(
         f'Truncator identifier parameter "{key_name}" was supplied '
-        f'with the value {repr(truncator_identifier)} but is not allowed. '
+        f'with the value {truncator_identifier!r} but is not allowed. '
         f'Allowed truncator identifiers are {ALLOWED_TRUNCATOR_IDENTIFIERS}'
     )

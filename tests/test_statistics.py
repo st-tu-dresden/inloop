@@ -96,7 +96,7 @@ class ValidatorTest(TestCase):
                 'date': valid_value
             }))
         except ValidationError:
-            self.fail(f'get_optional_timestamp should accept {repr(valid_value)}')
+            self.fail(f'get_optional_timestamp should accept {valid_value!r}')
 
     def test_get_optional_int(self):
         """Test the integer validator."""
@@ -111,7 +111,7 @@ class ValidatorTest(TestCase):
                     'int': valid_value
                 }))
             except ValidationError:
-                self.fail(f'get_optional_int should accept {repr(valid_value)}')
+                self.fail(f'get_optional_int should accept {valid_value!r}')
 
     def test_get_optional_bool(self):
         """Test the boolean validator."""
@@ -126,7 +126,7 @@ class ValidatorTest(TestCase):
                     'bool': valid_value
                 }))
             except ValidationError:
-                self.fail(f'get_optional_bool should accept {repr(valid_value)}')
+                self.fail(f'get_optional_bool should accept {valid_value!r}')
 
     def test_get_optional_truncator_identifier(self):
         """Test the optional truncator identifier validator."""
@@ -141,7 +141,7 @@ class ValidatorTest(TestCase):
                     'truncator': valid_value
                 }))
             except ValidationError:
-                self.fail(f'get_optional_truncator_identifier should accept {repr(valid_value)}')
+                self.fail(f'get_optional_truncator_identifier should accept {valid_value!r}')
 
 
 class BadRequestTest(TestCase):
@@ -211,8 +211,8 @@ class SubmissionsHistogramJsonViewTest(TestCase):
         super().setUp()
         try:
             self.url = reverse('statistics:submissions_histogram_api')
-        except NoReverseMatch as e:
-            self.fail(e)
+        except NoReverseMatch as error:
+            self.fail(error)
 
     def test_bad_request(self):
         """Test the view's response to a bad request."""
@@ -293,8 +293,8 @@ class AttemptsHistogramJsonViewTest(TestCase):
         super().setUp()
         try:
             self.url = reverse('statistics:attempts_histogram_api')
-        except NoReverseMatch as e:
-            self.fail(e)
+        except NoReverseMatch as error:
+            self.fail(error)
 
     def test_bad_json_request(self):
         """Test the view's response to a malformed json request."""
