@@ -6,6 +6,7 @@ from django.contrib.flatpages.views import flatpage
 from inloop.accounts import urls as account_urls
 from inloop.gitload import urls as gitload_urls
 from inloop.solutions import urls as solution_urls
+from inloop.statistics import urls as statistics_urls
 from inloop.tasks import urls as task_urls
 from inloop.views import home, logout
 
@@ -20,6 +21,7 @@ urlpatterns = [
     url(r'^gitload/', include(gitload_urls)),
     url(r'^solutions/', include(solution_urls)),
     url(r'^tasks/', include(task_urls)),
+    url(r'^statistics/', include(statistics_urls)),
 
     # explicitly override the admin logout url
     url(r'^admin/logout/$', logout),
