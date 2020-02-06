@@ -164,7 +164,7 @@ class QuerysetLimitReachedTest(TestCase):
         reason = 'test_reason'
         queryset_count = 100
         response = queryset_limit_reached(queryset_count, reason=reason)
-        self.assertEqual(response.status_code, HTTPStatus.CONFLICT)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         content = response.content.decode()
         try:
             json_content = json.loads(content)
@@ -225,7 +225,7 @@ class SubmissionsHistogramJsonViewTest(TestCase):
         """Test the views' response to crossing the queryset limit."""
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {'queryset_limit': 0}, follow=True)
-        self.assertEqual(response.status_code, HTTPStatus.CONFLICT)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_histogram(self):
         """
@@ -309,7 +309,7 @@ class AttemptsHistogramJsonViewTest(TestCase):
         response = self.client.get(self.url, {
             'task_id': self.task.id, 'queryset_limit': 0
         }, follow=True)
-        self.assertEqual(response.status_code, HTTPStatus.CONFLICT)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_no_task_id_parameter(self):
         """

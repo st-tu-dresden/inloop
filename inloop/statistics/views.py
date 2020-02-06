@@ -40,7 +40,7 @@ def queryset_limit_reached(
     return JsonResponse({
         'queryset_count': queryset_count,
         'reason': reason
-    }, status=HTTPStatus.CONFLICT)
+    }, status=HTTPStatus.BAD_REQUEST)
 
 
 class AdminView(UserPassesTestMixin, LoginRequiredMixin, View):
