@@ -4,8 +4,8 @@ from typing import Optional
 from django.core.exceptions import ValidationError
 
 ISOFORMAT_REGEX = re.compile(r"""
-    [0-9]{4}-[0-9]{2}-[0-9]{2} # The day, such as 01-01-1970
-    T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z$ # The time, such as 00:00:00.000Z
+    [0-9]{4}-[0-9]{2}-[0-9]{2}               # The day, such as 01-01-1970
+    T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$  # The time, such as 00:00:00.000Z
 """, re.VERBOSE)
 
 

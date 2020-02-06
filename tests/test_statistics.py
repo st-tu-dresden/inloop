@@ -26,6 +26,8 @@ class IsoFormatTest(TestCase):
         for invalid_value in [
             '2020-01-01T00:00:00.9999',
             '1970.01.01T00:00:00.000Z',
+            '1970.01.01T00:00:00.000Z',
+            '2020-01-01T00:00:00_000Z',
             '2020-01-31T10:27:42.013Z This text should not be accepted',
             'This text should not be accepted 2020-01-31T10:27:42.013Z'
         ]:
