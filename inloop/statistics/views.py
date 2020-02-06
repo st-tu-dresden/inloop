@@ -9,9 +9,9 @@ from django.http import Http404, HttpRequest, JsonResponse
 from django.views import View
 
 from inloop.solutions.models import Solution
-
-from .validators import (get_optional_bool, get_optional_int,
-                         get_optional_timestamp, get_optional_truncator_identifier)
+from inloop.statistics.validators import (get_optional_bool, get_optional_int,
+                                          get_optional_timestamp,
+                                          get_optional_truncator_identifier)
 
 
 def bad_json_request(reason: str = 'Malformed JSON') -> JsonResponse:
