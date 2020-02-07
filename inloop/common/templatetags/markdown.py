@@ -1,13 +1,3 @@
-"""Markdown Package.
-
-To provide dynamic Markdown rendering, we use the Markdown package.
-
-.. _Markdown package:
-   https://pypi.python.org/pypi/Markdown
-
-.. _Markdown package extensions
-   https://python-markdown.github.io/extensions/
-"""
 import subprocess
 
 from django.conf import settings
@@ -21,66 +11,68 @@ from markdown.treeprocessors import Treeprocessor
 
 
 class ImageVersionTreeprocessor(Treeprocessor):
-    """Provide a tree processor for image versioning."""
+    """Markdown tree processor that appends version strings to image resources."""
 
-    def __init__(self, version_id: str, *args, **kwargs):
-        """Create an image version tree processor."""
-        if not version_id.isalnum():
-            raise ValueError('version_id must be alphanumerical')
-        self.version_id = version_id
+    def __init__(self, version_provider, *args, **kwargs):
+        self.version_provider = version_provider
         super().__init__(*args, **kwargs)
 
     def run(self, root):
         """
-        Process the document root node.
-
-        Add the version id to the src attribute of all img tags to
-        control browser image caching based on the given version id.
+        Traverse the tree and add the version id to the src attribute
+        of all <img> tags to control browser image caching based on the
+        given version id.
         """
+        version_id = self.version_provider.get_version()
+        if version_id is None:
+            return
         img_nodes = root.findall('*/img')
         for node in img_nodes:
-            old_src = node.get('src')
-            if not old_src:
+            url = node.get('src')
+            if not url:
                 continue
-            node.set('src', f'{old_src}?version_id={self.version_id}')
-        return root
+            if url.startswith('https://') or url.startswith('http://'):
+                # note that the comparison is intentionally case-sensitive
+                continue
+            node.set('src', f'{url}?v={version_id}')
 
 
 class ImageVersionExtension(Extension):
-    """Represent a custom extension for the markdown package."""
+    """Markdown extension that appends version strings to image resources."""
 
-    def __init__(self, version_id: str, *args, **kwargs):
+    def __init__(self, version_provider, *args, **kwargs):
         """Create an image version extension."""
-        if not version_id.isalnum():
-            raise ValueError('version_id must be alphanumerical')
-        self.version_id = version_id
+        self.version_provider = version_provider
         super().__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """Wrap the custom image version treeprocessor."""
         md.treeprocessors.add(
             'image_version_extension',
-            ImageVersionTreeprocessor(self.version_id, md),
+            ImageVersionTreeprocessor(self.version_provider, md),
             '_end'
         )
 
 
-class GitImageVersionExtension(ImageVersionExtension):
-    """
-    Provide a git hash based convenience wrapper
-    for the image version extension.
-    """
+class GitVersionProvider:
+    """Provides a version string based on the id of a repo's latest commit."""
 
-    def __init__(self, *args, **kwargs):
-        """Create a git image version extension."""
-        version_id = subprocess.check_output([
-            'git',
-            '-C',
-            str(settings.BASE_DIR),
-            'rev-parse',
-            'HEAD',
-        ]).decode().strip()
-        super().__init__(version_id=version_id, *args, **kwargs)
+    args = 'git rev-parse --short HEAD'.split()
+
+    def __init__(self, repo):
+        """Initialize with given the path to a Git repository."""
+        self.repo = repo
+
+    def get_version(self):
+        """Return the short id of the latest commit or None if it can't be determined."""
+        try:
+            result = subprocess.run(
+                self.args, cwd=self.repo, stdout=subprocess.PIPE, universal_newlines=True
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except OSError:
+            pass
 
 
 register = Library()
@@ -90,7 +82,7 @@ convert = Markdown(output_format='html5', extensions=[
     'markdown.extensions.fenced_code',
     'markdown.extensions.tables',
     CodeHiliteExtension(use_pygments=False),
-    GitImageVersionExtension(),
+    ImageVersionExtension(GitVersionProvider(settings.REPOSITORY_ROOT)),
 ]).convert
 
 
