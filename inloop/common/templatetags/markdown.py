@@ -26,7 +26,7 @@ class ImageVersionTreeprocessor(Treeprocessor):
         version_id = self.version_provider.get_version()
         if version_id is None:
             return
-        img_nodes = root.findall('*/img')
+        img_nodes = root.iter('img')
         for node in img_nodes:
             url = node.get('src')
             if not url:

@@ -49,6 +49,12 @@ class ImageVersioningTest(TestCase):
         html = self.md.convert('![alt text](a/b/c.jpeg)')
         self.assertIn('src="a/b/c.jpeg?v=cafebabe"', html)
 
+    def test_version_is_appended_in_nested_img_tags(self):
+        html = self.md.convert('* ![alt text](a/b/c.jpeg)')
+        self.assertTrue(html.startswith('<ul>'))
+        self.assertTrue(html.endswith('</ul>'))
+        self.assertIn('src="a/b/c.jpeg?v=cafebabe"', html)
+
     def test_absolute_http_url_is_ignored(self):
         html = self.md.convert('![alt text](http://example.com/a/b/c.jpeg)')
         self.assertIn('src="http://example.com/a/b/c.jpeg"', html)
