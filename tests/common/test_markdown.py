@@ -30,11 +30,6 @@ class DummyVersionProvider:
         return 'cafebabe'
 
 
-class NoneVersionProvider:
-    def get_version(self):
-        return None
-
-
 class ImageVersioningTest(TestCase):
     def setUp(self):
         self.md = Markdown(output_format='html5', extensions=[
@@ -80,6 +75,11 @@ class ImageVersioningTest(TestCase):
     def test_empty_src_tag_is_ignored(self):
         html = self.md.convert('![alt]()')
         self.assertNotIn('v=cafebabe', html)
+
+
+class NoneVersionProvider:
+    def get_version(self):
+        return None
 
 
 class NoopImageVersioningTest(TestCase):

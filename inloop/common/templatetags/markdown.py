@@ -60,7 +60,7 @@ class GitVersionProvider:
     args = 'git rev-parse --short HEAD'.split()
 
     def __init__(self, repo):
-        """Initialize with given the path to a Git repository."""
+        """Initialize with the given path to a Git repository."""
         self.repo = repo
 
     def get_version(self):
