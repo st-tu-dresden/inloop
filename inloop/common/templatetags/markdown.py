@@ -35,7 +35,6 @@ class ImageVersionTreeprocessor(Treeprocessor):
                 # note that the comparison is intentionally case-sensitive
                 continue
             node.set('src', f'{url}?v={version_id}')
-        return root
 
 
 class ImageVersionExtension(Extension):
