@@ -1,83 +1,63 @@
 from unittest import TestCase
 
+from django.conf import settings
+
 from markdown import Markdown
 
-from inloop.common.templatetags.markdown import (GitImageVersionExtension, ImageVersionExtension,
-                                                 ImageVersionTreeprocessor)
+from inloop.common.templatetags.markdown import GitVersionProvider, ImageVersionExtension
 
 
-class ImageVersionTreeprocessorTestCase(TestCase):
-    def test_conflicting_image_version(self):
-        """
-        Verify, that version ids must be
-        alphanumerical to avoid html conflicts.
-        """
-        try:
-            _ = ImageVersionTreeprocessor("/test/")
-            self.fail("Should fail with a ValueError.")
-        except ValueError:
-            pass
+class GitVersionProviderTest(TestCase):
+    def test_get_version(self):
+        version = GitVersionProvider(settings.BASE_DIR).get_version()
+        self.assertRegex(version, r'^[0-9a-z]{4,}$')
 
 
-class ImageVersionExtensionTestCase(TestCase):
-    """Test the image version markdown extension."""
+class DummyVersionProvider:
+    def get_version(self):
+        return 'cafebabe'
 
-    def setUp(self) -> None:
-        self.version_id = "1337"
-        self.md = Markdown(output_format="html5", extensions=[
-            ImageVersionExtension(self.version_id),
+
+class NoneVersionProvider:
+    def get_version(self):
+        return None
+
+
+class ImageVersioningTest(TestCase):
+    def setUp(self):
+        self.md = Markdown(output_format='html5', extensions=[
+            ImageVersionExtension(DummyVersionProvider())
         ])
 
-    def test_image_versioning(self):
-        """Verify, that inline styled images are supplied with a hash."""
-        html = self.md.convert('![alt text](https://example.com/a/b/c.jpeg) "Title"')
-        self.assertIn('src="https://example.com/a/b/c.jpeg?version_id=1337"', html)
+    def test_version_is_appended(self):
+        html = self.md.convert('![alt text](https://example.com/a/b/c.jpeg)')
+        self.assertIn('src="https://example.com/a/b/c.jpeg?v=cafebabe"', html)
 
-    def test_ignore_html_code(self):
-        """
-        Validate, that html in code blocks is
-        ignored by the image version extension.
-        """
+    def test_code_block_is_ignored(self):
         html = self.md.convert(
             """
-            ```python
-            test = <img src="example.com/1.psd">
+            ```html
+            <img src="example.com/1.psd">
             ```
             """
         )
-        self.assertNotIn("version_id", html)
-        self.assertNotIn("1337", html)
+        self.assertNotIn('v=cafebabe', html)
 
-    def test_ignore_empty_src_tags(self):
-        """
-        Validate, that img nodes without
-        a specified source are not processed.
-        """
+    def test_ordinary_link_is_ignored(self):
+        html = self.md.convert('[foo bar baz](path/to/image.png)')
+        self.assertIn('href="path/to/image.png"', html)
+
+    def test_empty_src_tag_is_ignored(self):
         html = self.md.convert('![alt]()')
-        self.assertIn("img", html)
-        self.assertNotIn("version_id", html)
-        self.assertNotIn("1337", html)
+        self.assertNotIn('v=cafebabe', html)
 
 
-class ConflictingImageVersionTestCase(TestCase):
-    def test_conflicting_image_version(self):
-        """
-        Verify, that version ids must be
-        alphanumerical to avoid html conflicts.
-        """
-        try:
-            _ = Markdown(output_format="html5", extensions=[
-                ImageVersionExtension("/test/"),
-            ])
-            self.fail("Should fail with a ValueError.")
-        except ValueError:
-            pass
+class NoopImageVersioningTest(TestCase):
+    def setUp(self):
+        self.md = Markdown(output_format='html5', extensions=[
+            ImageVersionExtension(NoneVersionProvider())
+        ])
 
-
-class GitImageVersionTestCase(TestCase):
-    def test_git_version_id(self):
-        """Validate, that the current git commit hash is extracted correctly."""
-        e = GitImageVersionExtension()
-        self.assertEqual(len(e.version_id), 40)
-        self.assertTrue(e.version_id.isalnum())
-        self.assertEqual(len(e.version_id), len(e.version_id.strip()))
+    def test_no_version_is_appended(self):
+        html = self.md.convert('![alt text](https://example.com/a/b/c.jpeg)')
+        self.assertIn('src="https://example.com/a/b/c.jpeg"', html)
