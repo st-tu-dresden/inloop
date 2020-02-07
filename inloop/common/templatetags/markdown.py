@@ -26,11 +26,7 @@ class ImageVersionTreeprocessor(Treeprocessor):
     def __init__(self, version_id: str, *args, **kwargs):
         """Create an image version tree processor."""
         if not version_id.isalnum():
-            raise ValueError(
-                "The supplied version id should be alphanumerical "
-                "to avoid unwanted html conflicts. Given id: {}"
-                .format(version_id)
-            )
+            raise ValueError('version_id must be alphanumerical')
         self.version_id = version_id
         super().__init__(*args, **kwargs)
 
@@ -41,13 +37,12 @@ class ImageVersionTreeprocessor(Treeprocessor):
         Add the version id to the src attribute of all img tags to
         control browser image caching based on the given version id.
         """
-        img_nodes = root.findall("*/img")
+        img_nodes = root.findall('*/img')
         for node in img_nodes:
-            old_src = node.get("src")
+            old_src = node.get('src')
             if not old_src:
                 continue
-            new_src = "{}?version_id={}".format(old_src, self.version_id)
-            node.set("src", new_src)
+            node.set('src', f'{old_src}?version_id={self.version_id}')
         return root
 
 
@@ -57,20 +52,16 @@ class ImageVersionExtension(Extension):
     def __init__(self, version_id: str, *args, **kwargs):
         """Create an image version extension."""
         if not version_id.isalnum():
-            raise ValueError(
-                "The supplied version id should be alphanumerical "
-                "to avoid unwanted html conflicts. Given id: {}"
-                .format(version_id)
-            )
+            raise ValueError('version_id must be alphanumerical')
         self.version_id = version_id
         super().__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """Wrap the custom image version treeprocessor."""
         md.treeprocessors.add(
-            "image_version_extension",
+            'image_version_extension',
             ImageVersionTreeprocessor(self.version_id, md),
-            "_end"
+            '_end'
         )
 
 
@@ -83,11 +74,11 @@ class GitImageVersionExtension(ImageVersionExtension):
     def __init__(self, *args, **kwargs):
         """Create a git image version extension."""
         version_id = subprocess.check_output([
-            "git",
-            "-C",
+            'git',
+            '-C',
             str(settings.BASE_DIR),
-            "rev-parse",
-            "HEAD",
+            'rev-parse',
+            'HEAD',
         ]).decode().strip()
         super().__init__(version_id=version_id, *args, **kwargs)
 
