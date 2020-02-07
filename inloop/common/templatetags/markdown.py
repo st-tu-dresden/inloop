@@ -28,10 +28,13 @@ class ImageVersionTreeprocessor(Treeprocessor):
             return
         img_nodes = root.findall('*/img')
         for node in img_nodes:
-            old_src = node.get('src')
-            if not old_src:
+            url = node.get('src')
+            if not url:
                 continue
-            node.set('src', f'{old_src}?v={version_id}')
+            if url.startswith('https://') or url.startswith('http://'):
+                # note that the comparison is intentionally case-sensitive
+                continue
+            node.set('src', f'{url}?v={version_id}')
         return root
 
 

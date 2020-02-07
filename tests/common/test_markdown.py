@@ -29,9 +29,17 @@ class ImageVersioningTest(TestCase):
             ImageVersionExtension(DummyVersionProvider())
         ])
 
-    def test_version_is_appended(self):
+    def test_version_is_appended1(self):
+        html = self.md.convert('![alt text](/a/b/c.jpeg)')
+        self.assertIn('src="/a/b/c.jpeg?v=cafebabe"', html)
+
+    def test_version_is_appended2(self):
+        html = self.md.convert('![alt text](a/b/c.jpeg)')
+        self.assertIn('src="a/b/c.jpeg?v=cafebabe"', html)
+
+    def test_absolute_url_is_ignored(self):
         html = self.md.convert('![alt text](https://example.com/a/b/c.jpeg)')
-        self.assertIn('src="https://example.com/a/b/c.jpeg?v=cafebabe"', html)
+        self.assertIn('src="https://example.com/a/b/c.jpeg"', html)
 
     def test_code_block_is_ignored(self):
         html = self.md.convert(
@@ -59,5 +67,5 @@ class NoopImageVersioningTest(TestCase):
         ])
 
     def test_no_version_is_appended(self):
-        html = self.md.convert('![alt text](https://example.com/a/b/c.jpeg)')
-        self.assertIn('src="https://example.com/a/b/c.jpeg"', html)
+        html = self.md.convert('![alt text](a/b/c.jpeg)')
+        self.assertIn('src="a/b/c.jpeg"', html)
