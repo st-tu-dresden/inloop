@@ -1,17 +1,22 @@
 import re
+from datetime import timedelta
+from io import StringIO
 from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.management import call_command
 from django.db.models import ObjectDoesNotExist
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from constance.test import override_config
 
 from inloop.accounts.forms import SignupForm, StudentDetailsForm
-from inloop.accounts.models import Course, StudentDetails, user_profile_complete
+from inloop.accounts.models import (Course, StudentDetails,
+                                    prune_invalid_users, user_profile_complete)
+from inloop.accounts.tasks import autoprune_invalid_users
 
 from tests.accounts.mixins import SimpleAccountsData
 
@@ -70,6 +75,68 @@ class AccountModelsTest(TestCase):
         """After logging in, a message is displayed for an incomplete profile."""
         self.client.login(username='sarah', password='secret')
         self.assertTrue(mocked_messages.warning.called)
+
+
+@override_settings(ACCOUNT_ACTIVATION_DAYS=1)
+class PruneInvalidUsersTest(TestCase):
+    TIMEDELTA = timedelta(days=1, seconds=1)
+
+    def setUp(self):
+        super().setUp()
+        self.bob = User.objects.create_user('bob', 'bob@example.com', 'secret')
+
+    def test_active_accounts_are_not_deleted(self):
+        # TEST 1: active with date_joined older than deadline NOT deleted
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.save()
+        num_deleted = prune_invalid_users()
+        self.assertEqual(num_deleted, 0)
+        self.assertTrue(User.objects.filter(username='bob').exists())
+
+    def test_inactive_but_used_accounts_are_not_deleted(self):
+        # TEST 2: inactive but already logged in with date_joined older than deadline NOT deleted
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.last_login = self.bob.date_joined
+        self.bob.is_active = False
+        self.bob.save()
+        num_deleted = prune_invalid_users()
+        self.assertEqual(num_deleted, 0)
+        self.assertTrue(User.objects.filter(username='bob').exists())
+
+    def test_activatable_accounts_are_not_deleted(self):
+        # TEST 3: inactive, never logged in, before deadline NOT deleted
+        self.bob.is_active = False
+        self.bob.save()
+        num_deleted = prune_invalid_users()
+        self.assertEqual(num_deleted, 0)
+        self.assertTrue(User.objects.filter(username='bob').exists())
+
+    def test_inactive_unused_accounts_are_deleted(self):
+        # TEST 4: inactive, never logged in, older than deadline deleted
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.is_active = False
+        self.bob.save()
+        num_deleted = prune_invalid_users()
+        self.assertEqual(num_deleted, 1)
+        self.assertFalse(User.objects.filter(username='bob').exists())
+
+    def test_integration_with_management_command(self):
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.is_active = False
+        self.bob.save()
+        stdout = StringIO()
+        call_command('prune_invalid_users', stdout=stdout)
+        self.assertIn('Pruned 1 invalid account(s)', stdout.getvalue())
+        self.assertFalse(User.objects.filter(username='bob').exists())
+
+    def test_integration_with_queue(self):
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.is_active = False
+        self.bob.save()
+        with self.assertLogs() as capture_logs:
+            autoprune_invalid_users.call_local()
+        self.assertIn('Pruned 1 invalid account(s)', capture_logs.output[0])
+        self.assertFalse(User.objects.filter(username='bob').exists())
 
 
 class StudentDetailsFormTest(TestCase):
