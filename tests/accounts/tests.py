@@ -16,6 +16,7 @@ from constance.test import override_config
 from inloop.accounts.forms import SignupForm, StudentDetailsForm
 from inloop.accounts.models import (Course, StudentDetails,
                                     prune_invalid_users, user_profile_complete)
+from inloop.accounts.tasks import autoprune_invalid_users
 
 from tests.accounts.mixins import SimpleAccountsData
 
@@ -126,6 +127,15 @@ class PruneInvalidUsersTest(TestCase):
         stdout = StringIO()
         call_command('prune_invalid_users', stdout=stdout)
         self.assertIn('Pruned 1 invalid account(s)', stdout.getvalue())
+        self.assertFalse(User.objects.filter(username='bob').exists())
+
+    def test_integration_with_queue(self):
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.is_active = False
+        self.bob.save()
+        with self.assertLogs() as capture_logs:
+            autoprune_invalid_users.call_local()
+        self.assertIn('Pruned 1 invalid account(s)', capture_logs.output[0])
         self.assertFalse(User.objects.filter(username='bob').exists())
 
 
