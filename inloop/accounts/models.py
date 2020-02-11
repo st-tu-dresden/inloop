@@ -1,11 +1,15 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.signals import user_logged_in
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import ObjectDoesNotExist
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import mark_safe
 
 INCOMPLETE_HINT = (
@@ -29,6 +33,22 @@ def user_profile_complete(user):
         return all((user.first_name, user.last_name, user.studentdetails.matnum))
     except ObjectDoesNotExist:
         return False
+
+
+def prune_invalid_users():
+    """
+    Delete accounts that haven't been activated in time.
+    Return the number of deleted accounts.
+    """
+    User = get_user_model()
+    deadline = timezone.now() - timedelta(days=settings.ACCOUNT_ACTIVATION_DAYS)
+    invalid_users = User.objects.filter(
+        date_joined__lte=deadline,
+        is_active=False,
+        last_login=None
+    )
+    _, removals_by_type = invalid_users.delete()
+    return removals_by_type.get(settings.AUTH_USER_MODEL, 0)
 
 
 class Course(models.Model):
