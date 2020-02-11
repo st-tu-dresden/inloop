@@ -1,10 +1,12 @@
 import re
 from datetime import timedelta
+from io import StringIO
 from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.management import call_command
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -115,6 +117,15 @@ class PruneInvalidUsersTest(TestCase):
         self.bob.save()
         num_deleted = prune_invalid_users()
         self.assertEqual(num_deleted, 1)
+        self.assertFalse(User.objects.filter(username='bob').exists())
+
+    def test_integration_with_management_command(self):
+        self.bob.date_joined -= self.TIMEDELTA
+        self.bob.is_active = False
+        self.bob.save()
+        stdout = StringIO()
+        call_command('prune_invalid_users', stdout=stdout)
+        self.assertIn('Pruned 1 invalid account(s)', stdout.getvalue())
         self.assertFalse(User.objects.filter(username='bob').exists())
 
 
