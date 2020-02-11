@@ -36,7 +36,7 @@ class Repository:
         """Yield all existing files in this repository which match the given pattern."""
         return self._path.glob(glob_pattern)
 
-    def call_make(self, timeout=30):
+    def call_make(self, timeout=300):
         """Call the `make` command in this repository's directory."""
         subprocess.check_call(['make'], cwd=self.path_s, timeout=timeout)
 
