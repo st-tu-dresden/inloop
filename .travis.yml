@@ -12,14 +12,10 @@ matrix:
         pip: true
       install:
         - pip install -r build-requirements.txt
-        - pip install codacy-coverage
         - make
       script:
         - make lint
         - make coverage
-      after_success:
-        - pipenv run coverage xml
-        - python-codacy-coverage
 
     - language: node_js
       name: "CSS Checks"
