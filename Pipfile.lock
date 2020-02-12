@@ -39,11 +39,10 @@
         },
         "django-constance": {
             "hashes": [
-                "sha256:1b536d153c168ef548fea5bdcdea84afab83892e2163ec4e896557a3139effd7",
-                "sha256:c47db4abd5788584115db681c0e8fef8ff870d49af90aa359076f0833a537199"
+                "sha256:12d827f9d5552ee39884fb6fb356f231f32b1ab8958acc715e3d1a6ecf913653"
             ],
             "index": "pypi",
-            "version": "==2.5.0"
+            "version": "==2.6.0"
         },
         "django-environ": {
             "hashes": [
