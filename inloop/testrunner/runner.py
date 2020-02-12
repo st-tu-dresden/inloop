@@ -47,6 +47,8 @@ class DockerTestRunner:
     been built (e.g., during the import of a task repository).
     """
 
+    TRUNCATION_MARKER = b'\n\n[--- output truncated 8< ---]\n'
+
     def __init__(self, config):
         """
         Initialize the tester with a dict-like config and the name of the Docker image.
@@ -58,12 +60,16 @@ class DockerTestRunner:
                        to the Docker CLI as --memory=XXX (defaut: 256m)
             - fssize:  the size of the mounted scratch file system (default: 32m)
             - image:   the name of the docker image to be used (required, no default)
+            - output_limit:
+                       the maximum size, in bytes, of the stdout/stderr streams
+                       (default: 15000)
         """
         if 'image' not in config:
             raise ValueError('image is a required config key')
         config.setdefault('timeout', 30)
         config.setdefault('memory', '256m')
         config.setdefault('fssize', '32m')
+        config.setdefault('output_limit', 15000)
         self.config = config
 
     def ensure_absolute_dir(self, path):
@@ -121,6 +127,17 @@ class DockerTestRunner:
         if path1.startswith(path2) or path2.startswith(path1):
             raise ValueError('a mountpoint must not be a subdirectory of another mountpoint')
 
+    def clean_stream(self, stream):
+        """
+        Prepare the stream so it can be processed further in a safe manner.
+        Convert bytes to UTF-8.
+        If stream exceeds configured size, cut and add a marker.
+        """
+        limit = self.config['output_limit']
+        if len(stream) > limit:
+            stream = stream[:limit] + self.TRUNCATION_MARKER
+        return stream.decode('utf-8', errors='replace')
+
     def communicate(self, task_name, input_path, output_path):
         """
         Creates the container and communicates inputs and outputs.
@@ -165,8 +182,8 @@ class DockerTestRunner:
             LOG.debug('removing timed out container %s', ctr_id)
             subprocess.call(['docker', 'rm', '--force', str(ctr_id)], stdout=subprocess.DEVNULL)
 
-        stderr = stderr.decode('utf-8', errors='replace')
-        stdout = stdout.decode('utf-8', errors='replace')
+        stderr = self.clean_stream(stderr)
+        stdout = self.clean_stream(stdout)
 
         LOG.debug('container %s: rc=%r stdout=%r stderr=%r', ctr_id, rc, stdout, stderr)
 
