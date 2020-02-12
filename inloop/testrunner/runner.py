@@ -58,6 +58,9 @@ class DockerTestRunner:
                        to the Docker CLI as --memory=XXX (defaut: 256m)
             - fssize:  the size of the mounted scratch file system (default: 32m)
         """
+        config.setdefault('timeout', 30)
+        config.setdefault('memory', '256m')
+        config.setdefault('fssize', '32m')
         self.config = config
         self.image_name = image_name
 
@@ -132,10 +135,10 @@ class DockerTestRunner:
             '--read-only',
             '--net=none',
             '--hostname=localhost',
-            '--memory=%s' % self.config.get('memory', '256m'),
+            f"--memory={self.config['memory']}",
             f'--volume={input_path}:/checker/input:ro',
             f'--volume={output_path}:/checker/output',
-            '--tmpfs=/checker/scratch:size=%s' % self.config.get('fssize', '32m'),
+            f"--tmpfs=/checker/scratch:size={self.config['fssize']}",
             f'--name={ctr_id}',
             self.image_name,
             task_name
@@ -148,7 +151,7 @@ class DockerTestRunner:
         )
 
         try:
-            stdout, stderr = proc.communicate(timeout=self.config.get('timeout', 30))
+            stdout, stderr = proc.communicate(timeout=self.config['timeout'])
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             # kills the client
