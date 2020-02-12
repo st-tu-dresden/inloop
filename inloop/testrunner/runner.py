@@ -14,9 +14,10 @@ LOG = logging.getLogger(__name__)
 
 def collect_files(path, *, filesize_limit):
     """
-    Return a dictionary that contains immediate children of the
-    given path, mapping file name to file content.
+    Collect files into a dictionary that contains immediate children
+    of the given path, mapping file name to file content.
     Ignore files larger than filesize_limit (given in bytes).
+    Return a tuple (file_dictionary, ignored_filenames).
     """
     files = {}
     ignored_filenames = set()
