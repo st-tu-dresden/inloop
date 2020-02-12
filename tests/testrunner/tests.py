@@ -13,15 +13,17 @@ DATA_DIR = str(BASE_DIR.joinpath('data'))
 
 class CollectorTest(TestCase):
     def test_subdirs_and_large_files_are_not_collected(self):
-        filenames = collect_files(DATA_DIR, filesize_limit=300).keys()
-        self.assertEqual(filenames, {'empty1.txt', 'README.md'})
+        contents, ignored_names = collect_files(DATA_DIR, filesize_limit=300)
+        self.assertEqual(contents.keys(), {'empty1.txt', 'README.md'})
+        self.assertEqual(ignored_names, {'larger_than_300_bytes.txt'})
 
     def test_subdirs_are_not_collected(self):
-        filenames = collect_files(DATA_DIR, filesize_limit=1000).keys()
-        self.assertEqual(filenames, {'empty1.txt', 'README.md', 'larger_than_300_bytes.txt'})
+        contents, ignored_names = collect_files(DATA_DIR, filesize_limit=1000)
+        self.assertEqual(contents.keys(), {'empty1.txt', 'README.md', 'larger_than_300_bytes.txt'})
+        self.assertFalse(ignored_names)
 
     def test_collected_contents_are_correct(self):
-        contents = collect_files(DATA_DIR, filesize_limit=300)
+        contents, _ = collect_files(DATA_DIR, filesize_limit=300)
         self.assertEqual(contents['empty1.txt'], '')
         self.assertEqual(contents['README.md'], 'This is a test harness for collect_files().\n')
 

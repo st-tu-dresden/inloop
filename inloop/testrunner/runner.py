@@ -19,14 +19,16 @@ def collect_files(path, *, filesize_limit):
     Ignore files larger than filesize_limit (given in bytes).
     """
     files = {}
+    ignored_filenames = set()
     for entry in Path(path).iterdir():
         if not entry.is_file():
             continue
         if entry.stat().st_size > filesize_limit:
+            ignored_filenames.add(entry.name)
             continue
         with open(entry) as stream:
             files[entry.name] = stream.read(filesize_limit)
-    return files
+    return files, ignored_filenames
 
 
 TestOutput = namedtuple('TestOutput', 'rc stdout stderr duration files')
@@ -123,8 +125,11 @@ class DockerTestRunner:
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
-            files = collect_files(storage_dir, filesize_limit=self.config['filesize_limit'])
-
+            files, ignored_files = collect_files(
+                storage_dir, filesize_limit=self.config['filesize_limit']
+            )
+        if len(ignored_files) > 0:
+            LOG.info(f'Ignored {len(ignored_files)} because they were too large.')
         return TestOutput(rc, stdout, stderr, duration, files)
 
     def subpath_check(self, path1, path2):
