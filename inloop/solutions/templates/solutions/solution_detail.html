@@ -142,16 +142,9 @@
   </div><!-- /#files -->
 
   <div role="tabpanel" class="tab-pane" id="console">
-  {% if result.stdout %}
-    <pre class="console-output">
-      <code>{{ result.stdout }}</code>
-    </pre>
-  {% endif %}
-  {% if result.stderr %}
-    <pre class="console-output bg-danger text-white">
-      <code>{{ result.stderr }}</code>
-    </pre>
-  {% elif not result.stdout %}
+  {% if result.stdout or result.stderr %}
+    <pre class="console-output"><code>{{ result.stdout }}{{ result.stderr }}</code></pre>
+  {% else %}
     <p>Nothing to show here.</p>
   {% endif %}
   </div><!-- /#console -->
