@@ -187,9 +187,9 @@ HUEY = {
 }
 
 TESTRUNNER_OPTIONS = {
+    'image': 'inloop-testrunner',
     'timeout': 120,
 }
-TESTRUNNER_IMAGE = 'inloop-testrunner'
 
 REPOSITORY_ROOT = str(Path(MEDIA_ROOT) / 'repository')
 

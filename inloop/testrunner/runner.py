@@ -43,11 +43,11 @@ class DockerTestRunner:
         - process return codes
         - file sharing via mounted volumes
 
-    This class expects that the Docker image specified by image_name has already
+    This class expects that the Docker image specified in the config has already
     been built (e.g., during the import of a task repository).
     """
 
-    def __init__(self, config, image_name):
+    def __init__(self, config):
         """
         Initialize the tester with a dict-like config and the name of the Docker image.
 
@@ -57,12 +57,14 @@ class DockerTestRunner:
             - memory:  maximum memory a container may use, passed in as string
                        to the Docker CLI as --memory=XXX (defaut: 256m)
             - fssize:  the size of the mounted scratch file system (default: 32m)
+            - image:   the name of the docker image to be used (required, no default)
         """
+        if 'image' not in config:
+            raise ValueError('image is a required config key')
         config.setdefault('timeout', 30)
         config.setdefault('memory', '256m')
         config.setdefault('fssize', '32m')
         self.config = config
-        self.image_name = image_name
 
     def ensure_absolute_dir(self, path):
         """
@@ -140,7 +142,7 @@ class DockerTestRunner:
             f'--volume={output_path}:/checker/output',
             f"--tmpfs=/checker/scratch:size={self.config['fssize']}",
             f'--name={ctr_id}',
-            self.image_name,
+            self.config['image'],
             task_name
         ]
 

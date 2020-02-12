@@ -9,7 +9,6 @@ from inloop.testrunner.runner import DockerTestRunner, collect_files
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = str(BASE_DIR.joinpath('data'))
-IMAGE_NAME = 'inloop-integration-test'
 
 
 class CollectorTest(TestCase):
@@ -40,16 +39,21 @@ class DockerTestRunnerTests(TestCase):
     """
 
     OPTIONS = {
-        'timeout': 1.5
+        'image': 'inloop-integration-test',
+        'timeout': 1.5,
     }
 
     def setUp(self):
-        self.runner = DockerTestRunner(self.OPTIONS, IMAGE_NAME)
+        self.runner = DockerTestRunner(self.OPTIONS)
 
     def test_selftest(self):
         """Test if our test image works."""
-        rc = subprocess.call(['docker', 'run', '--rm', IMAGE_NAME, 'exit 42'])
+        rc = subprocess.call(['docker', 'run', '--rm', self.OPTIONS['image'], 'exit 42'])
         self.assertEqual(42, rc)
+
+    def test_constructor_requires_configkey(self):
+        with self.assertRaises(ValueError):
+            DockerTestRunner({})
 
     def test_outputs(self):
         """Test if we receive stdout, stderr and exit code."""
