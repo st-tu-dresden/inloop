@@ -12,18 +12,18 @@ DATA_DIR = str(BASE_DIR.joinpath('data'))
 
 
 class CollectorTest(TestCase):
-    def test_collected_names(self):
-        filenames = collect_files(DATA_DIR).keys()
-        self.assertEqual(len(filenames), 2)
-        self.assertIn('empty1.txt', filenames)
-        self.assertIn('README.md', filenames)
-        self.assertNotIn('should_be_ignored', filenames)
-        self.assertNotIn('empty2.txt', filenames)
+    def test_subdirs_and_large_files_are_not_collected(self):
+        filenames = collect_files(DATA_DIR, filesize_limit=300).keys()
+        self.assertEqual(filenames, {'empty1.txt', 'README.md'})
 
-    def test_collected_contents(self):
-        files = collect_files(DATA_DIR)
-        self.assertEqual('', files['empty1.txt'])
-        self.assertEqual('This is a test harness for collect_files().\n', files['README.md'])
+    def test_subdirs_are_not_collected(self):
+        filenames = collect_files(DATA_DIR, filesize_limit=1000).keys()
+        self.assertEqual(filenames, {'empty1.txt', 'README.md', 'larger_than_300_bytes.txt'})
+
+    def test_collected_contents_are_correct(self):
+        contents = collect_files(DATA_DIR, filesize_limit=300)
+        self.assertEqual(contents['empty1.txt'], '')
+        self.assertEqual(contents['README.md'], 'This is a test harness for collect_files().\n')
 
 
 @tag('slow', 'docker')

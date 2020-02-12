@@ -12,17 +12,20 @@ from tempfile import TemporaryDirectory
 LOG = logging.getLogger(__name__)
 
 
-def collect_files(path):
+def collect_files(path, *, filesize_limit):
     """
     Return a dictionary that contains immediate children of the
     given path, mapping file name to file content.
+    Ignore files larger than filesize_limit (given in bytes).
     """
     files = {}
     for entry in Path(path).iterdir():
         if not entry.is_file():
             continue
+        if entry.stat().st_size > filesize_limit:
+            continue
         with open(entry) as stream:
-            files[entry.name] = stream.read()
+            files[entry.name] = stream.read(filesize_limit)
     return files
 
 
@@ -65,6 +68,9 @@ class DockerTestRunner:
             - output_limit:
                        the maximum size, in bytes, of the stdout/stderr streams
                        (default: 15000)
+            - filesize_limit:
+                       the maximum allowed size, in bytes, of individual collected
+                       files (default: value of output_limit)
         """
         if 'image' not in config:
             raise ValueError('image is a required config key')
@@ -72,6 +78,7 @@ class DockerTestRunner:
         config.setdefault('memory', '256m')
         config.setdefault('fssize', '32m')
         config.setdefault('output_limit', 15000)
+        config.setdefault('filesize_limit', config['output_limit'])
         self.config = config
 
     def ensure_absolute_dir(self, path):
@@ -116,7 +123,7 @@ class DockerTestRunner:
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
-            files = collect_files(storage_dir)
+            files = collect_files(storage_dir, filesize_limit=self.config['filesize_limit'])
 
         return TestOutput(rc, stdout, stderr, duration, files)
 
