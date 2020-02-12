@@ -9,26 +9,27 @@ from inloop.testrunner.runner import DockerTestRunner, collect_files
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = str(BASE_DIR.joinpath('data'))
-IMAGE_NAME = 'inloop-integration-test'
 
 
 class CollectorTest(TestCase):
-    def test_collected_names(self):
-        filenames = collect_files(DATA_DIR).keys()
-        self.assertEqual(len(filenames), 2)
-        self.assertIn('empty1.txt', filenames)
-        self.assertIn('README.md', filenames)
-        self.assertNotIn('should_be_ignored', filenames)
-        self.assertNotIn('empty2.txt', filenames)
+    def test_subdirs_and_large_files_are_not_collected(self):
+        contents, ignored_names = collect_files(DATA_DIR, filesize_limit=300)
+        self.assertEqual(contents.keys(), {'empty1.txt', 'README.md'})
+        self.assertEqual(ignored_names, {'larger_than_300_bytes.txt'})
 
-    def test_collected_contents(self):
-        files = collect_files(DATA_DIR)
-        self.assertEqual('', files['empty1.txt'])
-        self.assertEqual('This is a test harness for collect_files().\n', files['README.md'])
+    def test_subdirs_are_not_collected(self):
+        contents, ignored_names = collect_files(DATA_DIR, filesize_limit=1000)
+        self.assertEqual(contents.keys(), {'empty1.txt', 'README.md', 'larger_than_300_bytes.txt'})
+        self.assertFalse(ignored_names)
+
+    def test_collected_contents_are_correct(self):
+        contents, _ = collect_files(DATA_DIR, filesize_limit=300)
+        self.assertEqual(contents['empty1.txt'], '')
+        self.assertEqual(contents['README.md'], 'This is a test harness for collect_files().\n')
 
 
 @tag('slow', 'docker')
-class DockerTestRunnerTests(TestCase):
+class DockerTestRunnerIntegrationTest(TestCase):
     """
     Each of the the following tests uses a *real* docker container, there is
     no monkey patching (aka mocking) involved.
@@ -40,15 +41,16 @@ class DockerTestRunnerTests(TestCase):
     """
 
     OPTIONS = {
-        'timeout': 1.5
+        'image': 'inloop-integration-test',
+        'timeout': 1.5,
     }
 
     def setUp(self):
-        self.runner = DockerTestRunner(self.OPTIONS, IMAGE_NAME)
+        self.runner = DockerTestRunner(self.OPTIONS)
 
     def test_selftest(self):
         """Test if our test image works."""
-        rc = subprocess.call(['docker', 'run', '--rm', IMAGE_NAME, 'exit 42'])
+        rc = subprocess.call(['docker', 'run', '--rm', self.OPTIONS['image'], 'exit 42'])
         self.assertEqual(42, rc)
 
     def test_outputs(self):
@@ -143,3 +145,45 @@ class DockerTestRunnerTests(TestCase):
         )
         # the default size=32m is expanded to kilobytes
         self.assertIn('size=32768k', result.stdout)
+
+
+class DockerTestRunnerTest(TestCase):
+    def setUp(self):
+        self.runner = DockerTestRunner({
+            'image': 'image-not-used',
+            'output_limit': 10,
+        })
+
+    def test_constructor_requires_configkey(self):
+        with self.assertRaises(ValueError):
+            DockerTestRunner({})
+
+    # TEST 1: good utf-8 sequence
+    def test_clean_stream_with_short_valid_utf8(self):
+        sample_stream = 'abcöüä'.encode()
+        cleaned = self.runner.clean_stream(sample_stream)
+        self.assertEqual(cleaned, 'abcöüä')
+
+    # TEST 2: bogus utf-8 sequence
+    def test_clean_stream_with_short_invalid_utf8(self):
+        sample_stream = 'abcöüä'.encode()
+        # cut off the right half of the utf8 char at the end ('ä'), making it invalid
+        cleaned = self.runner.clean_stream(sample_stream[:-1])
+        self.assertEqual(len(cleaned), 6)
+        self.assertIn('abcöü', cleaned)
+
+    # TEST 3: good utf-8 sequence, too long
+    def test_clean_stream_with_too_long_valid_utf8(self):
+        sample_stream = ('a' * 11).encode()
+        cleaned = self.runner.clean_stream(sample_stream)
+        self.assertNotIn('a' * 11, cleaned)
+        self.assertIn('a' * 10, cleaned)
+        self.assertIn('output truncated', cleaned)
+
+    # TEST 4: too long utf-8 sequence, utf-8 composite at cut position
+    def test_clean_stream_with_utf8_composite_at_cut_position(self):
+        sample_stream = ''.join(['a', 'ä' * 5]).encode()
+        cleaned = self.runner.clean_stream(sample_stream)
+        self.assertNotIn('ä' * 5, cleaned)
+        self.assertIn('aääää', cleaned)
+        self.assertIn('output truncated', cleaned)

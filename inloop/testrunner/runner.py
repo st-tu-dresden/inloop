@@ -5,23 +5,30 @@ import subprocess
 import time
 import uuid
 from collections import namedtuple
-from os.path import isabs, isdir, isfile, join, normpath, realpath
+from os.path import isabs, isdir, join, normpath, realpath
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 LOG = logging.getLogger(__name__)
 
 
-def collect_files(path):
+def collect_files(path, *, filesize_limit):
     """
-    Collect files in the directory specified by path non-recursively into a dict,
-    mapping filename to file content.
+    Return a dictionary that contains immediate children of the
+    given path, mapping file name to file content.
+    Ignore files larger than filesize_limit (given in bytes).
     """
-    retval = dict()
-    files = [f for f in os.listdir(path) if isfile(join(path, f))]
-    for filename in files:
-        with open(join(path, filename)) as stream:
-            retval[filename] = stream.read()
-    return retval
+    files = {}
+    ignored_filenames = set()
+    for entry in Path(path).iterdir():
+        if not entry.is_file():
+            continue
+        if entry.stat().st_size > filesize_limit:
+            ignored_filenames.add(entry.name)
+            continue
+        with open(entry) as stream:
+            files[entry.name] = stream.read(filesize_limit)
+    return files, ignored_filenames
 
 
 TestOutput = namedtuple('TestOutput', 'rc stdout stderr duration files')
@@ -43,11 +50,13 @@ class DockerTestRunner:
         - process return codes
         - file sharing via mounted volumes
 
-    This class expects that the Docker image specified by image_name has already
+    This class expects that the Docker image specified in the config has already
     been built (e.g., during the import of a task repository).
     """
 
-    def __init__(self, config, image_name):
+    TRUNCATION_MARKER = b'\n\n[--- output truncated 8< ---]\n'
+
+    def __init__(self, config):
         """
         Initialize the tester with a dict-like config and the name of the Docker image.
 
@@ -57,9 +66,22 @@ class DockerTestRunner:
             - memory:  maximum memory a container may use, passed in as string
                        to the Docker CLI as --memory=XXX (defaut: 256m)
             - fssize:  the size of the mounted scratch file system (default: 32m)
+            - image:   the name of the docker image to be used (required, no default)
+            - output_limit:
+                       the maximum size, in bytes, of the stdout/stderr streams
+                       (default: 15000)
+            - filesize_limit:
+                       the maximum allowed size, in bytes, of individual collected
+                       files (default: value of output_limit)
         """
+        if 'image' not in config:
+            raise ValueError('image is a required config key')
+        config.setdefault('timeout', 30)
+        config.setdefault('memory', '256m')
+        config.setdefault('fssize', '32m')
+        config.setdefault('output_limit', 15000)
+        config.setdefault('filesize_limit', config['output_limit'])
         self.config = config
-        self.image_name = image_name
 
     def ensure_absolute_dir(self, path):
         """
@@ -103,8 +125,11 @@ class DockerTestRunner:
             start_time = time.perf_counter()
             rc, stdout, stderr = self.communicate(task_name, input_path, output_path)
             duration = time.perf_counter() - start_time
-            files = collect_files(storage_dir)
-
+            files, ignored_files = collect_files(
+                storage_dir, filesize_limit=self.config['filesize_limit']
+            )
+        if len(ignored_files) > 0:
+            LOG.info(f'Ignored {len(ignored_files)} because they were too large.')
         return TestOutput(rc, stdout, stderr, duration, files)
 
     def subpath_check(self, path1, path2):
@@ -115,6 +140,17 @@ class DockerTestRunner:
         path2 = normpath(path2)
         if path1.startswith(path2) or path2.startswith(path1):
             raise ValueError('a mountpoint must not be a subdirectory of another mountpoint')
+
+    def clean_stream(self, stream):
+        """
+        Prepare the stream so it can be processed further in a safe manner.
+        Convert bytes to UTF-8.
+        If stream exceeds configured size, cut and add a marker.
+        """
+        limit = self.config['output_limit']
+        if len(stream) > limit:
+            stream = stream[:limit] + self.TRUNCATION_MARKER
+        return stream.decode('utf-8', errors='replace')
 
     def communicate(self, task_name, input_path, output_path):
         """
@@ -132,12 +168,12 @@ class DockerTestRunner:
             '--read-only',
             '--net=none',
             '--hostname=localhost',
-            '--memory=%s' % self.config.get('memory', '256m'),
+            f"--memory={self.config['memory']}",
             f'--volume={input_path}:/checker/input:ro',
             f'--volume={output_path}:/checker/output',
-            '--tmpfs=/checker/scratch:size=%s' % self.config.get('fssize', '32m'),
+            f"--tmpfs=/checker/scratch:size={self.config['fssize']}",
             f'--name={ctr_id}',
-            self.image_name,
+            self.config['image'],
             task_name
         ]
 
@@ -148,7 +184,7 @@ class DockerTestRunner:
         )
 
         try:
-            stdout, stderr = proc.communicate(timeout=self.config.get('timeout', 30))
+            stdout, stderr = proc.communicate(timeout=self.config['timeout'])
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             # kills the client
@@ -160,8 +196,8 @@ class DockerTestRunner:
             LOG.debug('removing timed out container %s', ctr_id)
             subprocess.call(['docker', 'rm', '--force', str(ctr_id)], stdout=subprocess.DEVNULL)
 
-        stderr = stderr.decode('utf-8', errors='replace')
-        stdout = stdout.decode('utf-8', errors='replace')
+        stderr = self.clean_stream(stderr)
+        stdout = self.clean_stream(stdout)
 
         LOG.debug('container %s: rc=%r stdout=%r stderr=%r', ctr_id, rc, stdout, stderr)
 
