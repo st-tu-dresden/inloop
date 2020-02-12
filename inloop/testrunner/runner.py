@@ -5,7 +5,8 @@ import subprocess
 import time
 import uuid
 from collections import namedtuple
-from os.path import isabs, isdir, isfile, join, normpath, realpath
+from os.path import isabs, isdir, join, normpath, realpath
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 LOG = logging.getLogger(__name__)
@@ -13,15 +14,16 @@ LOG = logging.getLogger(__name__)
 
 def collect_files(path):
     """
-    Collect files in the directory specified by path non-recursively into a dict,
-    mapping filename to file content.
+    Return a dictionary that contains immediate children of the
+    given path, mapping file name to file content.
     """
-    retval = dict()
-    files = [f for f in os.listdir(path) if isfile(join(path, f))]
-    for filename in files:
-        with open(join(path, filename)) as stream:
-            retval[filename] = stream.read()
-    return retval
+    files = {}
+    for entry in Path(path).iterdir():
+        if not entry.is_file():
+            continue
+        with open(entry) as stream:
+            files[entry.name] = stream.read()
+    return files
 
 
 TestOutput = namedtuple('TestOutput', 'rc stdout stderr duration files')
