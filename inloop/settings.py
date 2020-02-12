@@ -186,6 +186,7 @@ HUEY = {
     'url': env('REDIS_URL'),
 }
 
+# available options are documented in the DockerTestRunner class
 TESTRUNNER_OPTIONS = {
     'image': 'inloop-testrunner',
     'timeout': 120,
