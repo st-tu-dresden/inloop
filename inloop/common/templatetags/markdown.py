@@ -67,7 +67,11 @@ class GitVersionProvider:
         """Return the short id of the latest commit or None if it can't be determined."""
         try:
             result = subprocess.run(
-                self.args, cwd=self.repo, stdout=subprocess.PIPE, universal_newlines=True
+                self.args,
+                cwd=self.repo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                universal_newlines=True
             )
             if result.returncode == 0:
                 return result.stdout.strip()
