@@ -1,0 +1,12 @@
+#
+# This file lists commits that are not interesting for git-blame, i.e.,
+# commits that only deal with formatting. See the git-blame(1) manpage
+# for details.
+#
+# Configure git to pick this up with:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+
+b9dcc7d4ca8351e2346191cd0992b095d1ac03d5
+ea6d4ec3d7601b52b09acacfc158a818bcfd7df7
