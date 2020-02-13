@@ -12,7 +12,7 @@ matrix:
         pip: true
       install:
         - pip install -r build-requirements.txt
-        - make
+        - make init
       script:
         - make lint
         - make coverage
