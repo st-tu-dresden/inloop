@@ -1,6 +1,7 @@
 import os
 import shutil
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
@@ -68,9 +69,11 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         """Test the solution upload."""
         file_1 = SimpleUploadedFile('Fibonacci1.java', 'class Fibonacci1 {}'.encode())
         file_2 = SimpleUploadedFile('Fibonacci2.java', 'class Fibonacci2 {}'.encode())
-        response = self.client.post(self.url, data={
-            'uploads': [file_1, file_2]
-        }, follow=True)
+        with patch('inloop.solutions.views.solution_submitted') as mocked_signal:
+            response = self.client.post(self.url, data={
+                'uploads': [file_1, file_2]
+            }, follow=True)
+        mocked_signal.send.assert_called_once()
         self.assertResponseContainsMessage(
             'Your solution has been submitted to the checker.',
             self.Levels.SUCCESS,

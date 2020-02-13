@@ -15,7 +15,7 @@ matrix:
         - make init
       script:
         - make lint
-        - make coverage
+        - make coverage TESTOPTS='-v2'
 
     - language: node_js
       name: "CSS Checks"

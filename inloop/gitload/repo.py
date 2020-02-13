@@ -38,7 +38,7 @@ class Repository:
 
     def call_make(self, timeout=300):
         """Call the `make` command in this repository's directory."""
-        subprocess.check_call(['make'], cwd=self.path_s, timeout=timeout)
+        subprocess.check_call(['make', '--silent'], cwd=self.path_s, timeout=timeout)
 
     def synchronize(self):
         """Synchronize files with a remote source (optional)."""
