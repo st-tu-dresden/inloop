@@ -195,6 +195,29 @@ class DuplicateFileNameModalNotification extends ModalNotification {
 
 
 /**
+ * Create a modal that notifies the user about an invalid filename.
+ *
+ * @param {string} filename - the invalid filename.
+ */
+function showInvalidFilenameNotification(filename) {
+    new ModalNotification(
+        "Invalid filename",
+        `This is not a valid Java filename: ${filename}`
+    ).load();
+}
+
+
+/**
+ * Return true if the given name is a valid java filename, otherwise false.
+ *
+ * @param {string} filename - the filename to check.
+ */
+function isValidJavaFilename(filename) {
+    return /^[A-Za-z0-9_]+\.java$/.test(filename);
+}
+
+
+/**
  * Represents a modal with an input form.
  */
 class ModalInputForm extends Modal {
@@ -709,7 +732,13 @@ class TabBar {
         let self = this;
         let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
         inputForm.addOnInputCallback(function(fileName) {
-            if (fileName === undefined || fileName === "") return;
+            if (fileName === undefined || fileName.trim() === "") {
+                return;
+            }
+            if (!isValidJavaFilename(fileName)) {
+                showInvalidFilenameNotification(fileName);
+                return;
+            }
             if (fileBuilder.contains(fileName)) {
                 // Show duplicate file name modal notification and
                 // retry to create the tab on close
@@ -776,9 +805,18 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.activeTab.appearAsActive();
         let self = this;
-        let modalInputForm = new ModalInputForm("Rename " + this.activeTab.file.fileName, "New.java");
+        let modalInputForm = new ModalInputForm(
+            "Rename " + this.activeTab.file.fileName,
+            "Enter a filename"
+        );
         modalInputForm.addOnInputCallback(function(fileName) {
-            if (fileName === undefined || fileName === "") return;
+            if (fileName === undefined || fileName.trim() === "") {
+                return;
+            }
+            if (!isValidJavaFilename(fileName)) {
+                showInvalidFilenameNotification(fileName);
+                return;
+            }
             if (fileBuilder.contains(fileName)) {
                 // If the file name already exists, request another file name and retry
                 let notification = new DuplicateFileNameModalNotification(fileName);
