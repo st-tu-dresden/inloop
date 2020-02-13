@@ -223,7 +223,7 @@ Installation
 
         cd ~/inloop
         pip install pipenv
-        pipenv install
+        pipenv sync
         django-admin migrate
 
    **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.
