@@ -4,7 +4,8 @@ Requires=huey.service
 After=huey.service
 
 [Service]
-ExecStart=/usr/bin/envdir /home/inloop/envdir setuidgid gunicorn gunicorn inloop.wsgi:application
+ExecStart=/usr/bin/envdir /home/inloop/envdir setuidgid gunicorn gunicorn --config \
+    python:inloop.gunicorn_config inloop.wsgi:application
 ExecReload=/bin/kill -HUP $MAINPID
 SyslogIdentifier=gunicorn
 
