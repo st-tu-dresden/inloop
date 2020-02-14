@@ -38,7 +38,7 @@ Things to note:
 Prerequisites
 -------------
 
-**Supported operating system:** This manual is written for Debian 8+ and Ubuntu 16.04+. Any
+**Supported operating system:** This manual is written for Debian 10+ and Ubuntu 18.04+. Any
 other modern Linux distribution should also do the trick, given that it is able to run Docker and
 Python (see the [README](../README.md) for exact version requirements).
 
