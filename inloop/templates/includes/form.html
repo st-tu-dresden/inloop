@@ -2,6 +2,14 @@
 {% csrf_token %}
 {% for field in form %}
 {% spaceless %}
+{% if field|field_type == "booleanfield" %}
+<div class="checkbox{% if field.errors %} has-error{% endif %}">
+  <label>
+    {% render_field field %}
+    {{ field.help_text|safe }}
+  </label>
+</div>
+{% else %}
 <div class="form-group{% if field.errors %} has-error{% endif %}">
   {{ field.label_tag }}
   {% if forloop.first %}
@@ -17,5 +25,6 @@
     <div class="help-block">{{ field.help_text|safe }}</div>
   {% endif %}
 </div>
+{% endif %}
 {% endspaceless %}
 {% endfor %}

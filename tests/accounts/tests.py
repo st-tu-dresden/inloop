@@ -228,6 +228,7 @@ class SignupWorkflowTest(TestCase):
         'email': 'bob@example.org',
         'password1': 'secret',
         'password2': 'secret',
+        'privacy_consent': 'true',
     }
 
     @classmethod

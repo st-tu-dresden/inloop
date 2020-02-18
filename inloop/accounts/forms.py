@@ -29,6 +29,11 @@ class SignupForm(RegistrationFormUniqueEmail):
         ]
     )
 
+    privacy_consent = forms.BooleanField(
+        help_text='Yes, I accept the <a href="/about/privacy/">privacy statement</a>.',
+        required=True,
+    )
+
     def clean_email(self):
         """Perform additional email validation if configured in the admin interface."""
         pattern = config.EMAIL_PATTERN
