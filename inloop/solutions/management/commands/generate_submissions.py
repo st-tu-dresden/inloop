@@ -62,10 +62,9 @@ class Command(BaseCommand):
         now = timezone.now()
         start_date = now.replace(year=2015, month=4, day=15)  # birthday of INLOOP (see #14)
         users = self.generate_users(num_users, date_joined=start_date)
-        for n in range(num_solutions):
+        for _ in range(num_solutions):
             if start_date > now:
-                # reject creating unrealistic data
-                raise CommandError(f'Could only create {n} of {num_solutions} solutions.')
+                raise CommandError('Too many solutions requested.')
             solution = Solution.objects.create(
                 author=random.choice(users),
                 task=random.choice(tasks),
