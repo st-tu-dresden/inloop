@@ -85,7 +85,7 @@ def filter_stacktrace(trace):
     Filtering of JDK lines is necessary because Ant doesn't filter
     "new style" stack trace lines that contain the module name.
     """
-    return "\n".join(line for line in trace.splitlines() if not filter_line(line))
+    return '\n'.join(line for line in trace.splitlines() if not filter_line(line))
 
 
 def filter_line(line):
