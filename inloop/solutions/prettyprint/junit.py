@@ -9,6 +9,8 @@ Javadoc for the class
 
 which is part of Ant (see https://github.com/apache/ant).
 """
+import re
+
 from defusedxml import ElementTree as ET
 
 
@@ -61,6 +63,31 @@ def testcase_to_dict(testcase):
         element = testcase.find(tag)
         if element is not None:
             element_dict = dict(element.attrib)
-            element_dict['stacktrace'] = element.text
+            element_dict['stacktrace'] = filter_stacktrace(element.text)
             testcase_dict[tag] = element_dict
     return testcase_dict
+
+
+IGNORE_LINE_REGEXES = [
+    # JDK internal classes, mostly Reflection API
+    re.compile(r'at java\.base/jdk\.internal'),
+
+    # Our Kotlin-based StructAssert library, which doesn't
+    # have a top-level package at the moment.
+    # Bandaid solution: detect using the file extension.
+    re.compile(r'\(\w+\.kt:\d+\)'),
+]
+
+
+def filter_stacktrace(trace):
+    """
+    Clean the stracktrace from JDK and StructAssert internals.
+    Filtering of JDK lines is necessary because Ant doesn't filter
+    "new style" stack trace lines that contain the module name.
+    """
+    return "\n".join(line for line in trace.splitlines() if not filter_line(line))
+
+
+def filter_line(line):
+    """Return True if the line should be filtered."""
+    return any(regex.search(line) for regex in IGNORE_LINE_REGEXES)

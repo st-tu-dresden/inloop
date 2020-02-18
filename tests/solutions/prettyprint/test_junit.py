@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest import TestCase
 
 from inloop.solutions.prettyprint import junit
@@ -64,6 +65,19 @@ class JUnitXMLTests(TestCase):
         for document in documents:
             ts = junit.xml_to_dict(document)
             self.assertEqual(len(ts['testcases']), 0)
+
+
+class StacktraceFilterTest(TestCase):
+    def test(self):
+        with open(Path(SAMPLES_PATH, 'stacktrace.txt')) as stream:
+            stacktrace = stream.read()
+        filtered_stacktrace = junit.filter_stacktrace(stacktrace)
+        self.assertIn('AssertionFailedError', filtered_stacktrace)
+        self.assertIn('TaxiTest.createTaxi(', filtered_stacktrace)
+        self.assertIn('TaxiTest.setUp(', filtered_stacktrace)
+        self.assertNotIn('jdk.internal.reflect', filtered_stacktrace)
+        self.assertNotIn('types.TestClass', filtered_stacktrace)
+        self.assertNotIn('constraint.Constraint', filtered_stacktrace)
 
 
 class XMLBombProtectionTest(TestCase):

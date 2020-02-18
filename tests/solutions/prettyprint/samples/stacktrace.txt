@@ -1,0 +1,15 @@
+junit.framework.AssertionFailedError: Field Taxi.driver not found.
+reason: wrong field name
+expectedName: driver
+expectedType: Human
+	at types.TestClass.findField$structural_asserts(TestClass.kt:51)
+	at constraint.Constraint$Companion$setsToField$2.postCheck(Constraint.kt:58)
+	at invokable.BaseInvokable.checkConstraints$structural_asserts(BaseInvokable.kt:28)
+	at invokable.BaseConstructor.call$structural_asserts(BaseConstructor.kt:39)
+	at invoked.BaseInvokedConstructor.call(BaseInvokedConstructor.kt:45)
+	at invoked.BaseInvokedConstructor.callWithoutExceptions(BaseInvokedConstructor.kt:48)
+	at TaxiTest.createTaxi(TaxiTest.java:71)
+	at TaxiTest.setUp(TaxiTest.java:83)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
