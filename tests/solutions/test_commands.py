@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import StringIO
 from unittest.mock import patch
 
@@ -61,6 +62,6 @@ class GenerateSubmissionsCommandTest(SimpleTaskData, TestCase):
 
     def test_error_raised_for_unrealistic_data(self):
         with patch('inloop.solutions.management.commands.generate_submissions.timezone') as mock:
-            mock.now.return_value = timezone.now().replace(year=2014)
+            mock.now.return_value = datetime(2014, 1, 1, tzinfo=timezone.utc)
             with self.assertRaisesRegexp(CommandError, '0 of 5 solutions'):
                 call_command('generate_submissions', '2', '5')
