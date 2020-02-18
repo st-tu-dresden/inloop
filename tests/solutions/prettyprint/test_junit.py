@@ -68,7 +68,7 @@ class JUnitXMLTests(TestCase):
 
 
 class StacktraceFilterTest(TestCase):
-    def test(self):
+    def test_stacktrace_filter(self):
         with open(Path(SAMPLES_PATH, 'stacktrace.txt')) as stream:
             stacktrace = stream.read()
         filtered_stacktrace = junit.filter_stacktrace(stacktrace)
