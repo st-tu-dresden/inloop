@@ -56,15 +56,6 @@ class SolutionSubmissionView(LoginRequiredMixin, View):
 
 
 class SolutionEditorView(SolutionSubmissionView):
-
-    class JsonFailureResponse(JsonResponse):
-        def __init__(self):
-            super().__init__({'success': False})
-
-    class JsonSuccessResponse(JsonResponse):
-        def __init__(self):
-            super().__init__({'success': True})
-
     def get(self, request, slug):
         return TemplateResponse(request, 'solutions/editor/editor.html', {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
@@ -73,17 +64,17 @@ class SolutionEditorView(SolutionSubmissionView):
 
     def post(self, request, slug):
         if not request.is_ajax():
-            return SolutionEditorView.JsonFailureResponse()
+            return JsonResponse({'success': False})
 
         try:
             task = self.get_task(slug)
         except SubmissionError:
-            return SolutionEditorView.JsonFailureResponse()
+            return JsonResponse({'success': False})
 
         try:
             json_data = json.loads(request.body)
         except json.JSONDecodeError:
-            return SolutionEditorView.JsonFailureResponse()
+            return JsonResponse({'success': False})
 
         uploads = json_data.get('uploads', {})
         files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
@@ -91,9 +82,9 @@ class SolutionEditorView(SolutionSubmissionView):
         try:
             self.submit(files, request.user, task)
         except SubmissionError:
-            return SolutionEditorView.JsonFailureResponse()
+            return JsonResponse({'success': False})
 
-        return SolutionEditorView.JsonSuccessResponse()
+        return JsonResponse({'success': True})
 
 
 class SolutionUploadView(SolutionSubmissionView):
