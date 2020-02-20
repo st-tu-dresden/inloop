@@ -65,25 +65,14 @@ class SolutionEditorView(SolutionSubmissionView):
     def post(self, request, slug):
         if not request.is_ajax():
             return JsonResponse({'success': False})
-
         try:
             task = self.get_task(slug)
-        except SubmissionError:
-            return JsonResponse({'success': False})
-
-        try:
             json_data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False})
-
-        uploads = json_data.get('uploads', {})
-        files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
-
-        try:
+            uploads = json_data.get('uploads', {})
+            files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
             self.submit(files, request.user, task)
-        except SubmissionError:
+        except (SubmissionError, json.JSONDecodeError):
             return JsonResponse({'success': False})
-
         return JsonResponse({'success': True})
 
 
