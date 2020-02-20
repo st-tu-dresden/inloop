@@ -44,13 +44,13 @@ class SolutionSubmitMixin:
         if not files:
             raise SubmissionError("You haven't uploaded any files.")
         try:
-            validate_filenames([f.name for f in files])
+            validate_filenames([file.name for file in files])
         except ValidationError as error:
             raise SubmissionError(str(error))
         with transaction.atomic():
             solution = Solution.objects.create(author=author, task=task)
             SolutionFile.objects.bulk_create([
-                SolutionFile(solution=solution, file=f) for f in files
+                SolutionFile(solution=solution, file=file) for file in files
             ])
         solution_submitted.send(sender=self.__class__, solution=solution)
 
@@ -69,7 +69,10 @@ class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             task = self.get_task(slug)
             json_data = json.loads(request.body)
             uploads = json_data.get('uploads', {})
-            files = [SimpleUploadedFile(f, c.encode()) for f, c in uploads.items()]
+            files = [
+                SimpleUploadedFile(filename, content.encode())
+                for filename, content in uploads.items()
+            ]
             self.submit(files, request.user, task)
         except (SubmissionError, json.JSONDecodeError):
             return JsonResponse({'success': False})
