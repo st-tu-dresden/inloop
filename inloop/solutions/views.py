@@ -33,7 +33,7 @@ class SubmissionError(Exception):
     pass
 
 
-class SolutionSubmissionView(LoginRequiredMixin, View):
+class SolutionSubmitMixin:
     def get_task(self, slug):
         task = get_object_or_404(Task.objects.published(), slug=slug)
         if task.is_expired:
@@ -55,7 +55,7 @@ class SolutionSubmissionView(LoginRequiredMixin, View):
         solution_submitted.send(sender=self.__class__, solution=solution)
 
 
-class SolutionEditorView(SolutionSubmissionView):
+class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, 'solutions/editor/editor.html', {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
@@ -76,7 +76,7 @@ class SolutionEditorView(SolutionSubmissionView):
         return JsonResponse({'success': True})
 
 
-class SolutionUploadView(SolutionSubmissionView):
+class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
     def get(self, request, slug):
         return TemplateResponse(request, 'solutions/upload_form.html', {
             'task': get_object_or_404(Task.objects.published(), slug=slug),
