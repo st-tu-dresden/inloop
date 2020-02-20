@@ -29,39 +29,29 @@ class SolutionStatusView(LoginRequiredMixin, View):
         return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
 
 
+class SubmissionError(Exception):
+    pass
+
+
 class SolutionSubmissionView(LoginRequiredMixin, View):
-
-    class Error(ValueError):
-        pass
-
     def get_task(self, slug):
         task = get_object_or_404(Task.objects.published(), slug=slug)
         if task.is_expired:
-            raise SolutionSubmissionView.Error(
-                'The deadline for this task has passed.'
-            )
-
+            raise SubmissionError('The deadline for this task has passed.')
         return task
 
     def submit(self, files, author, task):
         if not files:
-            raise SolutionSubmissionView.Error(
-                "You haven't uploaded any files."
-            )
-
+            raise SubmissionError("You haven't uploaded any files.")
         try:
             validate_filenames([f.name for f in files])
-        except ValidationError as e:
-            raise SolutionSubmissionView.Error(
-                str(e)
-            )
-
+        except ValidationError as error:
+            raise SubmissionError(str(error))
         with transaction.atomic():
             solution = Solution.objects.create(author=author, task=task)
             SolutionFile.objects.bulk_create([
                 SolutionFile(solution=solution, file=f) for f in files
             ])
-
         solution_submitted.send(sender=self.__class__, solution=solution)
 
 
@@ -87,7 +77,7 @@ class SolutionEditorView(SolutionSubmissionView):
 
         try:
             task = self.get_task(slug)
-        except SolutionSubmissionView.Error:
+        except SubmissionError:
             return SolutionEditorView.JsonFailureResponse()
 
         try:
@@ -100,7 +90,7 @@ class SolutionEditorView(SolutionSubmissionView):
 
         try:
             self.submit(files, request.user, task)
-        except SolutionSubmissionView.Error:
+        except SubmissionError:
             return SolutionEditorView.JsonFailureResponse()
 
         return SolutionEditorView.JsonSuccessResponse()
@@ -118,8 +108,8 @@ class SolutionUploadView(SolutionSubmissionView):
             task = self.get_task(slug)
             files = request.FILES.getlist('uploads', default=[])
             self.submit(files, request.user, task)
-        except SolutionEditorView.Error as e:
-            messages.error(request, str(e))
+        except SubmissionError as error:
+            messages.error(request, str(error))
             return redirect('solutions:upload', slug=slug)
         messages.success(request, 'Your solution has been submitted to the checker.')
         return redirect('solutions:list', slug=slug)
