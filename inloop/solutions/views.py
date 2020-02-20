@@ -114,16 +114,13 @@ class SolutionUploadView(SolutionSubmissionView):
         })
 
     def post(self, request, slug):
-        task = self.get_task(slug)
-
-        files = request.FILES.getlist('uploads', default=[])
-
         try:
+            task = self.get_task(slug)
+            files = request.FILES.getlist('uploads', default=[])
             self.submit(files, request.user, task)
         except SolutionEditorView.Error as e:
             messages.error(request, str(e))
             return redirect('solutions:upload', slug=slug)
-
         messages.success(request, 'Your solution has been submitted to the checker.')
         return redirect('solutions:list', slug=slug)
 
