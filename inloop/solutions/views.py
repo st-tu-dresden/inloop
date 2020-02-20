@@ -35,12 +35,7 @@ class SolutionSubmissionView(LoginRequiredMixin, View):
         pass
 
     def get_task(self, slug):
-        try:
-            task = Task.objects.published().get(slug=slug)
-        except Task.DoesNotExist:
-            raise SolutionSubmissionView.Error(
-                'This task does not exist.'
-            )
+        task = get_object_or_404(Task.objects.published(), slug=slug)
         if task.is_expired:
             raise SolutionSubmissionView.Error(
                 'The deadline for this task has passed.'
