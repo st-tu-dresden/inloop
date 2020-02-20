@@ -87,8 +87,7 @@ class SolutionEditorView(SolutionSubmissionView):
 
         try:
             task = self.get_task(slug)
-        except SolutionSubmissionView.Error as e:
-            messages.error(request, e)
+        except SolutionSubmissionView.Error:
             return SolutionEditorView.JsonFailureResponse()
 
         try:
@@ -101,11 +100,9 @@ class SolutionEditorView(SolutionSubmissionView):
 
         try:
             self.submit(files, request.user, task)
-        except SolutionSubmissionView.Error as e:
-            messages.error(request, str(e))
+        except SolutionSubmissionView.Error:
             return SolutionEditorView.JsonFailureResponse()
 
-        messages.success(request, 'Your solution has been submitted to the checker.')
         return SolutionEditorView.JsonSuccessResponse()
 
 
