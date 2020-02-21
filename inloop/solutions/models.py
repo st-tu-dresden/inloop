@@ -7,7 +7,8 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.db.models import Max
+from django.db.models.aggregates import Max
+from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete
 from django.db.transaction import atomic
 from django.dispatch import receiver
@@ -140,13 +141,24 @@ class Solution(models.Model):
             return 'lost'
         return 'pending'
 
-    @atomic
+    def get_next_scoped_id(self):
+        """Compute the next scoped_id."""
+        query = (
+            Solution.objects.filter(author=self.author, task=self.task)
+            .aggregate(next_scoped_id=(Coalesce(Max('scoped_id'), 0) + 1))
+        )
+        return query['next_scoped_id']
+
     def save(self, *args, **kwargs):
+        """
+        Save this solution and ensure a scoped_id is assigned.
+        Calculation and storage of scoped_id is not atomic, callers
+        should be prepared to handle the resulting IntegrityError
+        when they use this method in a concurrent fashion (e.g., in
+        web requests).
+        """
         if not self.scoped_id:
-            current_max = Solution.objects.filter(
-                author=self.author, task=self.task
-            ).aggregate(Max('scoped_id'))['scoped_id__max']
-            self.scoped_id = (current_max or 0) + 1
+            self.scoped_id = self.get_next_scoped_id()
         return super().save(*args, **kwargs)
 
     def __repr__(self):
