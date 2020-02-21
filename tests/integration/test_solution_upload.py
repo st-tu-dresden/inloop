@@ -87,6 +87,18 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         self.assertIn('Fibonacci1.java', file_names)
         self.assertIn('Fibonacci2.java', file_names)
 
+    def test_integrity_error_is_handled(self):
+        sample_file = SimpleUploadedFile('Foo.java', b'public class Foo {}')
+        post_data = {'uploads': [sample_file]}
+        solution_count_before = Solution.objects.count()
+        with patch('inloop.solutions.models.Solution.get_next_scoped_id', return_value=1):
+            # mocked bogus scoped_id should force an IntegrityError
+            with self.assertLogs(level='ERROR') as capture_logs:
+                response = self.client.post(self.url, data=post_data, follow=True)
+        self.assertIn('db constraint violation', capture_logs.output[0])
+        self.assertContains(response, 'Concurrent submission')
+        self.assertEqual(solution_count_before, Solution.objects.count())
+
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(TEST_MEDIA_ROOT)

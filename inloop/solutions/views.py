@@ -1,4 +1,5 @@
 import json
+import logging
 from os.path import basename
 
 from django.contrib import messages
@@ -6,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -21,6 +22,8 @@ from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
 from inloop.tasks.models import Task
+
+logger = logging.getLogger(__name__)
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
@@ -45,14 +48,21 @@ class SolutionSubmitMixin:
             raise SubmissionError("You haven't uploaded any files.")
         try:
             validate_filenames([file.name for file in files])
+            solution = self.atomic_submit(files, author, task)
+            solution_submitted.send(sender=self.__class__, solution=solution)
         except ValidationError as error:
             raise SubmissionError(str(error))
-        with transaction.atomic():
-            solution = Solution.objects.create(author=author, task=task)
-            SolutionFile.objects.bulk_create([
-                SolutionFile(solution=solution, file=file) for file in files
-            ])
-        solution_submitted.send(sender=self.__class__, solution=solution)
+        except IntegrityError:
+            logger.exception('db constraint violation occurred')
+            raise SubmissionError('Concurrent submission is not possible.')
+
+    @transaction.atomic()
+    def atomic_submit(self, files, author, task):
+        solution = Solution.objects.create(author=author, task=task)
+        SolutionFile.objects.bulk_create([
+            SolutionFile(solution=solution, file=file) for file in files
+        ])
+        return solution
 
 
 class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
