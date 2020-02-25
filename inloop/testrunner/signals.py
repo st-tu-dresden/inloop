@@ -13,7 +13,8 @@ def handle_repository_loaded(sender, repository, **kwargs):
     """
     Listen for the repository_loaded signal and (re-) build the docker image.
     """
-    args = ['docker', 'build', '--pull', '-t', settings.TESTRUNNER_IMAGE, '.']
+    image_name = settings.TESTRUNNER_OPTIONS['image']
+    args = ['docker', 'build', '--pull', '-t', image_name, '.']
     check_call(args, cwd=repository.path, timeout=60)
 
 
