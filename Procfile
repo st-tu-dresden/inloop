@@ -1,3 +1,3 @@
-web:    django-admin runserver
-worker: django-admin run_huey --workers=2
+web:    ./manage.py runserver
+worker: ./manage.py run_huey --workers=2
 vnu:    ./vnu.sh
