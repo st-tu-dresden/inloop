@@ -48,10 +48,10 @@ Using the command line, a development instance can be set up as follows:
 
 3. On macOS, please run:
 
-           export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS"
-           export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
+           export CFLAGS="-I$(brew --prefix openssl@1.1)/include $CFLAGS"
+           export LDFLAGS="-L$(brew --prefix openssl@1.1)/lib $LDFLAGS"
 
-   (This is necessary to build the `psycopg2` library.)
+   (This is necessary on Python 3.7 or newer to build the `psycopg2` library.)
 
 4. Run `make init` and `make loaddb` to bootstrap your local development environment.
 
