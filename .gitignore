@@ -19,5 +19,8 @@ __pycache__/
 /htmlcov/
 /media/
 
+# pip
+*.egg-info/
+
 # environment file, read by pipenv and honcho
 /.env

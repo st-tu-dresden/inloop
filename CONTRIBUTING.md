@@ -40,18 +40,61 @@ Apply the following configuration to your local Git clone of INLOOP:
     git config pull.rebase true
 
 
-## Python dependency upgrades
+## Python dependency management
 
-This project uses `pipenv` to manage Python dependencies. The tool reads and saves
-requirements from and to `Pipfile` and `Pipfile.lock` files.
+We use [poetry](https://python-poetry.org/) to manage Python dependencies.
+The tool reads and saves requirements from and to [pyproject.toml](pyproject.toml)
+and [poetry.lock](poetry.lock) files. The latter one contains _exact_ versions
+and hashes of _all_ dependencies (transitive deps included), ensuring
+reproducible installations.
 
-* You can check the currently pinned dependency versions (in `Pipfile.lock`) for known
-  security vulnerabilities using `pipenv check`.
-* Other than that, you can use `pip` to check for outdated versions in general with
-  `pipenv run pip list -o`.
-* Use `pipenv update --dev` to update all dependencies. Afterwards, commit the updated
-  `Pipfile.lock` (and `Pipfile`, if changed) to the Git repository. (Please do not mix
-  changes unrelated to the upgrade into the commit.)
+### Most important poetry commands
+
+* Add a dependency: `poetry add some-package`.
+  * Use `poetry add --dev some-package` if your package is only needed during development.
+* Add a dependency with a version constraint: `poetry add some-package@^1.2.3`.
+  * This can also be used to update the version constraint of an
+    existing dependency, e.g., when moving from Django 1.11 to 2.0.
+  * Check the [poetry manual](https://python-poetry.org/docs/dependency-specification/)
+    for details about possible constraints.
+  * Beware, `zsh` users: you should escape the caret (`^`) symbol used in caret constraints.
+* Update a dependency: `poetry update some-package`.
+  * In other words, this updates the pinned version in `poetry.lock`.
+  * Keep in mind that the version constraints in `pyproject.toml` still apply.
+
+### Dependency update process
+
+General rules:
+* Update dependencies individually.
+* Perform work on an isolated branch, e.g., `update-dependencies`.
+* Create separate commits for individual version changes in `poetry.lock`.
+
+Steps:
+1. Update the given dependency, let's say Django: `poetry update django`.
+2. Ensure tests succeed locally: `make test`.
+3. Review the changes to `poetry.lock` with `git diff` and note the
+   version before and after the change.
+4. Commit changes with a commit message of the form:
+   `Bump django from 1.11.28 to 1.11.29`, i.e., "Bump X from Y to Z".
+5. Push the branch, create a PR and wait for Travis to finish its checks.
+
+### Upgrading Django major or minor versions
+
+In our `pyproject.toml`, the Django version is specified with a "tilde constraint"
+to avoid automatic switches to the next minor or major version, e.g., from 1.11.x
+to 1.12.y or from 1.11.x to 2.0.y.
+
+Thus, `poetry update django` will at most update the patch version, e.g., from
+1.11.28 to 1.11.29.
+
+The reason for this is that major or minor Django version upgrades should only
+be done manually with careful review of the release notes and thorough testing.
+
+For a major or minor upgrade, you need to run `poetry add` again with an updated
+version constraint. For example, to upgrade from the current Django 1.11 to the
+latest version, run `poetry add django@latest`. This will update `pyproject.toml`
+in addition to `poetry.lock`, and thus both need to be included in your
+"Bump django …" commit (see [previous section](#dependency-update-process)).
 
 
 ## Rules for contributing code
