@@ -14,7 +14,6 @@ endif
 init:
 	pipenv sync --dev
 	docker build -t $(IMAGE) tests/testrunner
-	ln -snf .env.develop .env
 
 run:
 	pipenv run honcho start
