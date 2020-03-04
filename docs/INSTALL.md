@@ -147,6 +147,11 @@ Installation
 
         ./support/scripts/debian_setup.sh --prod
 
+   and the [poetry](https://python-poetry.org/docs/) package manager (for the `inloop`
+   user only):
+
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+
 4. Create a clean virtualenv for INLOOP:
 
         python3 -m venv ~/virtualenv
@@ -222,8 +227,7 @@ Installation
    is not the case.
 
         cd ~/inloop
-        pip install pipenv
-        pipenv sync
+        poetry install --no-dev
         django-admin migrate
 
    **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.

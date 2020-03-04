@@ -39,7 +39,7 @@ INLOOP requires the following software:
 
 Using the command line, a development instance can be set up as follows:
 
-1. If you don't have it already, install [pipenv](https://pipenv.readthedocs.io/).
+1. If you don't have it already, install [poetry](https://python-poetry.org/docs/#installation).
    If you run into trouble, the known "good" versions of the build tools are listed in
    [build-requirements.txt](build-requirements.txt).
 
@@ -55,7 +55,7 @@ Using the command line, a development instance can be set up as follows:
 
 4. Run `make init` and `make loaddb` to bootstrap your local development environment.
 
-5. Start and monitor the development web server and huey workers with `pipenv run honcho start`.
+5. Start and monitor the development web server and huey workers with `make run`.
 
 6. The previous step prints the address and port number of the local webserver that was started.
    You can immediately log in using the demo user accounts *admin* and *student* with the password
