@@ -1,3 +1,12 @@
+"""
+Nox sessions, which each run in an isolated Python environment with
+minimal dependencies. This ensures that we never accidentally depend
+on dev dependencies in production code (thus, we achieve a feature
+similar to Maven's dependency scopes).
+
+The sessions are primarily used in our .travis-ci.yml.
+"""
+
 from tempfile import NamedTemporaryFile
 
 import nox
