@@ -1,39 +1,25 @@
-dist: trusty
+dist: bionic
 
-matrix:
+language: python
+
+os: linux
+
+jobs:
   include:
-    - language: python
-      name: "Python 3.6 Checks"
-      python:
-        - "3.6"
-      services:
-        - docker
-      cache:
-        pip: true
-      install:
-        - pip install -r build-requirements.txt
-        - make init
-      script:
-        - make lint
-        - make coverage TESTOPTS='-v2'
+  - name: Python 3.7 tests
+    python: 3.7
+    services: docker
+    env: NOXSESSION=tests-3.7
+  - name: Python 3.6 tests
+    python: 3.6
+    services: docker
+    env: NOXSESSION=tests-3.6
+  - name: Python linting
+    python: 3.6
+    env: NOXSESSION=lint
 
-    - language: node_js
-      name: "CSS Checks"
-      node_js:
-        - "10"
-      before_script:
-        - npm install -g csslint
-      script:
-        - sh csslint.sh
+cache: pip
 
-    - language: node_js
-      name: "JavaScript Checks"
-      node_js:
-        - "10"
-      before_script:
-        - npm install -g jshint
-      script:
-        - sh jshint.sh
+install: pip install -r build-requirements.txt
 
-notifications:
-  email: false
+script: nox

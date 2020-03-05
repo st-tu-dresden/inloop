@@ -61,6 +61,11 @@ reproducible installations.
 * Update a dependency: `poetry update some-package`.
   * In other words, this updates the pinned version in `poetry.lock`.
   * Keep in mind that the version constraints in `pyproject.toml` still apply.
+* Update poetry itself: `poetry self update`.
+  * This will only work if poetry was installed with the recommended installation method
+    and _not_ with `pip` or `pipx`.
+  * In our CI setup, poetry is installed with `pip` and the version is pinned in
+    [build-requirements.txt](build-requirements.txt).
 
 ### Dependency update process
 
