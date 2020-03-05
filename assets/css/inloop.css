@@ -80,8 +80,8 @@ code {
   content: '';
   display: block;
   width: 0;
-  height: 5em;
-  margin-top: -5em;
+  height: 65px;
+  margin-top: -65px;
 }
 
 /* @end */
