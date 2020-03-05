@@ -31,7 +31,7 @@ def install_with_constraints(session, *args, **kwargs):
 @nox.session(python=['3.6', '3.7'])
 def tests(session):
     """Run the complete test suite without dev dependencies."""
-    args = session.posargs or ['-v2']
+    args = session.posargs or ['-v2', '--failfast']
     session.run('poetry', 'install', '--no-dev', external=True)
     install_with_constraints(session, 'coverage')
     session.run('coverage', 'run', './manage.py', 'test', *args)
