@@ -3,7 +3,8 @@
     "model": "auth.user",
     "pk": 1,
     "fields": {
-        "password": "pbkdf2_sha256$30000$WFKiKYN6FGo2$5lG6rbQgjZU0keL99+3zzRddMdYQO+6raLR9NPu5zK8=",
+        "password": "pbkdf2_sha256$36000$gapCkdw2sYD2$8+QlpA6HQJ8X2QOvptGSEiBOo407/mG6aOhvWDl+Y/w=",
+        "last_login": "2020-03-05T13:59:30.045Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -11,6 +12,7 @@
         "email": "admin@localhost",
         "is_staff": true,
         "is_active": true,
+        "date_joined": "2020-01-19T08:23:24.881Z",
         "groups": [],
         "user_permissions": []
     }
@@ -19,7 +21,8 @@
     "model": "auth.user",
     "pk": 2,
     "fields": {
-        "password": "pbkdf2_sha256$30000$gz0cXyTDmT0y$sszYO09UfUu4owrxKnH+wxruLH9F5ADZfJHYlgBdpvM=",
+        "password": "pbkdf2_sha256$36000$shFzq0I2X0K2$JyqQptU4viouA+Qzsk9Ypb0rNpIj2paOhK0acd9EUik=",
+        "last_login": "2020-03-05T13:59:19Z",
         "is_superuser": false,
         "username": "student",
         "first_name": "John",
@@ -27,7 +30,28 @@
         "email": "student@localhost",
         "is_staff": false,
         "is_active": true,
+        "date_joined": "2020-01-19T08:23:24Z",
         "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$36000$XTtxXFkYBmYf$VPKx0mu7mnmYxc17/PZPupfp30iM5ljYahhxLF5GiYM=",
+        "last_login": "2020-03-05T14:05:17.008Z",
+        "is_superuser": false,
+        "username": "staff",
+        "first_name": "",
+        "last_name": "",
+        "email": "staff@localhost",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2020-03-05T14:01:51Z",
+        "groups": [
+            1
+        ],
         "user_permissions": []
     }
 }

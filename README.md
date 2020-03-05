@@ -57,8 +57,8 @@ Using the command line, a development instance can be set up as follows:
 5. Start and monitor the development web server and huey workers with `make run`.
 
 6. The previous step prints the address and port number of the local webserver that was started.
-   You can immediately log in using the demo user accounts *admin* and *student* with the password
-   *secret*.
+   You can immediately log in using the demo user accounts *admin*, *staff*, and *student* with
+   the password *secret*.
 
 You can use our [Java example task repository][repo-example] as a starting point to explore INLOOP.
 
