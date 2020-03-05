@@ -1,4 +1,22 @@
+from tempfile import NamedTemporaryFile
+
 import nox
+
+
+def install_with_constraints(session, *args, **kwargs):
+    """Install packages constrained by poetry's lockfile."""
+    with NamedTemporaryFile() as requirements:
+        # This approach is by Claudio Jolowicz, see his excellect
+        # example at github.com/cjolowicz/hypermodern-python.
+        session.run(
+            'poetry',
+            'export',
+            '--dev',
+            '--format=requirements.txt',
+            f'--output={requirements.name}',
+            external=True
+        )
+        session.install(f'--constraint={requirements.name}', *args, **kwargs)
 
 
 @nox.session(python=['3.6', '3.7'])
@@ -13,7 +31,7 @@ def tests(session):
 def lint(session):
     """Check code style with flake8 and isort."""
     locations = 'inloop', 'tests', 'noxfile.py', 'manage.py'
-    session.install('flake8', 'flake8-docstrings', 'isort')
+    install_with_constraints(session, 'flake8', 'flake8-docstrings', 'isort')
     session.run(
         'isort',
         '--check-only',
