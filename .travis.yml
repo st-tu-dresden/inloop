@@ -1,39 +1,16 @@
-dist: trusty
+dist: bionic
 
-matrix:
-  include:
-    - language: python
-      name: "Python 3.6 Checks"
-      python:
-        - "3.6"
-      services:
-        - docker
-      cache:
-        pip: true
-      install:
-        - pip install -r build-requirements.txt
-        - make init
-      script:
-        - make lint
-        - make coverage TESTOPTS='-v2'
+language: python
 
-    - language: node_js
-      name: "CSS Checks"
-      node_js:
-        - "10"
-      before_script:
-        - npm install -g csslint
-      script:
-        - sh csslint.sh
+python:
+- "3.6"
+- "3.7"
 
-    - language: node_js
-      name: "JavaScript Checks"
-      node_js:
-        - "10"
-      before_script:
-        - npm install -g jshint
-      script:
-        - sh jshint.sh
+services:
+- docker
 
-notifications:
-  email: false
+install:
+- pip install -r build-requirements.txt
+- docker build -t inloop-integration-test tests/testrunner
+
+script: nox
