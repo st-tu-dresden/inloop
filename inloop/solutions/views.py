@@ -5,6 +5,7 @@ from os.path import basename
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
@@ -164,11 +165,26 @@ class ModalConfirmationView(LoginRequiredMixin, View):
         })
 
 
+def access_solution_or_404(user: User, solution_id: int) -> Solution:
+    """
+    Access a solution with a given user.
+
+    Regular users should only be able to access solution objects
+    they authored. When a regular user tries to access another
+    user's solution, a Http 404 error is raised. Since staff
+    members however should be able to view other users'
+    solutions, this restriction does not apply to them.
+    """
+    if user.is_staff:
+        return get_object_or_404(Solution, pk=solution_id)
+    return get_object_or_404(Solution, pk=solution_id, author=user)
+
+
 class NewSolutionArchiveView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
             raise Http404('No solution id was supplied.')
-        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({'status': 'available'})
         try:
@@ -182,7 +198,7 @@ class SolutionArchiveStatusView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
             raise Http404('No solution id was supplied.')
-        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({'status': 'available'})
         return JsonResponse({'status': 'unavailable'})
@@ -192,7 +208,7 @@ class SolutionArchiveDownloadView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
             raise Http404('No solution id was supplied.')
-        solution = get_object_or_404(Solution, pk=solution_id, author=request.user)
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             response = HttpResponse(solution.archive, content_type='application/zip')
             attachment = 'attachment; filename=%s' % basename(solution.archive.name)
