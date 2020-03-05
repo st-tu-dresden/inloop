@@ -32,6 +32,14 @@ def install_with_constraints(session, *args, **kwargs):
 def tests(session):
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ['-v2', '--failfast']
+    session.run(
+        'docker',
+        'build',
+        '--tag',
+        'inloop-integration-test',
+        'tests/testrunner',
+        external=True,
+    )
     session.run('poetry', 'install', '--no-dev', external=True)
     install_with_constraints(session, 'coverage')
     session.run('coverage', 'run', './manage.py', 'test', *args)

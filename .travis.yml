@@ -18,8 +18,6 @@ services:
 
 cache: pip
 
-install:
-- pip install -r build-requirements.txt
-- docker build -t inloop-integration-test tests/testrunner
+install: pip install -r build-requirements.txt
 
 script: nox
