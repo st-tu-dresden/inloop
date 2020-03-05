@@ -76,7 +76,7 @@ code {
  * Insert an invisible spacer on selected headings
  * to force them below the sticky tab bar
  */
-.static-tab-content :target:before {
+.static-tab-content :target::before {
   content: '';
   display: block;
   width: 0;
