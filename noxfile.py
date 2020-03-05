@@ -33,7 +33,9 @@ def tests(session):
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ['-v2']
     session.run('poetry', 'install', '--no-dev', external=True)
-    session.run('python', 'manage.py', 'test', *args)
+    install_with_constraints(session, 'coverage')
+    session.run('coverage', 'run', './manage.py', 'test', *args)
+    session.run('coverage', 'report')
 
 
 @nox.session(python=['3.6'])
