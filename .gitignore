@@ -23,5 +23,8 @@ __pycache__/
 # pip
 *.egg-info/
 
-# environment file, read by pipenv and honcho
+# nox
+.nox/
+
+# optional environment file, read by honcho
 /.env
