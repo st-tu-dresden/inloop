@@ -74,15 +74,11 @@ code {
 }
 
 /*
- * Insert an invisible spacer on selected headings
- * to force them below the sticky tab bar
+ * Avoid tab bar overlapping in autolinked
+ * containers by adding a scroll-only margin.
  */
-.static-tab-content :target::before {
-  content: '';
-  display: block;
-  width: 0;
-  height: 65px;
-  margin-top: -65px;
+.autolink h2, .autolink h3 {
+  scroll-margin-top: 65px;
 }
 
 /* @end */
