@@ -79,7 +79,7 @@ $(document).ready(function() {
 
     class PendingArchiveDownloadBar extends DownloadBar {
         get text() {
-            return "Your archive is being created.";
+            return "The archive is being created.";
         }
 
         get css() {
@@ -109,7 +109,7 @@ $(document).ready(function() {
 
     class DownloadArchiveDownloadBar extends DownloadBar {
         get text() {
-            return "Click here to download your solution as zip archive.";
+            return "Click here to download the solution as zip archive.";
         }
 
         get css() {

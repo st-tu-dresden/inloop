@@ -10,7 +10,7 @@ from django.utils.encoding import force_text
 from inloop.solutions.models import Solution, SolutionFile, create_archive
 from inloop.testrunner.models import TestResult
 
-from tests.accounts.mixins import SimpleAccountsData
+from tests.accounts.mixins import AccountsData, SimpleAccountsData
 from tests.tasks.mixins import TaskData
 
 
@@ -59,7 +59,7 @@ TEST_MEDIA_ROOT = mkdtemp()
 
 @tag('slow')
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
-class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
+class SolutionDetailViewTest(TaskData, AccountsData, TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -105,28 +105,72 @@ class SolutionDetailViewTest(TaskData, SimpleAccountsData, TestCase):
             'Click here to create a downloadable zip archive for this solution.'
         )
 
-    def test_archive_download(self):
-        """Test archive download in solution detail view."""
+    def test_archive_status(self):
+        """Test the archive status endpoint."""
         self.assertTrue(self.client.login(username='bob', password='secret'))
+        response = self.client.get(reverse('solutions:archive_status', kwargs={
+            'solution_id': self.solution.id
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'unavailable')
+
         create_archive(self.solution)
 
-        # Download archive
+        response = self.client.get(reverse('solutions:archive_status', kwargs={
+            'solution_id': self.solution.id
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'available')
+
+    def test_archive_status_access(self):
+        """Test the access privileges to the archive status endpoint."""
+        for user, expected_status_code in [
+            (self.bob, 200),
+            (self.arnold, 200),
+            (self.alice, 404),
+        ]:
+            self.client.force_login(user)
+            response = self.client.get(reverse('solutions:archive_status', kwargs={
+                'solution_id': self.solution.id
+            }))
+            self.assertEquals(response.status_code, expected_status_code)
+
+    def test_new_archive_access(self):
+        """Test the access privileges to the archive creation."""
+        create_archive(self.solution)
+        for user, expected_status_code in [
+            (self.bob, 200),
+            (self.arnold, 200),
+            (self.alice, 404),
+        ]:
+            self.client.force_login(user)
+            response = self.client.get(reverse('solutions:archive_new', kwargs={
+                'solution_id': self.solution.id
+            }))
+            self.assertEqual(response.status_code, expected_status_code)
+
+    def test_archive_download(self):
+        """Test archive download in solution detail view."""
+        create_archive(self.solution)
+
         response = self.client.get(reverse('solutions:archive_download', kwargs={
             'solution_id': self.solution.id
         }), follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_archive_access(self):
-        """Verify that a user cannot download other users' solution archives."""
-        self.assertTrue(self.client.login(username='alice', password='secret'))
+    def test_archive_download_access(self):
+        """Test the access privileges to the archive download."""
         create_archive(self.solution)
-
-        # Because the solution was created by bob, alice
-        # should not be able to access his archive
-        response = self.client.get(reverse('solutions:archive_download', kwargs={
-            'solution_id': self.solution.id
-        }), follow=True)
-        self.assertEqual(response.status_code, 404)
+        for user, expected_status_code in [
+            (self.bob, 200),
+            (self.arnold, 200),
+            (self.alice, 404),
+        ]:
+            self.client.force_login(user)
+            response = self.client.get(reverse('solutions:archive_download', kwargs={
+                'solution_id': self.solution.id
+            }))
+            self.assertEqual(response.status_code, expected_status_code)
 
     def test_console_output(self):
         """Test console output tab in solution detail view."""
