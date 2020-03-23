@@ -3,8 +3,12 @@ from typing import Optional
 
 from django.core.exceptions import ValidationError
 
+DATE_INPUTFORMAT_REGEX = re.compile(r"""
+    [0-9]{4}-[0-9]{2}-[0-9]{2}$ # The day, such as 1970-01-01
+""", re.VERBOSE)
+
 ISOFORMAT_REGEX = re.compile(r"""
-    [0-9]{4}-[0-9]{2}-[0-9]{2}               # The day, such as 01-01-1970
+    [0-9]{4}-[0-9]{2}-[0-9]{2}               # The day, such as 1970-01-01
     T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$  # The time, such as 00:00:00.000Z
 """, re.VERBOSE)
 
@@ -17,9 +21,14 @@ def get_optional_timestamp(key_name: str, data: dict) -> Optional[str]:
     of JavaScript to be directly parseable by the database backend.
     """
     parameter = data.get(key_name)
-    if parameter is None:
+    if not parameter:
         return None
+    # Try to match supported date formats
+    # from the most to the least specific
     match = ISOFORMAT_REGEX.match(parameter)
+    if match is not None:
+        return parameter
+    match = DATE_INPUTFORMAT_REGEX.match(parameter)
     if match is not None:
         return parameter
     raise ValidationError(
@@ -33,7 +42,7 @@ def get_optional_bool(key_name: str, data: dict) -> Optional[bool]:
     Get and validate a boolean parameter from a data dictionary.
     """
     parameter = data.get(key_name)
-    if parameter is None:
+    if parameter is None or parameter == "":
         return None
     if isinstance(parameter, bool):
         return parameter
@@ -55,7 +64,7 @@ def get_optional_int(key_name: str, data: dict) -> Optional[int]:
     Get and validate an integer parameter from a data dictionary.
     """
     parameter = data.get(key_name)
-    if parameter is None:
+    if parameter is None or parameter == "":
         return None
     if isinstance(parameter, int):
         return parameter
@@ -78,7 +87,7 @@ def get_optional_truncator_identifier(key_name: str, data: dict) -> Optional[str
     Get and validate an SQL truncator identifier from a data dictionary.
     """
     truncator_identifier = data.get(key_name)
-    if truncator_identifier is None:
+    if not truncator_identifier:
         return None
     if truncator_identifier in ALLOWED_TRUNCATOR_IDENTIFIERS:
         return truncator_identifier
