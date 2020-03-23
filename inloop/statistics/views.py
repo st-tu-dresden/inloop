@@ -7,11 +7,13 @@ from django.db import models
 from django.db.models import functions
 from django.http import Http404, HttpRequest, JsonResponse
 from django.views import View
+from django.views.generic import TemplateView
 
 from inloop.solutions.models import Solution
 from inloop.statistics.validators import (get_optional_bool, get_optional_int,
                                           get_optional_timestamp,
                                           get_optional_truncator_identifier)
+from inloop.tasks.models import Category, Task
 
 
 def bad_request(reason: str) -> JsonResponse:
@@ -53,6 +55,36 @@ class AdminView(UserPassesTestMixin, LoginRequiredMixin, View):
         if not self.request.user.is_superuser and not self.request.user.is_staff:
             raise Http404()
         return True
+
+
+class StatisticsIndexTemplateView(AdminView, TemplateView):
+    """
+    Provide the template for the index statistics view.
+
+    The statistics index view provides a frame
+    for other modular statistics views.
+    """
+    template_name = 'statistics/index.html'
+
+
+class SubmissionsHistogramTemplateView(AdminView, TemplateView):
+    """
+    Provide the template for the modular submissions histogram.
+    """
+    template_name = 'statistics/submissions_histogram.html'
+
+    def get_context_data(self) -> dict:
+        return {'categories': Category.objects.all()}
+
+
+class AttemptsHistogramTemplateView(AdminView, TemplateView):
+    """
+    Provide the template for the modular attempts histogram.
+    """
+    template_name = 'statistics/attempts_histogram.html'
+
+    def get_context_data(self) -> dict:
+        return {'tasks': Task.objects.all()}
 
 
 class SubmissionsHistogramJsonView(AdminView):
