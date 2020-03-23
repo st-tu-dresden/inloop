@@ -7,6 +7,7 @@
   <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
   {% if user.is_superuser or user.is_staff %}
     <li><a href="{% url 'admin:index' %}">Administration</a></li>
+    <li><a href="{% url 'statistics:index' %}">Statistics</a></li>
   {% endif %}
   <li><a id="logout-link" href="{% url 'logout' %}">Logout</a></li>
 {% else %}
