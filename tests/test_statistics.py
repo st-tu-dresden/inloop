@@ -173,6 +173,89 @@ class QuerysetLimitReachedTest(TestCase):
         self.assertEqual(json_content.get('queryset_count'), queryset_count)
 
 
+class AdminViewTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Set up user accounts with different access privileges."""
+        super().setUpClass()
+        cls.super_user = User.objects.create_superuser(
+            username='super_user',
+            password='secret',
+            email='super_user@example.com',
+            is_superuser=True
+        )
+        cls.staff_user = User.objects.create_user(
+            username='staff_user',
+            password='secret',
+            email='staff_user@example.com',
+            is_staff=True
+        )
+        cls.regular_user = User.objects.create_user(
+            username='regular_user',
+            password='secret',
+            email='regular_user@example.com'
+        )
+
+    def test_index_view(self):
+        """
+        Test the admin view through the statistics
+        index view, which is restricted to admins.
+        """
+        try:
+            url = reverse('statistics:index')
+        except NoReverseMatch as e:
+            self.fail(e)
+        for allowed_user in [self.super_user, self.staff_user]:
+            self.client.force_login(allowed_user)
+            response = self.client.get(url, follow=True)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.client.force_login(self.regular_user)
+        response = self.client.get(url, follow=False)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.client.logout()
+        response = self.client.get(url, follow=False)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+
+class TemplateViewsIntegrationTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Set up a superuser account to access the statistics template views."""
+        super().setUpClass()
+        cls.super_user = User.objects.create_superuser(
+            username='super_user',
+            password='secret',
+            email='super_user@example.com',
+            is_superuser=True
+        )
+
+    def test_solutions_histogram_template_view(self):
+        """
+        Validate, that the solutions histogram template view
+        is integrated and renders correctly.
+        """
+        try:
+            url = reverse('statistics:submissions_histogram')
+        except NoReverseMatch as e:
+            self.fail(e)
+        self.client.force_login(self.super_user)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_attempts_histogram_template_view(self):
+        """
+        Validate, that the attempts histogram template view
+        is integrated and renders correctly.
+        """
+        try:
+            url = reverse('statistics:attempts_histogram')
+        except NoReverseMatch as e:
+            self.fail(e)
+        self.client.force_login(self.super_user)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+
 class SubmissionsHistogramJsonViewTest(TestCase):
     @classmethod
     def setUpClass(cls):

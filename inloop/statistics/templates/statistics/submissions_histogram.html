@@ -1,0 +1,59 @@
+<div class="mt-3">
+  <div class="row">
+    <div class="col-lg-2">
+      <form action="{% url 'statistics:submissions_histogram_api' %}"
+            id="chart-form" class="p-2 mb-3 bg-light rounded" method="get">
+        <h5>Parameters</h5>
+
+        <hr>
+
+        <label for="passed-select">Passed state</label>
+        <select id="passed-select" name="passed"
+                class="form-control border-dark">
+          <option selected value>Passed and Failed</option>
+          <option value="true">Passed</option>
+          <option value="false">Failed</option>
+        </select>
+
+        <label for="category-select" class="mt-2">Category</label>
+        <select id="category-select" name="category_id"
+                class="form-control border-dark">
+          <option selected value="">No category</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="granularity-select" class="mt-2">Granularity</label>
+        <select id="granularity-select" name="granularity"
+                class="form-control border-dark">
+          <option value="minute">Minutely</option>
+          <option value="hour">Hourly</option>
+          <option selected value="day">Daily</option>
+          <option value="month">Monthly</option>
+          <option value="year">Yearly</option>
+        </select>
+
+        <label for="from-timestamp-select" class="mt-2">Submission dates starting</label>
+        <input id="from-timestamp-select" class="form-control border-dark"
+               type="date" name="from_timestamp">
+
+        <label for="to-timestamp-select" class="mt-2">Submission dates ending</label>
+        <input id="to-timestamp-select" class="form-control border-dark"
+               type="date" name="to_timestamp">
+
+        <hr>
+
+        <input type="submit" class="btn btn-dark btn-block mt-3" value="Reload">
+      </form>
+    </div>
+    <div class="col">
+      <canvas id="chart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <hr>
+
+  <h5>Submissions Histogram</h5>
+  <p>The histogram shows the number of uploaded solutions over a selected period.</p>
+</div>

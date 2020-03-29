@@ -1,0 +1,94 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="INLOOP Statistics">
+  <meta name="author" content="The INLOOP contributors">
+
+  <title>Statistics</title>
+
+  <link rel="stylesheet" type="text/css"
+        href="{% static 'vendor/css/bootstrap.4.4.min.css' %}">
+
+  {% block extrahead %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary pl-4 pr-4">
+  <a class="navbar-brand" href="#">Statistics</a>
+  <button class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbar-toggler"
+          aria-controls="navbar-toggler"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbar-toggler">
+    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <a id="show-submissions-histogram" class="nav-link" href="#">
+          Submissions Histogram
+        </a>
+      </li>
+      <li class="nav-item">
+        <a id="show-attempts-histogram" class="nav-link" href="#">
+          Attempts Histogram
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <main id="main-window" role="main" class="col-lg-12 px-4">
+      <div class="d-flex flex-row justify-content-center align-items-center"
+           style="min-height: 90vh;">
+        <img height="200" width="200" alt="Statistics Icon" style="opacity: 0.1"
+             src="{% static 'img/statistics.svg' %}">
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'vendor/js/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap.4.4.min.js' %}"></script>
+<script src="{% static 'vendor/js/moment.min.js' %}"></script>
+<script src="{% static 'vendor/js/Chart.min.js' %}"></script>
+
+<script src="{% static 'js/statistics.histograms.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const submissionsHistogram = new SubmissionsHistogram("main-window", {
+    template: `{% url 'statistics:submissions_histogram' %}`,
+    querysetLimit: 5000
+  });
+
+  document.getElementById("show-submissions-histogram")
+    .addEventListener("click", () => {
+      submissionsHistogram.show(() => submissionsHistogram.reload());
+    });
+
+  const attemptsHistogram = new AttemptsHistogram("main-window", {
+    template: `{% url 'statistics:attempts_histogram' %}`,
+    querysetLimit: 5000
+  });
+
+  document.getElementById("show-attempts-histogram")
+    .addEventListener("click", () => {
+      attemptsHistogram.show(() => attemptsHistogram.reload());
+    });
+});
+</script>
+
+</body>
+
+</html>
