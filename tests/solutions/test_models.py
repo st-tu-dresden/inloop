@@ -9,8 +9,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from inloop.solutions.models import (Checkpoint, Solution, SolutionFile, create_archive,
-                                     get_archive_upload_path, get_upload_path)
+from inloop.solutions.models import (Checkpoint, CheckpointFile, Solution, SolutionFile,
+                                     create_archive, get_archive_upload_path, get_upload_path)
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.solutions.mixins import SimpleTaskData, SolutionsData
@@ -210,8 +210,10 @@ class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.valid_md5_hash = 'fdb8da1705ac435e669120369236a8f48fdf68bc'
-        cls.invalid_md5_hash = 'fdb8da1705ac435e669120369236a8f48fdf68bcFFFFFFF'
+        cls.valid_md5_hash = '0' * 40
+        cls.valid_md5_hash_updated = '1' * 40
+        cls.invalid_md5_hash = '0' * 41
+
         cls.valid_json_data_list = [
             {
                 'md5': cls.valid_md5_hash,
@@ -247,7 +249,7 @@ class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
         """Verify that checkpoint creation succeeds valid json data."""
 
         for json_data in self.valid_json_data_list:
-            checkpoint = Checkpoint.objects.create_checkpoint(
+            checkpoint = Checkpoint.objects.sync_checkpoint(
                 json_data=json_data,
                 task=self.task,
                 user=self.alice,
@@ -259,7 +261,7 @@ class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
 
         for json_data in self.invalid_json_data_list:
             try:
-                Checkpoint.objects.create_checkpoint(
+                Checkpoint.objects.sync_checkpoint(
                     json_data=json_data,
                     task=self.task,
                     user=self.alice,
@@ -276,7 +278,7 @@ class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
 
         files = {'Hello.java': 'class Hello {}', 'Hello2.java': 'class Hello {}'}
         json_data = {'md5': self.valid_md5_hash, 'files': files}
-        checkpoint = Checkpoint.objects.create_checkpoint(
+        checkpoint = Checkpoint.objects.sync_checkpoint(
             json_data=json_data, task=self.task, user=self.alice,
         )
         self.assertEqual(checkpoint.checkpointfile_set.count(), 2)
@@ -293,7 +295,23 @@ class CheckpointModelTest(SimpleAccountsData, SimpleTaskData, TestCase):
 
         files = {'Hello.java': 'class Hello {}', 'Hello.java': 'class Hello {}'}
         json_data = {'md5': self.valid_md5_hash, 'files': files}
-        checkpoint = Checkpoint.objects.create_checkpoint(
+        checkpoint = Checkpoint.objects.sync_checkpoint(
             json_data=json_data, task=self.task, user=self.alice,
         )
         self.assertEqual(checkpoint.checkpointfile_set.count(), 1)
+
+    def test_only_store_last_checkpoint(self):
+        """Test that the editor discards outdated checkpoints."""
+        files = {'Hello.java': 'class Hello {}', 'Bye.java': 'class Bye {}'}
+        json_data = {'md5': self.valid_md5_hash, 'files': files}
+        old_checkpoint = Checkpoint.objects.sync_checkpoint(
+            json_data=json_data, task=self.task, user=self.alice,
+        )
+
+        files['Hello.java'] = 'class Hello {public static void main(String[] args) {}}'
+        json_data = {'md5': self.valid_md5_hash_updated, 'files': files}
+        Checkpoint.objects.sync_checkpoint(
+            json_data=json_data, task=self.task, user=self.alice,
+        )
+        self.assertFalse(Checkpoint.objects.filter(id=old_checkpoint.id))
+        self.assertFalse(CheckpointFile.objects.filter(checkpoint_id=old_checkpoint.id))

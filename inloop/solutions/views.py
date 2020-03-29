@@ -354,7 +354,7 @@ def save_checkpoint(request, slug):
     # Load nested data from json
     data = json.loads(data)
     try:
-        Checkpoint.objects.create_checkpoint(data, task, request.user)
+        Checkpoint.objects.sync_checkpoint(data, task, request.user)
     except ValueError:
         return JsonResponse({'success': False})
 
