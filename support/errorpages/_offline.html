@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>INLOOP is offline</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+      html {
+        font-size: 20px;
+        font-family: sans-serif;
+        color: rgb(51, 51, 51);
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        display: grid;
+      }
+
+      body > div {
+        display: grid;
+        align-self: center;
+        justify-self: center;
+        text-align: center;
+        padding: 0 2rem;
+      }
+
+      body > div > img {
+        width: 75vw;
+        justify-self: center;
+      }
+
+      body > div > p:last-child {
+        font-size: 0.6rem;
+      }
+
+      @media only screen and (min-width: 768px) {
+        body > div > img {
+          width: 500px;
+        }
+
+        body > div {
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <img alt="The Tumbeasts ate our source code." src="/images/offline.png">
+      <p>
+        Sorry, INLOOP is offline for scheduled maintainance.<br>
+        Please try again later.
+      </p>
+      <p>
+        Artwork by <a href="http://theoatmeal.com">The Oatmeal</a> &mdash;
+        <a href="mailto:inf-inloop@groups.tu-dresden.de">Contact us</a>
+      </p>
+    </div>
+  </body>
+</html>
