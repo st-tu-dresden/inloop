@@ -2,7 +2,6 @@ from collections import Counter
 from http import HTTPStatus
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import functions
 from django.http import Http404, HttpRequest, JsonResponse
@@ -10,9 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from inloop.solutions.models import Solution
-from inloop.statistics.validators import (get_optional_bool, get_optional_int,
-                                          get_optional_timestamp,
-                                          get_optional_truncator_identifier)
+from inloop.statistics.forms import AttemptsHistogramForm, SubmissionsHistogramForm
 from inloop.tasks.models import Category, Task
 
 
@@ -108,15 +105,16 @@ class SubmissionsHistogramJsonView(AdminView):
         It is possible to pass a queryset limit to
         avoid computation of too many objects.
         """
-        try:
-            queryset_limit = get_optional_int('queryset_limit', request.GET)
-            from_timestamp = get_optional_timestamp('from_timestamp', request.GET)
-            to_timestamp = get_optional_timestamp('to_timestamp', request.GET)
-            passed = get_optional_bool('passed', request.GET)
-            category_id = get_optional_int('category_id', request.GET)
-            granularity = get_optional_truncator_identifier('granularity', request.GET)
-        except ValidationError as error:
-            return bad_request(error.message)
+        form = SubmissionsHistogramForm(request.GET)
+        if not form.is_valid():
+            return bad_request('The supplied form was invalid.')
+
+        queryset_limit = form.cleaned_data.get('queryset_limit')
+        from_timestamp = form.cleaned_data.get('from_timestamp')
+        to_timestamp = form.cleaned_data.get('to_timestamp')
+        passed = form.cleaned_data.get('passed')
+        category_id = form.cleaned_data.get('category_id')
+        granularity = form.cleaned_data.get('granularity', 'minute')
 
         truncator = functions.Trunc('submission_date', granularity)
 
@@ -169,13 +167,12 @@ class AttemptsHistogramJsonView(AdminView):
         It is possible to pass a queryset limit to
         avoid computation of too many objects.
         """
-        try:
-            queryset_limit = get_optional_int('queryset_limit', request.GET)
-            task_id = get_optional_int('task_id', request.GET)
-        except ValidationError as error:
-            return bad_request(error.message)
-        if task_id is None:
-            return bad_request('The parameter task_id must be supplied.')
+        form = AttemptsHistogramForm(request.GET)
+        if not form.is_valid():
+            return bad_request('The supplied form was invalid.')
+
+        queryset_limit = form.cleaned_data.get('queryset_limit')
+        task_id = form.cleaned_data['task_id']
 
         queryset = Solution.objects \
             .filter(passed=True, task_id=task_id) \
@@ -188,7 +185,6 @@ class AttemptsHistogramJsonView(AdminView):
             return queryset_limit_reached(queryset_count)
 
         histogram = Counter(queryset.values_list('num_trials', flat=True))
-
         return JsonResponse({
             'histogram': histogram
         })
