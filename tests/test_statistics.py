@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from http import HTTPStatus
 from json import JSONDecodeError
 
@@ -8,41 +9,14 @@ from django.db.models import functions
 from django.test import TestCase
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.timezone import make_aware
 
 from inloop.solutions.models import Solution
-from inloop.statistics.validators import (ALLOWED_TRUNCATOR_IDENTIFIERS, ISOFORMAT_REGEX,
-                                          get_optional_bool, get_optional_int,
-                                          get_optional_timestamp,
-                                          get_optional_truncator_identifier)
+from inloop.statistics.forms import ALLOWED_TRUNCATOR_IDENTIFIERS, validate_granularity
 from inloop.statistics.views import bad_request, queryset_limit_reached
 from inloop.tasks.models import Category, Task
 
 User = get_user_model()
-
-
-class IsoFormatTest(TestCase):
-    def test_iso_format_regex(self):
-        """Test the iso format regex against invalid and valid values."""
-        for invalid_value in [
-            '2020-01-01T00:00:00.9999',
-            '1970.01.01T00:00:00.000Z',
-            '1970.01.01T00:00:00.000Z',
-            '2020-01-01T00:00:00_000Z',
-            '2020-01-31T10:27:42.013Z This text should not be accepted',
-            'This text should not be accepted 2020-01-31T10:27:42.013Z'
-        ]:
-            match = ISOFORMAT_REGEX.match(invalid_value)
-            if match is not None:
-                self.fail(
-                    f'The iso format regex should not '
-                    f'accept this value: {invalid_value}'
-                )
-
-        valid_value = '2020-01-01T00:00:00.000Z'
-        match = ISOFORMAT_REGEX.match(valid_value)
-        self.assertIsNotNone(
-            match, f'The iso format regex should accept this value: {valid_value}'
-        )
 
 
 class TruncatorAvailabilityTest(TestCase):
@@ -83,65 +57,15 @@ class TruncatorAvailabilityTest(TestCase):
 
 
 class ValidatorTest(TestCase):
-    def test_get_optional_timestamp(self):
-        """Test the timestamp validator."""
-        self.assertIsNone(get_optional_timestamp('nonexistent_key', {}))
+    def test_validate_granularity(self):
+        """Test the granularity validator."""
         with self.assertRaises(ValidationError):
-            get_optional_timestamp('date', {
-                'date': '2020-01-01T00:00:00.000Z invalid appended text'
-            })
-        valid_value = '2020-01-01T00:00:00.000Z'
-        try:
-            self.assertIsNotNone(get_optional_timestamp('date', {
-                'date': valid_value
-            }))
-        except ValidationError:
-            self.fail(f'get_optional_timestamp should accept {valid_value!r}')
-
-    def test_get_optional_int(self):
-        """Test the integer validator."""
-        self.assertIsNone(get_optional_int('nonexistent_key', {}))
-        with self.assertRaises(ValidationError):
-            get_optional_int('int', {
-                'int': 'undefined'
-            })
-        for valid_value in ['1', 2, -1]:
-            try:
-                self.assertIsNotNone(get_optional_int('int', {
-                    'int': valid_value
-                }))
-            except ValidationError:
-                self.fail(f'get_optional_int should accept {valid_value!r}')
-
-    def test_get_optional_bool(self):
-        """Test the boolean validator."""
-        self.assertIsNone(get_optional_bool('nonexistent_key', {}))
-        with self.assertRaises(ValidationError):
-            get_optional_bool('bool', {
-                'bool': 'undefined'
-            })
-        for valid_value in [True, False, 'True', 'False', 'true', 'false', 0, 1]:
-            try:
-                self.assertIsNotNone(get_optional_bool('bool', {
-                    'bool': valid_value
-                }))
-            except ValidationError:
-                self.fail(f'get_optional_bool should accept {valid_value!r}')
-
-    def test_get_optional_truncator_identifier(self):
-        """Test the optional truncator identifier validator."""
-        self.assertIsNone(get_optional_truncator_identifier('nonexistent_key', {}))
-        with self.assertRaises(ValidationError):
-            get_optional_truncator_identifier('truncator', {
-                'truncator': 'lightyears'
-            })
+            validate_granularity('lightyears')
         for valid_value in ALLOWED_TRUNCATOR_IDENTIFIERS:
             try:
-                self.assertIsNotNone(get_optional_truncator_identifier('truncator', {
-                    'truncator': valid_value
-                }))
+                validate_granularity(valid_value)
             except ValidationError:
-                self.fail(f'get_optional_truncator_identifier should accept {valid_value!r}')
+                self.fail(f'The granularity validator should accept {valid_value}!')
 
 
 class BadRequestTest(TestCase):
@@ -275,18 +199,17 @@ class SubmissionsHistogramJsonViewTest(TestCase):
             slug='task'
         )
 
-        cls.from_timestamp = '2020-01-01T00:00:00.000Z'
-        cls.to_timestamp = '2021-01-01T00:00:00.000Z'
+        submission_date = make_aware(datetime.strptime('01-01-1970', '%d-%m-%Y'))
 
         cls.first_solution = Solution.objects.create(
             author=cls.super_user, task=cls.task, passed=True
         )
-        cls.first_solution.submission_date = cls.from_timestamp
+        cls.first_solution.submission_date = submission_date
         cls.first_solution.save()
         cls.second_solution = Solution.objects.create(
             author=cls.super_user, task=cls.task, passed=True
         )
-        cls.second_solution.submission_date = cls.to_timestamp
+        cls.second_solution.submission_date = submission_date
         cls.second_solution.save()
 
     def setUp(self):
@@ -316,10 +239,10 @@ class SubmissionsHistogramJsonViewTest(TestCase):
         """
         self.client.force_login(self.super_user)
         response = self.client.get(self.url, {
-            'from_timestamp': self.from_timestamp,
-            'to_timestamp': self.to_timestamp,
-            'granularity': 'year',
-            'passed': 'true',
+            'from_timestamp': '1970-01-01',
+            'to_timestamp': '1970-01-01',
+            'granularity': 'day',
+            'passed': True,
             'category_id': self.category.id
         })
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -330,13 +253,12 @@ class SubmissionsHistogramJsonViewTest(TestCase):
             self.fail('The returned data should be valid JSON')
         histogram = data.get('histogram')
         self.assertIsNotNone(histogram)
-        # The histogram should contain two buckets
-        self.assertEquals(len(histogram), 2)
+        # The histogram should contain one bucket with both solutions
+        self.assertEquals(len(histogram), 1)
+        self.assertEquals(histogram[0]['count'], 2)
 
 
 class AttemptsHistogramJsonViewTest(TestCase):
-    # Test bad json request
-    # Test histogram with all params
     @classmethod
     def setUpClass(cls):
         """Set up attempts to validate the histogram."""
