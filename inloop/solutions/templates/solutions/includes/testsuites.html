@@ -41,7 +41,7 @@
       <code>{{ tc.name }}()</code> passed
     </h5>
   {% else %}
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#stacktrace-{{ forloop.counter }}">
+    <a class="disguised" href="#stacktrace-{{ forloop.counter }}" data-toggle="collapse">
       <h5 class="inline">
         <span class="glyphicon glyphicon-remove text-danger"></span>
         <code>{{ tc.name }}()</code> failed:
