@@ -41,14 +41,15 @@
       <code>{{ tc.name }}()</code> passed
     </h5>
   {% else %}
-    <a class="disguised" href="#stacktrace-{{ forloop.counter }}" data-toggle="collapse">
+  {% with outer_id=forloop.parentloop.counter inner_id=forloop.counter %}
+    <a class="disguised" href="#stacktrace-{{ outer_id }}-{{ inner_id }}" data-toggle="collapse">
       <h5 class="inline">
         <span class="glyphicon glyphicon-remove text-danger"></span>
         <code>{{ tc.name }}()</code> failed:
         {% firstof tc.failure.message tc.error.message %}
       </h5>
     </a>
-    <div class="collapse" id="stacktrace-{{ forloop.counter }}">
+    <div class="collapse" id="stacktrace-{{ outer_id }}-{{ inner_id }}">
       {% if tc.failure.stacktrace or tc.error.stacktrace %}
       {% spaceless %}
       <pre class="console-output stacktrace">
@@ -57,6 +58,7 @@
       {% endspaceless %}
       {% endif %}
     </div>
+  {% endwith %}
   {% endif %}
   </li>
 
