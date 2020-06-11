@@ -1,16 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
 
 from inloop.tasks.views import index as task_index
 
+login = LoginView.as_view(extra_context={'hide_login_link': True})
+
 
 def home(request):
     if request.user.is_anonymous:
-        return login(request, extra_context={'hide_login_link': True})
+        return login(request)
     return task_index(request)
 
 
