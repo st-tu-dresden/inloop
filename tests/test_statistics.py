@@ -254,8 +254,8 @@ class SubmissionsHistogramJsonViewTest(TestCase):
         histogram = data.get('histogram')
         self.assertIsNotNone(histogram)
         # The histogram should contain one bucket with both solutions
-        self.assertEquals(len(histogram), 1)
-        self.assertEquals(histogram[0]['count'], 2)
+        self.assertEqual(len(histogram), 1)
+        self.assertEqual(histogram[0]['count'], 2)
 
 
 class AttemptsHistogramJsonViewTest(TestCase):
@@ -341,4 +341,4 @@ class AttemptsHistogramJsonViewTest(TestCase):
             self.fail('The returned data should be valid JSON')
         histogram = data.get('histogram')
         self.assertIsNotNone(histogram)
-        self.assertEquals(histogram, {'4': 1, '1': 1})
+        self.assertEqual(histogram, {'4': 1, '1': 1})

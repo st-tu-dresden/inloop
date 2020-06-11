@@ -312,7 +312,7 @@ class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
         self.assertContains(response, 'Set a new password')
         self.assertTrue(response.redirect_chain)
         current_location, status_code = response.redirect_chain[0]
-        self.assertEquals(status_code, 302)
+        self.assertEqual(status_code, 302)
 
         form_data = {
             'new_password1': 'ji32k7au4a83',
