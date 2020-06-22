@@ -6,12 +6,14 @@
   <div class="bottom-spaced">
   <h4 class="inline">{{ testsuite.name }} (passed {{ testsuite.passed }} of {{ testsuite.total }})</h4>
   {% if testsuite.system_out %}
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#stdout-{{ forloop.counter }}">
+    <a class="disguised" href="#stdout-{{ forloop.counter }}" data-toggle="collapse" role="button"
+       aria-expanded="false" aria-controls="#stdout-{{ forloop.counter }}">
       <code class="inline">System.out</code>
     </a>
   {% endif %}
   {% if testsuite.system_err %}
-    <a class="disguised" href="#" data-toggle="collapse" data-target="#stderr-{{ forloop.counter }}">
+    <a class="disguised" href="#stderr-{{ forloop.counter }}" data-toggle="collapse" role="button"
+       aria-expanded="false" aria-controls="#stderr-{{ forloop.counter }}">
       <code class="inline">System.err</code>
     </a>
   {% endif %}
