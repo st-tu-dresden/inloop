@@ -1,6 +1,5 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.views import login
 from django.contrib.flatpages.views import flatpage
 
 from inloop.accounts import urls as account_urls
@@ -8,13 +7,11 @@ from inloop.gitload import urls as gitload_urls
 from inloop.solutions import urls as solution_urls
 from inloop.statistics import urls as statistics_urls
 from inloop.tasks import urls as task_urls
-from inloop.views import home, logout
+from inloop.views import home, login, logout
 
 urlpatterns = [
     url(r'^$', home, name='home'),
-    url(r'^login/$', login, name='login', kwargs={
-        'extra_context': {'hide_login_link': True}
-    }),
+    url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout, name='logout'),
 
     url(r'^account/', include(account_urls)),

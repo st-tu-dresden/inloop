@@ -133,7 +133,7 @@ class SolutionDetailViewTest(TaskData, AccountsData, TestCase):
             response = self.client.get(reverse('solutions:archive_status', kwargs={
                 'solution_id': self.solution.id
             }))
-            self.assertEquals(response.status_code, expected_status_code)
+            self.assertEqual(response.status_code, expected_status_code)
 
     def test_new_archive_access(self):
         """Test the access privileges to the archive creation."""
