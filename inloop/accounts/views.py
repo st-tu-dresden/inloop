@@ -9,8 +9,9 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
 
 from constance import config
-from registration.backends.hmac.views import (ActivationView as HmacActivationView,
-                                              RegistrationView as HmacRegistrationView)
+from django_registration.backends.activation.views import (ActivationView as HmacActivationView,
+                                                           RegistrationView as
+                                                           HmacRegistrationView)
 
 from inloop.accounts.forms import SignupForm, StudentDetailsForm, UserChangeForm
 from inloop.accounts.models import StudentDetails
