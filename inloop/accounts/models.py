@@ -10,7 +10,7 @@ from django.db.models import ObjectDoesNotExist
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.text import mark_safe
+from django.utils.safestring import mark_safe
 
 INCOMPLETE_HINT = (
     'Your user profile is incomplete. To ensure we can award bonus points to you, please '
