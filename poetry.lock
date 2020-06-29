@@ -100,7 +100,7 @@ description = "Django live settings with pluggable backends, including Redis."
 name = "django-constance"
 optional = false
 python-versions = "*"
-version = "2.6.0"
+version = "2.7.0"
 
 [package.extras]
 database = ["django-picklefield"]
@@ -651,7 +651,8 @@ django = [
     {file = "Django-2.2.13.tar.gz", hash = "sha256:84f370f6acedbe1f3c41e1a02de44ac206efda3355e427139ecb785b5f596d80"},
 ]
 django-constance = [
-    {file = "django-constance-2.6.0.tar.gz", hash = "sha256:12d827f9d5552ee39884fb6fb356f231f32b1ab8958acc715e3d1a6ecf913653"},
+    {file = "django-constance-2.7.0.tar.gz", hash = "sha256:62bdb1a3aef20d80e18d832b30ffcc6626762c538817a5a3571bcefa5a55c849"},
+    {file = "django_constance-2.7.0-py3-none-any.whl", hash = "sha256:866a7356d3f8ee08374285e97c1edae70edaa3df6eaf7b2e9699f7cde8a88f3b"},
 ]
 django-debug-toolbar = [
     {file = "django-debug-toolbar-2.2.tar.gz", hash = "sha256:eabbefe89881bbe4ca7c980ff102e3c35c8e8ad6eb725041f538988f2f39a943"},
