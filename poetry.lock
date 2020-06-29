@@ -165,11 +165,11 @@ category = "main"
 description = "An extensible user-registration application for Django"
 name = "django-registration"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "3.0.1"
+python-versions = ">=3.5"
+version = "3.1"
 
 [package.dependencies]
-Django = ">=1.11"
+Django = ">=2.2"
 confusable-homoglyphs = ">=3.0,<4.0"
 
 [[package]]
@@ -577,7 +577,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "9b5692d67fd139d73dddf3400187bb84b2b406a478a128cd40fa96c25678abc2"
+content-hash = "292a2930074d236093e42d2a8859ab5e805dbc2bd36a4b69d5890dc3ab4e85e0"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -673,8 +673,8 @@ django-redis = [
     {file = "django_redis-4.11.0-py3-none-any.whl", hash = "sha256:e1aad4cc5bd743d8d0b13d5cae0cef5410eaace33e83bff5fc3a139ad8db50b4"},
 ]
 django-registration = [
-    {file = "django-registration-3.0.1.tar.gz", hash = "sha256:5193f8a8f8b5ee9f3cc6ae3b561739d17f69759b9abe72f33aec07467a99eeff"},
-    {file = "django_registration-3.0.1-py2.py3-none-any.whl", hash = "sha256:88673ceecb09413493f78a2847cb78da8df47d4d6629aee6a17d9e3c6c66c444"},
+    {file = "django-registration-3.1.tar.gz", hash = "sha256:2437a098e6e06983e4b4b442680b1c49a2e979f1a0ef3a504beb3a84ff36131d"},
+    {file = "django_registration-3.1-py3-none-any.whl", hash = "sha256:071dce4f4348ff1da338a0a09bda8e34d44c001ab569777e4c88ee21ce5c499e"},
 ]
 django-widget-tweaks = [
     {file = "django-widget-tweaks-1.4.8.tar.gz", hash = "sha256:9f91ca4217199b7671971d3c1f323a2bec71a0c27dec6260b3c006fa541bc489"},
