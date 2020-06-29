@@ -34,7 +34,7 @@ class DetectedPlagiarismsAdmin(PlagiarismAdmin):
 @admin.register(PlagiarismTest)
 class PlagiarismTestsAdmin(PlagiarismAdmin):
     list_display = ['id', 'created_at', 'command', 'all_detected_plagiarisms']
-    actions = ['download_jplag_zip']
+    actions = PlagiarismAdmin.actions + ['download_jplag_zip']
 
     def download_jplag_zip(self, request, queryset):
         """

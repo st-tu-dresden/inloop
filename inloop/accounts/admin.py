@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from inloop.accounts.models import Course, StudentDetails
 
@@ -18,7 +19,7 @@ class StudentDetailsAdmin(admin.ModelAdmin):
         return obj.user.last_name
 
     def email(self, obj):
-        return '<a href="mailto:{email}">{email}</a>'.format(email=obj.user.email)
+        return format_html('<a href="mailto:{email}">{email}</a>', email=obj.user.email)
 
     first_name.admin_order_field = 'user__first_name'
     last_name.admin_order_field = 'user__last_name'

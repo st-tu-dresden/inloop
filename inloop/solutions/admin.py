@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from django.contrib import admin
+from django.utils.html import format_html
 from django.utils.timezone import now
 
 from inloop.solutions.models import Solution, SolutionFile
@@ -75,7 +76,6 @@ class SolutionAdmin(admin.ModelAdmin):
     ]
 
     def site_link(self, obj):
-        return f'<a href="{obj.get_absolute_url()}">{obj} details</a>'
+        return format_html('<a href="{}">{}</a>', obj.get_absolute_url(), obj)
 
-    site_link.allow_tags = True
     site_link.short_description = 'View on site'
