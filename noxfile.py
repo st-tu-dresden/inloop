@@ -28,7 +28,7 @@ def install_with_constraints(session, *args, **kwargs):
         session.install(f'--constraint={requirements.name}', *args, **kwargs)
 
 
-@nox.session(python=['3.6', '3.7'])
+@nox.session(python=['3.7', '3.8'])
 def tests(session):
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ['-v2', '--failfast']
@@ -46,7 +46,7 @@ def tests(session):
     session.run('coverage', 'report')
 
 
-@nox.session(python=['3.6'])
+@nox.session(python=['3.7'])
 def lint(session):
     """Check code style with flake8 and isort."""
     locations = 'inloop', 'tests', 'noxfile.py', 'manage.py'
