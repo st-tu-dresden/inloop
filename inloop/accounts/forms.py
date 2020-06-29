@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from constance import config
-from registration import validators
-from registration.forms import RegistrationFormUniqueEmail
+from django_registration import validators
+from django_registration.forms import RegistrationFormUniqueEmail
 
 from inloop.accounts.models import StudentDetails
 from inloop.common.templatetags.markdown import markdown
@@ -37,14 +37,15 @@ class SignupForm(RegistrationFormUniqueEmail):
     def clean_email(self):
         """Perform additional email validation if configured in the admin interface."""
         pattern = config.EMAIL_PATTERN
+        email = self.cleaned_data['email']
         if pattern:
             # The pattern is always validated in the admin interface by testing if
             # re.compile() succeeds. If it fails to compile now, there must be some
             # serious error which we can't fix here and it's better to crash.
             regex = re.compile(pattern, re.VERBOSE)
-            if not regex.search(self.cleaned_data['email']):
+            if not regex.search(email):
                 raise ValidationError(markdown(config.EMAIL_ERROR_MESSAGE))
-        return super().clean_email()
+        return email
 
     def clean_username(self):
         """Ensure no duplicate user names exist, using case-insensitive comparison."""
