@@ -236,7 +236,7 @@ class SolutionDetailView(LoginRequiredMixin, View):
         return {}
 
     def get_object(self, **kwargs):
-        task = Task.objects.published().filter(slug=kwargs['slug'])
+        task = get_object_or_404(Task.objects.published(), slug=kwargs['slug'])
         self.solution = get_object_or_404(
             Solution, author=self.request.user, task=task, scoped_id=kwargs['scoped_id']
         )
