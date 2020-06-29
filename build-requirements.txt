@@ -1,4 +1,4 @@
-nox==2019.11.9
-pip==20.0.2
-poetry==1.0.5
-setuptools==45.2.0
+nox==2020.5.24
+pip==20.1.1
+poetry==1.0.9
+setuptools==47.3.1
