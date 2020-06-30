@@ -1,11 +1,9 @@
 [Unit]
 Description=INLOOP huey workers
-Requires=docker.service
-After=docker.service
+Wants=docker.service redis-server.service postgresql.service
 PartOf=gunicorn.service
 
 [Service]
 Environment=HOME=/var/lib/inloop
-ExecStartPre=/usr/bin/setfacl -m u:huey:rw /var/run/docker.sock
 ExecStart=/usr/bin/envdir /home/inloop/envdir setuidgid huey django-admin run_huey --workers=2
 SyslogIdentifier=huey

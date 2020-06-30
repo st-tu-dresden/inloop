@@ -1,0 +1,10 @@
+[Unit]
+Description=INLOOP huey permission helper for the docker socket
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/setfacl -m u:huey:rw /var/run/docker.sock
+
+[Install]
+WantedBy=docker.service
