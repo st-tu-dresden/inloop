@@ -307,10 +307,14 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
     template_name = 'solutions/file_detail.html'
 
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return SolutionFile.objects.all()
         return SolutionFile.objects.filter(solution__author=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.user != self.object.solution.author:
+            context['impersonate'] = True
         context['solution'] = self.object.solution
         return context
 

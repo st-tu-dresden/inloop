@@ -195,3 +195,46 @@ class SolutionDetailViewTest(TaskData, AccountsData, TestCase):
     def tearDownClass(cls):
         shutil.rmtree(TEST_MEDIA_ROOT)
         super().tearDownClass()
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class SolutionFileViewTest(AccountsData, TaskData, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.solution = Solution.objects.create(author=cls.alice, task=cls.published_task1)
+        cls.solution_file = SolutionFile.objects.create(
+            solution=cls.solution,
+            file=SimpleUploadedFile('example.py', b'print("Hello World")')
+        )
+
+    def test_author_can_access_solution(self):
+        self.assertTrue(self.client.login(username='alice', password='secret'))
+        response = self.client.get(reverse('solutions:showfile', kwargs={
+            'pk': self.solution_file.pk
+        }))
+        self.assertContains(response, 'example.py')
+        self.assertContains(response, 'print(&quot;Hello World&quot;)')
+
+    def test_staff_can_access_solution(self):
+        self.assertTrue(self.client.login(username='arnold', password='secret'))
+        response = self.client.get(reverse('solutions:showfile', kwargs={
+            'pk': self.solution_file.pk
+        }))
+        self.assertContains(response, 'viewing a file authored by')
+        self.assertContains(response, '<a href="mailto:alice@example.org">alice</a>')
+        self.assertContains(response, 'example.py')
+        self.assertContains(response, 'print(&quot;Hello World&quot;)')
+
+    def test_others_cant_access_solution(self):
+        self.assertTrue(self.client.login(username='bob', password='secret'))
+        response = self.client.get(reverse('solutions:showfile', kwargs={
+            'pk': self.solution_file.pk
+        }))
+        self.assertEqual(response.status_code, 404)
+
+    def test_anonymous_cant_access_solution(self):
+        response = self.client.get(reverse('solutions:showfile', kwargs={
+            'pk': self.solution_file.pk
+        }))
+        self.assertEqual(response.status_code, 302)

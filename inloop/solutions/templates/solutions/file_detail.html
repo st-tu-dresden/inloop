@@ -1,7 +1,10 @@
 {% extends "base_site.html" %}
 {% load static %}
 
-{% block title %}Solution #{{ solution.scoped_id }} / {{ file.name }}{% endblock %}
+{% block title %}Solution
+#{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %} / {{ file.name }}
+{% endblock %}
+
 {% block extrahead %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
 {% endblock %}
@@ -14,12 +17,25 @@
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
+{% if impersonate %}
+  <li><a href="{% url 'solutions:staffdetail' solution.id %}">Solution #{{ solution.id }}</a></li>
+{% else %}
   <li><a href="{% url 'solutions:detail' task.slug solution.scoped_id %}">Solution
      #{{ solution.scoped_id }}</a></li>
+{% endif %}
   <li class="active">{{ file.name }}</li>
 </ol>
 {% endwith %}
 {# /Breadcrumb #}
+
+{% if impersonate %}
+<div class="alert alert-info }}" role="alert">
+  {% with author=solution.author %}
+  You are viewing a file authored by
+  <a href="mailto:{{ author.email }}">{% firstof author.get_full_name author.get_username %}</a>.
+  {% endwith %}
+</div>
+{% endif %}
 
 <div>
   <pre class="line-numbers codehilite"><code class="language-java">{{ file.contents }}</code></pre>
