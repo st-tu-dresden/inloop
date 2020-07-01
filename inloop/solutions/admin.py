@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 from django.contrib import admin
 from django.utils.html import format_html
-from django.utils.timezone import now
 
 from inloop.solutions.models import Solution, SolutionFile
 
@@ -13,34 +12,47 @@ class SolutionFileInline(admin.StackedInline):
     max_num = 0
 
 
-class SemesterFieldListFilter(admin.DateFieldListFilter):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.title = 'semester'
-        self.links = self.generate_links()
+class SemesterListFilter(admin.SimpleListFilter):
+    title = 'semester'
+    parameter_name = 'semester'
 
-    def generate_links(self):
-        """Derive semesters of submitted solutions."""
-        semesters = [('Any semester', {})]
+    def lookups(self, request, model_admin):
         first_solution = Solution.objects.first()
         if not first_solution:
-            return semesters
+            return []
+        last_solution = Solution.objects.last()
+        start_year = first_solution.submission_date.year
+        end_year = last_solution.submission_date.year
+        lookups = []
+        for year in range(start_year - 1, end_year + 1):
+            lookups.extend([
+                (f'{year}s', f'Summer {year}'),
+                (f'{year}w', f'Winter {year}/{year + 1}')
+            ])
+        return lookups
 
-        # start and end are both in the CEST timezone
+    def queryset(self, request, queryset):
+        value = self.value()
+        if not value:
+            return queryset
+        try:
+            year = int(value[:-1])
+        except ValueError:
+            return queryset
         tzinfo_cest = timezone(timedelta(hours=2))
         summer_start = datetime(2018, 4, 1, tzinfo=tzinfo_cest)
         winter_start = datetime(2018, 10, 1, tzinfo=tzinfo_cest)
-
-        for year in range(first_solution.submission_date.year, now().year + 1):
-            semesters.append((f'Summer {year}', {
-                self.lookup_kwarg_since: str(summer_start.replace(year)),
-                self.lookup_kwarg_until: str(winter_start.replace(year))
-            }))
-            semesters.append((f'Winter {year}/{year + 1}', {
-                self.lookup_kwarg_since: str(winter_start.replace(year)),
-                self.lookup_kwarg_until: str(summer_start.replace(year=year + 1))
-            }))
-        return semesters
+        if value.endswith('s'):
+            return queryset.filter(
+                submission_date__gte=summer_start.replace(year=year),
+                submission_date__lt=winter_start.replace(year=year),
+            )
+        elif value.endswith('w'):
+            return queryset.filter(
+                submission_date__gte=winter_start.replace(year=year),
+                submission_date__lt=summer_start.replace(year=year + 1),
+            )
+        return queryset
 
 
 @admin.register(Solution)
@@ -57,7 +69,7 @@ class SolutionAdmin(admin.ModelAdmin):
     list_filter = [
         'passed',
         'task__category',
-        ('submission_date', SemesterFieldListFilter),
+        SemesterListFilter,
         'submission_date',
         'task'
     ]
