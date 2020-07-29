@@ -4,10 +4,11 @@
 
 {% block title %}{{ task.title }}{% endblock %}
 {% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/editor-v2.css' %}">
 {% endblock %}
 {% block body_classes %}{% endblock %}
-
+{% block navbar_container_classes %}container-fluid{% endblock  %}
 {% block container_classes %}{% endblock %}
 
 {% block content %}
