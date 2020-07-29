@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+{% load markdown %}
+{% load static %}
+
+{% block title %}{{ task.title }}{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/editor-v2.css' %}">
+{% endblock %}
+{% block body_classes %}{% endblock %}
+
+{% block container_classes %}{% endblock %}
+
+{% block content %}
+<h1>{{ task.title }}</h1>
+{{ task.description|markdown }}
+{% endblock  %}
+
+{% block footer %}{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'vendor/js/prism.js' %}"></script>
+<script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
+<script src="{% static 'vendor/js/anchor.min.js' %}"></script>
+<script src="{% static 'js/inloop.js' %}"></script>
+<script src="{% static 'js/editor-v2.js' %}"></script>
+{% endblock %}

@@ -1,11 +1,13 @@
 from django.conf.urls import url
 
+from inloop.solutions.editor_views import SideBySideEditorView
 from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
                                     ModularEditorTabView, NewSolutionArchiveView,
                                     SolutionArchiveDownloadView, SolutionArchiveStatusView,
                                     SolutionDetailView, SolutionEditorView, SolutionFileView,
                                     SolutionListView, SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
+from inloop.tasks.views import serve_attachment
 
 app_name = 'solutions'
 urlpatterns = [
@@ -59,6 +61,16 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/editor$',
         SolutionEditorView.as_view(),
         name='editor'
+    ),
+    url(
+        r'^(?P<slug_or_name>[-\w]+)/editor-v2$',
+        SideBySideEditorView.as_view(),
+        name='editor-v2'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/(?P<path>.*)$',
+        serve_attachment,
+        name='serve_attachment'
     ),
     url(
         r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
