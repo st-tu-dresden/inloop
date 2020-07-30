@@ -68,11 +68,6 @@ urlpatterns = [
         name='editor-v2'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/(?P<path>.*)$',
-        serve_attachment,
-        name='serve_attachment'
-    ),
-    url(
         r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
         ModularEditorTabView.as_view(),
         name='modular-tab'
@@ -101,5 +96,10 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/checkpoints/last/$',
         get_last_checkpoint,
         name='get-last-checkpoint'
+    ),
+    url(
+        r'^(?P<slug>[-\w]+)/(?P<path>.*)$',
+        serve_attachment,
+        name='serve_attachment'
     ),
 ]
