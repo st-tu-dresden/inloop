@@ -403,8 +403,9 @@ class StatusButton {
      * @param {boolean} isSaved - Defines if the button appears as saved after instantiation.
      */
     constructor(isSaved) {
+        this.button = $('#editor-button-save');
         this.background = $(STATUS_BUTTON_BACKGROUND_ID);
-        this.icon = $(STATUS_BUTTON_ICON_ID);
+        this.icon = $('#editor-button-save .glyphicon').first();
         this.hint = new ToolTip(STATUS_BUTTON_HINT_ID);
         if (isSaved === true) {
             this.appearAsSaved();
@@ -418,6 +419,8 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as saved.
      */
     appearAsSaved() {
+        this.button.removeClass('btn-danger');
+        this.button.addClass('btn-success');
         this.background.removeClass(CSS_BACKGROUND_UNSAVED);
         this.background.addClass(CSS_BACKGROUND_SAVED);
         this.icon.removeClass(CSS_ICON_UNSAVED);
@@ -433,6 +436,8 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as unsaved.
      */
     appearAsUnsaved() {
+        this.button.removeClass('btn-success');
+        this.button.addClass('btn-danger');
         this.background.removeClass(CSS_BACKGROUND_SAVED);
         this.background.addClass(CSS_BACKGROUND_UNSAVED);
         this.icon.removeClass(CSS_ICON_SAVED);

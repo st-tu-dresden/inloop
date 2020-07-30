@@ -12,14 +12,34 @@
 {% block container_classes %}container-fluid{% endblock %}
 
 {% block content %}
+
 <div>
   <h1>{{ task.title }}</h1>
   {{ task.description|markdown }}
-  {{ task.description|markdown }}
-  {{ task.description|markdown }}
 </div>
 <div>
-  <ul id="tab-container" class="nav nav-pills scrollable">
+  <div>
+  <div>
+    <button id="editor-button-save" type="button" class="btn btn-success" onclick="communicator.save(); blur();">
+      <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Save all
+    </button>
+    <button type="button" class="btn btn-primary" onclick="tabBar.createNewEmptyTab(); blur();">
+      <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
+    </button>
+    <button type="button" class="btn btn-default">
+      <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload
+    </button>
+    <button type="button" class="btn btn-default">
+      <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Run code
+    </button>
+    </div>
+    <div id="editor-countdown">
+      <span>Time remaining: 00:14:23</span>
+    </div>
+  </div>
+  
+  <ul id="tab-container" class="nav nav-pills">
+  <!--
     <li id="status-button-hint" data-toggle="tooltip" title="Save this solution."
         data-placement="auto">
       <a id="status-button" href="#" onclick="communicator.save(); blur();">
@@ -38,15 +58,14 @@
       <a href="#" onclick="tabBar.createNewEmptyTab(); blur();">
           <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
-    </li>
-    <li class="vertical-divider">
-    </li>
+    </li>-->
   </ul>
+
   <div id="editor-container">
-    <div class="background-color-editor"></div>
-    <div class="background-color-editor editor-divider"></div>
+    {% comment %} <div class="background-color-editor"></div>
+    <div class="background-color-editor editor-divider"></div> {% endcomment %}
     <div id="editor" class="editor"></div>
-    <div class="background-color-editor editor-round-bottom"></div>
+    {% comment %} <div class="background-color-editor editor-round-bottom"></div> {% endcomment %}
   </div>
 </div>
 {% endblock  %}
@@ -54,6 +73,7 @@
 {% block footer %}{% endblock %}
 
 {% block extrabody %}
+<div id="modals"></div>
 <script src="{% static 'vendor/js/prism.js' %}"></script>
 <script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
 <script src="{% static 'vendor/js/anchor.min.js' %}"></script>
