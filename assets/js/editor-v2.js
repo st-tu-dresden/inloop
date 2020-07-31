@@ -706,7 +706,7 @@ class TabBar {
      */
     constructor(files) {
         this.tabs = [];
-        this.editor = new Editor();
+        this.editor = new InloopEditor();
         this.editor.addOnChangeListener(function() {
             hashComparator.lookForChanges(fileBuilder.files);
         });
@@ -885,7 +885,7 @@ class TabBar {
  *    If the hash differs, the HashComparator will handle the visual representation
  *    through its {@link StatusButton}.
  */
-class Editor {
+class InloopEditor {
     /**
      * Provides the default editor configuration.
      *
@@ -907,7 +907,7 @@ class Editor {
             mode: "ace/mode/java",
             newLineMode: "auto",
             tabSize: 4,
-            maxLines: Infinity,
+            //maxLines: Infinity,
             enableBasicAutocompletion: false,
             enableLiveAutocompletion: false,
             fontFamily: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
@@ -927,7 +927,7 @@ class Editor {
         if (this.editor === undefined) {
             return;
         }
-        this.editor.setOptions(Editor.config());
+        this.editor.setOptions(InloopEditor.config());
     }
 
     /**
@@ -946,7 +946,7 @@ class Editor {
      * @param {File} file - The file to be bound.
      */
     bind(file) {
-      
+
         if (this.editor === undefined) return;
         this.editor.setReadOnly(false);
         this.editor.removeAllListeners("change");
@@ -957,6 +957,8 @@ class Editor {
             file.fileContent = self.editor.getValue();
             if (self.onChangeClosure !== undefined) self.onChangeClosure();
         });
+
+        this.editor.resize();
     }
 
     /**
