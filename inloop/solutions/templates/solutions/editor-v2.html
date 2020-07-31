@@ -30,10 +30,10 @@
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
       </button>
       <button type="button" class="btn btn-default">
-        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload
+        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit
       </button>
       <button type="button" class="btn btn-default">
-        <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Run code
+        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax
       </button>
     </div>
   </div>
@@ -66,17 +66,37 @@
     <div id="editor-top-bar">
       <ul id="tab-container"></ul>
       <div>
-        <button type="button" class="btn btn-link btn-xs" aria-label="Left Align">
+        <button onclick="tabBar.edit(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs" aria-label="Left Align">
           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Rename
         </button>
-        <button type="button" class="btn btn-link btn-xs" aria-label="Left Align">
+        <button onclick="tabBar.destroyActiveTab(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs" aria-label="Left Align">
           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete
         </button>
       </div>
     </div>
-    <div id="editor" class="editor">
-    </div>
+      <div id="editor"></div>
+    
     {% comment %} <div class="background-color-editor editor-round-bottom"></div> {% endcomment %}
+  </div>
+  <div id="console-output">
+    <div>
+      <h3>Syntax check result</h3>
+      <button type="button" class="btn btn-link btn-xs" aria-label="Left Align">
+          <span class="glyphicon glyphicon-close" aria-hidden="true"></span> Hide
+        </button>
+    </div>
+    <div>
+      I'm baby taxidermy ennui mustache, twee beard scenester deep v fixie cronut put a bird on it. Helvetica tote bag vegan whatever green juice, actually hoodie cronut selfies taiyaki polaroid paleo beard godard. Gentrify blue bottle photo booth gochujang direct trade actually cornhole asymmetrical godard sartorial 8-bit green juice hella. Locavore mustache beard retro chia. Four dollar toast chia 90's blog pitchfork, direct trade enamel pin cred 3 wolf moon keffiyeh. Distillery subway tile XOXO, taxidermy neutra hell of chillwave.
+
+      Distillery intelligentsia prism blog fingerstache gentrify. Narwhal mumblecore activated charcoal, try-hard blog shaman paleo forage everyday carry pabst dreamcatcher portland put a bird on it. Seitan irony intelligentsia sriracha pop-up. Pop-up tote bag street art, church-key fanny pack celiac kitsch raw denim. Flannel taxidermy poutine, gastropub wolf venmo brunch single-origin coffee polaroid 
+      portland disrupt unicorn mustache keffiyeh post-ironic.
+
+      Kickstarter sartorial tumblr austin green juice keffiyeh bespoke pitchfork taiyaki. Pabst intelligentsia glossier migas locavore next level unicorn poke celiac flexitarian keffiyeh, twee microdosing. Squid iceland prism pabst fanny pack pitchfork keffiyeh pug 8-bit shabby chic ennui XOXO lumbersexual. Dreamcatcher church-key vaporware fam trust fund photo booth chartreuse PBR&B fixie. Chia bicycle rights dreamcatcher pour-over tote bag vegan lo-fi farm-to-table craft beer.
+
+      Iceland gastropub live-edge cronut PBR&B iPhone. Fingerstache +1 post-ironic heirloom twee adaptogen austin, green juice unicorn ramps af echo park. Celiac snackwave yr shaman. Tote bag typewriter tumblr XOXO retro twee trust fund readymade put a bird on it man braid lyft. Celiac pop-up waistcoat authentic intelligentsia jean shorts 8-bit.
+
+      Sustainable microdosing seitan, offal cardigan truffaut 3 wolf moon DIY retro. Pop-up authentic meh cronut hella occupy man braid. Food truck ugh biodiesel, farm-to-table etsy yr shaman air plant. Butcher tumblr leggings put a bird on it. Keytar stumptown sriracha edison bulb farm-to-table neutra sartorial live-edge fingerstache mixtape vape vinyl letterpress taxidermy pabst. Thundercats roof party man braid ennui.
+    </div>
   </div>
 </div>
 {% endblock  %}
@@ -90,9 +110,9 @@
 <script src="{% static 'vendor/js/anchor.min.js' %}"></script>
 <script src="{% static 'js/inloop.js' %}"></script>
 
-<script src="{% static 'vendor/js/ace/ace.js' %}"></script>
-<script src="{% static 'vendor/js/ace/ext-language_tools.js' %}"></script>
-<script src="{% static 'vendor/js/ace/mode-java.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/ace.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/ext-language_tools.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/mode-java.js' %}"></script>
 <script src="{% static 'vendor/js/jquery.min.js' %}"></script>
 <script src="{% static 'vendor/js/rusha.min.js' %}"></script>
 <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>

@@ -419,12 +419,13 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as saved.
      */
     appearAsSaved() {
-        this.button.removeClass('btn-danger');
-        this.button.addClass('btn-success');
-        this.background.removeClass(CSS_BACKGROUND_UNSAVED);
-        this.background.addClass(CSS_BACKGROUND_SAVED);
-        this.icon.removeClass(CSS_ICON_UNSAVED);
-        this.icon.addClass(CSS_ICON_SAVED);
+        //this.button.removeClass('btn-danger');
+        //this.button.addClass('btn-success');
+        this.button.attr('disabled', 'disabled');
+        //this.background.removeClass(CSS_BACKGROUND_UNSAVED);
+        //this.background.addClass(CSS_BACKGROUND_SAVED);
+        // this.icon.removeClass(CSS_ICON_UNSAVED);
+        // this.icon.addClass(CSS_ICON_SAVED);
         if (this.isSaved === false) {
             this.hint.changeTitle("Solution saved!");
             this.hint.show(2000);
@@ -436,12 +437,13 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as unsaved.
      */
     appearAsUnsaved() {
-        this.button.removeClass('btn-success');
-        this.button.addClass('btn-danger');
-        this.background.removeClass(CSS_BACKGROUND_SAVED);
-        this.background.addClass(CSS_BACKGROUND_UNSAVED);
-        this.icon.removeClass(CSS_ICON_SAVED);
-        this.icon.addClass(CSS_ICON_UNSAVED);
+        //this.button.removeClass('btn-success');
+        //this.button.addClass('btn-danger');
+        this.button.removeAttr('disabled');
+        //this.background.removeClass(CSS_BACKGROUND_SAVED);
+        //this.background.addClass(CSS_BACKGROUND_UNSAVED);
+        // this.icon.removeClass(CSS_ICON_SAVED);
+        // this.icon.addClass(CSS_ICON_UNSAVED);
         if (this.isSaved === true) {
             this.hint.changeTitle("Changes detected. Remember to save your solution!");
             this.hint.show(2000);
@@ -797,7 +799,7 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
-        $("#editor textarea").focus();
+        //$("#editor textarea").focus();
     }
 
     /**
@@ -905,9 +907,9 @@ class Editor {
             mode: "ace/mode/java",
             newLineMode: "auto",
             tabSize: 4,
+            maxLines: Infinity,
             enableBasicAutocompletion: false,
             enableLiveAutocompletion: false,
-            maxLines: Infinity,
             fontFamily: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
             fontSize: "10.5pt",
             value: "// Select or create files to continue"
@@ -944,6 +946,7 @@ class Editor {
      * @param {File} file - The file to be bound.
      */
     bind(file) {
+      
         if (this.editor === undefined) return;
         this.editor.setReadOnly(false);
         this.editor.removeAllListeners("change");
@@ -963,6 +966,7 @@ class Editor {
      * the editor view.
      */
     unbind() {
+      
         if (this.editor === undefined) return;
         this.editor.removeAllListeners("change");
         this.editor.setValue("");

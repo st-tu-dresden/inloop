@@ -60,7 +60,11 @@ body > div:first-of-type > div:last-child > div:first-child {
   margin-top: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  overflow-y: auto;
+  overflow-y: hidden;
+}
+
+#editor {
+  flex: auto;
 }
 
 #editor-top-bar {
@@ -113,4 +117,21 @@ body > div:first-of-type > div:last-child > div:first-child {
 
 h1 {
   margin-top: 10px;
+}
+
+#console-output > div:first-child {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#console-output > div:last-child {
+  background: #111;
+  border-radius: 4px;
+  max-height: 30vh;
+  margin-bottom: 15px;
+  padding: 12px;
+  font-family: monospace;
+  color: lightgreen;
+  overflow-y: auto;
 }
