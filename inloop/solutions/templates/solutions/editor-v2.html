@@ -12,91 +12,65 @@
 {% block container_classes %}container-fluid{% endblock %}
 
 {% block content %}
-<header>
+<header class="toolbar">
   <div>
     <h1>{{ task.title }}</h1>
-    <span id="editor-countdown">00:14:23</span>
+    <span id="task-countdown">00:14:23</span>
   </div>
 
   <div>
-    <div class="btn-group btn-group-sm" role="group" aria-label="...">
-      <button type="button" class="btn btn-default" disabled="disabled">Editor</button>
-      <button type="button" class="btn btn-default">Manual upload</button>
+    <div class="btn-group btn-group-sm" role="group">
+      <button id="toolbar-switch-btn--editor" type="button" class="btn btn-default" disabled="disabled">Editor</button>
+      <button id="toolbar-switch-btn--manual" type="button" class="btn btn-default">Manual upload</button>
     </div>
     <div>
-      <button id="editor-button-save" type="button" class="btn btn-success btn-sm" onclick="communicator.save(); blur();">
+      <button id="toolbar-btn--save" type="button" class="btn btn-success btn-sm" onclick="communicator.save();">
         <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Save all
       </button>
-      <button type="button" class="btn btn-primary btn-sm" onclick="tabBar.createNewEmptyTab(); blur();">
+      <button id="toolbar-btn--save" type="button" class="btn btn-primary btn-sm" onclick="tabBar.createNewEmptyTab();">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
       </button>
-      <button type="button" class="btn btn-default btn-sm">
+      <button id="toolbar-btn--submit" type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit
       </button>
-      <button type="button" class="btn btn-default btn-sm">
+      <button id="toolbar-btn--syntax" type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax
       </button>
     </div>
   </div>
 </header>
+
 <main>
-<div>
-  {{ task.description|markdown }}
-</div>
-<div>
-
-
-  <!--
-    <li id="status-button-hint" data-toggle="tooltip" title="Save this solution."
-        data-placement="auto">
-      <a id="status-button" href="#" onclick="communicator.save(); blur();">
-          <span id="status-button-icon"
-                class="glyphicon glyphicon-floppy-saved"></span>
-      </a>
-    </li>
-    <li data-toggle="tooltip" title="Save and upload this solution to the checker."
-        data-placement="auto">
-      <a href="#" onclick="communicator.upload(fileBuilder.files); blur();">
-          <span class="glyphicon glyphicon-cloud-upload"></span>
-      </a>
-    </li>
-    <li data-toggle="tooltip" title="Create a new file."
-        data-placement="auto">
-      <a href="#" onclick="tabBar.createNewEmptyTab(); blur();">
-          <span class="glyphicon glyphicon-plus-sign"></span>
-      </a>
-    </li>-->
-  
-
-  <div id="editor-container">
-    {% comment %} <div class="background-color-editor"></div>
-    <div class="background-color-editor editor-divider"></div> {% endcomment %}
-    <div id="editor-top-bar">
-      <ul id="tab-container"></ul>
-      <div>
-        <button onclick="tabBar.edit(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs" aria-label="Left Align">
-          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Rename
-        </button>
-        <button onclick="tabBar.destroyActiveTab(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs" aria-label="Left Align">
-          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete
-        </button>
+  <div>
+    {{ task.description|markdown }}
+  </div>
+  <div>
+    <div id="editor">
+      <div id="editor-tabbar">
+        <ul id="editor-tabbar-files"></ul>
+        <div>
+          <button id="editor-tabbar-btn--rename" onclick="tabBar.edit(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Rename
+          </button>
+          <button id="editor-tabbar-btn--delete" onclick="tabBar.destroyActiveTab(tabBar.activeTab.tabId)" type="button" class="btn btn-link btn-xs">
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete
+          </button>
+        </div>
+      </div>
+      <div id="editor-content">
       </div>
     </div>
-      <div id="editor"></div>
-    
-    {% comment %} <div class="background-color-editor editor-round-bottom"></div> {% endcomment %}
-  </div>
-  <div id="console-output">
-    <div>
-      <h3>Syntax check result</h3>
-      <button type="button" class="btn btn-link btn-xs" aria-label="Left Align">
-          <span class="glyphicon glyphicon-close" aria-hidden="true"></span> Hide
+    <div id="console">
+      <div>
+        <h3>Syntax check result</h3>
+        <button id="console-btn--hide" type="button" class="btn btn-link btn-xs">
+            <span class="glyphicon glyphicon-close" aria-hidden="true"></span> Hide
         </button>
-    </div>
-    <div>
+      </div>
+      <div id="console-content">
+      </div>
     </div>
   </div>
-</div>
 </main>
 {% endblock  %}
 
@@ -108,7 +82,6 @@
 <script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
 <script src="{% static 'vendor/js/anchor.min.js' %}"></script>
 <script src="{% static 'js/inloop.js' %}"></script>
-
 <script src="{% static 'vendor/js/ace-1.4.12/ace.js' %}"></script>
 <script src="{% static 'vendor/js/ace-1.4.12/ext-language_tools.js' %}"></script>
 <script src="{% static 'vendor/js/ace-1.4.12/mode-java.js' %}"></script>
@@ -127,8 +100,8 @@
         data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
         data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}"
         data-modal-container-id="#modals"
-        data-tab-container-id="#tab-container"
-        data-editor-id="editor"
+        data-tab-container-id="#editor-tabbar-files"
+        data-editor-id="editor-content"
         data-status-button-background-id="#status-button"
         data-status-button-icon-id="#status-button-icon"
         data-status-button-hint-id="#status-button-hint"

@@ -1,9 +1,12 @@
+html {
+  font-size: 15px;
+}
+
 body.editor-v2 {
   height: 100vh;
   margin: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .container-fluid {
@@ -14,10 +17,45 @@ body > div:first-of-type {
   display: flex;
   flex: auto;
   flex-direction: column;
-  overflow: hidden;
-  margin: 0;
-  max-width: 1800px;
   align-self: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: #eee;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #ddd;
+}
+
+.toolbar > div {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.toolbar > div:first-child,
+main > div:first-child {
+  flex: 2;
+  padding-right: 1.4rem;
+}
+
+.toolbar > div:last-child,
+main > div:last-child {
+  flex: 3;
+  padding-left: 1.4rem;
+}
+
+h1,
+#task-countdown {
+  line-height: 1;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0;
+  margin-top: 0.2rem;
 }
 
 main {
@@ -27,97 +65,44 @@ main {
   overflow: hidden;
 }
 
-h1 {
-  font-weight: bold;
-  font-size: 20px;
-  margin: 0;
-}
-
-h1, #editor-countdown {
-  line-height: 1;
-  margin-top: 3px;
-}
-
-header {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 16px;
-  border-radius: 4px;
-  background: #eee;
-  padding: 6px 10px;
-  border: 2px solid #ddd;
-}
-
-header > div {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-}
-header > div:first-child {
-  flex: 2;
-  padding-right: 15px;
-}
-
-header > div:last-child {
-  flex: 3;
-  padding-left: 15px;
-}
-
-body > div:first-of-type > main > div {
+main > div:first-child {
   overflow-y: auto;
 }
 
-body > div:first-of-type > main >div:first-child {
-  flex: 2;
-  padding-right: 15px;
-}
-
-body > div:first-of-type > main >div:last-child {
-  flex: 3;
-  padding-left: 15px;
+main > div:last-child {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
-#editor-countdown {
-  font-weight: bold;
-  font-size: 20px;
-}
-
-#editor-container {
+#editor {
   display: flex;
   flex-direction: column;
   flex: auto;
   background: rgb(250, 250, 250);
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   overflow-y: hidden;
 }
 
-#editor {
+#editor-content {
   flex: auto;
 }
 
-#editor-top-bar {
+#editor-tabbar {
   background: #eee;
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
+  margin-bottom: 0.6rem;
+  padding-right: 0.6rem;
 }
 
-#editor-top-bar > div {
+#editor-tabbar > div {
   display: flex;
   align-items: center;
 }
 
-#editor-top-bar > div > button {
-  margin-right: 10px;
-}
-
-#tab-container {
+#editor-tabbar-files {
   flex: auto;
   margin: 0;
   padding: 0;
@@ -126,41 +111,40 @@ body > div:first-of-type > main >div:last-child {
   list-style: none;
 }
 
-#tab-container li {
+#editor-tabbar-files > li {
   background-color: #dfdfdf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.6rem;
 }
 
-#tab-container > li > a {
-  padding-left: 12px;
-  padding-right: 12px;
-  line-height: 2;
-}
-
-#tab-container > li > a:hover {
+#editor-tabbar-files > li > a:hover {
   text-decoration: none;
 }
 
-#tab-container li.active, #tab-container li.active:hover {
+#editor-tabbar-files > li.active,
+#editor-tabbar-files > li.active:hover {
   background-color: #d0d0d0;
-  border-bottom: 3px solid #3867d6;;
+  border-bottom: 3px solid #3867d6;
 }
 
-#tab-container li:not(:last-child) {
+#editor-tabbar-files > li:not(:last-child) {
   margin-right: 2px;
 }
 
-#console-output > div:first-child {
+#console > div:first-child {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-#console-output > div:last-child {
+#console > div:last-child {
   background: #111;
   border-radius: 4px;
   max-height: 30vh;
-  margin-bottom: 15px;
-  padding: 12px;
+  margin-bottom: 1rem;
+  padding: 0.8rem;
   font-family: monospace;
   color: lightgreen;
   overflow-y: auto;
