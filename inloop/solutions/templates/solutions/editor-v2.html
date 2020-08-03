@@ -88,7 +88,7 @@
 <script src="{% static 'vendor/js/rusha.min.js' %}"></script>
 <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'js/ace-theme-inloop.js' %}"></script>
-<script id="editor-script" src="{% static 'js/editor-v2.js' %}"
+<script id="editor-script" type="module" src="{% static 'js/editor/editor-v2.js' %}"
         data-csrf-token="{{ csrf_token }}"
         data-modular-tab-url="{% url 'solutions:modular-tab' task.slug %}"
         data-modal-notification-url="{% url 'solutions:modal-notification' task.slug %}"

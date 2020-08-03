@@ -1,3 +1,5 @@
+import messages from './messages.js';
+
 // Load data attributes, which are rendered into the script tag
 const script = document.getElementById("editor-script");
 const MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
@@ -150,46 +152,6 @@ class ModalNotification extends Modal {
         });
     }
 }
-
-
-/**
- * Represents a notification modal with a custom "try again later" body.
- */
-class TryAgainLaterModalNotification extends ModalNotification {
-
-    /**
-     * Creates a "try again later" modal notification.
-     *
-     * @constructor
-     * @param {string} title - The title of the notification.
-     */
-    constructor(title) {
-        super(title, "Please try again later.");
-    }
-}
-
-
-/**
- * Represents a notification modal with custom body and title, which notifies
- * the user that a filename already exists.
- */
-class DuplicateFileNameModalNotification extends ModalNotification {
-    /**
-     * Creates a duplicate filename modal notification.
-     *
-     * @constructor
-     * @param {string} fileName - The filename to be displayed.
-     */
-    constructor(fileName) {
-        super(
-            "Duplicate Filename",
-            "\"" + fileName +  "\" exists already. " +
-            "Please choose another filename or edit the " +
-            "name of the existing file."
-        );
-    }
-}
-
 
 /**
  * Create a modal that notifies the user about an invalid filename.
@@ -723,7 +685,7 @@ class TabBar {
             if (fileBuilder.contains(fileName)) {
                 // Show duplicate file name modal notification and
                 // retry to create the tab on close
-                let modal = new DuplicateFileNameModalNotification(fileName);
+                let modal = new ModalNotification(messages.duplicate_filename, fileName + messages.duplicate_filename_text);
                 modal.addOnHiddenCallback(function() {
                     self.createNewEmptyTab();
                 });
@@ -800,7 +762,7 @@ class TabBar {
             }
             if (fileBuilder.contains(fileName)) {
                 // If the file name already exists, request another file name and retry
-                let notification = new DuplicateFileNameModalNotification(fileName);
+                let notification = new ModalNotification(messages.duplicate_filename, fileName + messages.duplicate_filename_text);
                 notification.addOnHiddenCallback(function() {
                     self.edit(tabId);
                 });
@@ -1044,7 +1006,7 @@ class Communicator {
     upload(files) {
         this.save(function(success) {
             if (success !== true) {
-                let modal = new TryAgainLaterModalNotification("Upload failed.");
+                let modal = new ModalNotification(messages.upload_failed);
                 modal.load();
                 return;
             }
@@ -1094,9 +1056,9 @@ document.addEventListener("keydown", function(e) {
     }
 }, false);
 
-document.getElementById(BTN_SAVE_ID).addEventListener('onclick', () => communicator.save());
-document.getElementById(BTN_SUBMIT_ID).addEventListener('onclick', () => communicator.upload(fileBuilder.files));
-document.getElementById(BTN_ADD_FILE_ID).addEventListener('onclick', () => tabBar.createNewEmptyTab());
-document.getElementById(BTN_RENAME_FILE_ID).addEventListener('onclick', () => tabBar.edit(tabBar.activeTab.tabId));
-document.getElementById(BTN_DELETE_FILE_ID).addEventListener('onclick', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
-document.getElementById(BTN_DELETE_FILE_ID).addEventListener('onclick', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
+document.getElementById(BTN_SAVE_ID).addEventListener('click', () => communicator.save());
+document.getElementById(BTN_SUBMIT_ID).addEventListener('click', () => communicator.upload(fileBuilder.files));
+document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.createNewEmptyTab());
+document.getElementById(BTN_RENAME_FILE_ID).addEventListener('click', () => tabBar.edit(tabBar.activeTab.tabId));
+document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
+document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
