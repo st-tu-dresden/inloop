@@ -297,60 +297,6 @@ class ModalConfirmationForm extends Modal {
     }
 }
 
-
-/**
- * Represents a tooltip (a helpful floating text popup).
- */
-class ToolTip {
-    /**
-     * Creates a tooltip.
-     *
-     * @constructor
-     * @param {string} id - The html id of the html element on which the text should be displayed.
-     */
-    constructor(id) {
-        this.elem = $(id);
-        this.runningTimeout = undefined;
-    }
-
-    /**
-     * Changes the title of the tooltip.
-     *
-     * @param {string} newTitle - The new title.
-     */
-    changeTitle(newTitle) {
-        this.elem.title = newTitle;
-        this.elem.attr("data-original-title", newTitle)
-    }
-
-    /**
-     * Shows the tooltip for a given duration.
-     *
-     * @param {number} milliseconds - Show duration in milliseconds.
-     */
-    show(milliseconds) {
-        if (this.runningTimeout !== undefined) {
-            clearTimeout(this.runningTimeout);
-            this.runningTimeout = undefined;
-        }
-        this.elem.tooltip("show");
-        let self = this;
-        if (milliseconds !== undefined) {
-            self.runningTimeout = setTimeout(function() {
-                self.hide();
-            }, milliseconds);
-        }
-    }
-
-    /**
-     * Hides the tooltip.
-     */
-    hide() {
-        this.elem.tooltip("hide");
-    }
-}
-
-
 /*
  * Represents an interactive button, which displays the current save status.
  */
