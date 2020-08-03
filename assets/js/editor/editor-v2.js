@@ -1,4 +1,4 @@
-import messages from './messages.js';
+import msgs from './messages.js';
 
 // Load data attributes, which are rendered into the script tag
 const script = document.getElementById("editor-script");
@@ -152,19 +152,6 @@ class ModalNotification extends Modal {
         });
     }
 }
-
-/**
- * Create a modal that notifies the user about an invalid filename.
- *
- * @param {string} filename - the invalid filename.
- */
-function showInvalidFilenameNotification(filename) {
-    new ModalNotification(
-        "Invalid filename",
-        `This is not a valid Java filename: ${filename}`
-    ).load();
-}
-
 
 /**
  * Return true if the given name is a valid java filename, otherwise false.
@@ -625,13 +612,13 @@ class TabBar {
                 return;
             }
             if (!isValidJavaFilename(fileName)) {
-                showInvalidFilenameNotification(fileName);
-                return;
+              new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${filename}`).load();
+              return;
             }
             if (fileBuilder.contains(fileName)) {
                 // Show duplicate file name modal notification and
                 // retry to create the tab on close
-                let modal = new ModalNotification(messages.duplicate_filename, fileName + messages.duplicate_filename_text);
+                let modal = new ModalNotification(msgs.duplicate_filename, fileName + msgs.duplicate_filename_text);
                 modal.addOnHiddenCallback(function() {
                     self.createNewEmptyTab();
                 });
@@ -703,12 +690,12 @@ class TabBar {
                 return;
             }
             if (!isValidJavaFilename(fileName)) {
-                showInvalidFilenameNotification(fileName);
+                new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${filename}`).load();
                 return;
             }
             if (fileBuilder.contains(fileName)) {
                 // If the file name already exists, request another file name and retry
-                let notification = new ModalNotification(messages.duplicate_filename, fileName + messages.duplicate_filename_text);
+                let notification = new ModalNotification(msgs.duplicate_filename, fileName + msgs.duplicate_filename_text);
                 notification.addOnHiddenCallback(function() {
                     self.edit(tabId);
                 });
@@ -952,7 +939,7 @@ class Communicator {
     upload(files) {
         this.save(function(success) {
             if (success !== true) {
-                let modal = new ModalNotification(messages.upload_failed);
+                let modal = new ModalNotification(msgs.upload_failed);
                 modal.load();
                 return;
             }
@@ -977,7 +964,6 @@ class Communicator {
         });
     }
 }
-
 
 let fileBuilder;
 let hashComparator;
