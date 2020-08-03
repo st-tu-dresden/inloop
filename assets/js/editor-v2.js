@@ -12,6 +12,11 @@ const SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
 const MODAL_CONTAINER_ID = 'modals';
 const EDITOR_TABBAR_FILES_ID = 'editor-tabbar-files';
 const EDITOR_ID = 'editor-content';
+const BTN_SAVE_ID = 'toolbar-btn--save';
+const BTN_ADD_FILE_ID = 'toolbar-btn--newfile';
+const BTN_SUBMIT_ID = 'toolbar-btn--submit';
+const BTN_RENAME_FILE_ID = 'editor-tabbar-btn--rename';
+const BTN_DELETE_FILE_ID = 'editor-tabbar-btn--delete';
 
 /**
  * Checks for ES6 support.
@@ -1088,3 +1093,10 @@ document.addEventListener("keydown", function(e) {
         }
     }
 }, false);
+
+document.getElementById(BTN_SAVE_ID).addEventListener('onclick', () => communicator.save());
+document.getElementById(BTN_SUBMIT_ID).addEventListener('onclick', () => communicator.upload(fileBuilder.files));
+document.getElementById(BTN_ADD_FILE_ID).addEventListener('onclick', () => tabBar.createNewEmptyTab());
+document.getElementById(BTN_RENAME_FILE_ID).addEventListener('onclick', () => tabBar.edit(tabBar.activeTab.tabId));
+document.getElementById(BTN_DELETE_FILE_ID).addEventListener('onclick', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
+document.getElementById(BTN_DELETE_FILE_ID).addEventListener('onclick', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
