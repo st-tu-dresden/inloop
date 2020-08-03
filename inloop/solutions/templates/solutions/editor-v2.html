@@ -12,31 +12,39 @@
 {% block container_classes %}container-fluid{% endblock %}
 
 {% block content %}
-
-<div>
-  <h1>{{ task.title }}</h1>
-  {{ task.description|markdown }}
-</div>
-<div>
+<header>
   <div>
-    <div id="editor-countdown">
-      <span>Time remaining: 00:14:23</span>
+    <h1>{{ task.title }}</h1>
+    <span id="editor-countdown">00:14:23</span>
+  </div>
+
+  <div>
+    <div class="btn-group btn-group-sm" role="group" aria-label="...">
+      <button type="button" class="btn btn-default" disabled="disabled">Editor</button>
+      <button type="button" class="btn btn-default">Manual upload</button>
     </div>
     <div>
-      <button id="editor-button-save" type="button" class="btn btn-success" onclick="communicator.save(); blur();">
+      <button id="editor-button-save" type="button" class="btn btn-success btn-sm" onclick="communicator.save(); blur();">
         <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Save all
       </button>
-      <button type="button" class="btn btn-primary" onclick="tabBar.createNewEmptyTab(); blur();">
+      <button type="button" class="btn btn-primary btn-sm" onclick="tabBar.createNewEmptyTab(); blur();">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
       </button>
-      <button type="button" class="btn btn-default">
+      <button type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit
       </button>
-      <button type="button" class="btn btn-default">
+      <button type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax
       </button>
     </div>
   </div>
+</header>
+<main>
+<div>
+  {{ task.description|markdown }}
+</div>
+<div>
+
 
   <!--
     <li id="status-button-hint" data-toggle="tooltip" title="Save this solution."
@@ -86,19 +94,10 @@
         </button>
     </div>
     <div>
-      I'm baby taxidermy ennui mustache, twee beard scenester deep v fixie cronut put a bird on it. Helvetica tote bag vegan whatever green juice, actually hoodie cronut selfies taiyaki polaroid paleo beard godard. Gentrify blue bottle photo booth gochujang direct trade actually cornhole asymmetrical godard sartorial 8-bit green juice hella. Locavore mustache beard retro chia. Four dollar toast chia 90's blog pitchfork, direct trade enamel pin cred 3 wolf moon keffiyeh. Distillery subway tile XOXO, taxidermy neutra hell of chillwave.
-
-      Distillery intelligentsia prism blog fingerstache gentrify. Narwhal mumblecore activated charcoal, try-hard blog shaman paleo forage everyday carry pabst dreamcatcher portland put a bird on it. Seitan irony intelligentsia sriracha pop-up. Pop-up tote bag street art, church-key fanny pack celiac kitsch raw denim. Flannel taxidermy poutine, gastropub wolf venmo brunch single-origin coffee polaroid 
-      portland disrupt unicorn mustache keffiyeh post-ironic.
-
-      Kickstarter sartorial tumblr austin green juice keffiyeh bespoke pitchfork taiyaki. Pabst intelligentsia glossier migas locavore next level unicorn poke celiac flexitarian keffiyeh, twee microdosing. Squid iceland prism pabst fanny pack pitchfork keffiyeh pug 8-bit shabby chic ennui XOXO lumbersexual. Dreamcatcher church-key vaporware fam trust fund photo booth chartreuse PBR&B fixie. Chia bicycle rights dreamcatcher pour-over tote bag vegan lo-fi farm-to-table craft beer.
-
-      Iceland gastropub live-edge cronut PBR&B iPhone. Fingerstache +1 post-ironic heirloom twee adaptogen austin, green juice unicorn ramps af echo park. Celiac snackwave yr shaman. Tote bag typewriter tumblr XOXO retro twee trust fund readymade put a bird on it man braid lyft. Celiac pop-up waistcoat authentic intelligentsia jean shorts 8-bit.
-
-      Sustainable microdosing seitan, offal cardigan truffaut 3 wolf moon DIY retro. Pop-up authentic meh cronut hella occupy man braid. Food truck ugh biodiesel, farm-to-table etsy yr shaman air plant. Butcher tumblr leggings put a bird on it. Keytar stumptown sriracha edison bulb farm-to-table neutra sartorial live-edge fingerstache mixtape vape vinyl letterpress taxidermy pabst. Thundercats roof party man braid ennui.
     </div>
   </div>
 </div>
+</main>
 {% endblock  %}
 
 {% block footer %}{% endblock %}
