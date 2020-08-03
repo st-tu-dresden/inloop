@@ -98,17 +98,8 @@
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
         data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
-        data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}"
-        data-modal-container-id="#modals"
-        data-tab-container-id="#editor-tabbar-files"
-        data-editor-id="editor-content"
-        data-status-button-background-id="#status-button"
-        data-status-button-icon-id="#status-button-icon"
-        data-status-button-hint-id="#status-button-hint"
-        data-css-background-unsaved="unsaved"
-        data-css-background-saved="saved"
-        data-css-icon-unsaved="glyphicon-floppy-remove"
-        data-css-icon-saved="glyphicon-floppy-saved"></script>
+        data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}">
+</script>
 {% endblock %}
 
 

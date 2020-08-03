@@ -1,25 +1,17 @@
 // Load data attributes, which are rendered into the script tag
-let script = document.getElementById("editor-script");
-let MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
-let MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
-let MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
-let MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
-let SAVE_CHECKPOINT_URL = script.getAttribute("data-save-checkpoint-url");
-let GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-url");
-let CSRF_TOKEN = script.getAttribute("data-csrf-token");
-let SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
-let SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
-let MODAL_CONTAINER_ID = script.getAttribute("data-modal-container-id");
-let TAB_CONTAINER_ID = script.getAttribute("data-tab-container-id");
-let EDITOR_ID = script.getAttribute("data-editor-id");
-let STATUS_BUTTON_BACKGROUND_ID = script.getAttribute("data-status-button-background-id");
-let STATUS_BUTTON_ICON_ID = script.getAttribute("data-status-button-icon-id");
-let STATUS_BUTTON_HINT_ID = script.getAttribute("data-status-button-hint-id");
-let CSS_BACKGROUND_UNSAVED = script.getAttribute("data-css-background-unsaved");
-let CSS_BACKGROUND_SAVED = script.getAttribute("data-css-background-saved");
-let CSS_ICON_UNSAVED = script.getAttribute("data-css-icon-unsaved");
-let CSS_ICON_SAVED = script.getAttribute("data-css-icon-saved");
-
+const script = document.getElementById("editor-script");
+const MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
+const MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
+const MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
+const MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
+const SAVE_CHECKPOINT_URL = script.getAttribute("data-save-checkpoint-url");
+const GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-url");
+const CSRF_TOKEN = script.getAttribute("data-csrf-token");
+const SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
+const SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
+const MODAL_CONTAINER_ID = 'modals';
+const EDITOR_TABBAR_FILES_ID = 'editor-tabbar-files';
+const EDITOR_ID = 'editor-content';
 
 /**
  * Checks for ES6 support.
@@ -108,7 +100,7 @@ class Modal {
     load(completion) {
         let self = this;
         $.get(this.url, this.params, function(html) {
-            let container = $(MODAL_CONTAINER_ID);
+            let container = $('#' + MODAL_CONTAINER_ID);
             if (container === undefined || html === undefined) {
                 return;
             }
@@ -404,9 +396,6 @@ class StatusButton {
      */
     constructor(isSaved) {
         this.button = $('#toolbar-btn--save');
-        this.background = $(STATUS_BUTTON_BACKGROUND_ID);
-        this.icon = $('#toolbar-btn--save .glyphicon').first();
-        this.hint = new ToolTip(STATUS_BUTTON_HINT_ID);
         if (isSaved === true) {
             this.appearAsSaved();
         } else {
@@ -419,17 +408,7 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as saved.
      */
     appearAsSaved() {
-        //this.button.removeClass('btn-danger');
-        //this.button.addClass('btn-success');
         this.button.attr('disabled', 'disabled');
-        //this.background.removeClass(CSS_BACKGROUND_UNSAVED);
-        //this.background.addClass(CSS_BACKGROUND_SAVED);
-        // this.icon.removeClass(CSS_ICON_UNSAVED);
-        // this.icon.addClass(CSS_ICON_SAVED);
-        if (this.isSaved === false) {
-            this.hint.changeTitle("Solution saved!");
-            this.hint.show(2000);
-        }
         this.isSaved = true;
     }
 
@@ -437,17 +416,7 @@ class StatusButton {
      * Changes the appearance of the status button, so that it appears as unsaved.
      */
     appearAsUnsaved() {
-        //this.button.removeClass('btn-success');
-        //this.button.addClass('btn-danger');
         this.button.removeAttr('disabled');
-        //this.background.removeClass(CSS_BACKGROUND_SAVED);
-        //this.background.addClass(CSS_BACKGROUND_UNSAVED);
-        // this.icon.removeClass(CSS_ICON_SAVED);
-        // this.icon.addClass(CSS_ICON_UNSAVED);
-        if (this.isSaved === true) {
-            this.hint.changeTitle("Changes detected. Remember to save your solution!");
-            this.hint.show(2000);
-        }
         this.isSaved = false;
     }
 }
@@ -550,7 +519,7 @@ class Tab {
                 if (self.onCreateClosure !== undefined) self.onCreateClosure(false);
                 return;
             }
-            let container = $(TAB_CONTAINER_ID);
+            let container = $('#' + EDITOR_TABBAR_FILES_ID);
             if (container === undefined) {
                 if (self.onCreateClosure !== undefined) self.onCreateClosure(false);
                 return;
@@ -564,7 +533,7 @@ class Tab {
      * Removes the rendered tab html from the DOM.
      */
     destroy() {
-        let container = $(TAB_CONTAINER_ID);
+        let container = $('#' + EDITOR_TABBAR_FILES_ID);
         container.find("#" + this.tabId).first().remove();
         container.find("#edit-" + this.tabId).first().remove();
         container.find("#remove-" + this.tabId).first().remove();
