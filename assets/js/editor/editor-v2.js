@@ -387,8 +387,10 @@ class TabBar {
           hashComparator.lookForChanges(fileBuilder.files);
           if (file === undefined) return;
           self.createNewTab(file);
+          self.toggleRenameDeleteButtons();
         };
         showPrompt(getString(msgs.choose_filename), fileCreationCallback);
+
     }
 
     /**
@@ -405,6 +407,7 @@ class TabBar {
         tab.build();
         tab.rename(file.fileName);
         self.activate(tabId);
+        self.toggleRenameDeleteButtons();
         return tab;
     }
 
@@ -462,12 +465,22 @@ class TabBar {
         if (this.activeTab === undefined) return;
         const deleteConfirmationCallback = () => {
           self.activeTab.appearAsInactive();
+          self.tabs = self.tabs.filter(tab => tab.tabId !== this.activeTab.tabId);
           self.editor.unbind();
           self.activeTab.destroy();
           self.activeTab = undefined;
           hashComparator.lookForChanges(fileBuilder.files);
+          self.toggleRenameDeleteButtons();
         }
         showConfirmDialog(getString(msgs.delete_file_confirmation, this.activeTab.file.fileName), deleteConfirmationCallback);
+    }
+
+    toggleRenameDeleteButtons() {
+      const deleteButton = document.getElementById(BTN_DELETE_FILE_ID);
+      const renameButton = document.getElementById(BTN_RENAME_FILE_ID);
+      const hasNoFiles = this.tabs.length === 0;
+      deleteButton.disabled = hasNoFiles;
+      renameButton.disabled = hasNoFiles;
     }
 }
 

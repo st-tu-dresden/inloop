@@ -38,7 +38,7 @@ body > div:first-of-type {
 }
 
 main > div:first-child {
-  padding-left: .6rem;
+  padding-left: 0.6rem;
 }
 
 .toolbar > div:first-child,
@@ -99,11 +99,17 @@ main > div:last-child {
   flex-direction: row;
   margin-bottom: 0.6rem;
   padding-right: 0.6rem;
+  height: 2.2rem;
 }
 
 #editor-tabbar > div {
   display: flex;
   align-items: center;
+}
+
+#editor-tabbar button:hover,
+#editor-tabbar button:focus {
+  color: #337ab7;
 }
 
 #editor-tabbar-files {
@@ -120,14 +126,21 @@ main > div:last-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 0.6rem 0.4rem 0.6rem;
   cursor: pointer;
+  border-bottom: 3px solid;
+  border-bottom-color: #dfdfdf;
 }
 
 #editor-tabbar-files > li.active,
 #editor-tabbar-files > li.active:hover {
   background-color: #d0d0d0;
-  border-bottom: 3px solid #3867d6;
+  border-bottom-color: #3867d6;
+}
+
+#editor-tabbar-files > li:hover {
+  background-color: #d9d9d9;
+  border-bottom-color: #d9d9d9;
 }
 
 #editor-tabbar-files > li:not(:last-child) {
