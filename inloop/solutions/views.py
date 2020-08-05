@@ -321,45 +321,41 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 
 @login_required
 def get_last_checkpoint(request, slug):
-    if not request.is_ajax():
-        return JsonResponse({'success': False})
-
     task = get_object_or_404(Task.objects.published(), slug=slug)
 
     checkpoints = Checkpoint.objects.filter(author=request.user, task=task)
     if not checkpoints.exists():
-        return JsonResponse({'success': True, 'checkpoint': None})
+        return JsonResponse({'success': True, 'files': None})
 
     last_checkpoint = checkpoints.last()
-    checkpoint_files = dict()
-    for checkpoint_file in last_checkpoint.checkpointfile_set.all():
-        checkpoint_files[checkpoint_file.name] = checkpoint_file.contents
+    checkpoint_files = []
+    for checkpoint_file in last_checkpoint.checkpointfile_set.order_by('id'):
+        checkpoint_files.append({
+            'name': checkpoint_file.name,
+            'contents': checkpoint_file.contents
+        })
 
     return JsonResponse({
         'success': True,
-        'checkpoint': {
-            'md5': str(last_checkpoint.md5),
-            'files': checkpoint_files,
-        }
+        'checksum': str(last_checkpoint.md5),
+        'files': checkpoint_files,
     })
 
 
 @login_required
 def save_checkpoint(request, slug):
-    if not request.is_ajax() or not request.method == 'POST':
+    if not request.method == 'POST':
         return JsonResponse({'success': False})
 
     task = get_object_or_404(Task.objects.published(), slug=slug)
-
-    data = request.POST.get('checkpoint')
-    if data is None:
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
         return JsonResponse({'success': False})
 
-    # Load nested data from json
-    data = json.loads(data)
     try:
-        Checkpoint.objects.sync_checkpoint(data, task, request.user)
-    except ValueError:
+        Checkpoint.objects.save_checkpoint(data, task, request.user)
+    except KeyError:
         return JsonResponse({'success': False})
 
     return JsonResponse({'success': True})

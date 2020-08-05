@@ -859,19 +859,15 @@ class Communicator {
                     // Return empty files and empty hash
                     completion([], "");
                 } else {
-                    let checkpoint = response.checkpoint;
-                    if (checkpoint === null) {
+                    if (!response.files === null) {
                         // Return empty files and empty hash
                         completion([], "");
                     } else {
-                        let md5 = checkpoint.md5;
-                        let files = checkpoint.files;
-                        let editorFiles = [];
-                        for (let key of Object.keys(files)) {
-                            editorFiles.push(new File(key, files[key]));
+                        const editorFiles = [];
+                        for (let file of response.files) {
+                            editorFiles.push(new File(file.name, file.contents));
                         }
-                        editorFiles.reverse();
-                        completion(editorFiles, md5);
+                        completion(editorFiles, response.checksum);
                     }
                 }
             }
@@ -887,23 +883,21 @@ class Communicator {
      * @param {boolean} [completion.success] - The success status.
      */
     save(completion) {
-        let files = {};
+        let files = [];
         for (let file of fileBuilder.files) {
-            files[file.fileName] = file.fileContent;
+            files.push({name: file.fileName, contents: file.fileContent});
         }
-        let md5 = hashComparator.computeHash(fileBuilder.files);
+        let checksum = hashComparator.computeHash(fileBuilder.files);
         $.ajax({
             url: SAVE_CHECKPOINT_URL,
             type: "post",
             headers: {"X-CSRFToken": CSRF_TOKEN},
+            contentType: "application/json; charset=utf-8",
             datatype: "json",
-            data: {checkpoint: JSON.stringify({
-                files: files,
-                md5: md5,
-            })},
+            data: JSON.stringify({checksum: checksum, files: files}),
             success: function(response) {
                 if (response.success === true) {
-                    hashComparator.updateHash(md5);
+                    hashComparator.updateHash(checksum);
                     hashComparator.lookForChanges(fileBuilder.files);
                     if (completion !== undefined) completion(true);
                 } else {
