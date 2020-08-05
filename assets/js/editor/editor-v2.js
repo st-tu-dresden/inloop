@@ -1,16 +1,12 @@
-import msgs from './messages.js';
+import {getString, msgs} from './messages.js';
 
 // Load data attributes, which are rendered into the script tag
 const script = document.getElementById("editor-script");
-const MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
-const MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
-const MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
 const SAVE_CHECKPOINT_URL = script.getAttribute("data-save-checkpoint-url");
 const GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-url");
 const CSRF_TOKEN = script.getAttribute("data-csrf-token");
 const SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 const SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
-const MODAL_CONTAINER_ID = 'modals';
 const EDITOR_TABBAR_FILES_ID = 'editor-tabbar-files';
 const EDITOR_ID = 'editor-content';
 const BTN_SAVE_ID = 'toolbar-btn--save';
@@ -24,7 +20,7 @@ const BTN_DELETE_FILE_ID = 'editor-tabbar-btn--delete';
  *
  * ES6 support is needed for the editor.
  */
-var supportsES6 = function() {
+const supportsES6 = function() {
     try {
         new Function("(a = 0) => a");
         return true;
@@ -38,10 +34,7 @@ var supportsES6 = function() {
 // Check for ES6 support and display an error
 // message if ES6 is not supported.
 if (!supportsES6) {
-    alert(
-      "Your browser does not support ECMAScript 6." +
-      " Please update or change your browser to use the editor."
-    );
+    showAlert(getString(msgs.missing_es6_support));
 }
 
 
@@ -58,229 +51,12 @@ jQuery.fn.textNodes = function() {
 };
 
 /**
- * Represents a modal (a Bootstrap popup).
- */
-class Modal {
-    /**
-     * Creates a modal.
-     *
-     * @constructor
-     * @param {string} url - The url on which to get the modal html.
-     * @param {string} hook - The html id under which the modal is to be created.
-     * @param {Object} params - The get parameters needed to render the modal html.
-     */
-    constructor(url, hook, params) {
-        this.url = url;
-        this.hook = hook;
-        this.params = params;
-        this.onHiddenCallbacks = [];
-        this.onShownCallbacks = [];
-    }
-
-    /**
-     * Adds a callback function, which is executed when the modal is hidden.
-     *
-     * @param {function} callback - The callback function.
-     */
-    addOnHiddenCallback(callback) {
-        this.onHiddenCallbacks.push(callback);
-    }
-
-    /**
-     * Adds a callback function, which is executed when the modal is shown.
-     *
-     * @param {function} callback - The callback function.
-     */
-    addOnShownCallback(callback) {
-        this.onShownCallbacks.push(callback);
-    }
-
-    /**
-     * Gets, inserts and shows the rendered modal.
-     *
-     * @param {function} [completion] - The handler which is called on completion.
-     * @param {string} [completion.html] - The rendered modal html.
-     * @param {jQuery} [completion.container] - The modal container node.
-     * @param {jQuery} [completion.modal] - The modal node.
-     */
-    load(completion) {
-        let self = this;
-        $.get(this.url, this.params, function(html) {
-            let container = $('#' + MODAL_CONTAINER_ID);
-            if (container === undefined || html === undefined) {
-                return;
-            }
-            container.html(html);
-            let modal = $("#" + self.hook);
-            modal.modal("show");
-
-            // Connect callbacks to the modal
-            modal.on('hidden.bs.modal', function () {
-                for (let callback of self.onHiddenCallbacks) {
-                    callback();
-                }
-            });
-            modal.on('shown.bs.modal', function () {
-                for (let callback of self.onShownCallbacks) {
-                    callback();
-                }
-            });
-
-            if (completion !== undefined) completion(html, container, modal);
-        })
-    }
-}
-
-
-/**
- * Represents a simple modal notification with title and body.
- */
-class ModalNotification extends Modal {
-    /**
-     * Creates a modal notification.
-     *
-     * @constructor
-     * @param {string} title - The title of the notification.
-     * @param {string} body - The body of the notification.
-     */
-    constructor(title, body) {
-        super(MODAL_NOTIFICATION_URL, "modal-notification-hook", {
-            hook: "modal-notification-hook",
-            title: title,
-            body: body
-        });
-    }
-}
-
-/**
  * Return true if the given name is a valid java filename, otherwise false.
  *
  * @param {string} filename - the filename to check.
  */
 function isValidJavaFilename(filename) {
     return /^[A-Za-z0-9_]+\.java$/.test(filename);
-}
-
-
-/**
- * Represents a modal with an input form.
- */
-class ModalInputForm extends Modal {
-    /**
-     * Creates a modal input form.
-     *
-     * @constructor
-     * @param {string} title - The modal title to be displayed.
-     * @param {string} placeholder - The modal input form placeholder to be displayed.
-     */
-    constructor(title, placeholder) {
-        super(MODAL_INPUT_FORM_URL, "modal-input-form-hook", {
-            hook: "modal-input-form-hook",
-            title: title,
-            input_hook: "modal-input-form-input-hook",
-            placeholder: placeholder
-        });
-        this.onInputCallbacks = [];
-    }
-
-    /**
-     * Adds a callback function, which is executed on input of the modal input form.
-     *
-     * @param {function} callback - The callback function.
-     */
-    addOnInputCallback(callback) {
-        this.onInputCallbacks.push(callback);
-    }
-
-    /**
-     * Gets, inserts and shows the rendered modal.
-     *
-     * @param {function} [completion] - A handler which is called on completion.
-     * @param {string} [completion.html] - The rendered modal html.
-     * @param {jQuery} [completion.container] - The modal container node.
-     * @param {jQuery} [completion.modal] - The modal node.
-     */
-    load(completion) {
-        let self = this;
-
-        // Connect callbacks to the modal
-        this.addOnShownCallback(function() {
-            $("#modal-input-form-input-hook").focus();
-        });
-        this.addOnHiddenCallback(function() {
-            for (let callback of self.onInputCallbacks) {
-                callback($("#modal-input-form-input-hook").val());
-            }
-        });
-
-        super.load(completion);
-    }
-}
-
-
-/**
- * Represents a modal with a confirmation form.
- */
-class ModalConfirmationForm extends Modal {
-    /**
-     * Creates a modal input form.
-     *
-     * @constructor
-     * @param {string} title - The modal title to be displayed.
-     */
-    constructor(title) {
-        super(MODAL_CONFIRMATION_FORM_URL, "modal-confirmation-form-hook", {
-            hook: "modal-confirmation-form-hook",
-            title: title,
-            confirm_button_hook: "modal-confirmation-form-confirm-button-hook",
-            cancel_button_hook: "modal-confirmation-form-cancel-button-hook"
-        });
-        this.onConfirmCallbacks = [];
-        this.onCancelCallbacks = [];
-    }
-
-    /**
-     * Adds a callback function, which is executed on confirmation of the form.
-     *
-     * @param {function} callback - The callback function.
-     */
-    addOnConfirmCallback(callback) {
-        this.onConfirmCallbacks.push(callback);
-    }
-
-    /**
-     * Adds a callback function, which is executed on cancellation of the form.
-     *
-     * @param {function} callback - The callback function.
-     */
-    addOnCancelCallback(callback) {
-        this.onCancelCallbacks.push(callback);
-    }
-
-    /**
-     * Gets, inserts and shows the rendered modal.
-     *
-     * @param {function} [completion] - A handler which is called on completion.
-     * @param {string} [completion.html] - The rendered modal html.
-     * @param {jQuery} [completion.container] - The modal container node.
-     * @param {jQuery} [completion.modal] - The modal node.
-     */
-    load(completion) {
-        let self = this;
-        super.load(function(html, container, modal) {
-            $("#modal-confirmation-form-confirm-button-hook").click(function() {
-                for (let callback of self.onConfirmCallbacks) {
-                    callback();
-                }
-            });
-            $("#modal-confirmation-form-cancel-button-hook").click(function() {
-                for (let callback of self.onCancelCallbacks) {
-                    callback();
-                }
-            });
-            if (completion !== undefined) completion(html, container, modal);
-        });
-    }
 }
 
 /*
@@ -294,7 +70,7 @@ class StatusButton {
      * @param {boolean} isSaved - Defines if the button appears as saved after instantiation.
      */
     constructor(isSaved) {
-        this.button = $('#toolbar-btn--save');
+        this.button = $(`#${BTN_SAVE_ID}`);
         if (isSaved === true) {
             this.appearAsSaved();
         } else {
@@ -604,11 +380,11 @@ class TabBar {
         let self = this;
         const fileCreationCallback = (fileName) => {
           if (!isValidJavaFilename(fileName) || fileName.trim() === '') {
-            showPrompt(msgs.invalid_filename_text, fileCreationCallback, fileName);
+            showPrompt(getString(msgs.invalid_filename, fileName), fileCreationCallback, fileName);
             return;
           }
           if (fileBuilder.contains(fileName)) {
-            showPrompt(msgs.duplicate_filename_text, fileCreationCallback, fileName);
+            showPrompt(getString(msgs.duplicate_filename, fileName), fileCreationCallback, fileName);
             return;
           }
           const file = fileBuilder.build(fileName, '');
@@ -616,7 +392,7 @@ class TabBar {
           if (file === undefined) return;
           self.createNewTab(file);
         };
-        showPrompt(msgs.choose_filename_text,fileCreationCallback)
+        showPrompt(getString(msgs.choose_filename), fileCreationCallback);
     }
 
     /**
@@ -650,7 +426,7 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive();
-        //$("#editor textarea").focus();
+        document.querySelector(`#${EDITOR_ID} > textarea`).focus();
     }
 
     /**
@@ -663,32 +439,22 @@ class TabBar {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.activeTab.appearAsActive();
         let self = this;
-        let modalInputForm = new ModalInputForm(
-            "Rename " + this.activeTab.file.fileName,
-            "Enter a filename"
-        );
-        modalInputForm.addOnInputCallback(function(fileName) {
-            if (fileName === undefined || fileName.trim() === "") {
-                return;
-            }
-            if (!isValidJavaFilename(fileName)) {
-                new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${filename}`).load();
-                return;
-            }
-            if (fileBuilder.contains(fileName)) {
-                // If the file name already exists, request another file name and retry
-                let notification = new ModalNotification(msgs.duplicate_filename, fileName + msgs.duplicate_filename_text);
-                notification.addOnHiddenCallback(function() {
-                    self.edit(tabId);
-                });
-                notification.load();
-                return;
-            }
-            self.activeTab.file.fileName = fileName;
-            self.activeTab.rename(fileName);
-            hashComparator.lookForChanges(fileBuilder.files);
-        });
-        modalInputForm.load();
+
+        const fileEditCallback = (fileName) => {
+          if (!isValidJavaFilename(fileName) || fileName.trim() === '') {
+            showPrompt(getString(msgs.invalid_filename, fileName), fileEditCallback, fileName);
+            return;
+          }
+          if (fileBuilder.contains(fileName)) {
+            showPrompt(getString(msgs.duplicate_filename, fileName), fileEditCallback, fileName);
+            return;
+          }
+          self.activeTab.file.fileName = fileName;
+          self.activeTab.rename(fileName);
+          document.querySelector(`#${EDITOR_ID} > textarea`).focus();
+          hashComparator.lookForChanges(fileBuilder.files);
+        };
+        showPrompt(getString(msgs.edit_filename, this.activeTab.file.fileName), fileEditCallback, this.activeTab.file.fileName);
     }
 
     /**
@@ -696,20 +462,16 @@ class TabBar {
      * the active tab and the file attached to it, if confirmed.
      */
     destroyActiveTab() {
-        if (this.activeTab === undefined) return;
-        let confirmation = new ModalConfirmationForm(
-            "Are you sure that you want to delete \""
-            + this.activeTab.file.fileName + "\"?"
-        );
         let self = this;
-        confirmation.addOnConfirmCallback(function() {
-            self.activeTab.appearAsInactive();
-            self.editor.unbind();
-            self.activeTab.destroy();
-            self.activeTab = undefined;
-            hashComparator.lookForChanges(fileBuilder.files);
-        });
-        confirmation.load();
+        if (this.activeTab === undefined) return;
+        const deleteConfirmationCallback = () => {
+          self.activeTab.appearAsInactive();
+          self.editor.unbind();
+          self.activeTab.destroy();
+          self.activeTab = undefined;
+          hashComparator.lookForChanges(fileBuilder.files);
+        }
+        showConfirmDialog(getString(msgs.delete_file_confirmation, this.activeTab.file.fileName), deleteConfirmationCallback);
     }
 }
 
@@ -905,6 +667,7 @@ class Communicator {
                 }
             }
         });
+        document.querySelector(`#${EDITOR_ID} > textarea`).focus();
     }
 
     /**
@@ -916,8 +679,7 @@ class Communicator {
     upload(files) {
         this.save(function(success) {
             if (success !== true) {
-                let modal = new ModalNotification(msgs.upload_failed);
-                modal.load();
+                showAlert(getString(msgs.upload_failed));
                 return;
             }
             let postData = {uploads: {}};
@@ -970,16 +732,15 @@ document.getElementById(BTN_SUBMIT_ID).addEventListener('click', () => communica
 document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.createNewEmptyTab());
 document.getElementById(BTN_RENAME_FILE_ID).addEventListener('click', () => tabBar.edit(tabBar.activeTab.tabId));
 document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
-document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
 
 function showPrompt(text, callback, value = '') {
-  const result = window.prompt(text, value);
+  const result = window.prompt(`${text}\n\n`, value);
   result !== null && callback(result); 
 }
 
-function showConfirmDialog(text, successCallback, cancelCallback) {
+function showConfirmDialog(text, callback) {
   const result = window.confirm(text);
-  result ? successCallback() : cancelCallback();
+  result && callback();
 }
 
 function showAlert(text) {
