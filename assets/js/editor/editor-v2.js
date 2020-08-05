@@ -191,13 +191,9 @@ class Tab {
         let self = this;
         const tabBarFileList = document.getElementById(EDITOR_TABBAR_FILES_ID);
         const newTab = document.createElement('li');
+        newTab.innerText = this.file.fileName;
         newTab.id = this.tabId;
-        const tabContent = document.createElement('a');
-        tabContent.id = `label-${this.tabId}`;
-        tabContent.href = '#';
-        tabContent.innerText = this.file.fileName;
-        tabContent.addEventListener('click', () => tabBar.activate(this.tabId));
-        newTab.appendChild(tabContent);
+        newTab.addEventListener('click', () => tabBar.activate(this.tabId));
         tabBarFileList.appendChild(newTab);
     }
 

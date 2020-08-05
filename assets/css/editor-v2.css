@@ -37,6 +37,10 @@ body > div:first-of-type {
   justify-content: space-between;
 }
 
+main > div:first-child {
+  padding-left: .6rem;
+}
+
 .toolbar > div:first-child,
 main > div:first-child {
   flex: 2;
@@ -117,10 +121,7 @@ main > div:last-child {
   align-items: center;
   justify-content: center;
   padding: 0.4rem 0.6rem;
-}
-
-#editor-tabbar-files > li > a:hover {
-  text-decoration: none;
+  cursor: pointer;
 }
 
 #editor-tabbar-files > li.active,
@@ -131,6 +132,10 @@ main > div:last-child {
 
 #editor-tabbar-files > li:not(:last-child) {
   margin-right: 2px;
+}
+
+#console {
+  display: none;
 }
 
 #console > div:first-child {
