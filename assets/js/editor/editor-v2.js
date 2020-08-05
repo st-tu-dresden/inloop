@@ -2,7 +2,6 @@ import msgs from './messages.js';
 
 // Load data attributes, which are rendered into the script tag
 const script = document.getElementById("editor-script");
-const MODULAR_TAB_URL = script.getAttribute("data-modular-tab-url");
 const MODAL_NOTIFICATION_URL = script.getAttribute("data-modal-notification-url");
 const MODAL_INPUT_FORM_URL = script.getAttribute("data-modal-input-form-url");
 const MODAL_CONFIRMATION_FORM_URL = script.getAttribute("data-modal-confirmation-form-url");
@@ -414,19 +413,16 @@ class Tab {
      */
     build() {
         let self = this;
-        $.get(MODULAR_TAB_URL, {tab_id: this.tabId}, function(html) {
-            if (html === undefined) {
-                if (self.onCreateClosure !== undefined) self.onCreateClosure(false);
-                return;
-            }
-            let container = $('#' + EDITOR_TABBAR_FILES_ID);
-            if (container === undefined) {
-                if (self.onCreateClosure !== undefined) self.onCreateClosure(false);
-                return;
-            }
-            container.append(html);
-            if (self.onCreateClosure !== undefined) self.onCreateClosure(true);
-        })
+        const tabBarFileList = document.getElementById(EDITOR_TABBAR_FILES_ID);
+        const newTab = document.createElement('li');
+        newTab.id = this.tabId;
+        const tabContent = document.createElement('a');
+        tabContent.id = `label-${this.tabId}`;
+        tabContent.href = '#';
+        tabContent.innerText = this.file.fileName;
+        tabContent.addEventListener('click', () => tabBar.activate(this.tabId));
+        newTab.appendChild(tabContent);
+        tabBarFileList.appendChild(newTab);
     }
 
     /**
@@ -621,33 +617,6 @@ class TabBar {
           self.createNewTab(file);
         };
         showPrompt(msgs.choose_filename_text,fileCreationCallback)
-        //let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
-        /*
-        inputForm.addOnInputCallback(function(fileName) {
-            if (fileName === undefined || fileName.trim() === "") {
-                return;
-            }
-            if (!isValidJavaFilename(fileName)) {
-              new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${fileName}`).load();
-              //showPrompt(`${msgs.invalid_filename_text} ${filename}`, )
-              return;
-            }
-            if (fileBuilder.contains(fileName)) {
-                // Show duplicate file name modal notification and
-                // retry to create the tab on close
-                let modal = new ModalNotification(msgs.duplicate_filename, fileName + msgs.duplicate_filename_text);
-                modal.addOnHiddenCallback(function() {
-                    self.createNewEmptyTab();
-                });
-                modal.load();
-                return;
-            }
-            let file = fileBuilder.build(fileName, "");
-            hashComparator.lookForChanges(fileBuilder.files);
-            if (file === undefined) return;
-            self.createNewTab(file);
-        });
-        inputForm.load();*/
     }
 
     /**
@@ -659,15 +628,11 @@ class TabBar {
     createNewTab(file) {
         let tabId = this.dequeueTabId();
         let self = this;
-        let tab = new Tab(tabId, file).onCreate(function(success) {
-            if (success !== true) {
-                return;
-            }
-            tab.rename(file.fileName);
-            self.activate(tabId);
-        });
+        let tab = new Tab(tabId, file);
         this.tabs.push(tab);
         tab.build();
+        tab.rename(file.fileName);
+        self.activate(tabId);
         return tab;
     }
 
@@ -905,6 +870,7 @@ class Communicator {
                         for (let key of Object.keys(files)) {
                             editorFiles.push(new File(key, files[key]));
                         }
+                        editorFiles.reverse();
                         completion(editorFiles, md5);
                     }
                 }

@@ -90,7 +90,6 @@
 <script src="{% static 'js/ace-theme-inloop.js' %}"></script>
 <script id="editor-script" type="module" src="{% static 'js/editor/editor-v2.js' %}"
         data-csrf-token="{{ csrf_token }}"
-        data-modular-tab-url="{% url 'solutions:modular-tab' task.slug %}"
         data-modal-notification-url="{% url 'solutions:modal-notification' task.slug %}"
         data-modal-input-form-url="{% url 'solutions:modal-input-form' task.slug %}"
         data-modal-confirmation-form-url="{% url 'solutions:modal-confirmation-form' task.slug %}"
