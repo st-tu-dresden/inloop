@@ -606,13 +606,30 @@ class TabBar {
      */
     createNewEmptyTab() {
         let self = this;
-        let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
+        const fileCreationCallback = (fileName) => {
+          if (!isValidJavaFilename(fileName) || fileName.trim() === '') {
+            showPrompt(msgs.invalid_filename_text, fileCreationCallback, fileName);
+            return;
+          }
+          if (fileBuilder.contains(fileName)) {
+            showPrompt(msgs.duplicate_filename_text, fileCreationCallback, fileName);
+            return;
+          }
+          const file = fileBuilder.build(fileName, '');
+          hashComparator.lookForChanges(fileBuilder.files);
+          if (file === undefined) return;
+          self.createNewTab(file);
+        };
+        showPrompt(msgs.choose_filename_text,fileCreationCallback)
+        //let inputForm = new ModalInputForm("Choose a name for your new file.", "Enter a filename");
+        /*
         inputForm.addOnInputCallback(function(fileName) {
             if (fileName === undefined || fileName.trim() === "") {
                 return;
             }
             if (!isValidJavaFilename(fileName)) {
-              new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${filename}`).load();
+              new ModalNotification(msgs.invalid_filename, `${msgs.invalid_filename_text} ${fileName}`).load();
+              //showPrompt(`${msgs.invalid_filename_text} ${filename}`, )
               return;
             }
             if (fileBuilder.contains(fileName)) {
@@ -630,7 +647,7 @@ class TabBar {
             if (file === undefined) return;
             self.createNewTab(file);
         });
-        inputForm.load();
+        inputForm.load();*/
     }
 
     /**
@@ -994,3 +1011,17 @@ document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.
 document.getElementById(BTN_RENAME_FILE_ID).addEventListener('click', () => tabBar.edit(tabBar.activeTab.tabId));
 document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
 document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
+
+function showPrompt(text, callback, value = '') {
+  const result = window.prompt(text, value);
+  result !== null && callback(result); 
+}
+
+function showConfirmDialog(text, successCallback, cancelCallback) {
+  const result = window.confirm(text);
+  result ? successCallback() : cancelCallback();
+}
+
+function showAlert(text) {
+  window.alert(text);
+}
