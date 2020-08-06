@@ -62,37 +62,21 @@ function isValidJavaFilename(filename) {
 /*
  * Represents an interactive button, which displays the current save status.
  */
-class StatusButton {
+class SaveButton {
     /**
      * Creates a status button.
      *
      * @constructor
-     * @param {boolean} isSaved - Defines if the button appears as saved after instantiation.
      */
-    constructor(isSaved) {
-        this.button = $(`#${BTN_SAVE_ID}`);
-        if (isSaved === true) {
-            this.appearAsSaved();
-        } else {
-            this.appearAsUnsaved();
-        }
-        this.isSaved = isSaved;
+    constructor() {
+        this.button = document.getElementById(BTN_SAVE_ID);
     }
 
     /**
-     * Changes the appearance of the status button, so that it appears as saved.
+     * Changes the appearance of the save button.
      */
-    appearAsSaved() {
-        this.button.attr('disabled', 'disabled');
-        this.isSaved = true;
-    }
-
-    /**
-     * Changes the appearance of the status button, so that it appears as unsaved.
-     */
-    appearAsUnsaved() {
-        this.button.removeAttr('disabled');
-        this.isSaved = false;
+    appearAsEnabled(enable) {
+        this.button.disabled = !enable;
     }
 }
 
@@ -110,7 +94,7 @@ class HashComparator {
     constructor(hash) {
         this.rusha = new Rusha();
         this.hash = hash;
-        this.statusButton = new StatusButton(false);
+        this.saveButton = new SaveButton();
     }
 
     /**
@@ -147,11 +131,7 @@ class HashComparator {
      */
     lookForChanges(files) {
         let equal = this.computeHash(files) === this.hash;
-        if (equal === true) {
-            this.statusButton.appearAsSaved();
-        } else {
-            this.statusButton.appearAsUnsaved();
-        }
+        this.saveButton.appearAsEnabled(!equal);
         return equal;
     }
 }
@@ -509,7 +489,7 @@ class TabBar {
  *    of the tabs and their corresponding files.
  * -  Update the hash of the {@link HashComparator} with {@link Editor#addOnChangeListener}.
  *    If the hash differs, the HashComparator will handle the visual representation
- *    through its {@link StatusButton}.
+ *    through its {@link SaveButton}.
  */
 class InloopEditor {
     /**
