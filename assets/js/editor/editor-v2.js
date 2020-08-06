@@ -107,7 +107,7 @@ class Tab {
       const newTab = document.createElement('li');
       newTab.innerText = this.file.fileName;
       newTab.id = `file-tab-${this.tabId}`;
-      newTab.addEventListener('click', () => tabBar.activate(this.tabId));
+      newTab.addEventListener('click', () => tabBar.switchToTab(this.tabId));
       this.tabDomElement = newTab;
       this.tabListContainer.appendChild(newTab);
   }
@@ -295,37 +295,28 @@ class TabBar {
      */
     constructor(files) {
         this.tabs = [];
+        this.tabId = 0;
         this.editor = new InloopEditor();
         this.editor.addOnChangeListener(function() {
             hashComparator.lookForChanges(fileBuilder.files);
         });
+        this.renameFileButton = document.getElementById(BTN_RENAME_FILE_ID);
+        this.deleteFileButton = document.getElementById(BTN_DELETE_FILE_ID);
+        this.renameFileButton.addEventListener('click', () => this.renameFile());
+        this.deleteFileButton.addEventListener('click', () => this.deleteFile());
         for (let file of files) {
             this.createNewTab(file);
         }
+        this.toggleRenameDeleteButtons();
     }
 
     /**
-     * Dequeues a new unique tab id. The tab id needs to be unique.
+     * Creates a new file.
      *
-     * @returns {number} - The dequeued tab id.
-     */ 
-    dequeueTabId() {
-        // Store a class attribute to keep track of the current tab id
-        if (this.tabId === undefined) {
-            this.tabId = 0;
-        }
-        this.tabId += 1;
-        return this.tabId;
-    }
-
-    /**
-     * Creates a new empty tab.
-     *
-     * Displays a modal input form as a file name input and
-     * creates the empty tab based on the given file name.
+     * Displays a prompt for file name input and
+     * creates an additional file tab based on the given file name.
      */
-    createNewEmptyTab() {
-        let self = this;
+    createNewFile() {
         const fileCreationCallback = (fileName) => {
           if (!isValidJavaFilename(fileName) || fileName.trim() === '') {
             showPrompt(getString(msgs.invalid_filename, fileName), fileCreationCallback, fileName);
@@ -338,28 +329,22 @@ class TabBar {
           const file = fileBuilder.build(fileName, '');
           hashComparator.lookForChanges(fileBuilder.files);
           if (file === undefined) return;
-          self.createNewTab(file);
-          self.toggleRenameDeleteButtons();
+          this.createNewTab(file);
         };
         showPrompt(getString(msgs.choose_filename), fileCreationCallback);
-
     }
 
     /**
-     * Creates a new tab based on a given file. Creates the tab asynchronously.
+     * Creates a new tab based on a given file.
      *
      * @param {File} file - The file.
      * @returns {Tab} - The created tab.
      */
     createNewTab(file) {
-        let tabId = this.dequeueTabId();
-        let self = this;
-        let tab = new Tab(tabId, file);
+        let tab = new Tab(++this.tabId, file);
+        tab.build();  
         this.tabs.push(tab);
-        tab.build();
-        tab.rename(file.fileName);
-        self.activate(tabId);
-        self.toggleRenameDeleteButtons();
+        this.switchToTab(tab.tabId);
         return tab;
     }
 
@@ -370,25 +355,21 @@ class TabBar {
      *
      * @param {number} tabId - The id of the tab.
      */
-    activate(tabId) {
-        if (this.activeTab !== undefined) {
-            this.activeTab.appearAsActive(false);
-        }
-        this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
+    switchToTab(tabId) {
+        this.activeTab && this.activeTab.appearAsActive(false);
+        this.activeTab = this.tabs.find(tab => tab.tabId === tabId);
         this.editor.bind(this.activeTab.file);
         this.activeTab.appearAsActive(true);
-        document.querySelector(`#${EDITOR_ID} > textarea`).focus();
+        this.editor.focus();
     }
 
     /**
-     * Displays a modal notification input form to rename
+     * Displays a prompt dialog with input form to rename
      * the selected tab and the file attached to it.
      *
      * @param tabId
      */
-    edit(tabId) {
-        this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
-        this.activeTab.appearAsActive();
+    renameFile() {
         const fileEditCallback = (fileName) => {
           if (fileName === this.activeTab.file.fileName) {
             return;
@@ -403,28 +384,29 @@ class TabBar {
           }
           this.activeTab.file.fileName = fileName;
           this.activeTab.rename(fileName);
-          document.querySelector(`#${EDITOR_ID} > textarea`).focus();
+          this.editor.focus();
           hashComparator.lookForChanges(fileBuilder.files);
         };
         showPrompt(getString(msgs.edit_filename, this.activeTab.file.fileName), fileEditCallback, this.activeTab.file.fileName);
     }
 
     /**
-     * Displays a modal confirmation form and removes
+     * Displays a confirm dialog and removes
      * the active tab and the file attached to it, if confirmed.
      */
-    destroyActiveTab() {
+    deleteFile() {
         if (this.activeTab === undefined) return;
         const deleteConfirmationCallback = () => {
           this.activeTab.appearAsActive(false);
-          const destroyedTabIndex = this.tabs.lastIndexOf(this.activeTab);
+          const deletedFileTabIndex = this.tabs.lastIndexOf(this.activeTab);
           this.tabs = this.tabs.filter((tab, i) => tab.tabId !== this.activeTab.tabId);
           this.editor.unbind();
           this.activeTab.destroy();
-          this.activeTab = undefined;
           hashComparator.lookForChanges(fileBuilder.files);
           if (this.tabs.length > 0) {
-            this.activate(this.tabs[destroyedTabIndex] && this.tabs[destroyedTabIndex].tabId || this.tabs[this.tabs.length - 1].tabId);
+            this.switchToTab(this.tabs[deletedFileTabIndex] && this.tabs[deletedFileTabIndex].tabId || this.tabs[this.tabs.length - 1].tabId);
+          } else {
+            this.activeTab = undefined;
           }
           this.toggleRenameDeleteButtons();
         }
@@ -432,11 +414,9 @@ class TabBar {
     }
 
     toggleRenameDeleteButtons() {
-      const deleteButton = document.getElementById(BTN_DELETE_FILE_ID);
-      const renameButton = document.getElementById(BTN_RENAME_FILE_ID);
       const hasNoFiles = this.tabs.length === 0;
-      deleteButton.disabled = hasNoFiles;
-      renameButton.disabled = hasNoFiles;
+      this.renameFileButton.disabled = hasNoFiles;
+      this.deleteFileButton.disabled = hasNoFiles;
     }
 }
 
@@ -553,6 +533,10 @@ class InloopEditor {
         this.editor.setReadOnly(true);
         this.editor.off("change");
     }
+
+    focus() {
+        document.querySelector(`#${EDITOR_ID} > textarea`).focus();
+    }
 }
 
 
@@ -632,7 +616,6 @@ class Communicator {
                 }
             }
         });
-        document.querySelector(`#${EDITOR_ID} > textarea`).focus();
     }
 
     /**
@@ -693,10 +676,9 @@ document.addEventListener("keydown", function(e) {
 }, false);
 
 document.getElementById(BTN_SAVE_ID).addEventListener('click', () => communicator.save());
+document.getElementById(BTN_SAVE_ID).addEventListener('click', () => tabBar.editor.focus());
 document.getElementById(BTN_SUBMIT_ID).addEventListener('click', () => communicator.upload(fileBuilder.files));
-document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.createNewEmptyTab());
-document.getElementById(BTN_RENAME_FILE_ID).addEventListener('click', () => tabBar.edit(tabBar.activeTab.tabId));
-document.getElementById(BTN_DELETE_FILE_ID).addEventListener('click', () => tabBar.destroyActiveTab(tabBar.activeTab.tabId));
+document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.createNewFile());
 
 function showPrompt(text, callback, value = '') {
   const result = window.prompt(`${text}\n\n`, value);
