@@ -74,12 +74,76 @@ class SaveButton {
 
     /**
      * Changes the appearance of the save button.
+     * 
+     * @param {boolean} enable - True for enabling, false for disabling the button
      */
     appearAsEnabled(enable) {
         this.button.disabled = !enable;
     }
 }
 
+/**
+ * Represents an editor tab for an editor file.
+ */
+class Tab {
+
+  /**
+   * Creates a tab.
+   *
+   * @constructor
+   * @param {number} tabId - The unique id of the tab.
+   * @param {File} file - The file to attach to this tab.
+   */
+  constructor(tabId, file) {
+      this.tabId = tabId;
+      this.file = file;
+      this.tabListContainer = document.getElementById(EDITOR_TABBAR_FILES_ID);
+  }
+
+  /**
+   * Gets and inserts tab html.
+   */
+  build() {
+      const newTab = document.createElement('li');
+      newTab.innerText = this.file.fileName;
+      newTab.id = `file-tab-${this.tabId}`;
+      newTab.addEventListener('click', () => tabBar.activate(this.tabId));
+      this.tabDomElement = newTab;
+      this.tabListContainer.appendChild(newTab);
+  }
+
+  /**
+   * Removes the rendered tab html from the DOM.
+   */
+  destroy() {
+      this.tabDomElement.remove();
+      fileBuilder.destroy(this.file);
+  }
+
+  /**
+   * Changes the tab label to a given name.
+   * Should be called on any filename changes
+   * of the file coupled to the tab.
+   *
+   * @param {string} name - The new tab label.
+   */
+  rename(name) {
+      this.tabDomElement.innerText = name;
+  }
+
+  /**
+   * Changes the style of the tab.
+   * 
+   * @param {boolean} active - True to make tab appear as active, false as inactive.
+   */
+  appearAsActive(active) {
+    if (active) {
+      this.tabDomElement.classList.add('active');
+    } else {
+      this.tabDomElement.classList.remove('active');
+    }
+  }
+}
 
 /**
  * Represents a hash based comparator for files.
@@ -135,98 +199,6 @@ class HashComparator {
         return equal;
     }
 }
-
-
-/**
- * Represents an editor tab for an editor file.
- */
-class Tab {
-
-    /**
-     * Creates a tab.
-     *
-     * @constructor
-     * @param {number} tabId - The unique id of the tab.
-     * @param {File} file - The file to attach to this tab.
-     */
-    constructor(tabId, file) {
-        this.tabId = tabId;
-        this.file = file;
-    }
-
-    /**
-     * Adds a closure function, which is executed when the tab was loaded.
-     *
-     * @param {function} closure - The closure function.
-     */
-    onCreate(closure) {
-        this.onCreateClosure = closure;
-        return this;
-    }
-
-    /**
-     * Gets and inserts the rendered tab html.
-     */
-    build() {
-        let self = this;
-        const tabBarFileList = document.getElementById(EDITOR_TABBAR_FILES_ID);
-        const newTab = document.createElement('li');
-        newTab.innerText = this.file.fileName;
-        newTab.id = this.tabId;
-        newTab.addEventListener('click', () => tabBar.activate(this.tabId));
-        tabBarFileList.appendChild(newTab);
-    }
-
-    /**
-     * Removes the rendered tab html from the DOM.
-     */
-    destroy() {
-        let container = $('#' + EDITOR_TABBAR_FILES_ID);
-        container.find("#" + this.tabId).first().remove();
-        container.find("#edit-" + this.tabId).first().remove();
-        container.find("#remove-" + this.tabId).first().remove();
-        fileBuilder.destroy(this.file);
-    }
-
-    /**
-     * Changes the tab label to a given name.
-     * Should be called on any filename changes
-     * of the file coupled to the tab.
-     *
-     * @param {string} name - The new tab label.
-     */
-    rename(name) {
-        document.getElementById(this.tabId).innerText = name;
-    }
-
-    /**
-     * Changes the style of the tab, so that it appears as active.
-     */
-    appearAsActive() {
-        $("#" + this.tabId).addClass("active");
-        let editElement = $("#edit-" + this.tabId);
-        editElement.css("display", "inherit");
-        editElement.addClass("active");
-        let removeElement = $("#remove-" + this.tabId);
-        removeElement.css("display", "inherit");
-        removeElement.addClass("active");
-    }
-
-    /**
-     * Changes the style of the tab, so that it appears as inactive.
-     */
-    appearAsInactive() {
-        $("#" + this.tabId).removeClass("active");
-        let editElement = $("#edit-" + this.tabId);
-        editElement.css("display", "none");
-        editElement.removeClass("active");
-        let removeElement = $("#remove-" + this.tabId);
-        removeElement.css("display", "none");
-        removeElement.removeClass("active");
-    }
-
-}
-
 
 /**
  * Represents an editor file.
@@ -400,11 +372,11 @@ class TabBar {
      */
     activate(tabId) {
         if (this.activeTab !== undefined) {
-            this.activeTab.appearAsInactive();
+            this.activeTab.appearAsActive(false);
         }
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.editor.bind(this.activeTab.file);
-        this.activeTab.appearAsActive();
+        this.activeTab.appearAsActive(true);
         document.querySelector(`#${EDITOR_ID} > textarea`).focus();
     }
 
@@ -444,7 +416,7 @@ class TabBar {
     destroyActiveTab() {
         if (this.activeTab === undefined) return;
         const deleteConfirmationCallback = () => {
-          this.activeTab.appearAsInactive();
+          this.activeTab.appearAsActive(false);
           const destroyedTabIndex = this.tabs.lastIndexOf(this.activeTab);
           this.tabs = this.tabs.filter((tab, i) => tab.tabId !== this.activeTab.tabId);
           this.editor.unbind();
