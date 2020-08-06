@@ -356,7 +356,7 @@ class TabBar {
      * Dequeues a new unique tab id. The tab id needs to be unique.
      *
      * @returns {number} - The dequeued tab id.
-     */
+     */ 
     dequeueTabId() {
         // Store a class attribute to keep track of the current tab id
         if (this.tabId === undefined) {
@@ -461,16 +461,19 @@ class TabBar {
      * the active tab and the file attached to it, if confirmed.
      */
     destroyActiveTab() {
-        let self = this;
         if (this.activeTab === undefined) return;
         const deleteConfirmationCallback = () => {
-          self.activeTab.appearAsInactive();
-          self.tabs = self.tabs.filter(tab => tab.tabId !== this.activeTab.tabId);
-          self.editor.unbind();
-          self.activeTab.destroy();
-          self.activeTab = undefined;
+          this.activeTab.appearAsInactive();
+          const destroyedTabIndex = this.tabs.lastIndexOf(this.activeTab);
+          this.tabs = this.tabs.filter((tab, i) => tab.tabId !== this.activeTab.tabId);
+          this.editor.unbind();
+          this.activeTab.destroy();
+          this.activeTab = undefined;
           hashComparator.lookForChanges(fileBuilder.files);
-          self.toggleRenameDeleteButtons();
+          if (this.tabs.length > 0) {
+            this.activate(this.tabs[destroyedTabIndex] && this.tabs[destroyedTabIndex].tabId || this.tabs[this.tabs.length - 1].tabId);
+          }
+          this.toggleRenameDeleteButtons();
         }
         showConfirmDialog(getString(msgs.delete_file_confirmation, this.activeTab.file.fileName), deleteConfirmationCallback);
     }
