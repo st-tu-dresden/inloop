@@ -566,41 +566,42 @@ class Communicator {
         if (response.status !== 200) {
           alert(getString(msgs.error_loading_files));
         } else {
-          return response.status == 200 && await response.json();
+          return await response.json();
         }
     }
 
     /**
-     * Saves the current editor state in asynchronously.
+     * Saves the current editor state asynchronously.
      * The current editor state is stored as a checkpoint
      * via AJAX in the backend.
-     *
-     * @param {function} [completion] - The function to be called after save.
-     * @param {boolean} [completion.success] - The success status.
      */
-    save(completion) {
-        let files = [];
-        for (let file of fileBuilder.files) {
-            files.push({name: file.fileName, contents: file.fileContent});
-        }
-        let checksum = hashComparator.computeHash(fileBuilder.files);
-        $.ajax({
-            url: SAVE_CHECKPOINT_URL,
-            type: "post",
-            headers: {"X-CSRFToken": CSRF_TOKEN},
-            contentType: "application/json; charset=utf-8",
-            datatype: "json",
-            data: JSON.stringify({checksum: checksum, files: files}),
-            success: function(response) {
-                if (response.success === true) {
-                    hashComparator.updateHash(checksum);
-                    hashComparator.lookForChanges(fileBuilder.files);
-                    if (completion !== undefined) completion(true);
-                } else {
-                    if (completion !== undefined) completion(false);
-                }
-            }
-        });
+    async saveFiles() {
+      const checksum = hashComparator.computeHash(fileBuilder.files);
+      const payload = {
+        checksum: checksum,
+        files: fileBuilder.files.map(file => { 
+          return {name: file.fileName, contents: file.fileContent};
+        })
+      }
+      const requestConfig = {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': CSRF_TOKEN,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }
+      const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig);
+      if (response.status !== 200) {
+        alert(getString(msgs.error_saving_files));
+        return;
+      }
+      const data = await response.json();
+      if (data.success) {
+        hashComparator.updateHash(checksum);
+        hashComparator.lookForChanges(fileBuilder.files);
+      }
+      return data;
     }
 
     /**
@@ -609,31 +610,31 @@ class Communicator {
      *
      * @param {Array} files - The files to be uploaded.
      */
-    upload(files) {
-        this.save(function(success) {
-            if (success !== true) {
-                showAlert(getString(msgs.upload_failed));
-                return;
-            }
-            let postData = {uploads: {}};
-            for (let file of files) {
-                postData.uploads[file.fileName] = file.fileContent;
-            }
-            $.ajax({
-                url: SOLUTIONS_EDITOR_URL,
-                type: "post",
-                data: JSON.stringify(postData),
-                headers: {"X-CSRFToken": CSRF_TOKEN},
-                datatype: "json",
-                success: function( successResponse ) {
-                    if (successResponse.success === true) {
-                        window.location.replace(SOLUTIONS_LIST_URL);
-                    } else {
-                        window.location.replace(SOLUTIONS_EDITOR_URL);
-                    }
-                }
-            });
-        });
+    async submitFiles(files) {
+      const saveResult = await this.saveFiles();
+      if (!saveResult || !saveResult.success) {
+          showAlert(getString(msgs.upload_failed));
+          return;
+      }
+      const payload = {uploads: {}};
+      for (let file of files) {
+          payload.uploads[file.fileName] = file.fileContent;
+      }
+      const requestConfig = {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': CSRF_TOKEN,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }
+      const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
+      if (response.status !== 200) {
+        alert(getString(msgs.error_saving_files));
+        return;
+      }
+      const data = await response.json();
+      window.location.replace(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
     }
 }
 
@@ -661,14 +662,14 @@ document.addEventListener("keydown", function(e) {
     if (e.keyCode === 83) {
         if (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) {
             e.preventDefault();
-            communicator.save();
+            communicator.saveFiles();
         }
     }
 }, false);
 
-document.getElementById(BTN_SAVE_ID).addEventListener('click', () => communicator.save());
+document.getElementById(BTN_SAVE_ID).addEventListener('click', () => communicator.saveFiles());
 document.getElementById(BTN_SAVE_ID).addEventListener('click', () => tabBar.editor.focus());
-document.getElementById(BTN_SUBMIT_ID).addEventListener('click', () => communicator.upload(fileBuilder.files));
+document.getElementById(BTN_SUBMIT_ID).addEventListener('click', () => communicator.submitFiles(fileBuilder.files));
 document.getElementById(BTN_ADD_FILE_ID).addEventListener('click', () => tabBar.createNewFile());
 
 function showPrompt(text, callback, value = '') {

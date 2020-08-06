@@ -74,8 +74,6 @@ class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         })
 
     def post(self, request, slug):
-        if not request.is_ajax():
-            return JsonResponse({'success': False})
         try:
             task = self.get_task(slug)
             json_data = json.loads(request.body)
