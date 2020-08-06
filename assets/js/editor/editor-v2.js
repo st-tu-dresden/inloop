@@ -216,7 +216,7 @@ class Tab {
      * @param {string} name - The new tab label.
      */
     rename(name) {
-        $("#label-" + this.tabId).textNodes().first().replaceWith(name);
+        document.getElementById(this.tabId).innerText = name;
     }
 
     /**
@@ -437,9 +437,10 @@ class TabBar {
     edit(tabId) {
         this.activeTab = this.tabs.find(function(element) {return element.tabId === tabId;});
         this.activeTab.appearAsActive();
-        let self = this;
-
         const fileEditCallback = (fileName) => {
+          if (fileName === this.activeTab.file.fileName) {
+            return;
+          }
           if (!isValidJavaFilename(fileName) || fileName.trim() === '') {
             showPrompt(getString(msgs.invalid_filename, fileName), fileEditCallback, fileName);
             return;
@@ -448,8 +449,8 @@ class TabBar {
             showPrompt(getString(msgs.duplicate_filename, fileName), fileEditCallback, fileName);
             return;
           }
-          self.activeTab.file.fileName = fileName;
-          self.activeTab.rename(fileName);
+          this.activeTab.file.fileName = fileName;
+          this.activeTab.rename(fileName);
           document.querySelector(`#${EDITOR_ID} > textarea`).focus();
           hashComparator.lookForChanges(fileBuilder.files);
         };
