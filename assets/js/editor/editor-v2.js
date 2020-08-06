@@ -553,36 +553,21 @@ class Communicator {
 
     /**
      * Loads files and their MD5 hash from the last checkpoint asynchronously.
-     * The last checkpoint is fetched via AJAX from the backend.
-     *
-     * @param {function} completion - The function to be called after load.
-     * @param {Array} completion.files - The loaded files of the checkpoint.
-     * @param {String} completion.hash - The MD5 hash of the checkpoint.
+     * Returns a promise containing the response's content.
+     * If request fails, alert is shown and nothin is returned.
      */
-    load(completion) {
-        $.ajax({
-            url: GET_LAST_CHECKPOINT_URL,
-            type: "get",
-            headers: {"X-CSRFToken": CSRF_TOKEN},
-            datatype: "json",
-            success: function(response) {
-                if (response.success !== true) {
-                    // Return empty files and empty hash
-                    completion([], "");
-                } else {
-                    if (!response.files === null) {
-                        // Return empty files and empty hash
-                        completion([], "");
-                    } else {
-                        const editorFiles = [];
-                        for (let file of response.files) {
-                            editorFiles.push(new File(file.name, file.contents));
-                        }
-                        completion(editorFiles, response.checksum);
-                    }
-                }
+    async getLastCheckpoint() {
+        const requestConfig = {
+            headers: {
+              'X-CSRFToken': CSRF_TOKEN,
             }
-        });
+        };
+        const response = await fetch(GET_LAST_CHECKPOINT_URL, requestConfig);
+        if (response.status !== 200) {
+          alert(getString(msgs.error_loading_files));
+        } else {
+          return response.status == 200 && await response.json();
+        }
     }
 
     /**
@@ -657,11 +642,17 @@ let hashComparator;
 let tabBar;
 let communicator = new Communicator();
 
-communicator.load(function(files, hash) {
-    fileBuilder = new FileBuilder(files);
-    hashComparator = new HashComparator(hash);
-    hashComparator.lookForChanges(files);
-    tabBar = new TabBar(files);
+communicator.getLastCheckpoint().then(data => {
+  let files = [];
+  let checksum = '';
+  if (data && data.success && data.files) {
+    files = data.files.map(file => new File(file.name, file.contents));
+    checksum = data.checksum;
+  }
+  fileBuilder = new FileBuilder(files);
+  hashComparator = new HashComparator(checksum);
+  hashComparator.lookForChanges(files);
+  tabBar = new TabBar(files);
 });
 
 // Prevent CTRL+S (CMD+S on Mac) and add
