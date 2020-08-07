@@ -47,18 +47,6 @@ function getString(string, extra) {
 }
 
 /**
- * Parses all non empty text subnodes of a jQuery node.
- *
- * jQuery nodes may contain other subnodes. Use this convenience function
- * to only parse non empty text subnodes (i.e. nodes, which already contain text).
- */
-jQuery.fn.textNodes = function () {
-  return this.contents().filter(function () {
-    return this.nodeType === Node.TEXT_NODE && this.nodeValue.trim() !== "";
-  });
-};
-
-/**
  * Return true if the given name is a valid java filename, otherwise false.
  *
  * @param {string} filename - the filename to check.
