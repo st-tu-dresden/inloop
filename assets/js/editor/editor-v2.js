@@ -57,29 +57,6 @@ function isValidJavaFilename(filename) {
   return /^[A-Za-z0-9_]+\.java$/.test(filename);
 }
 
-/*
- * Represents an interactive button, which displays the current save status.
- */
-class SaveButton {
-  /**
-   * Creates a status button.
-   *
-   * @constructor
-   */
-  constructor() {
-    this.button = document.getElementById(BTN_SAVE_ID);
-  }
-
-  /**
-   * Changes the appearance of the save button.
-   *
-   * @param {boolean} enable - True for enabling, false for disabling the button
-   */
-  appearAsEnabled(enable) {
-    this.button.disabled = !enable;
-  }
-}
-
 /**
  * Represents an editor tab for an editor file.
  */
@@ -152,10 +129,10 @@ class HashComparator {
    * @constructor
    * @param {string} hash - The MD5 hash of the files as an initial value.
    */
-  constructor(hash) {
+  constructor(hash, hasChangesCallback) {
     this.rusha = new Rusha();
     this.hash = hash;
-    this.saveButton = new SaveButton();
+    this.hasChangesCallback = hasChangesCallback;
   }
 
   /**
@@ -192,7 +169,7 @@ class HashComparator {
    */
   lookForChanges(files) {
     let equal = this.computeHash(files) === this.hash;
-    this.saveButton.appearAsEnabled(!equal);
+    this.hasChangesCallback(!equal);
     return equal;
   }
 }
@@ -645,19 +622,6 @@ let hashComparator;
 let tabBar;
 let communicator = new Communicator();
 
-communicator.getLastCheckpoint().then((data) => {
-  let files = [];
-  let checksum = "";
-  if (data && data.success && data.files) {
-    files = data.files.map((file) => new File(file.name, file.contents));
-    checksum = data.checksum;
-  }
-  fileBuilder = new FileBuilder(files);
-  hashComparator = new HashComparator(checksum);
-  hashComparator.lookForChanges(files);
-  tabBar = new TabBar(files);
-});
-
 // Prevent CTRL+S (CMD+S on Mac) and add
 // our custom event handler
 document.addEventListener(
@@ -729,9 +693,25 @@ class Toolbar {
       clearInterval(this.timeinterval);
     }
   }
+
+  setSaveButtonEnabled(enable) {
+    this.saveButton.disabled = !enable;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const toolbar = new Toolbar(DEADLINE_ID, BTN_SAVE_ID, BTN_ADD_FILE_ID, BTN_SUBMIT_ID);
   toolbar.init();
+  communicator.getLastCheckpoint().then((data) => {
+    let files = [];
+    let checksum = "";
+    if (data && data.success && data.files) {
+      files = data.files.map((file) => new File(file.name, file.contents));
+      checksum = data.checksum;
+    }
+    fileBuilder = new FileBuilder(files);
+    hashComparator = new HashComparator(checksum, hasChanges => toolbar.setSaveButtonEnabled(hasChanges));
+    hashComparator.lookForChanges(files);
+    tabBar = new TabBar(files);
+  });
 });
