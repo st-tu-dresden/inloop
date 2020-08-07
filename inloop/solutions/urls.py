@@ -12,7 +12,7 @@ urlpatterns = [
     url(
         r'^editor/(?P<slug_or_name>[-\w]+)/$',
         SideBySideEditorView.as_view(),
-        name='editor-v2'
+        name='editor'
     ),
     url(
         r'^editor/(?P<slug>[-\w]+)/(?P<path>.*)$',
@@ -64,11 +64,6 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/upload$',
         SolutionUploadView.as_view(),
         name='upload'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/editor$',
-        SideBySideEditorView.as_view(),
-        name='editor'
     ),
     url(
         r'^(?P<slug>[-\w]+)/checkpoints/save/$',

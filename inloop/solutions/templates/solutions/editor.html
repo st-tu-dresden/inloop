@@ -5,9 +5,9 @@
 {% block title %}{{ task.title }}{% endblock %}
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/editor-v2.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/editor.css' %}">
 {% endblock %}
-{% block body_classes %}editor-v2{% endblock %}
+{% block body_classes %}editor{% endblock %}
 {% block navbar_container_classes %}container-fluid{% endblock  %}
 {% block container_classes %}container-fluid{% endblock %}
 
@@ -105,7 +105,7 @@
 <script src="{% static 'vendor/js/rusha.min.js' %}"></script>
 <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'js/ace-theme-inloop.js' %}"></script>
-<script id="editor-script" type="module" src="{% static 'js/editor/editor-v2.js' %}"
+<script id="editor-script" type="module" src="{% static 'js/editor/editor.js' %}"
         data-csrf-token="{{ csrf_token }}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"

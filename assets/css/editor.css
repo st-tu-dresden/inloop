@@ -2,7 +2,7 @@ html {
   font-size: 15px;
 }
 
-body.editor-v2 {
+body.editor {
   height: 100vh;
   margin: 0;
   display: flex;

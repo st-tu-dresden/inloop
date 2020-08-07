@@ -8,7 +8,7 @@
 <ol class="breadcrumb colorful-nav">
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
-  <li><a href="{% url 'solutions:editor-v2' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="{% url 'solutions:editor' task.slug %}">{{ task.title }}</a></li>
   <li class="active">My solutions</li>
 </ol>
 
