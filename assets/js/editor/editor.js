@@ -689,20 +689,27 @@ class Toolbar {
   getTimeRemaining() {
     const total = Date.parse(this.endtime) - new Date();
     const seconds = Math.floor((total / 1000) % 60);
-    const minutes = Math.floor(total / 1000 / 60);
-    return { total, minutes, seconds };
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / 1000 / 60 / 60) % 24);
+    const days = Math.floor(total / 1000 / 60 / 60 / 24);
+    return { total, days, hours, minutes, seconds };
   }
 
   updateClock() {
     const t = this.getTimeRemaining();
-    const formatAsTwoDigit = (number) => (number < 10 ? `0${number}` : number);
-    this.deadlineElement.innerText =
-      formatAsTwoDigit(t.minutes) + ":" + formatAsTwoDigit(t.seconds);
-    if (t.minutes < 5 && !this.deadlineElement.classList.contains("deadline-attention")) {
-      this.deadlineElement.classList.add("deadline-attention");
+    const format = (number) => (number < 10 ? `0${number}` : number);
+    const elem = this.deadlineElement;
+    if (t.days > 0) {
+      elem.innerText = t.days > 1 ? `${t.days} days` : "1 day";
+    } else {
+      elem.innerText = format(t.hours) + ":" + format(t.minutes) + ":" + format(t.seconds);
+    }
+    const fiveMinutesInMillis = 5 * 60 * 1000;
+    if (t.total < fiveMinutesInMillis && !elem.classList.contains("deadline-attention")) {
+      elem.classList.add("deadline-attention");
     }
     if (t.total <= 0) {
-      this.deadlineElement.innerText = getString(msgs.deadline_expired);
+      elem.innerText = getString(msgs.deadline_expired);
       clearInterval(this.timeinterval);
     }
   }
