@@ -1,5 +1,3 @@
-import { getString, msgs } from "./messages.js";
-
 // Load data attributes, which are rendered into the script tag
 const script = document.getElementById("editor-script");
 const SAVE_CHECKPOINT_URL = script.getAttribute("data-save-checkpoint-url");
@@ -21,6 +19,32 @@ const DEADLINE_ID = "task-deadline";
 const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
 const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
 const TOOLBAR_BUTTONS_RIGHT_ID = 'toolbar-buttons--right';
+
+const msgs = {
+  try_again_later: "Please try again later.",
+  upload_failed: "Upload failed.",
+  duplicate_filename:
+    'A file with the name "%filename%" already exists.\nPlease choose another filename.',
+  invalid_filename:
+    '"%filename%" is not a valid Java filename.\nMake sure to add the correct file suffix (.java).',
+  choose_filename: "Please enter a name for your new file.",
+  edit_filename: 'Renaming "%filename%".\nPlease enter a new file name.',
+  delete_file_confirmation: 'Are you sure you want to delete "%filename%"?',
+  missing_es6_support:
+    "Your browser does not support ECMAScript 6. Please update or change your browser to use the editor.",
+  error_loading_files: "Error occured: Could not load saved files from server.",
+  error_saving_files: "Error occured: Could not save files.",
+  deadline_expired: "Deadline expired",
+  not_implemented_yet: "This functionality has not been implemented yet.",
+};
+
+function getString(string, extra) {
+  if (extra) {
+    return string.replace(/\%.*\%/, extra);
+  } else {
+    return string;
+  }
+}
 
 /**
  * Checks for ES6 support.
