@@ -21,7 +21,9 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
 
     def test_pending_state(self):
         self.assertTrue(self.client.login(username='bob', password='secret'))
-        response = self.client.get('/solutions/%d/status' % self.solution.id)
+        response = self.client.get(reverse('solutions:status', kwargs={
+            'id': self.solution.id
+        }))
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             force_text(response.content),
@@ -30,7 +32,9 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
 
     def test_only_owner_can_access(self):
         self.assertTrue(self.client.login(username='alice', password='secret'))
-        response = self.client.get('/solutions/%d/status' % self.solution.id)
+        response = self.client.get(reverse('solutions:status', kwargs={
+            'id': self.solution.id
+        }))
         self.assertEqual(response.status_code, 404)
 
 

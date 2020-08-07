@@ -19,31 +19,20 @@ urlpatterns = [
         serve_attachment,
         name='serve_attachment'
     ),
-    # we assume that there will be no task slugs consisting entirely of digits
     url(
-        r'^(?P<id>[\d]+)/$',
+        r'^detail/(?P<slug>[-\w]+)/(?P<scoped_id>[\d]+)/$',
+        SolutionDetailView.as_view(),
+        name='detail'
+    ),
+    url(
+        r'^staffdetail/(?P<id>[\d]+)/$',
         StaffSolutionDetailView.as_view(),
         name='staffdetail'
     ),
     url(
-        r'^(?P<id>[\d]+)/status$',
+        r'^status/(?P<id>[\d]+)/$',
         SolutionStatusView.as_view(),
         name='status'
-    ),
-    url(
-        r'^(?P<solution_id>[\d]+)/archive/status$',
-        SolutionArchiveStatusView.as_view(),
-        name='archive_status'
-    ),
-    url(
-        r'^(?P<solution_id>[\d]+)/archive/new$',
-        NewSolutionArchiveView.as_view(),
-        name='archive_new'
-    ),
-    url(
-        r'^(?P<solution_id>[-\w]+)/archive/download$',
-        SolutionArchiveDownloadView.as_view(),
-        name='archive_download'
     ),
     url(
         r'^file/(?P<pk>[\d]+)/$',
@@ -56,22 +45,32 @@ urlpatterns = [
         name='list'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/detail/(?P<scoped_id>[\d]+)/$',
-        SolutionDetailView.as_view(),
-        name='detail'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/upload$',
+        r'^upload/(?P<slug>[-\w]+)/$',
         SolutionUploadView.as_view(),
         name='upload'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/checkpoints/save/$',
+        r'^archive-status/(?P<solution_id>[\d]+)/$',
+        SolutionArchiveStatusView.as_view(),
+        name='archive_status'
+    ),
+    url(
+        r'^create-archive/(?P<solution_id>[\d]+)/$',
+        NewSolutionArchiveView.as_view(),
+        name='archive_new'
+    ),
+    url(
+        r'^download/(?P<solution_id>[-\w]+)/$',
+        SolutionArchiveDownloadView.as_view(),
+        name='archive_download'
+    ),
+    url(
+        r'^checkpoint/save/(?P<slug>[-\w]+)/$',
         save_checkpoint,
         name='save-checkpoint'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/checkpoints/last/$',
+        r'^checkpoint/get/(?P<slug>[-\w]+)/$',
         get_last_checkpoint,
         name='get-last-checkpoint'
     ),
