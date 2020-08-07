@@ -28,7 +28,7 @@ def checkeroutput_filter(queryset):
 
 
 def xml_to_dict(xml_report):
-    """Parse the given JUnit or checkstyle XML string and return a dict representation."""
+    """Parse the given JUnit XML string and return a dict representation."""
     return testsuite_to_dict(ET.fromstring(xml_report))
 
 
