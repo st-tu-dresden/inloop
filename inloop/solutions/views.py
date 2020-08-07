@@ -9,9 +9,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.http import Http404, HttpResponse, JsonResponse
+from django.db.models import ObjectDoesNotExist, Q
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.views.generic import DetailView, View
 
 from huey.exceptions import TaskLockedException
@@ -66,18 +68,28 @@ class SolutionSubmitMixin:
         return solution
 
 
-class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
-    def get(self, request, slug):
-        return TemplateResponse(request, 'solutions/editor/editor.html', {
-            'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 1
-        })
-
-    def post(self, request, slug):
-        if not request.is_ajax():
-            return JsonResponse({'success': False})
+class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
+    def get(self, request, slug_or_name):
+        """
+        Show the side-by-side editor for the task referenced by slug or system_name.
+        Requests with a non-slug url are redirected to their slug url equivalent.
+        """
+        qs = Task.objects.published()
         try:
-            task = self.get_task(slug)
+            task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
+        except ObjectDoesNotExist:
+            raise Http404
+        if slug_or_name != task.slug:
+            return HttpResponseRedirect(reverse('solutions:editor', args=[task.slug]))
+        return TemplateResponse(request, 'solutions/editor.html', {'task': task})
+
+    def post(self, request, slug_or_name):
+        """
+        Handle JSON-encoded POST submissions requests from the side-by-side editor.
+        """
+        try:
+            # if it's a name and not a slug, get_task(…) will make it fail with 404
+            task = self.get_task(slug_or_name)
             json_data = json.loads(request.body)
             uploads = json_data.get('uploads', {})
             files = [
@@ -107,62 +119,6 @@ class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
             return redirect('solutions:upload', slug=slug)
         messages.success(request, 'Your solution has been submitted to the checker.')
         return redirect('solutions:list', slug=slug)
-
-
-class ModularEditorTabView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        tab_id = request.GET.get('tab_id')
-        if not tab_id:
-            raise Http404('No file name supplied to tab view.')
-        return TemplateResponse(request, 'solutions/editor/modular_editor_tab.html', {
-            'tab_id': tab_id,
-        })
-
-
-class ModalNotificationView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        body = request.GET.get('body')
-        hook = request.GET.get('hook')
-        if not title or not body or not hook:
-            raise Http404('No title or body or hook supplied to notification view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_notification.html', {
-            'title': title,
-            'body': body,
-            'hook': hook
-        })
-
-
-class ModalInputView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        placeholder = request.GET.get('placeholder')
-        hook = request.GET.get('hook')
-        input_hook = request.GET.get('input_hook')
-        if not title or not placeholder or not hook or not input_hook:
-            raise Http404('Insufficient data supplied to input view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_input_form.html', {
-            'title': title,
-            'placeholder': placeholder,
-            'hook': hook,
-            'input_hook': input_hook
-        })
-
-
-class ModalConfirmationView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        hook = request.GET.get('hook')
-        confirm_button_hook = request.GET.get('confirm_button_hook')
-        cancel_button_hook = request.GET.get('cancel_button_hook')
-        if not title or not hook or not confirm_button_hook or not cancel_button_hook:
-            raise Http404('Insufficient data supplied to confirmation view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_confirmation_form.html', {
-            'title': title,
-            'hook': hook,
-            'confirm_button_hook': confirm_button_hook,
-            'cancel_button_hook': cancel_button_hook
-        })
 
 
 def access_solution_or_404(user: User, solution_id: int) -> Solution:
@@ -227,7 +183,6 @@ class SolutionListView(LoginRequiredMixin, View):
         return TemplateResponse(request, 'solutions/solution_list.html', {
             'task': task,
             'solutions': solutions,
-            'active_tab': 3
         })
 
 
@@ -321,45 +276,41 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 
 @login_required
 def get_last_checkpoint(request, slug):
-    if not request.is_ajax():
-        return JsonResponse({'success': False})
-
     task = get_object_or_404(Task.objects.published(), slug=slug)
 
     checkpoints = Checkpoint.objects.filter(author=request.user, task=task)
     if not checkpoints.exists():
-        return JsonResponse({'success': True, 'checkpoint': None})
+        return JsonResponse({'success': True, 'files': None})
 
     last_checkpoint = checkpoints.last()
-    checkpoint_files = dict()
-    for checkpoint_file in last_checkpoint.checkpointfile_set.all():
-        checkpoint_files[checkpoint_file.name] = checkpoint_file.contents
+    checkpoint_files = []
+    for checkpoint_file in last_checkpoint.checkpointfile_set.order_by('id'):
+        checkpoint_files.append({
+            'name': checkpoint_file.name,
+            'contents': checkpoint_file.contents
+        })
 
     return JsonResponse({
         'success': True,
-        'checkpoint': {
-            'md5': str(last_checkpoint.md5),
-            'files': checkpoint_files,
-        }
+        'checksum': str(last_checkpoint.md5),
+        'files': checkpoint_files,
     })
 
 
 @login_required
 def save_checkpoint(request, slug):
-    if not request.is_ajax() or not request.method == 'POST':
+    if not request.method == 'POST':
         return JsonResponse({'success': False})
 
     task = get_object_or_404(Task.objects.published(), slug=slug)
-
-    data = request.POST.get('checkpoint')
-    if data is None:
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
         return JsonResponse({'success': False})
 
-    # Load nested data from json
-    data = json.loads(data)
     try:
-        Checkpoint.objects.sync_checkpoint(data, task, request.user)
-    except ValueError:
+        Checkpoint.objects.save_checkpoint(data, task, request.user)
+    except KeyError:
         return JsonResponse({'success': False})
 
     return JsonResponse({'success': True})

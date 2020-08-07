@@ -17,9 +17,6 @@
   <li role="presentation" {% if active_tab == 0 %}class="active"{% endif %}>
     <a href="{% url 'tasks:detail' task.slug %}">Description</a>
   </li>
-  <li role="presentation" {% if active_tab == 1 %}class="active"{% endif %}>
-    <a href="{% url 'solutions:editor' task.slug %}">Editor</a>
-  </li>
   <li role="presentation" {% if active_tab == 2 %}class="active"{% endif %}>
     <a href="{% url 'solutions:upload' task.slug %}">Manual upload</a>
   </li>

@@ -1,14 +1,24 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
-                                    ModularEditorTabView, NewSolutionArchiveView,
+from inloop.solutions.views import (NewSolutionArchiveView, SideBySideEditorView,
                                     SolutionArchiveDownloadView, SolutionArchiveStatusView,
-                                    SolutionDetailView, SolutionEditorView, SolutionFileView,
-                                    SolutionListView, SolutionStatusView, SolutionUploadView,
+                                    SolutionDetailView, SolutionFileView, SolutionListView,
+                                    SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
+from inloop.tasks.views import serve_attachment
 
 app_name = 'solutions'
 urlpatterns = [
+    url(
+        r'^editor/(?P<slug_or_name>[-\w]+)/$',
+        SideBySideEditorView.as_view(),
+        name='editor'
+    ),
+    url(
+        r'^editor/(?P<slug>[-\w]+)/(?P<path>.*)$',
+        serve_attachment,
+        name='serve_attachment'
+    ),
     # we assume that there will be no task slugs consisting entirely of digits
     url(
         r'^(?P<id>[\d]+)/$',
@@ -41,7 +51,7 @@ urlpatterns = [
         name='showfile'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/$',
+        r'^list/(?P<slug>[-\w]+)/$',
         SolutionListView.as_view(),
         name='list'
     ),
@@ -54,31 +64,6 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/upload$',
         SolutionUploadView.as_view(),
         name='upload'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/editor$',
-        SolutionEditorView.as_view(),
-        name='editor'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
-        ModularEditorTabView.as_view(),
-        name='modular-tab'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-notification/$',
-        ModalNotificationView.as_view(),
-        name='modal-notification'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-input-form/$',
-        ModalInputView.as_view(),
-        name='modal-input-form'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-confirmation-form/$',
-        ModalConfirmationView.as_view(),
-        name='modal-confirmation-form'
     ),
     url(
         r'^(?P<slug>[-\w]+)/checkpoints/save/$',

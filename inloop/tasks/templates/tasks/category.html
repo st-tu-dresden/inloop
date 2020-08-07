@@ -28,7 +28,7 @@
 
     {% for task in tasks %}
     <tr>
-      <td><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></td>
+      <td>{{ task.title }} [<a href="{% url 'solutions:editor' task.slug %}">open</a> | <a href="{% url 'solutions:list' task.slug %}">my solutions</a>]</td>
       <td>{% firstof task.pubdate|date:"d-m-Y" "-" %}</td>
       {% if have_deadlines %}
       <td>{% firstof task.deadline|date:"d-m-Y" "-"  %}</td>

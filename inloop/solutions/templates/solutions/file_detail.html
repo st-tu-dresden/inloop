@@ -16,7 +16,8 @@
 <ol class="breadcrumb colorful-nav">
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
-  <li><a href="{% url 'tasks:detail' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="{% url 'solutions:editor' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="{% url 'solutions:list' task.slug %}">My solutions</a></li>
 {% if impersonate %}
   <li><a href="{% url 'solutions:staffdetail' solution.id %}">Solution #{{ solution.id }}</a></li>
 {% else %}

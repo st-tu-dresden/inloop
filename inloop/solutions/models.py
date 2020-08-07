@@ -256,6 +256,21 @@ class Checkpoint(models.Model):
                 ])
             return checkpoint
 
+        def save_checkpoint(self, json_data, task, user):
+            checksum = json_data['checksum']
+            files = json_data['files']
+            with atomic():
+                self.filter(author=user, task=task).delete()
+                checkpoint = self.create(author=user, task=task, md5=checksum)
+                CheckpointFile.objects.bulk_create([
+                    CheckpointFile(
+                        checkpoint=checkpoint,
+                        name=file['name'],
+                        contents=file['contents']
+                    )
+                    for file in files
+                ])
+
     objects = Manager()
 
 

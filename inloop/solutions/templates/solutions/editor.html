@@ -1,0 +1,124 @@
+{% extends "base_site.html" %}
+{% load markdown %}
+{% load static %}
+
+{% block title %}{{ task.title }}{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/editor.css' %}">
+{% endblock %}
+{% block body_classes %}editor{% endblock %}
+{% block navbar_container_classes %}container-fluid{% endblock  %}
+{% block container_classes %}container-fluid{% endblock %}
+
+{% block content %}
+<header class="toolbar">
+  <div>
+    <h1>{{ task.title }}</h1>
+{% if task.deadline %}
+    <time id="task-deadline" datetime="{{ task.deadline.isoformat }}"
+          title="{{ task.deadline }}">{{ task.deadline }}</time>
+{% endif %}
+  </div>
+
+  <div>
+    <div class="btn-group btn-group-sm" role="group">
+      <button id="toolbar-switch-btn--editor" title="Switch to editor view" type="button" class="btn btn-default" disabled>Editor</button>
+      <button id="toolbar-switch-btn--manual" title="Switch to manual upload view" type="button" class="btn btn-default">Manual upload</button>
+    </div>
+    <div id="toolbar-buttons--right">
+      <button id="toolbar-btn--save" title="Save current solution" type="button" class="btn btn-success btn-sm">
+        <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true" disabled></span> Save all
+      </button>
+      <button id="toolbar-btn--newfile" title="Create new file" type="button" class="btn btn-primary btn-sm">
+        <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
+      </button>
+      <button id="toolbar-btn--submit" title="Submit current solution" type="button" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit
+      </button>
+      <button id="toolbar-btn--syntax" title="Run syntax check on current solution" type="button" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div>
+    <p class="editor-task-hints">
+      <a href="{% url 'tasks:detail' task.slug %}"
+         title="Show only the task without the editor">[view printable version]</a>
+    </p>
+    {{ task.description|markdown }}
+  </div>
+  <div>
+    <div id="editor">
+      <div id="editor-tabbar">
+        <ul id="editor-tabbar-files"></ul>
+        <div>
+          <button id="editor-tabbar-btn--rename" title="Rename current file" type="button" class="btn btn-link btn-xs" disabled>
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Rename
+          </button>
+          <button id="editor-tabbar-btn--delete" title="Delete current file" type="button" class="btn btn-link btn-xs" disabled>
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete
+          </button>
+        </div>
+      </div>
+      <div id="editor-content">
+      </div>
+    </div>
+    <div id="manual-upload">
+      {% if not task.is_expired %}
+      <p class="help-block">
+        To upload more than one file, just click <i>Choose files...</i> and mark multiple files by holding
+        down <kbd>ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
+      </p>
+      <form id="manual-upload-form" class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
+            method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group upload-drop-zone" style="position: relative; width: 100%">
+          <input id="manual-upload-file-input" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
+          <label id="uploadFiles" for="uploads">Choose files...</label>
+        </div>
+      </form>
+      {% else %}
+      <p class="alert alert-warning">
+        The deadline for this task has passed. You cannot submit new solutions.
+      </p>
+      {% endif %}
+    </div>
+    <div id="console">
+      <div>
+        <h3>Syntax check result</h3>
+        <button id="console-btn--hide" type="button" class="btn btn-link btn-xs">
+            <span class="glyphicon glyphicon-close" aria-hidden="true"></span> Hide
+        </button>
+      </div>
+      <div id="console-content"></div>
+    </div>
+  </div>
+</main>
+{% endblock  %}
+
+{% block footer %}{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'vendor/js/prism.js' %}"></script>
+<script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/ace.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/ext-language_tools.js' %}"></script>
+<script src="{% static 'vendor/js/ace-1.4.12/mode-java.js' %}"></script>
+<script src="{% static 'vendor/js/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/js/rusha.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/ace-theme-inloop.js' %}"></script>
+<script id="editor-script" type="module" src="{% static 'js/editor/editor.js' %}"
+        data-csrf-token="{{ csrf_token }}"
+        data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
+        data-solutions-list-url="{% url 'solutions:list' task.slug %}"
+        data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
+        data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}">
+</script>
+{% endblock %}
+
+

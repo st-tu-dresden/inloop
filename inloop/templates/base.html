@@ -27,7 +27,7 @@
 </head>
 <body class="{% block body_classes %}{% endblock %}">
 <nav class="navbar navbar-inverse navbar-static-top navigation-bar-inloop">
-  <div class="container">
+  <div class="{% block navbar_container_classes %}container{% endblock  %}">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
               data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -51,7 +51,7 @@
   </div>
 </nav>
 
-<div class="container">
+<div class="{% block container_classes %}container{% endblock %}">
 {% block messages %}
 {% for message in messages %}
 <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
@@ -65,6 +65,7 @@
 {% block content %}{% endblock %}
 </div>
 
+{% block footer %}
 <footer class="footer">
   <div class="container clearfix">
     <ul class="list-inline footer-left">
@@ -79,6 +80,7 @@
     </ul>
   </div>
 </footer>
+{% endblock  %}
 
 <script src="{% static 'vendor/js/jquery.min.js' %}"></script>
 <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>
