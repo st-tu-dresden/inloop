@@ -619,7 +619,7 @@ class Communicator {
       return;
     }
     const data = await response.json();
-    window.location.replace(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
+    window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
   }
 }
 
