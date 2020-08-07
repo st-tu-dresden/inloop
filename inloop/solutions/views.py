@@ -9,9 +9,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.http import Http404, HttpResponse, JsonResponse
+from django.db.models import ObjectDoesNotExist, Q
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.views.generic import DetailView, View
 
 from huey.exceptions import TaskLockedException
@@ -64,6 +66,24 @@ class SolutionSubmitMixin:
             SolutionFile(solution=solution, file=file) for file in files
         ])
         return solution
+
+
+class SideBySideEditorView(LoginRequiredMixin, View):
+    """
+    Show the task description referenced by slug or system_name.
+
+    Requests with a non-slug url are redirected to their slug url equivalent.
+    """
+
+    def get(self, request, slug_or_name):
+        qs = Task.objects.published()
+        try:
+            task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
+        except ObjectDoesNotExist:
+            raise Http404
+        if slug_or_name != task.slug:
+            return HttpResponseRedirect(reverse('solutions:editor-v2', args=[task.slug]))
+        return TemplateResponse(request, 'solutions/editor-v2.html', {'task': task})
 
 
 class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
