@@ -14,6 +14,7 @@ const BTN_ADD_FILE_ID = "toolbar-btn--newfile";
 const BTN_SUBMIT_ID = "toolbar-btn--submit";
 const BTN_RENAME_FILE_ID = "editor-tabbar-btn--rename";
 const BTN_DELETE_FILE_ID = "editor-tabbar-btn--delete";
+const DEADLINE_ID = "task-deadline";
 
 /**
  * Checks for ES6 support.
@@ -671,14 +672,6 @@ document.addEventListener(
   },
   false
 );
-
-document.getElementById(BTN_SAVE_ID).addEventListener("click", () => communicator.saveFiles());
-document.getElementById(BTN_SAVE_ID).addEventListener("click", () => tabBar.editor.focus());
-document
-  .getElementById(BTN_SUBMIT_ID)
-  .addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
-document.getElementById(BTN_ADD_FILE_ID).addEventListener("click", () => tabBar.createNewFile());
-
 function showPrompt(text, callback, value = "") {
   const result = window.prompt(`${text}\n\n`, value);
   result !== null && callback(result);
@@ -692,3 +685,53 @@ function showConfirmDialog(text, callback) {
 function showAlert(text) {
   window.alert(text);
 }
+
+class Toolbar {
+  constructor(deadlineId, saveButtonId, addFileButtonId, submitButtonId) {
+    this.deadlineElement = document.getElementById(deadlineId);
+    this.endtime = this.deadlineElement.getAttribute("datetime");
+    this.saveButton = document.getElementById(saveButtonId);
+    this.addFileButton = document.getElementById(addFileButtonId);
+    this.submitButton = document.getElementById(submitButtonId);
+  }
+
+  init() {
+    this.saveButton.addEventListener("click", () => communicator.saveFiles());
+    this.saveButton.addEventListener("click", () => tabBar.editor.focus());
+    this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
+    this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    this.startDeadlineCounter();
+  }
+
+  startDeadlineCounter() {
+    if (this.getTimeRemaining().total > 0) {
+      this.updateClock();
+      this.timeinterval = setInterval(() => this.updateClock(), 1000);
+    }
+  }
+
+  getTimeRemaining() {
+    const total = Date.parse(this.endtime) - new Date();
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor(total / 1000 / 60);
+    return { total, minutes, seconds };
+  }
+
+  updateClock() {
+    const t = this.getTimeRemaining();
+    const formatAsTwoDigit = (number) => (number < 10 ? `0${number}` : number);
+    this.deadlineElement.innerText =
+      formatAsTwoDigit(t.minutes) + ":" + formatAsTwoDigit(t.seconds);
+    if (t.minutes < 50 && !this.deadlineElement.classList.contains("deadline-attention")) {
+      this.deadlineElement.classList.add("deadline-attention");
+    }
+    if (t.total <= 0) {
+      clearInterval(this.timeinterval);
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toolbar = new Toolbar(DEADLINE_ID, BTN_SAVE_ID, BTN_ADD_FILE_ID, BTN_SUBMIT_ID);
+  toolbar.init();
+});
