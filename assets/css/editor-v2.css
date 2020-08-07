@@ -18,6 +18,7 @@ body > div:first-of-type {
   flex: auto;
   flex-direction: column;
   align-self: center;
+  overflow: hidden;
 }
 
 .toolbar {
@@ -44,6 +45,11 @@ body > div:first-of-type {
 
 main > div:first-child {
   padding-left: 0.6rem;
+  overflow-y: auto;
+}
+
+main > div:first-child img {
+  min-width: 75%;
 }
 
 .toolbar > div:first-child,
@@ -94,7 +100,6 @@ main > div:last-child {
   background: rgb(250, 250, 250);
   border: 1px solid #ccc;
   border-radius: 4px;
-  overflow-y: hidden;
 }
 
 #editor-content {
