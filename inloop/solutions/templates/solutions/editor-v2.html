@@ -107,9 +107,6 @@
 <script src="{% static 'js/ace-theme-inloop.js' %}"></script>
 <script id="editor-script" type="module" src="{% static 'js/editor/editor-v2.js' %}"
         data-csrf-token="{{ csrf_token }}"
-        data-modal-notification-url="{% url 'solutions:modal-notification' task.slug %}"
-        data-modal-input-form-url="{% url 'solutions:modal-input-form' task.slug %}"
-        data-modal-confirmation-form-url="{% url 'solutions:modal-confirmation-form' task.slug %}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
         data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
