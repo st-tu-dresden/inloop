@@ -2,8 +2,8 @@ from django.conf.urls import url
 
 from inloop.solutions.views import (NewSolutionArchiveView, SideBySideEditorView,
                                     SolutionArchiveDownloadView, SolutionArchiveStatusView,
-                                    SolutionDetailView, SolutionEditorView, SolutionFileView,
-                                    SolutionListView, SolutionStatusView, SolutionUploadView,
+                                    SolutionDetailView, SolutionFileView, SolutionListView,
+                                    SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
 from inloop.tasks.views import serve_attachment
 
@@ -67,7 +67,7 @@ urlpatterns = [
     ),
     url(
         r'^(?P<slug>[-\w]+)/editor$',
-        SolutionEditorView.as_view(),
+        SideBySideEditorView.as_view(),
         name='editor'
     ),
     url(

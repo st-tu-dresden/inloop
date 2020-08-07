@@ -68,14 +68,12 @@ class SolutionSubmitMixin:
         return solution
 
 
-class SideBySideEditorView(LoginRequiredMixin, View):
-    """
-    Show the task description referenced by slug or system_name.
-
-    Requests with a non-slug url are redirected to their slug url equivalent.
-    """
-
+class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
     def get(self, request, slug_or_name):
+        """
+        Show the side-by-side editor for the task referenced by slug or system_name.
+        Requests with a non-slug url are redirected to their slug url equivalent.
+        """
         qs = Task.objects.published()
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
@@ -85,9 +83,10 @@ class SideBySideEditorView(LoginRequiredMixin, View):
             return HttpResponseRedirect(reverse('solutions:editor-v2', args=[task.slug]))
         return TemplateResponse(request, 'solutions/editor-v2.html', {'task': task})
 
-
-class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
     def post(self, request, slug):
+        """
+        Handle JSON-encoded POST submissions requests from the side-by-side editor.
+        """
         try:
             task = self.get_task(slug)
             json_data = json.loads(request.body)
