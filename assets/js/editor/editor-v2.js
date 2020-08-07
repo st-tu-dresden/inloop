@@ -534,12 +534,7 @@ class Communicator {
    * If request fails, alert is shown and nothin is returned.
    */
   async getLastCheckpoint() {
-    const requestConfig = {
-      headers: {
-        "X-CSRFToken": CSRF_TOKEN,
-      },
-    };
-    const response = await fetch(GET_LAST_CHECKPOINT_URL, requestConfig);
+    const response = await fetch(GET_LAST_CHECKPOINT_URL);
     if (response.status !== 200) {
       alert(getString(msgs.error_loading_files));
     } else {
