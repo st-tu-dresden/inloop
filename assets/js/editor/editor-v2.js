@@ -47,26 +47,6 @@ function getString(string, extra) {
 }
 
 /**
- * Checks for ES6 support.
- *
- * ES6 support is needed for the editor.
- */
-const supportsES6 = (function () {
-  try {
-    new Function("(a = 0) => a");
-    return true;
-  } catch (err) {
-    return false;
-  }
-})();
-
-// Check for ES6 support and display an error
-// message if ES6 is not supported.
-if (!supportsES6) {
-  showAlert(getString(msgs.missing_es6_support));
-}
-
-/**
  * Parses all non empty text subnodes of a jQuery node.
  *
  * jQuery nodes may contain other subnodes. Use this convenience function
