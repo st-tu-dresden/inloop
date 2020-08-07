@@ -1,11 +1,10 @@
 from django.conf.urls import url
 
 from inloop.solutions.editor_views import SideBySideEditorView
-from inloop.solutions.views import (ModalConfirmationView, ModalInputView, ModalNotificationView,
-                                    ModularEditorTabView, NewSolutionArchiveView,
-                                    SolutionArchiveDownloadView, SolutionArchiveStatusView,
-                                    SolutionDetailView, SolutionEditorView, SolutionFileView,
-                                    SolutionListView, SolutionStatusView, SolutionUploadView,
+from inloop.solutions.views import (NewSolutionArchiveView, SolutionArchiveDownloadView,
+                                    SolutionArchiveStatusView, SolutionDetailView,
+                                    SolutionEditorView, SolutionFileView, SolutionListView,
+                                    SolutionStatusView, SolutionUploadView,
                                     StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
 from inloop.tasks.views import serve_attachment
 
@@ -71,26 +70,6 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/editor$',
         SolutionEditorView.as_view(),
         name='editor'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
-        ModularEditorTabView.as_view(),
-        name='modular-tab'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-notification/$',
-        ModalNotificationView.as_view(),
-        name='modal-notification'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-input-form/$',
-        ModalInputView.as_view(),
-        name='modal-input-form'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/modal-confirmation-form/$',
-        ModalConfirmationView.as_view(),
-        name='modal-confirmation-form'
     ),
     url(
         r'^(?P<slug>[-\w]+)/checkpoints/save/$',

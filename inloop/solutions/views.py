@@ -67,12 +67,6 @@ class SolutionSubmitMixin:
 
 
 class SolutionEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
-    def get(self, request, slug):
-        return TemplateResponse(request, 'solutions/editor/editor.html', {
-            'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 1
-        })
-
     def post(self, request, slug):
         try:
             task = self.get_task(slug)
@@ -105,62 +99,6 @@ class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
             return redirect('solutions:upload', slug=slug)
         messages.success(request, 'Your solution has been submitted to the checker.')
         return redirect('solutions:list', slug=slug)
-
-
-class ModularEditorTabView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        tab_id = request.GET.get('tab_id')
-        if not tab_id:
-            raise Http404('No file name supplied to tab view.')
-        return TemplateResponse(request, 'solutions/editor/modular_editor_tab.html', {
-            'tab_id': tab_id,
-        })
-
-
-class ModalNotificationView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        body = request.GET.get('body')
-        hook = request.GET.get('hook')
-        if not title or not body or not hook:
-            raise Http404('No title or body or hook supplied to notification view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_notification.html', {
-            'title': title,
-            'body': body,
-            'hook': hook
-        })
-
-
-class ModalInputView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        placeholder = request.GET.get('placeholder')
-        hook = request.GET.get('hook')
-        input_hook = request.GET.get('input_hook')
-        if not title or not placeholder or not hook or not input_hook:
-            raise Http404('Insufficient data supplied to input view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_input_form.html', {
-            'title': title,
-            'placeholder': placeholder,
-            'hook': hook,
-            'input_hook': input_hook
-        })
-
-
-class ModalConfirmationView(LoginRequiredMixin, View):
-    def get(self, request, slug):
-        title = request.GET.get('title')
-        hook = request.GET.get('hook')
-        confirm_button_hook = request.GET.get('confirm_button_hook')
-        cancel_button_hook = request.GET.get('cancel_button_hook')
-        if not title or not hook or not confirm_button_hook or not cancel_button_hook:
-            raise Http404('Insufficient data supplied to confirmation view.')
-        return TemplateResponse(request, 'solutions/editor/modals/modal_confirmation_form.html', {
-            'title': title,
-            'hook': hook,
-            'confirm_button_hook': confirm_button_hook,
-            'cancel_button_hook': cancel_button_hook
-        })
 
 
 def access_solution_or_404(user: User, solution_id: int) -> Solution:
