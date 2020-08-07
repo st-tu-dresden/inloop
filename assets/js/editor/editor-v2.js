@@ -20,6 +20,7 @@ const BTN_SWITCH_TO_UPLOAD = "toolbar-switch-btn--manual";
 const DEADLINE_ID = "task-deadline";
 const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
 const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
+const TOOLBAR_BUTTONS_RIGHT_ID = 'toolbar-buttons--right';
 
 /**
  * Checks for ES6 support.
@@ -727,6 +728,7 @@ class Toolbar {
     this.switchToUploadButton.disabled = isEditor;
     document.getElementById("manual-upload").style.display = isEditor ? "flex" : "none";
     document.getElementById("editor").style.display = isEditor ? "none" : "flex";
+    document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = isEditor ? "none" : "block"
     if (!isEditor) tabBar.editor.focus();
   }
 }
