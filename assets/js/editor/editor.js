@@ -654,7 +654,6 @@ class Toolbar {
     switchToUploadButtonId
   ) {
     this.deadlineElement = document.getElementById(deadlineId);
-    this.endtime = this.deadlineElement.getAttribute("datetime");
     this.saveButton = document.getElementById(saveButtonId);
     this.addFileButton = document.getElementById(addFileButtonId);
     this.submitButton = document.getElementById(submitButtonId);
@@ -674,7 +673,10 @@ class Toolbar {
     this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToEditorButton.disabled = true;
-    this.startDeadlineCounter();
+    if (this.deadlineElement !== null) {
+      this.endtime = this.deadlineElement.getAttribute("datetime");
+      this.startDeadlineCounter();
+    }
   }
 
   startDeadlineCounter() {

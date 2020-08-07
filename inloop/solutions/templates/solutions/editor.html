@@ -15,7 +15,10 @@
 <header class="toolbar">
   <div>
     <h1>{{ task.title }}</h1>
-    <time id="task-deadline" datetime="2020-08-07 13:19"></time>
+{% if task.deadline %}
+    <time id="task-deadline" datetime="{{ task.deadline.isoformat }}"
+          title="{{ task.deadline }}">{{ task.deadline }}</time>
+{% endif %}
   </div>
 
   <div>
