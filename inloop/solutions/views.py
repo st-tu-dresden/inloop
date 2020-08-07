@@ -83,12 +83,13 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             return HttpResponseRedirect(reverse('solutions:editor', args=[task.slug]))
         return TemplateResponse(request, 'solutions/editor.html', {'task': task})
 
-    def post(self, request, slug):
+    def post(self, request, slug_or_name):
         """
         Handle JSON-encoded POST submissions requests from the side-by-side editor.
         """
         try:
-            task = self.get_task(slug)
+            # if it's a name and not a slug, get_task(…) will make it fail with 404
+            task = self.get_task(slug_or_name)
             json_data = json.loads(request.body)
             uploads = json_data.get('uploads', {})
             files = [
