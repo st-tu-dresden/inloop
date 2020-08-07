@@ -11,6 +11,16 @@ from inloop.tasks.views import serve_attachment
 
 app_name = 'solutions'
 urlpatterns = [
+    url(
+        r'^editor/(?P<slug_or_name>[-\w]+)/$',
+        SideBySideEditorView.as_view(),
+        name='editor-v2'
+    ),
+    url(
+        r'^editor/(?P<slug>[-\w]+)/(?P<path>.*)$',
+        serve_attachment,
+        name='serve_attachment'
+    ),
     # we assume that there will be no task slugs consisting entirely of digits
     url(
         r'^(?P<id>[\d]+)/$',
@@ -63,11 +73,6 @@ urlpatterns = [
         name='editor'
     ),
     url(
-        r'^(?P<slug_or_name>[-\w]+)/editor-v2$',
-        SideBySideEditorView.as_view(),
-        name='editor-v2'
-    ),
-    url(
         r'^(?P<slug>[-\w]+)/modular-editor-tab/$',
         ModularEditorTabView.as_view(),
         name='modular-tab'
@@ -96,10 +101,5 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/checkpoints/last/$',
         get_last_checkpoint,
         name='get-last-checkpoint'
-    ),
-    url(
-        r'^(?P<slug>[-\w]+)/(?P<path>.*)$',
-        serve_attachment,
-        name='serve_attachment'
     ),
 ]

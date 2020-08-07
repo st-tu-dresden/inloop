@@ -23,6 +23,6 @@ class SideBySideEditorView(LoginRequiredMixin, View):
             raise Http404
 
         if slug_or_name != task.slug:
-            return HttpResponseRedirect(reverse('tasks:detail', args=[task.slug]))
+            return HttpResponseRedirect(reverse('solutions:editor-v2', args=[task.slug]))
 
         return TemplateResponse(request, 'solutions/editor-v2.html', {'task': task})
