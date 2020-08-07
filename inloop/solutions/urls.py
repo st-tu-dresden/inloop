@@ -53,7 +53,7 @@ urlpatterns = [
         name='showfile'
     ),
     url(
-        r'^(?P<slug>[-\w]+)/$',
+        r'^list/(?P<slug>[-\w]+)/$',
         SolutionListView.as_view(),
         name='list'
     ),

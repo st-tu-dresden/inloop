@@ -225,7 +225,6 @@ class SolutionListView(LoginRequiredMixin, View):
         return TemplateResponse(request, 'solutions/solution_list.html', {
             'task': task,
             'solutions': solutions,
-            'active_tab': 3
         })
 
 
