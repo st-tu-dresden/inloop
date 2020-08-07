@@ -9,7 +9,8 @@ export const msgs = {
   missing_es6_support: 'Your browser does not support ECMAScript 6. Please update or change your browser to use the editor.',
   error_loading_files: 'Error occured: Could not load saved files from server.',
   error_saving_files: 'Error occured: Could not save files.',
-  deadline_expired: 'Deadline expired'
+  deadline_expired: 'Deadline expired',
+  not_implemented_yet: 'This functionality has not been implemented yet.'
 };
 
 export function getString(string, extra) {

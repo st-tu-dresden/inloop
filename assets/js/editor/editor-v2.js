@@ -14,6 +14,7 @@ const BTN_ADD_FILE_ID = "toolbar-btn--newfile";
 const BTN_SUBMIT_ID = "toolbar-btn--submit";
 const BTN_RENAME_FILE_ID = "editor-tabbar-btn--rename";
 const BTN_DELETE_FILE_ID = "editor-tabbar-btn--delete";
+const BTN_SYNTAX_ID = "toolbar-btn--syntax";
 const DEADLINE_ID = "task-deadline";
 
 /**
@@ -651,17 +652,19 @@ function showAlert(text) {
 }
 
 class Toolbar {
-  constructor(deadlineId, saveButtonId, addFileButtonId, submitButtonId) {
+  constructor(deadlineId, saveButtonId, addFileButtonId, submitButtonId, syntaxButtonId) {
     this.deadlineElement = document.getElementById(deadlineId);
     this.endtime = this.deadlineElement.getAttribute("datetime");
     this.saveButton = document.getElementById(saveButtonId);
     this.addFileButton = document.getElementById(addFileButtonId);
     this.submitButton = document.getElementById(submitButtonId);
+    this.syntaxButton = document.getElementById(syntaxButtonId);
   }
 
   init() {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
+    this.syntaxButton.addEventListener("click", () => showAlert(getString(msgs.not_implemented_yet)));
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
     this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
     this.startDeadlineCounter();
@@ -701,7 +704,7 @@ class Toolbar {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const toolbar = new Toolbar(DEADLINE_ID, BTN_SAVE_ID, BTN_ADD_FILE_ID, BTN_SUBMIT_ID);
+  const toolbar = new Toolbar(DEADLINE_ID, BTN_SAVE_ID, BTN_ADD_FILE_ID, BTN_SUBMIT_ID, BTN_SYNTAX_ID);
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
     let files = [];
