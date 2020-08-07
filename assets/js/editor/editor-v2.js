@@ -668,8 +668,8 @@ class Toolbar {
   }
 
   startDeadlineCounter() {
+    this.updateClock();
     if (this.getTimeRemaining().total > 0) {
-      this.updateClock();
       this.timeinterval = setInterval(() => this.updateClock(), 1000);
     }
   }
@@ -686,10 +686,11 @@ class Toolbar {
     const formatAsTwoDigit = (number) => (number < 10 ? `0${number}` : number);
     this.deadlineElement.innerText =
       formatAsTwoDigit(t.minutes) + ":" + formatAsTwoDigit(t.seconds);
-    if (t.minutes < 50 && !this.deadlineElement.classList.contains("deadline-attention")) {
+    if (t.minutes < 5 && !this.deadlineElement.classList.contains("deadline-attention")) {
       this.deadlineElement.classList.add("deadline-attention");
     }
     if (t.total <= 0) {
+      this.deadlineElement.innerText = getString(msgs.deadline_expired);
       clearInterval(this.timeinterval);
     }
   }
