@@ -82,6 +82,11 @@ main {
   overflow: hidden;
 }
 
+.editor-task-hints {
+  text-align: right;
+  font-size: 80%;
+}
+
 main > div:first-child {
   overflow-y: auto;
 }

@@ -45,6 +45,10 @@
 
 <main>
   <div>
+    <p class="editor-task-hints">
+      <a href="{% url 'tasks:detail' task.slug %}"
+         title="Show only the task without the editor">[view printable version]</a>
+    </p>
     {{ task.description|markdown }}
   </div>
   <div>
