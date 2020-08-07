@@ -84,6 +84,7 @@ main > div:first-child {
 main > div:last-child {
   display: flex;
   flex-direction: column;
+  padding-bottom: 1rem;
 }
 
 #editor {
@@ -91,7 +92,6 @@ main > div:last-child {
   flex-direction: column;
   flex: auto;
   background: rgb(250, 250, 250);
-  margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   overflow-y: hidden;
@@ -99,6 +99,12 @@ main > div:last-child {
 
 #editor-content {
   flex: auto;
+}
+
+#manual-upload {
+  display: none;
+  flex: auto;
+  flex-direction: column;
 }
 
 #editor-tabbar {
@@ -174,4 +180,28 @@ main > div:last-child {
   font-family: monospace;
   color: lightgreen;
   overflow-y: auto;
+}
+
+/* Dropzone Style */
+.upload-drop-zone {
+  height: 200px;
+  border-width: 2px;
+  margin-bottom: 20px;
+}
+
+.upload-drop-zone {
+  color: #ccc;
+  border: dashed #3867d6;
+  line-height: 200px;
+  text-align: center
+}
+.upload-drop-zone.drop {
+  color: #222;
+  border-color: #222;
+}
+
+#manual-upload-file-input {
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
 }

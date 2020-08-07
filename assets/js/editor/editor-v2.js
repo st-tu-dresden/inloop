@@ -15,7 +15,11 @@ const BTN_SUBMIT_ID = "toolbar-btn--submit";
 const BTN_RENAME_FILE_ID = "editor-tabbar-btn--rename";
 const BTN_DELETE_FILE_ID = "editor-tabbar-btn--delete";
 const BTN_SYNTAX_ID = "toolbar-btn--syntax";
+const BTN_SWITCH_TO_EDITOR = "toolbar-switch-btn--editor";
+const BTN_SWITCH_TO_UPLOAD = "toolbar-switch-btn--manual";
 const DEADLINE_ID = "task-deadline";
+const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
+const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
 
 /**
  * Checks for ES6 support.
@@ -652,21 +656,36 @@ function showAlert(text) {
 }
 
 class Toolbar {
-  constructor(deadlineId, saveButtonId, addFileButtonId, submitButtonId, syntaxButtonId) {
+  constructor(
+    deadlineId,
+    saveButtonId,
+    addFileButtonId,
+    submitButtonId,
+    syntaxButtonId,
+    switchToEditorButtonId,
+    switchToUploadButtonId
+  ) {
     this.deadlineElement = document.getElementById(deadlineId);
     this.endtime = this.deadlineElement.getAttribute("datetime");
     this.saveButton = document.getElementById(saveButtonId);
     this.addFileButton = document.getElementById(addFileButtonId);
     this.submitButton = document.getElementById(submitButtonId);
     this.syntaxButton = document.getElementById(syntaxButtonId);
+    this.switchToEditorButton = document.getElementById(switchToEditorButtonId);
+    this.switchToUploadButton = document.getElementById(switchToUploadButtonId);
   }
 
   init() {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
-    this.syntaxButton.addEventListener("click", () => showAlert(getString(msgs.not_implemented_yet)));
+    this.syntaxButton.addEventListener("click", () =>
+      showAlert(getString(msgs.not_implemented_yet))
+    );
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
     this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
+    this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
+    this.switchToEditorButton.disabled = true;
     this.startDeadlineCounter();
   }
 
@@ -701,10 +720,31 @@ class Toolbar {
   setSaveButtonEnabled(enable) {
     this.saveButton.disabled = !enable;
   }
+
+  toggleEditorUpload() {
+    const isEditor = this.switchToEditorButton.disabled;
+    this.switchToEditorButton.disabled = !isEditor;
+    this.switchToUploadButton.disabled = isEditor;
+    document.getElementById("manual-upload").style.display = isEditor ? "flex" : "none";
+    document.getElementById("editor").style.display = isEditor ? "none" : "flex";
+    if (!isEditor) tabBar.editor.focus();
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const toolbar = new Toolbar(DEADLINE_ID, BTN_SAVE_ID, BTN_ADD_FILE_ID, BTN_SUBMIT_ID, BTN_SYNTAX_ID);
+  document.getElementById(MANUAL_UPLOAD_INPUT_ID).addEventListener("change", function () {
+    document.getElementById(MANUAL_UPLOAD_FORM_ID).submit();
+  });
+
+  const toolbar = new Toolbar(
+    DEADLINE_ID,
+    BTN_SAVE_ID,
+    BTN_ADD_FILE_ID,
+    BTN_SUBMIT_ID,
+    BTN_SYNTAX_ID,
+    BTN_SWITCH_TO_EDITOR,
+    BTN_SWITCH_TO_UPLOAD
+  );
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
     let files = [];
@@ -714,7 +754,9 @@ document.addEventListener("DOMContentLoaded", () => {
       checksum = data.checksum;
     }
     fileBuilder = new FileBuilder(files);
-    hashComparator = new HashComparator(checksum, hasChanges => toolbar.setSaveButtonEnabled(hasChanges));
+    hashComparator = new HashComparator(checksum, (hasChanges) =>
+      toolbar.setSaveButtonEnabled(hasChanges)
+    );
     hashComparator.lookForChanges(files);
     tabBar = new TabBar(files);
   });
