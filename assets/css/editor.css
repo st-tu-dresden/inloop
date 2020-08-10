@@ -13,6 +13,10 @@ body.editor {
   max-width: 1800px;
 }
 
+nav.navbar {
+  margin-bottom: .6rem;
+}
+
 body > div:first-of-type {
   display: flex;
   flex: auto;
@@ -24,11 +28,11 @@ body > div:first-of-type {
 .toolbar {
   display: flex;
   flex-direction: row;
-  margin-bottom: 1rem;
+  margin-bottom: .6rem;
   border-radius: 4px;
   background: #eee;
-  padding: 0.4rem 0.6rem;
-  border: 2px solid #ddd;
+  padding: .4rem .6rem;
+  border: 1px solid #ccc;
 }
 
 .toolbar > div {
@@ -43,7 +47,7 @@ body > div:first-of-type {
 }
 
 main > div:first-child {
-  padding-left: 0.6rem;
+  padding-left: .6rem;
   overflow-y: auto;
 }
 
@@ -70,7 +74,6 @@ main > div:last-child {
   font-weight: bold;
   font-size: 1.2rem;
   margin: 0;
-  margin-top: 0.2rem;
 }
 
 .deadline-attention {
@@ -96,7 +99,7 @@ main > div:first-child {
 main > div:last-child {
   display: flex;
   flex-direction: column;
-  padding-bottom: 1rem;
+  padding-bottom: .6rem;
 }
 
 #editor {
@@ -106,6 +109,7 @@ main > div:last-child {
   background: rgb(250, 250, 250);
   border: 1px solid #ccc;
   border-radius: 4px;
+  overflow: hidden;
 }
 
 #editor-content {
@@ -122,8 +126,8 @@ main > div:last-child {
   background: #eee;
   display: flex;
   flex-direction: row;
-  margin-bottom: 0.6rem;
-  padding-right: 0.6rem;
+  margin-bottom: .6rem;
+  padding-right: .6rem;
   height: 2.2rem;
 }
 
@@ -151,7 +155,7 @@ main > div:last-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 0.6rem 0.4rem 0.6rem;
+  padding: .6rem .6rem .4rem .6rem;
   cursor: pointer;
   border-bottom: 3px solid;
   border-bottom-color: #dfdfdf;
@@ -187,7 +191,7 @@ main > div:last-child {
   border-radius: 4px;
   max-height: 30vh;
   margin-bottom: 1rem;
-  padding: 0.8rem;
+  padding: .8rem;
   font-family: monospace;
   color: lightgreen;
   overflow-y: auto;
