@@ -785,3 +785,12 @@ if (document.readyState != "loading"){
 } else {
   document.addEventListener("DOMContentLoaded", () => init());
 }
+
+window.addEventListener("beforeunload", (e) => {
+  if (!hashComparator.lookForChanges(fileBuilder.files)) {
+    e.preventDefault();
+    const confirmationMessage = "";
+    e.returnValue = confirmationMessage;
+    return confirmationMessage;
+  }
+});
