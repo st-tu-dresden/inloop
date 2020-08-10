@@ -279,6 +279,7 @@ class TabBar {
       this.createNewTab(file);
     }
     this.toggleRenameDeleteButtons();
+    this.toggleToolbarSyntaxSubmitButtons();
   }
 
   /**
@@ -301,6 +302,7 @@ class TabBar {
       hashComparator.lookForChanges(fileBuilder.files);
       if (file === undefined) return;
       this.createNewTab(file);
+      this.toggleToolbarSyntaxSubmitButtons();
     };
     showPrompt(getString(msgs.choose_filename), fileCreationCallback);
   }
@@ -387,11 +389,18 @@ class TabBar {
         this.activeTab = undefined;
       }
       this.toggleRenameDeleteButtons();
+      this.toggleToolbarSyntaxSubmitButtons();
     };
     showConfirmDialog(
       getString(msgs.delete_file_confirmation, this.activeTab.file.fileName),
       deleteConfirmationCallback
     );
+  }
+
+  toggleToolbarSyntaxSubmitButtons() {
+    const hasFiles = this.tabs.length > 0;
+    toolbar.setSubmitButtonEnabled(hasFiles);
+    toolbar.setSyntaxButtonEnabled(hasFiles);
   }
 
   toggleRenameDeleteButtons() {
@@ -613,6 +622,7 @@ class Communicator {
 let fileBuilder;
 let hashComparator;
 let tabBar;
+let toolbar;
 let communicator = new Communicator();
 
 // Prevent CTRL+S (CMD+S on Mac) and add
@@ -714,6 +724,14 @@ class Toolbar {
     }
   }
 
+  setSubmitButtonEnabled(enable) {
+    this.submitButton.disabled = !enable;
+  }
+
+  setSyntaxButtonEnabled(enable) {
+    this.syntaxButton.disabled = !enable;
+  }
+
   setSaveButtonEnabled(enable) {
     this.saveButton.disabled = !enable;
   }
@@ -734,7 +752,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(MANUAL_UPLOAD_FORM_ID).submit();
   });
 
-  const toolbar = new Toolbar(
+  toolbar = new Toolbar(
     DEADLINE_ID,
     BTN_SAVE_ID,
     BTN_ADD_FILE_ID,
