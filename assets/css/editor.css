@@ -17,8 +17,8 @@ body > div:first-of-type {
   display: flex;
   flex: auto;
   flex-direction: column;
-  align-self: center;
   overflow: hidden;
+  width: 100%;
 }
 
 .toolbar {
