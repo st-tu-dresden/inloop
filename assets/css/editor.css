@@ -48,7 +48,9 @@ main > div:first-child {
 }
 
 main > div:first-child img {
-  min-width: 75%;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
 }
 
 .toolbar > div:first-child,
