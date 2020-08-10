@@ -301,6 +301,7 @@ class TabBar {
       hashComparator.lookForChanges(fileBuilder.files);
       if (file === undefined) return;
       this.createNewTab(file);
+      this.toggleRenameDeleteButtons();
     };
     showPrompt(getString(msgs.choose_filename), fileCreationCallback);
   }
