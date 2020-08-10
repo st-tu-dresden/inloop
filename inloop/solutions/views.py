@@ -19,8 +19,6 @@ from django.views.generic import DetailView, View
 from huey.exceptions import TaskLockedException
 
 from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
-from inloop.solutions.prettyprint.checkstyle import (CheckstyleData, context_from_xml_strings,
-                                                     xml_strings_from_testoutput)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
@@ -217,24 +215,10 @@ class SolutionDetailView(LoginRequiredMixin, View):
         xml_reports_junit = checkeroutput_filter(result.testoutput_set)
         testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
 
-        xml_strings_checkstyle = xml_strings_from_testoutput(
-            testoutput_set=result.testoutput_set,
-            startswith='checkstyle_errors',
-            endswith='.xml'
-        )
-
-        if xml_strings_checkstyle:
-            checkstyle_context = context_from_xml_strings(
-                xml_strings=xml_strings_checkstyle, filter_keys=[])
-            checkstyle_data = CheckstyleData(checkstyle_context, solution.solutionfile_set.all())
-        else:
-            checkstyle_data = None
-
         context = {
             'solution': solution,
             'result': result,
             'testsuites': testsuites,
-            'checkstyle_data': checkstyle_data,
             'files': solution.solutionfile_set.all(),
             'requested_archive': kwargs.get('requested_archive')
         }
