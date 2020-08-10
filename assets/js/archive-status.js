@@ -163,8 +163,7 @@ $(document).ready(function() {
         }
     }
 
-
-    window.createArchive = function () {
+    createArchive = function () {
         let downloadBarFactory = new DownloadBarFactory();
         Endpoint.get(SOLUTION_ARCHIVE_NEW_URL, function(data) {
             downloadBarFactory.produce(data.status);
@@ -183,4 +182,8 @@ $(document).ready(function() {
         });
     }
 
+    let createArchiveLink = document.getElementById("archive-download-bar");
+    if (createArchiveLink !== null) {
+        createArchiveLink.addEventListener("click", () => createArchive());
+    }
 });
