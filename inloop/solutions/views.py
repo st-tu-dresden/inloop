@@ -14,8 +14,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonRespons
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.views.generic import DetailView, View
 from django.views.decorators.cache import never_cache
+from django.views.generic import DetailView, View
 
 from huey.exceptions import TaskLockedException
 
