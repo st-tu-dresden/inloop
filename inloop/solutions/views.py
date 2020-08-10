@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic import DetailView, View
+from django.views.decorators.cache import never_cache
 
 from huey.exceptions import TaskLockedException
 
@@ -258,6 +259,7 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
         return context
 
 
+@never_cache
 @login_required
 def get_last_checkpoint(request, slug):
     task = get_object_or_404(Task.objects.published(), slug=slug)
