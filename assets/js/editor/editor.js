@@ -749,7 +749,8 @@ class Toolbar {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById(MANUAL_UPLOAD_INPUT_ID).addEventListener("change", function () {
+  const uploadInputElement = document.getElementById(MANUAL_UPLOAD_INPUT_ID);
+  uploadInputElement && uploadInputElement.addEventListener("change", function () {
     document.getElementById(MANUAL_UPLOAD_FORM_ID).submit();
   });
 
