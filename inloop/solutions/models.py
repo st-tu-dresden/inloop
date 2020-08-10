@@ -273,6 +273,9 @@ class Checkpoint(models.Model):
 
     objects = Manager()
 
+    def __str__(self):
+        return f'task_id={self.task_id}, author_id={self.author_id}'
+
 
 class CheckpointFile(models.Model):
     """Represents a single file as part of a checkpoint."""
@@ -282,3 +285,6 @@ class CheckpointFile(models.Model):
 
     class Meta:
         ordering = ['name']
+
+    def __str__(self):
+        return f'{self.name}'
