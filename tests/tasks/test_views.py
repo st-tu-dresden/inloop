@@ -29,3 +29,9 @@ class TaskDetailViewTest(SimpleAccountsData, TaskData, TestCase):
         slug_url = reverse('tasks:detail', args=['task-1'])
         self.assertTrue(self.client.login(username='bob', password='secret'))
         self.assertRedirects(self.client.get(name_url), slug_url)
+
+    def test_redirect_to_editor(self):
+        old_detail_url = reverse('tasks:redirect-to-editor', args=['task-1'])
+        editor_url = reverse('solutions:editor', args=['task-1'])
+        self.assertTrue(self.client.login(username='bob', password='secret'))
+        self.assertRedirects(self.client.get(old_detail_url), editor_url)
