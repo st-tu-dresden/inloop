@@ -748,7 +748,7 @@ class Toolbar {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function init() { 
   const uploadInputElement = document.getElementById(MANUAL_UPLOAD_INPUT_ID);
   uploadInputElement && uploadInputElement.addEventListener("change", function () {
     document.getElementById(MANUAL_UPLOAD_FORM_ID).submit();
@@ -778,4 +778,10 @@ document.addEventListener("DOMContentLoaded", () => {
     hashComparator.lookForChanges(files);
     tabBar = new TabBar(files);
   });
-});
+}
+
+if (document.readyState != "loading"){
+  init();
+} else {
+  document.addEventListener("DOMContentLoaded", () => init());
+}
