@@ -7,7 +7,7 @@ function displayText(files) {
   return "";
 }
 
-document.getElementById("uploadBtn").addEventListener("change", function () {
+document.getElementById("upload-btn").addEventListener("change", function () {
   document.getElementById("submit").submit();
 });
 

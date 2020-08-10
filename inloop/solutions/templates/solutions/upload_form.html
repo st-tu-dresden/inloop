@@ -13,8 +13,8 @@
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="form-group upload-drop-zone" style="position: relative; width: 100%">
-    <input id="uploadBtn" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
-    <label id="uploadFiles" for="uploadBtn">Choose files...</label>
+    <input id="upload-btn" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
+    <label for="upload-btn">Choose files...</label>
   </div>
 </form>
 {% else %}

@@ -128,7 +128,7 @@ code {
 /* @end */
 
 /* Upload form */
-#uploadBtn {
+#upload-btn {
   opacity: 0;
   filter: alpha(opacity=0);
   cursor: pointer;
