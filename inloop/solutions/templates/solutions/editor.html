@@ -27,8 +27,8 @@
       <button id="toolbar-switch-btn--manual" title="Switch to manual upload view" type="button" class="btn btn-default">Manual upload</button>
     </div>
     <div id="toolbar-buttons--right">
-      <button id="toolbar-btn--save" title="Save current solution" type="button" class="btn btn-success btn-sm">
-        <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true" disabled></span> Save all
+      <button id="toolbar-btn--save" title="Save current solution" type="button" class="btn btn-success btn-sm" disabled>
+        <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Save all
       </button>
       <button id="toolbar-btn--newfile" title="Create new file" type="button" class="btn btn-primary btn-sm">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
@@ -78,7 +78,7 @@
         {% csrf_token %}
         <div class="form-group upload-drop-zone" style="position: relative; width: 100%">
           <input id="manual-upload-file-input" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
-          <label id="uploadFiles" for="uploads">Choose files...</label>
+          <label for="manual-upload-file-input">Choose files...</label>
         </div>
       </form>
       {% else %}
