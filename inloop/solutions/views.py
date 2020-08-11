@@ -29,6 +29,14 @@ from inloop.tasks.models import Task
 logger = logging.getLogger(__name__)
 
 
+class HttpResponseBadJsonRequest(JsonResponse):
+    """Response that indicates an invalid JSON request made by the client."""
+    status_code = 400
+
+    def __init__(self):
+        super().__init__({'error': 'invalid json'})
+
+
 class SolutionStatusView(LoginRequiredMixin, View):
     def get(self, request, id):
         solution = get_object_or_404(Solution, pk=id, author=request.user)
@@ -112,7 +120,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         except SubmissionError as error:
             return JsonResponse({'success': False, 'reason': str(error)})
         except JSONDecodeError:
-            return JsonResponse({'success': False})
+            return HttpResponseBadJsonRequest()
         return JsonResponse({'success': True})
 
 
@@ -307,7 +315,7 @@ def save_checkpoint(request, slug):
     try:
         data = json.loads(request.body)
     except JSONDecodeError:
-        return JsonResponse({'success': False})
+        return HttpResponseBadJsonRequest()
 
     try:
         Checkpoint.objects.save_checkpoint(data, task, request.user)
