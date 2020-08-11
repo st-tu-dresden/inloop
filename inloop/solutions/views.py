@@ -117,11 +117,17 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
                 for filename, content in uploads.items()
             ]
             self.submit(files, request.user, task)
+            if not task.has_submission_limit:
+                return JsonResponse({'success': True})
+            return JsonResponse({
+                'success': True,
+                'submission_limit': task.submission_limit,
+                'num_submissions': Solution.objects.filter(author=request.user, task=task).count()
+            })
         except SubmissionError as error:
             return JsonResponse({'success': False, 'reason': str(error)})
         except JSONDecodeError:
             return HttpResponseBadJsonRequest()
-        return JsonResponse({'success': True})
 
 
 class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
