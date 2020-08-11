@@ -38,6 +38,8 @@ const msgs = {
   not_implemented_yet: "This functionality has not been implemented yet.",
 };
 
+const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+
 function getString(string, extra) {
   if (extra) {
     return string.replace(/\%.*\%/, extra);
@@ -767,7 +769,7 @@ function init() {
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
     let files = [];
-    let checksum = "";
+    let checksum = EMPTY_STRING_SHA1;
     if (data && data.success && data.files) {
       files = data.files.map((file) => new File(file.name, file.contents));
       checksum = data.checksum;
