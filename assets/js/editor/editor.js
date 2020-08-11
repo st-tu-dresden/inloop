@@ -19,6 +19,9 @@ const DEADLINE_ID = "task-deadline";
 const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
 const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
 const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
+const CONSOLE_CONTAINER_ID = "console";
+const CONSOLE_CONTENT_ID = "console-content";
+const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
 
 const msgs = {
   try_again_later: "Please try again later.",
@@ -36,6 +39,8 @@ const msgs = {
   error_saving_files: "Error occured: Could not save files.",
   deadline_expired: "Deadline expired",
   not_implemented_yet: "This functionality has not been implemented yet.",
+  syntax_check_successful: "Syntax check successful. No errors detected.",
+  syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -620,6 +625,52 @@ class Communicator {
     const data = await response.json();
     window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
   }
+
+  async checkSyntax(files) {
+    return mockSyntaxCheck();
+  }
+}
+
+class SyntaxCheckConsole {
+  constructor() {
+    this.consoleContainerElement = document.getElementById(CONSOLE_CONTAINER_ID);
+    this.consoleContentElement = document.getElementById(CONSOLE_CONTENT_ID);
+    this.consoleHideBtn = document.getElementById(CONSOLE_HIDE_BUTTON_ID);
+    this.consoleHideBtn.addEventListener("click", () => this.show(false));
+  }
+
+  show(show) {
+    this.consoleContainerElement.style.display = show ? "block" : "none";
+  }
+
+  createOutputElement(err) {
+    const s = (text) => `<strong>${text}</strong>`;
+    const uc = (text) => `${text[0].toUpperCase()}${text.slice(1)}`; 
+    const p = document.createElement("p");
+    let className;
+    if (err.type == "error") {
+      className = "error";
+    } else if (err.type == "warning") {
+      className = "warning";
+    }
+    p.innerHTML = `${s(uc(err.type)) } in line ${s(err.line)} of ${s(err.file)}: ${err.message}`;
+    className && (p.className = `console-content--${className}`);
+    return p;
+  }
+
+  setContent(checkResult) {
+    if (checkResult.success) {
+      this.consoleContentElement.innerHTML = `<p>${getString(msgs.syntax_check_successful)}`;
+    } else {
+      this.consoleContentElement.innerHTML = `<p>${getString(
+        msgs.syntax_check_failed,
+        checkResult.diagnostics.length
+      )}</p>`;
+      checkResult.diagnostics.forEach((err) =>
+        this.consoleContentElement.appendChild(this.createOutputElement(err))
+      );
+    }
+  }
 }
 
 let fileBuilder;
@@ -627,6 +678,7 @@ let hashComparator;
 let tabBar;
 let toolbar;
 let communicator = new Communicator();
+let syntaxCheckConsole = new SyntaxCheckConsole();
 
 // Prevent CTRL+S (CMD+S on Mac) and add
 // our custom event handler
@@ -655,7 +707,6 @@ function showConfirmDialog(text, callback) {
 function showAlert(text) {
   window.alert(text);
 }
-
 class Toolbar {
   constructor(
     deadlineId,
@@ -678,11 +729,9 @@ class Toolbar {
   init() {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
-    this.syntaxButton.addEventListener("click", () =>
-      showAlert(getString(msgs.not_implemented_yet))
-    );
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
     this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    this.syntaxButton.addEventListener("click", () => this.checkSyntax());
     this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToEditorButton.disabled = true;
@@ -690,6 +739,13 @@ class Toolbar {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
     }
+  }
+
+  checkSyntax() {
+    communicator.checkSyntax().then((result) => {
+      syntaxCheckConsole.show(true);
+      syntaxCheckConsole.setContent(result);
+    });
   }
 
   startDeadlineCounter() {
@@ -748,6 +804,38 @@ class Toolbar {
     document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = isEditor ? "none" : "block";
     if (!isEditor) tabBar.editor.focus();
   }
+}
+
+function mockSyntaxCheck() {
+  /*
+  The returned JSON will include a boolean success key and a diagnostics key.
+  The former one specifies if the compilation was successful, i.e., if there
+  were no syntax errors. The latter one is a (possibly empty) list of objects
+  with file, line, message, type keys that describe the errors or warnings."
+  */
+  const diagnostics = () => {
+    let result = [];
+    for (let i = 0; i < 10; i++) {
+      result.push({
+        file: `File${i}.java`,
+        line: i + 100,
+        message:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+        type: (() => {
+          if (i % 3 == 0) return "error";
+          else if (i % 4 == 0) return "warning";
+          else return "RandomHint";
+        })(),
+      });
+    }
+    return result;
+  };
+  const result = {
+    success: false,
+    diagnostics: diagnostics(),
+  };
+
+  return result;
 }
 
 function init() {
