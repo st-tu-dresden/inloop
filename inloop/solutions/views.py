@@ -1,5 +1,6 @@
 import json
 import logging
+from json import JSONDecodeError
 from os.path import basename
 
 from django.contrib import messages
@@ -50,6 +51,7 @@ class SolutionSubmitMixin:
             raise SubmissionError("You haven't uploaded any files.")
         try:
             validate_filenames([file.name for file in files])
+            self.check_submission_limit(author, task)
             solution = self.atomic_submit(files, author, task)
             solution_submitted.send(sender=self.__class__, solution=solution)
         except ValidationError as error:
@@ -57,6 +59,17 @@ class SolutionSubmitMixin:
         except IntegrityError:
             logger.exception('db constraint violation occurred')
             raise SubmissionError('Concurrent submission is not possible.')
+
+    def check_submission_limit(self, author, task):
+        """
+        Ensure that the author is within the submission limit for the task (if any).
+        """
+        if task.has_submission_limit:
+            count = Solution.objects.filter(author=author, task=task).count()
+            limit = task.submission_limit
+            if count >= limit:
+                suffix = 's' if limit > 1 else ''
+                raise SubmissionError(f'You cannot submit more than {limit} solution{suffix}.')
 
     @transaction.atomic()
     def atomic_submit(self, files, author, task):
@@ -84,7 +97,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
 
     def post(self, request, slug_or_name):
         """
-        Handle JSON-encoded POST submissions requests from the side-by-side editor.
+        Handle JSON-encoded POST submission requests from the side-by-side editor.
         """
         try:
             # if it's a name and not a slug, get_task(…) will make it fail with 404
@@ -96,7 +109,9 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
                 for filename, content in uploads.items()
             ]
             self.submit(files, request.user, task)
-        except (SubmissionError, json.JSONDecodeError):
+        except SubmissionError as error:
+            return JsonResponse({'success': False, 'reason': str(error)})
+        except JSONDecodeError:
             return JsonResponse({'success': False})
         return JsonResponse({'success': True})
 
@@ -291,7 +306,7 @@ def save_checkpoint(request, slug):
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
-    except json.JSONDecodeError:
+    except JSONDecodeError:
         return JsonResponse({'success': False})
 
     try:
