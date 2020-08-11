@@ -97,6 +97,11 @@ class Task(models.Model):
         null=True,
         blank=True
     )
+    max_submissions = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='Submission limit (per user, -1 means unlimited, null means default)'
+    )
 
     objects = TaskQuerySet.as_manager()
 
