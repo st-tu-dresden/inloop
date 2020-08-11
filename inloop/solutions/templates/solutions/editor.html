@@ -1,5 +1,6 @@
 {% extends "base_site.html" %}
 {% load markdown %}
+{% load solution_extras %}
 {% load static %}
 
 {% block title %}{{ task.title }}{% endblock %}
@@ -34,7 +35,7 @@
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
       </button>
       <button id="toolbar-btn--submit" title="Submit current solution" type="button" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit
+        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit{% submission_progress ' ({current}/{limit})' task %}
       </button>
       <button id="toolbar-btn--syntax" title="Run syntax check on current solution" type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax

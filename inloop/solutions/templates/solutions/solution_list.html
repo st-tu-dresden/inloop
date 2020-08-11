@@ -21,7 +21,11 @@
       <span data-id="{{ solution.id }}" class="glyphicon solution-{{ solution.status }}"></span>
     </div>
 
+{% if task.has_submission_limit %}
+    <h4 class="list-group-item-heading">#{{ solution.scoped_id }} of {{ task.submission_limit }}</h4>
+{% else %}
     <h4 class="list-group-item-heading">#{{ solution.scoped_id }}</h4>
+{% endif %}
     <p class="list-group-item-text">
       Submitted
       <time class="timeago" datetime="{{ solution.submission_date.isoformat }}">

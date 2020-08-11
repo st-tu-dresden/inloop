@@ -1,5 +1,6 @@
 {% extends "base_site.html" %}
 {% load static %}
+{% load solution_extras %}
 
 {% block extrahead %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
@@ -21,7 +22,7 @@
     <a href="{% url 'solutions:upload' task.slug %}">Manual upload</a>
   </li>
   <li role="presentation" {% if active_tab == 3 %}class="active"{% endif %}>
-    <a href="{% url 'solutions:list' task.slug %}">Your solutions</a>
+    <a href="{% url 'solutions:list' task.slug %}">Your solutions{% submission_progress ' ({current} of {limit})' task %}</a>
   </li>
 {% block extra_in_tab %}{% endblock %}
 </ul>
