@@ -103,7 +103,10 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             raise Http404
         if slug_or_name != task.slug:
             return HttpResponseRedirect(reverse('solutions:editor', args=[task.slug]))
-        return TemplateResponse(request, 'solutions/editor.html', {'task': task})
+        return TemplateResponse(request, 'solutions/editor.html', {
+            'task': task,
+            'syntax_check_endpoint': config.SYNTAX_CHECK_ENDPOINT
+        })
 
     def post(self, request, slug_or_name):
         """

@@ -40,9 +40,11 @@
               data-submission-limit="{{ progress_info.limit }}"{% if progress_info.limit_reached %} disabled{% endif %}>
         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit{{ progress_info|format_if:' ({current}/{limit})' }}
       </button>
+{% if syntax_check_endpoint %}
       <button id="toolbar-btn--syntax" title="Run syntax check on current solution" type="button" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Check syntax
       </button>
+{% endif %}
     </div>
   </div>
 </header>
@@ -120,6 +122,9 @@
         data-csrf-token="{{ csrf_token }}"
         data-solutions-editor-url="{% url 'solutions:editor' task.slug %}"
         data-solutions-list-url="{% url 'solutions:list' task.slug %}"
+{% if syntax_check_endpoint %}
+        data-syntax-check-url="{{ syntax_check_endpoint }}"
+{% endif %}
         data-get-last-checkpoint-url="{% url 'solutions:get-last-checkpoint' task.slug %}"
         data-save-checkpoint-url="{% url 'solutions:save-checkpoint' task.slug %}">
 </script>
