@@ -35,7 +35,9 @@
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Create file
       </button>
       {% get_submission_progress task as progress_info %}
-      <button id="toolbar-btn--submit" title="Submit current solution" type="button" class="btn btn-default btn-sm">
+      <button id="toolbar-btn--submit" title="Submit current solution" type="button" class="btn btn-default btn-sm"
+              data-current-submissions="{{ progress_info.current }}"
+              data-submission-limit="{{ progress_info.limit }}"{% if progress_info.limit_reached %} disabled{% endif %}>
         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Submit{{ progress_info|format_if:' ({current}/{limit})' }}
       </button>
       <button id="toolbar-btn--syntax" title="Run syntax check on current solution" type="button" class="btn btn-default btn-sm">
