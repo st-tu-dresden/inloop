@@ -13,6 +13,12 @@
 {% block container_classes %}container-fluid{% endblock %}
 
 {% block content %}
+<noscript>
+  <p class="alert alert-warning">
+    Unfortunately your browser does not support JavaScript or you manually disabled JavaScript.
+    In order to use the online editor or the manual file upload JavaScript has to be enabled.
+  </p>
+</noscript>
 <header class="toolbar">
   <div>
     <h1>{{ task.title }}</h1>
