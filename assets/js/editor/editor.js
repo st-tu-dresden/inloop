@@ -666,28 +666,44 @@ class SyntaxCheckConsole {
   }
 
   createOutputElement(err) {
-    const s = (text) => `<strong>${text}</strong>`;
-    const uc = (text) => `${text[0].toUpperCase()}${text.slice(1)}`; 
+    const strong = (text) => {
+      const strong = document.createElement("strong");
+      strong.textContent = text;
+      return strong;
+    }
+    const uppercase = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
     const p = document.createElement("p");
+    
     let className;
     if (err.type == "error") {
       className = "error";
     } else if (err.type == "warning") {
       className = "warning";
     }
-    p.innerHTML = `${s(uc(err.type)) } in line ${s(err.line)} of ${s(err.file)}: ${err.message}`;
+    
+    p.append(strong(uppercase(err.type)));
+    p.append(" in line ");
+    p.append(strong(err.line));
+    p.append(" of ");
+    p.append(strong(err.file));
+    p.append(": ");
+    p.append(document.createTextNode(err.message));
+    
     className && (p.className = `console-content--${className}`);
     return p;
   }
 
   setContent(checkResult) {
+    const p = document.createElement("p");
+    while (this.consoleContentElement.firstChild) {
+      this.consoleContentElement.removeChild(this.consoleContentElement.firstChild);
+    }
     if (checkResult.success) {
-      this.consoleContentElement.innerHTML = `<p>${getString(msgs.syntax_check_successful)}`;
+      p.textContent = getString(msgs.syntax_check_successful);
+      this.consoleContentElement.appendChild(p);
     } else {
-      this.consoleContentElement.innerHTML = `<p>${getString(
-        msgs.syntax_check_failed,
-        checkResult.diagnostics.length
-      )}</p>`;
+      p.textContent = getString(msgs.syntax_check_failed, checkResult.diagnostics.length);
+      this.consoleContentElement.appendChild(p);
       checkResult.diagnostics.forEach((err) =>
         this.consoleContentElement.appendChild(this.createOutputElement(err))
       );
