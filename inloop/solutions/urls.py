@@ -4,7 +4,8 @@ from inloop.solutions.views import (NewSolutionArchiveView, SideBySideEditorView
                                     SolutionArchiveDownloadView, SolutionArchiveStatusView,
                                     SolutionDetailView, SolutionFileView, SolutionListView,
                                     SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView, get_last_checkpoint, save_checkpoint)
+                                    StaffSolutionDetailView, get_last_checkpoint,
+                                    mock_syntax_check, save_checkpoint)
 from inloop.tasks.views import serve_attachment
 
 app_name = 'solutions'
@@ -74,4 +75,5 @@ urlpatterns = [
         get_last_checkpoint,
         name='get-last-checkpoint'
     ),
+    url(r'^syntax-check/$', mock_syntax_check, name='mock-syntax-check'),
 ]

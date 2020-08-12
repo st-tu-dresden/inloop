@@ -12,9 +12,13 @@ config = {
         'The URL of the syntax check endpoint. If empty, syntax checks '
         'will be disabled globally.'
     )),
+    'SYNTAX_CHECK_MOCK_VALUE': ('', (
+        'JSON response to return on the mock syntax check endpoint. '
+        'If empty, the endpoint is disabled.'
+    )),
 }
 
 fieldsets = {
     'General settings': ['ALLOWED_FILENAME_EXTENSIONS'],
-    'Syntax check': ['SYNTAX_CHECK_ENDPOINT']
+    'Syntax check': ['SYNTAX_CHECK_ENDPOINT', 'SYNTAX_CHECK_MOCK_VALUE']
 }
