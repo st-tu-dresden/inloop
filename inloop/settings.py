@@ -19,6 +19,7 @@ from environ import Env
 from inloop.accounts import constance as accounts_constance
 from inloop.gitload import constance as gitload_constance
 from inloop.solutions import constance as solutions_constance
+from inloop.tasks import constance as tasks_constance
 
 if sys.getfilesystemencoding() != 'utf-8':
     raise ImproperlyConfigured('LANG must be a utf-8 locale')
@@ -218,6 +219,9 @@ CONSTANCE_CONFIG_FIELDSETS.update(gitload_constance.fieldsets)
 
 CONSTANCE_CONFIG.update(solutions_constance.config)
 CONSTANCE_CONFIG_FIELDSETS.update(solutions_constance.fieldsets)
+
+CONSTANCE_CONFIG.update(tasks_constance.config)
+CONSTANCE_CONFIG_FIELDSETS.update(tasks_constance.fieldsets)
 
 JPLAG_JAR_PATH = str(BASE_DIR / 'lib' / 'jplag-2.11.9-SNAPSHOT.jar')
 JPLAG_SIMILARITY = 90

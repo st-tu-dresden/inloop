@@ -7,6 +7,8 @@ from django.db.models.fields import BooleanField
 from django.utils import timezone
 from django.utils.text import slugify
 
+from constance import config
+
 
 class Category(models.Model):
     """Task categories may be used to arbitrarily group tasks."""
@@ -97,6 +99,11 @@ class Task(models.Model):
         null=True,
         blank=True
     )
+    max_submissions = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='Submission limit (per user, -1 means unlimited, null means default)'
+    )
 
     objects = TaskQuerySet.as_manager()
 
@@ -112,6 +119,17 @@ class Task(models.Model):
 
     def is_completed_by(self, user):
         return self.id in Task.objects.completed_by(user).values_list('id', flat=True)
+
+    @property
+    def submission_limit(self):
+        """Return the max_submissions of this task or the overall limit, if not set."""
+        if self.max_submissions is not None:
+            return self.max_submissions
+        return config.MAX_SUBMISSIONS
+
+    @property
+    def has_submission_limit(self):
+        return self.submission_limit != -1
 
     @property
     def sluggable_title(self):
