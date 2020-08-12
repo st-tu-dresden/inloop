@@ -16,8 +16,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, View
 
+from constance import config
 from huey.exceptions import TaskLockedException
 
 from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
@@ -101,7 +103,10 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             raise Http404
         if slug_or_name != task.slug:
             return HttpResponseRedirect(reverse('solutions:editor', args=[task.slug]))
-        return TemplateResponse(request, 'solutions/editor.html', {'task': task})
+        return TemplateResponse(request, 'solutions/editor.html', {
+            'task': task,
+            'syntax_check_endpoint': config.SYNTAX_CHECK_ENDPOINT
+        })
 
     def post(self, request, slug_or_name):
         """
@@ -329,3 +334,20 @@ def save_checkpoint(request, slug):
         return JsonResponse({'success': False})
 
     return JsonResponse({'success': True})
+
+
+@csrf_exempt
+def mock_syntax_check(request):
+    """Temporary endpoint that outputs some fake syntax check results."""
+    if not request.method == 'POST':
+        return JsonResponse({'success': False})
+    if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
+        return JsonResponse({
+            'success': False,
+            'reason': 'bad configuration'
+        })
+    try:
+        mocked_data = json.loads(config.SYNTAX_CHECK_MOCK_VALUE)
+        return JsonResponse(mocked_data)
+    except JSONDecodeError:
+        return HttpResponseBadJsonRequest()
