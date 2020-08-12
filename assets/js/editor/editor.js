@@ -697,16 +697,13 @@ class SyntaxCheckConsole {
     while (this.consoleContentElement.firstChild) {
       this.consoleContentElement.removeChild(this.consoleContentElement.firstChild);
     }
-    if (checkResult.success) {
-      p.textContent = getString(msgs.syntax_check_successful);
-      this.consoleContentElement.appendChild(p);
-    } else {
-      p.textContent = getString(msgs.syntax_check_failed, checkResult.diagnostics.length);
-      this.consoleContentElement.appendChild(p);
-      checkResult.diagnostics.forEach((err) =>
-        this.consoleContentElement.appendChild(this.createOutputElement(err))
-      );
-    }
+    p.textContent = checkResult.success
+      ? getString(msgs.syntax_check_successful)
+      : getString(msgs.syntax_check_failed, checkResult.diagnostics.length);
+    this.consoleContentElement.appendChild(p);
+    checkResult.diagnostics.forEach((err) =>
+      this.consoleContentElement.appendChild(this.createOutputElement(err))
+    );
     tabBar.editor.editor.resize();
   }
 }
