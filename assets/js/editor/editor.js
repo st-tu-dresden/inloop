@@ -662,6 +662,7 @@ class SyntaxCheckConsole {
 
   show(show) {
     this.consoleContainerElement.style.display = show ? "block" : "none";
+    tabBar.editor.editor.resize();
   }
 
   createOutputElement(err) {
@@ -691,6 +692,7 @@ class SyntaxCheckConsole {
         this.consoleContentElement.appendChild(this.createOutputElement(err))
       );
     }
+    tabBar.editor.editor.resize();
   }
 }
 
