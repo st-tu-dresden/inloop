@@ -638,7 +638,6 @@ class Communicator {
     const requestConfig = {
       method: "POST",
       headers: {
-        "X-CSRFToken": CSRF_TOKEN,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -673,7 +672,7 @@ class SyntaxCheckConsole {
     }
     const uppercase = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
     const p = document.createElement("p");
-    
+
     let className;
     if (err.type == "error") {
       className = "error";
