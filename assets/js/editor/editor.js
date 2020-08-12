@@ -5,6 +5,7 @@ const GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-ur
 const CSRF_TOKEN = script.getAttribute("data-csrf-token");
 const SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 const SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
+const SYNTAX_CHECK_URL = script.getAttribute("data-syntax-check-url");
 const EDITOR_TABBAR_FILES_ID = "editor-tabbar-files";
 const EDITOR_ID = "editor-content";
 const BTN_SAVE_ID = "toolbar-btn--save";
@@ -41,6 +42,7 @@ const msgs = {
   not_implemented_yet: "This functionality has not been implemented yet.",
   syntax_check_successful: "Syntax check successful. No errors detected.",
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
+  error_checking_syntax: "Could not check syntax. Please try again later."
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -582,7 +584,7 @@ class Communicator {
     };
     const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig);
     if (response.status !== 200) {
-      alert(getString(msgs.error_saving_files));
+      showAlert(getString(msgs.error_saving_files));
       return;
     }
     const data = await response.json();
@@ -619,15 +621,34 @@ class Communicator {
     };
     const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
     if (response.status !== 200) {
-      alert(getString(msgs.error_saving_files));
+      showAlert(getString(msgs.error_saving_files));
       return;
     }
     const data = await response.json();
     window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
   }
 
-  async checkSyntax(files) {
-    return mockSyntaxCheck();
+  async checkSyntax() {
+    if (!SYNTAX_CHECK_URL) return;
+    const payload = {
+      files: fileBuilder.files.map((file) => {
+        return { name: file.fileName, contents: file.fileContent };
+      }),
+    };
+    const requestConfig = {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": CSRF_TOKEN,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+    const response = await fetch(SYNTAX_CHECK_URL, requestConfig);
+    if (response.status !== 200) {
+      showAlert(getString(msgs.error_checking_syntax));
+      return;
+    }
+    return await response.json();
   }
 }
 
@@ -731,7 +752,9 @@ class Toolbar {
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
     this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
-    this.syntaxButton.addEventListener("click", () => this.checkSyntax());
+    if (this.syntaxButton) {
+      this.syntaxButton.addEventListener("click", () => this.checkSyntax());
+    }
     this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToEditorButton.disabled = true;
@@ -743,6 +766,7 @@ class Toolbar {
 
   checkSyntax() {
     communicator.checkSyntax().then((result) => {
+      if (!result) return;
       syntaxCheckConsole.show(true);
       syntaxCheckConsole.setContent(result);
     });
@@ -788,7 +812,7 @@ class Toolbar {
   }
 
   setSyntaxButtonEnabled(enable) {
-    this.syntaxButton.disabled = !enable;
+    this.syntaxButton && (this.syntaxButton.disabled = !enable);
   }
 
   setSaveButtonEnabled(enable) {
@@ -804,38 +828,6 @@ class Toolbar {
     document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = isEditor ? "none" : "block";
     if (!isEditor) tabBar.editor.focus();
   }
-}
-
-function mockSyntaxCheck() {
-  /*
-  The returned JSON will include a boolean success key and a diagnostics key.
-  The former one specifies if the compilation was successful, i.e., if there
-  were no syntax errors. The latter one is a (possibly empty) list of objects
-  with file, line, message, type keys that describe the errors or warnings."
-  */
-  const diagnostics = () => {
-    let result = [];
-    for (let i = 0; i < 10; i++) {
-      result.push({
-        file: `File${i}.java`,
-        line: i + 100,
-        message:
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
-        type: (() => {
-          if (i % 3 == 0) return "error";
-          else if (i % 4 == 0) return "warning";
-          else return "RandomHint";
-        })(),
-      });
-    }
-    return result;
-  };
-  const result = {
-    success: false,
-    diagnostics: diagnostics(),
-  };
-
-  return result;
 }
 
 function init() {
