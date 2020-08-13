@@ -46,7 +46,8 @@ const msgs = {
   syntax_check_successful: "Syntax check successful. No errors detected.",
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
   error_checking_syntax: "Could not check syntax. Please try again later.",
-  submission_failed: "Submission failed: %message%"
+  submission_failed: "Submission failed: %message%",
+  submission_failed_unknown: "Submission failed due to an unknown reason."
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -787,13 +788,14 @@ class Toolbar {
         return;
       }
       if (result.success) {
-        console.log(result);
         if (result.num_submissions && result.submission_limit) {
           this.updateSubmitButton(result.num_submissions, result.submission_limit);
         }
         window.location.assign(SOLUTIONS_LIST_URL);
       } else if (result.reason) {
         showAlert(getString(msgs.submission_failed, result.reason));
+      } else {
+        showAlert(getString(msgs.submission_failed_unknown));
       }
     });
   }
