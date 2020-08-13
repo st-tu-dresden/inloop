@@ -297,19 +297,15 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 @login_required
 def get_last_checkpoint(request, slug):
     task = get_object_or_404(Task.objects.published(), slug=slug)
-
-    checkpoints = Checkpoint.objects.filter(author=request.user, task=task)
-    if not checkpoints.exists():
+    last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
+    if not last_checkpoint:
         return JsonResponse({'success': True, 'files': None})
-
-    last_checkpoint = checkpoints.last()
     checkpoint_files = []
     for checkpoint_file in last_checkpoint.checkpointfile_set.order_by('id'):
         checkpoint_files.append({
             'name': checkpoint_file.name,
             'contents': checkpoint_file.contents
         })
-
     return JsonResponse({
         'success': True,
         'checksum': str(last_checkpoint.md5),
