@@ -670,7 +670,7 @@ class SyntaxCheckConsole {
       strong.textContent = text;
       return strong;
     }
-    const uppercase = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
+    const capitalize = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
     const p = document.createElement("p");
 
     let className;
@@ -679,15 +679,15 @@ class SyntaxCheckConsole {
     } else if (err.type == "warning") {
       className = "warning";
     }
-    
-    p.append(strong(uppercase(err.type)));
+
+    p.append(strong(capitalize(err.type)));
     p.append(" in line ");
     p.append(strong(err.line));
     p.append(" of ");
     p.append(strong(err.file));
     p.append(": ");
     p.append(document.createTextNode(err.message));
-    
+
     className && (p.className = `console-content--${className}`);
     return p;
   }
