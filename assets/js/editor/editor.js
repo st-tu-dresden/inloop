@@ -821,6 +821,7 @@ class Toolbar {
     this.submitButton.innerText = `Submit (${currentSubmissions}/${maxSubmissions})`;
     this.submitButton.setAttribute(CURRENT_SUBMITS_DATA_KEY, currentSubmissions);
     this.submitButton.setAttribute(MAX_SUBMITS_DATA_KEY, maxSubmissions);
+    this.setSubmitButtonEnabled(currentSubmissions < maxSubmissions);
   }
 
   checkSyntax() {
