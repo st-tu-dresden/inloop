@@ -797,7 +797,7 @@ class Toolbar {
       } else {
         showAlert(getString(msgs.submission_failed_unknown));
       }
-    });
+    }).catch(error => showAlert(error));
   }
 
   updateSubmitButton(currentSubmissions, maxSubmissions) {
