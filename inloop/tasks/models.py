@@ -2,6 +2,7 @@ import itertools
 import re
 from datetime import timedelta
 
+from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models.expressions import Value
 from django.db.models.fields import BooleanField
@@ -104,6 +105,13 @@ class Task(models.Model):
         null=True,
         blank=True,
         help_text='Submission limit (per user, -1 means unlimited, null means default)'
+    )
+    group = models.ForeignKey(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text='Make the task only available to the chosen group, or all users if unset'
     )
 
     objects = TaskQuerySet.as_manager()

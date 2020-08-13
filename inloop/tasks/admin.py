@@ -12,7 +12,7 @@ User = get_user_model()
 @admin.register(Task)
 class TaskAdmin(PlagiarismAdmin):
     fieldsets = [(None, {
-        'fields': ['slug', 'title', 'category', 'max_submissions']
+        'fields': ['slug', 'title', 'category', 'max_submissions', 'group']
     }), ('Date Information', {
         'fields': ['pubdate', 'deadline']
     }), ('Content', {
