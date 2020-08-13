@@ -23,6 +23,9 @@ const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
 const CONSOLE_CONTAINER_ID = "console";
 const CONSOLE_CONTENT_ID = "console-content";
 const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
+const CURRENT_SUBMITS_DATA_KEY = "data-current-submissions";
+const MAX_SUBMITS_DATA_KEY = "data-submission-limit";
+const NO_SUBMISSION_LIMIT = -1;
 
 const msgs = {
   try_again_later: "Please try again later.",
@@ -822,7 +825,10 @@ class Toolbar {
   }
 
   setSubmitButtonEnabled(enable) {
-    this.submitButton.disabled = !enable;
+    const maxSubmissions = parseInt(this.submitButton.getAttribute(MAX_SUBMITS_DATA_KEY));
+    const currentSubmissions = parseInt(this.submitButton.getAttribute(CURRENT_SUBMITS_DATA_KEY));
+    const maySubmit = (maxSubmissions == NO_SUBMISSION_LIMIT) || (currentSubmissions < maxSubmissions);
+    this.submitButton.disabled = !(maySubmit && enable);
   }
 
   setSyntaxButtonEnabled(enable) {
