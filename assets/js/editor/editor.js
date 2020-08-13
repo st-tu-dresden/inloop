@@ -788,10 +788,11 @@ class Toolbar {
         return;
       }
       if (result.success) {
-        if (result.num_submissions && result.submission_limit) {
+        if (result.skip_redirect && result.num_submissions && result.submission_limit) {
           this.updateSubmitButton(result.num_submissions, result.submission_limit);
+        } else {
+          window.location.assign(SOLUTIONS_LIST_URL);
         }
-        window.location.assign(SOLUTIONS_LIST_URL);
       } else if (result.reason) {
         showAlert(getString(msgs.submission_failed, result.reason));
       } else {
