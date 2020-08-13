@@ -29,7 +29,6 @@ const NO_SUBMISSION_LIMIT = -1;
 
 const msgs = {
   try_again_later: "Please try again later.",
-  upload_failed: "Upload failed.",
   duplicate_filename:
     'A file with the name "%filename%" already exists.\nPlease choose another filename.',
   invalid_filename:
@@ -40,7 +39,7 @@ const msgs = {
   missing_es6_support:
     "Your browser does not support ECMAScript 6. Please update or change your browser to use the editor.",
   error_loading_files: "Error occured: Could not load saved files from server.",
-  error_saving_files: "Could not save files.\n%message%",
+  error_save: "Could not save files.\n%message%",
   deadline_expired: "Deadline expired",
   not_implemented_yet: "This functionality has not been implemented yet.",
   syntax_check_successful: "Syntax check successful. No errors detected.",
@@ -590,7 +589,7 @@ class Communicator {
     let errorMsg = "";
     const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig).catch((error) => errorMsg = error);
     if (!response.status || response.status !== 200) {
-      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_saving_files, errorMsg || `${response.status} ${response.statusText}`));
+      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save, errorMsg || `${response.status} ${response.statusText}`));
       return;
     }
     const data = await response.json();
@@ -598,7 +597,7 @@ class Communicator {
       hashComparator.updateHash(checksum);
       hashComparator.lookForChanges(fileBuilder.files);
     } else {
-      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_saving_files));
+      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save));
       return;
     }
     if (saveBeforeSubmit) {
