@@ -45,7 +45,8 @@ const msgs = {
   not_implemented_yet: "This functionality has not been implemented yet.",
   syntax_check_successful: "Syntax check successful. No errors detected.",
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
-  error_checking_syntax: "Could not check syntax. Please try again later."
+  error_checking_syntax: "Could not check syntax. Please try again later.",
+  submission_failed: "Submission failed: %message%"
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -627,8 +628,7 @@ class Communicator {
       showAlert(getString(msgs.error_saving_files));
       return;
     }
-    const data = await response.json();
-    window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
+    return await response.json();
   }
 
   async checkSyntax() {
@@ -768,7 +768,7 @@ class Toolbar {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
-    this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    this.submitButton.addEventListener("click", () => this.submitFiles(fileBuilder.files));
     if (this.syntaxButton) {
       this.syntaxButton.addEventListener("click", () => this.checkSyntax());
     }
@@ -779,6 +779,29 @@ class Toolbar {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
     }
+  }
+
+  submitFiles(files) {
+    communicator.submitFiles(files).then(result => {
+      if (!result) {
+        return;
+      }
+      if (result.success) {
+        console.log(result);
+        if (result.num_submissions && result.submission_limit) {
+          this.updateSubmitButton(result.num_submissions, result.submission_limit);
+        }
+        window.location.assign(SOLUTIONS_LIST_URL);
+      } else if (result.reason) {
+        showAlert(getString(msgs.submission_failed, result.reason));
+      }
+    });
+  }
+
+  updateSubmitButton(currentSubmissions, maxSubmissions) {
+    this.submitButton.innerText = `Submit (${currentSubmissions}/${maxSubmissions})`;
+    this.submitButton.setAttribute(CURRENT_SUBMITS_DATA_KEY, currentSubmissions);
+    this.submitButton.setAttribute(MAX_SUBMITS_DATA_KEY, maxSubmissions);
   }
 
   checkSyntax() {
