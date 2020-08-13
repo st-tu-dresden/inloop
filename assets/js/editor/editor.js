@@ -5,6 +5,7 @@ const GET_LAST_CHECKPOINT_URL = script.getAttribute("data-get-last-checkpoint-ur
 const CSRF_TOKEN = script.getAttribute("data-csrf-token");
 const SOLUTIONS_EDITOR_URL = script.getAttribute("data-solutions-editor-url");
 const SOLUTIONS_LIST_URL = script.getAttribute("data-solutions-list-url");
+const SYNTAX_CHECK_URL = script.getAttribute("data-syntax-check-url");
 const EDITOR_TABBAR_FILES_ID = "editor-tabbar-files";
 const EDITOR_ID = "editor-content";
 const BTN_SAVE_ID = "toolbar-btn--save";
@@ -19,6 +20,9 @@ const DEADLINE_ID = "task-deadline";
 const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
 const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
 const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
+const CONSOLE_CONTAINER_ID = "console";
+const CONSOLE_CONTENT_ID = "console-content";
+const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
 
 const msgs = {
   try_again_later: "Please try again later.",
@@ -36,6 +40,9 @@ const msgs = {
   error_saving_files: "Error occured: Could not save files.",
   deadline_expired: "Deadline expired",
   not_implemented_yet: "This functionality has not been implemented yet.",
+  syntax_check_successful: "Syntax check successful. No errors detected.",
+  syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
+  error_checking_syntax: "Could not check syntax. Please try again later."
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -577,7 +584,7 @@ class Communicator {
     };
     const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig);
     if (response.status !== 200) {
-      alert(getString(msgs.error_saving_files));
+      showAlert(getString(msgs.error_saving_files));
       return;
     }
     const data = await response.json();
@@ -614,11 +621,90 @@ class Communicator {
     };
     const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
     if (response.status !== 200) {
-      alert(getString(msgs.error_saving_files));
+      showAlert(getString(msgs.error_saving_files));
       return;
     }
     const data = await response.json();
     window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
+  }
+
+  async checkSyntax() {
+    if (!SYNTAX_CHECK_URL) return;
+    const payload = {
+      files: fileBuilder.files.map((file) => {
+        return { name: file.fileName, contents: file.fileContent };
+      }),
+    };
+    const requestConfig = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+    const response = await fetch(SYNTAX_CHECK_URL, requestConfig);
+    if (response.status !== 200) {
+      showAlert(getString(msgs.error_checking_syntax));
+      return;
+    }
+    return await response.json();
+  }
+}
+
+class SyntaxCheckConsole {
+  constructor() {
+    this.consoleContainerElement = document.getElementById(CONSOLE_CONTAINER_ID);
+    this.consoleContentElement = document.getElementById(CONSOLE_CONTENT_ID);
+    this.consoleHideBtn = document.getElementById(CONSOLE_HIDE_BUTTON_ID);
+    this.consoleHideBtn.addEventListener("click", () => this.show(false));
+  }
+
+  show(show) {
+    this.consoleContainerElement.style.display = show ? "block" : "none";
+    tabBar.editor.editor.resize();
+  }
+
+  createOutputElement(err) {
+    const strong = (text) => {
+      const strong = document.createElement("strong");
+      strong.textContent = text;
+      return strong;
+    }
+    const capitalize = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
+    const p = document.createElement("p");
+
+    let className;
+    if (err.type == "error") {
+      className = "error";
+    } else if (err.type == "warning") {
+      className = "warning";
+    }
+
+    p.append(strong(capitalize(err.type)));
+    p.append(" in line ");
+    p.append(strong(err.line));
+    p.append(" of ");
+    p.append(strong(err.file));
+    p.append(": ");
+    p.append(document.createTextNode(err.message));
+
+    className && (p.className = `console-content--${className}`);
+    return p;
+  }
+
+  setContent(checkResult) {
+    const p = document.createElement("p");
+    while (this.consoleContentElement.firstChild) {
+      this.consoleContentElement.removeChild(this.consoleContentElement.firstChild);
+    }
+    p.textContent = checkResult.success
+      ? getString(msgs.syntax_check_successful)
+      : getString(msgs.syntax_check_failed, checkResult.diagnostics.length);
+    this.consoleContentElement.appendChild(p);
+    checkResult.diagnostics.forEach((err) =>
+      this.consoleContentElement.appendChild(this.createOutputElement(err))
+    );
+    tabBar.editor.editor.resize();
   }
 }
 
@@ -627,6 +713,7 @@ let hashComparator;
 let tabBar;
 let toolbar;
 let communicator = new Communicator();
+let syntaxCheckConsole = new SyntaxCheckConsole();
 
 // Prevent CTRL+S (CMD+S on Mac) and add
 // our custom event handler
@@ -655,7 +742,6 @@ function showConfirmDialog(text, callback) {
 function showAlert(text) {
   window.alert(text);
 }
-
 class Toolbar {
   constructor(
     deadlineId,
@@ -678,11 +764,11 @@ class Toolbar {
   init() {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
-    this.syntaxButton.addEventListener("click", () =>
-      showAlert(getString(msgs.not_implemented_yet))
-    );
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
     this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    if (this.syntaxButton) {
+      this.syntaxButton.addEventListener("click", () => this.checkSyntax());
+    }
     this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
     this.switchToEditorButton.disabled = true;
@@ -690,6 +776,14 @@ class Toolbar {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
     }
+  }
+
+  checkSyntax() {
+    communicator.checkSyntax().then((result) => {
+      if (!result) return;
+      syntaxCheckConsole.show(true);
+      syntaxCheckConsole.setContent(result);
+    });
   }
 
   startDeadlineCounter() {
@@ -732,7 +826,7 @@ class Toolbar {
   }
 
   setSyntaxButtonEnabled(enable) {
-    this.syntaxButton.disabled = !enable;
+    this.syntaxButton && (this.syntaxButton.disabled = !enable);
   }
 
   setSaveButtonEnabled(enable) {

@@ -180,21 +180,47 @@ main > div:last-child {
   display: none;
 }
 
+#console h3 {
+  font-size: 1.2rem;
+  margin: .8rem 0 .6rem 0;
+  font-weight: bold;
+}
+
 #console > div:first-child {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-#console > div:last-child {
-  background: #111;
+#console-content {
+  background: #333;
   border-radius: 4px;
   max-height: 30vh;
+  min-height: 20vh;
   margin-bottom: 1rem;
-  padding: .8rem;
+  padding: .2rem 0;
   font-family: monospace;
-  color: lightgreen;
+  color: white;
   overflow-y: auto;
+}
+
+#console-content > p:first-child {
+  font-weight: bold;
+}
+
+#console-content > p {
+  padding: .6rem .8rem;
+  margin: 0 0 .2rem 0;
+}
+
+.console-content--warning {
+  background-color: rgba(255, 210, 77, .1);
+  color: rgb(255, 210, 77);
+}
+
+.console-content--error {
+  background-color: rgba(255, 102, 102, .1);
+  color: rgb(255, 206, 206)
 }
 
 /* Dropzone Style */
