@@ -23,10 +23,12 @@ const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
 const CONSOLE_CONTAINER_ID = "console";
 const CONSOLE_CONTENT_ID = "console-content";
 const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
+const CURRENT_SUBMITS_DATA_KEY = "data-current-submissions";
+const MAX_SUBMITS_DATA_KEY = "data-submission-limit";
+const NO_SUBMISSION_LIMIT = -1;
 
 const msgs = {
   try_again_later: "Please try again later.",
-  upload_failed: "Upload failed.",
   duplicate_filename:
     'A file with the name "%filename%" already exists.\nPlease choose another filename.',
   invalid_filename:
@@ -37,12 +39,16 @@ const msgs = {
   missing_es6_support:
     "Your browser does not support ECMAScript 6. Please update or change your browser to use the editor.",
   error_loading_files: "Error occured: Could not load saved files from server.",
-  error_saving_files: "Error occured: Could not save files.",
+  error_save: "Could not save files.\n%message%",
   deadline_expired: "Deadline expired",
   not_implemented_yet: "This functionality has not been implemented yet.",
   syntax_check_successful: "Syntax check successful. No errors detected.",
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
-  error_checking_syntax: "Could not check syntax. Please try again later."
+  error_checking_syntax: "Could not check syntax. Please try again later.",
+  error_submit: "Submission failed.\n%message%",
+  error_save_before_submit:
+    "Submission failed. Could not save files before submitting.\n%message%",
+  error_unknown: "Unknown error"
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -566,7 +572,7 @@ class Communicator {
    * The current editor state is stored as a checkpoint
    * via AJAX in the backend.
    */
-  async saveFiles() {
+  async saveFiles(saveBeforeSubmit = false) {
     const checksum = hashComparator.computeHash(fileBuilder.files);
     const payload = {
       checksum: checksum,
@@ -582,17 +588,30 @@ class Communicator {
       },
       body: JSON.stringify(payload),
     };
-    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig);
-    if (response.status !== 200) {
-      showAlert(getString(msgs.error_saving_files));
+    let errorMsg = "";
+    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig).catch(
+      (error) => (errorMsg = error)
+    );
+    if (!response.status || response.status !== 200) {
+      showAlert(
+        getString(
+          saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save,
+          errorMsg || `${response.status} ${response.statusText}`
+        )
+      );
       return;
     }
     const data = await response.json();
     if (data.success) {
       hashComparator.updateHash(checksum);
       hashComparator.lookForChanges(fileBuilder.files);
+    } else {
+      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save));
+      return;
     }
-    return data;
+    if (saveBeforeSubmit) {
+      return data;
+    }
   }
 
   /**
@@ -602,9 +621,8 @@ class Communicator {
    * @param {Array} files - The files to be uploaded.
    */
   async submitFiles(files) {
-    const saveResult = await this.saveFiles();
+    const saveResult = await this.saveFiles(true);
     if (!saveResult || !saveResult.success) {
-      showAlert(getString(msgs.upload_failed));
       return;
     }
     const payload = { uploads: {} };
@@ -619,13 +637,17 @@ class Communicator {
       },
       body: JSON.stringify(payload),
     };
-    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
-    if (response.status !== 200) {
-      showAlert(getString(msgs.error_saving_files));
+    let errorMsg = "";
+    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig).catch(
+      (error) => (errorMsg = error)
+    );
+    if (!response.status || response.status !== 200) {
+      showAlert(
+        getString(msgs.error_submit, errorMsg || `${response.status} ${response.statusText}`)
+      );
       return;
     }
-    const data = await response.json();
-    window.location.assign(data.success ? SOLUTIONS_LIST_URL : SOLUTIONS_EDITOR_URL);
+    return await response.json();
   }
 
   async checkSyntax() {
@@ -669,7 +691,7 @@ class SyntaxCheckConsole {
       const strong = document.createElement("strong");
       strong.textContent = text;
       return strong;
-    }
+    };
     const capitalize = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
     const p = document.createElement("p");
 
@@ -765,7 +787,7 @@ class Toolbar {
     this.saveButton.addEventListener("click", () => communicator.saveFiles());
     this.saveButton.addEventListener("click", () => tabBar.editor.focus());
     this.addFileButton.addEventListener("click", () => tabBar.createNewFile());
-    this.submitButton.addEventListener("click", () => communicator.submitFiles(fileBuilder.files));
+    this.submitButton.addEventListener("click", () => this.submitFiles(fileBuilder.files));
     if (this.syntaxButton) {
       this.syntaxButton.addEventListener("click", () => this.checkSyntax());
     }
@@ -776,6 +798,30 @@ class Toolbar {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
     }
+  }
+
+  submitFiles(files) {
+    communicator.submitFiles(files).then((result) => {
+      if (!result) {
+        return;
+      }
+      if (result.success) {
+        if (result.skip_redirect && result.num_submissions && result.submission_limit) {
+          this.updateSubmitButton(result.num_submissions, result.submission_limit);
+        } else {
+          window.location.assign(SOLUTIONS_LIST_URL);
+        }
+      } else {
+        showAlert(getString(msgs.error_submit, result.reason || msgs.error_unknown));
+      }
+    });
+  }
+
+  updateSubmitButton(currentSubmissions, maxSubmissions) {
+    this.submitButton.innerText = `Submit (${currentSubmissions}/${maxSubmissions})`;
+    this.submitButton.setAttribute(CURRENT_SUBMITS_DATA_KEY, currentSubmissions);
+    this.submitButton.setAttribute(MAX_SUBMITS_DATA_KEY, maxSubmissions);
+    this.setSubmitButtonEnabled(currentSubmissions < maxSubmissions);
   }
 
   checkSyntax() {
@@ -822,7 +868,10 @@ class Toolbar {
   }
 
   setSubmitButtonEnabled(enable) {
-    this.submitButton.disabled = !enable;
+    const maxSubmissions = parseInt(this.submitButton.getAttribute(MAX_SUBMITS_DATA_KEY));
+    const currentSubmissions = parseInt(this.submitButton.getAttribute(CURRENT_SUBMITS_DATA_KEY));
+    const maySubmit = maxSubmissions == NO_SUBMISSION_LIMIT || currentSubmissions < maxSubmissions;
+    this.submitButton.disabled = !(maySubmit && enable);
   }
 
   setSyntaxButtonEnabled(enable) {
