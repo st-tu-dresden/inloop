@@ -40,14 +40,14 @@ const msgs = {
   missing_es6_support:
     "Your browser does not support ECMAScript 6. Please update or change your browser to use the editor.",
   error_loading_files: "Error occured: Could not load saved files from server.",
-  error_saving_files: "Error occured: Could not save files.",
+  error_saving_files: "Could not save files.\n%message%",
   deadline_expired: "Deadline expired",
   not_implemented_yet: "This functionality has not been implemented yet.",
   syntax_check_successful: "Syntax check successful. No errors detected.",
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
   error_checking_syntax: "Could not check syntax. Please try again later.",
-  submission_failed: "Submission failed: %message%",
-  submission_failed_unknown: "Submission failed due to an unknown reason."
+  error_submit: "Submission failed.\n%message%",
+  error_save_before_submit: "Submission failed. Could not save files before submitting.\n%message%"
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -571,7 +571,7 @@ class Communicator {
    * The current editor state is stored as a checkpoint
    * via AJAX in the backend.
    */
-  async saveFiles() {
+  async saveFiles(saveBeforeSubmit = false) {
     const checksum = hashComparator.computeHash(fileBuilder.files);
     const payload = {
       checksum: checksum,
@@ -587,17 +587,23 @@ class Communicator {
       },
       body: JSON.stringify(payload),
     };
-    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig);
-    if (response.status !== 200) {
-      showAlert(getString(msgs.error_saving_files));
+    let errorMsg = "";
+    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig).catch((error) => errorMsg = error);
+    if (!response.status || response.status !== 200) {
+      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_saving_files, errorMsg || `${response.status} ${response.statusText}`));
       return;
     }
     const data = await response.json();
     if (data.success) {
       hashComparator.updateHash(checksum);
       hashComparator.lookForChanges(fileBuilder.files);
+    } else {
+      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_saving_files));
+      return;
     }
-    return data;
+    if (saveBeforeSubmit) {
+      return data;
+    }
   }
 
   /**
@@ -607,9 +613,8 @@ class Communicator {
    * @param {Array} files - The files to be uploaded.
    */
   async submitFiles(files) {
-    const saveResult = await this.saveFiles();
+    const saveResult = await this.saveFiles(true);
     if (!saveResult || !saveResult.success) {
-      showAlert(getString(msgs.submission_failed_unknown));
       return;
     }
     const payload = { uploads: {} };
@@ -624,9 +629,10 @@ class Communicator {
       },
       body: JSON.stringify(payload),
     };
-    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
-    if (response.status !== 200) {
-      showAlert(getString(msgs.submission_failed_unknown));
+    let errorMsg = "";
+    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig).catch((error) => errorMsg = error);
+    if (!response.status || response.status !== 200) {
+      showAlert(getString(msgs.error_submit, errorMsg || `${response.status} ${response.statusText}`));
       return;
     }
     return await response.json();
@@ -794,11 +800,11 @@ class Toolbar {
           window.location.assign(SOLUTIONS_LIST_URL);
         }
       } else if (result.reason) {
-        showAlert(getString(msgs.submission_failed, result.reason));
+        showAlert(getString(msgs.error_submit, result.reason));
       } else {
-        showAlert(getString(msgs.submission_failed_unknown));
+        showAlert(getString(msgs.error_submit));
       }
-    }).catch(error => showAlert(error));
+    });
   }
 
   updateSubmitButton(currentSubmissions, maxSubmissions) {
