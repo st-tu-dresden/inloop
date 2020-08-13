@@ -46,7 +46,8 @@ const msgs = {
   syntax_check_failed: "Syntax check failed. %amount% errors/warnings detected.",
   error_checking_syntax: "Could not check syntax. Please try again later.",
   error_submit: "Submission failed.\n%message%",
-  error_save_before_submit: "Submission failed. Could not save files before submitting.\n%message%"
+  error_save_before_submit:
+    "Submission failed. Could not save files before submitting.\n%message%",
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -587,9 +588,16 @@ class Communicator {
       body: JSON.stringify(payload),
     };
     let errorMsg = "";
-    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig).catch((error) => errorMsg = error);
+    const response = await fetch(SAVE_CHECKPOINT_URL, requestConfig).catch(
+      (error) => (errorMsg = error)
+    );
     if (!response.status || response.status !== 200) {
-      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save, errorMsg || `${response.status} ${response.statusText}`));
+      showAlert(
+        getString(
+          saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save,
+          errorMsg || `${response.status} ${response.statusText}`
+        )
+      );
       return;
     }
     const data = await response.json();
@@ -629,9 +637,13 @@ class Communicator {
       body: JSON.stringify(payload),
     };
     let errorMsg = "";
-    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig).catch((error) => errorMsg = error);
+    const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig).catch(
+      (error) => (errorMsg = error)
+    );
     if (!response.status || response.status !== 200) {
-      showAlert(getString(msgs.error_submit, errorMsg || `${response.status} ${response.statusText}`));
+      showAlert(
+        getString(msgs.error_submit, errorMsg || `${response.status} ${response.statusText}`)
+      );
       return;
     }
     return await response.json();
@@ -678,7 +690,7 @@ class SyntaxCheckConsole {
       const strong = document.createElement("strong");
       strong.textContent = text;
       return strong;
-    }
+    };
     const capitalize = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
     const p = document.createElement("p");
 
@@ -788,7 +800,7 @@ class Toolbar {
   }
 
   submitFiles(files) {
-    communicator.submitFiles(files).then(result => {
+    communicator.submitFiles(files).then((result) => {
       if (!result) {
         return;
       }
@@ -858,7 +870,7 @@ class Toolbar {
   setSubmitButtonEnabled(enable) {
     const maxSubmissions = parseInt(this.submitButton.getAttribute(MAX_SUBMITS_DATA_KEY));
     const currentSubmissions = parseInt(this.submitButton.getAttribute(CURRENT_SUBMITS_DATA_KEY));
-    const maySubmit = (maxSubmissions == NO_SUBMISSION_LIMIT) || (currentSubmissions < maxSubmissions);
+    const maySubmit = maxSubmissions == NO_SUBMISSION_LIMIT || currentSubmissions < maxSubmissions;
     this.submitButton.disabled = !(maySubmit && enable);
   }
 
