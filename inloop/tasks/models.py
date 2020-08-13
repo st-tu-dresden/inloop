@@ -1,5 +1,6 @@
 import itertools
 import re
+from datetime import timedelta
 
 from django.db import models
 from django.db.models.expressions import Value
@@ -114,8 +115,11 @@ class Task(models.Model):
 
     @property
     def is_expired(self):
-        """Return True if the task has passed its optional deadline."""
-        return self.deadline and timezone.now() > self.deadline
+        """Return True if the task has passed its optional deadline and the tolerance."""
+        if self.deadline:
+            tolerance = timedelta(seconds=config.DEADLINE_TOLERANCE)
+            return timezone.now() > (self.deadline + tolerance)
+        return False
 
     def is_completed_by(self, user):
         return self.id in Task.objects.completed_by(user).values_list('id', flat=True)

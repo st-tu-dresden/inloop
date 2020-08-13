@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.utils import timezone
 
@@ -23,9 +25,41 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
         self.assertTrue(self.published_task1.is_published)
         self.assertFalse(self.unpublished_task1.is_published)
 
-    def test_is_expired(self):
+    def test_is_not_expired_when_no_deadline(self):
         self.assertFalse(self.published_task1.is_expired)
         self.assertFalse(self.unpublished_task1.is_expired)
+
+    def test_is_expired_with_no_tolerance(self):
+        now = timezone.now()
+        task = Task.objects.create(
+            title='Test Task',
+            category=self.category1,
+            pubdate=now,
+            deadline=(now - timedelta(seconds=1))
+        )
+        self.assertTrue(task.is_expired)
+
+    @override_config(DEADLINE_TOLERANCE=30)
+    def test_is_expired_with_tolerance(self):
+        now = timezone.now()
+        task = Task.objects.create(
+            title='Test Task',
+            category=self.category1,
+            pubdate=now,
+            deadline=(now - timedelta(seconds=31))
+        )
+        self.assertTrue(task.is_expired)
+
+    @override_config(DEADLINE_TOLERANCE=30)
+    def test_is_not_expired_with_tolerance(self):
+        now = timezone.now()
+        task = Task.objects.create(
+            title='Test Task',
+            category=self.category1,
+            pubdate=now,
+            deadline=(now - timedelta(seconds=29))
+        )
+        self.assertFalse(task.is_expired)
 
     def test_is_completed_by(self):
         Solution.objects.create(author=self.bob, task=self.published_task1)
