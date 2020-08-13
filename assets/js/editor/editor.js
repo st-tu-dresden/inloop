@@ -48,6 +48,7 @@ const msgs = {
   error_submit: "Submission failed.\n%message%",
   error_save_before_submit:
     "Submission failed. Could not save files before submitting.\n%message%",
+  error_unknown: "Unknown error"
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -810,10 +811,8 @@ class Toolbar {
         } else {
           window.location.assign(SOLUTIONS_LIST_URL);
         }
-      } else if (result.reason) {
-        showAlert(getString(msgs.error_submit, result.reason));
       } else {
-        showAlert(getString(msgs.error_submit));
+        showAlert(getString(msgs.error_submit, result.reason || msgs.error_unknown));
       }
     });
   }
