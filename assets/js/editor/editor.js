@@ -609,7 +609,7 @@ class Communicator {
   async submitFiles(files) {
     const saveResult = await this.saveFiles();
     if (!saveResult || !saveResult.success) {
-      showAlert(getString(msgs.upload_failed));
+      showAlert(getString(msgs.submission_failed_unknown));
       return;
     }
     const payload = { uploads: {} };
@@ -626,7 +626,7 @@ class Communicator {
     };
     const response = await fetch(SOLUTIONS_EDITOR_URL, requestConfig);
     if (response.status !== 200) {
-      showAlert(getString(msgs.error_saving_files));
+      showAlert(getString(msgs.submission_failed_unknown));
       return;
     }
     return await response.json();
