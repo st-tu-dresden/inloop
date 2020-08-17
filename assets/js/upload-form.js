@@ -7,8 +7,10 @@ function displayText(files) {
   return "";
 }
 
-document.getElementById("upload-btn").addEventListener("change", function () {
-  document.getElementById("submit").submit();
+document.getElementById("submit-button").style.display = "none";
+
+document.getElementById("file-input").addEventListener("change", function () {
+  document.getElementById("file-upload-form").submit();
 });
 
 

@@ -128,10 +128,16 @@ code {
 /* @end */
 
 /* Upload form */
-#upload-btn {
+#file-input {
   opacity: 0;
   filter: alpha(opacity=0);
   cursor: pointer;
+}
+
+#file-upload-form > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 0;
 }
 
 /* @begin solution list view styles */
