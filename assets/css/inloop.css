@@ -129,8 +129,10 @@ code {
 
 /* Upload form */
 #file-input {
-  opacity: 0;
-  filter: alpha(opacity=0);
+  width: 100%;
+  padding: 5px;
+  border: 2px dashed #3867d6;
+  color: #666;
   cursor: pointer;
 }
 
@@ -303,24 +305,6 @@ a {
 
 code {
   color: #3867d6;
-}
-
-/* Dropzone Style */
-.upload-drop-zone {
-  height: 200px;
-  border-width: 2px;
-  margin-bottom: 20px;
-}
-
-.upload-drop-zone {
-  color: #ccc;
-  border: dashed #3867d6;
-  line-height: 200px;
-  text-align: center
-}
-.upload-drop-zone.drop {
-  color: #222;
-  border-color: #222;
 }
 
 .full {
