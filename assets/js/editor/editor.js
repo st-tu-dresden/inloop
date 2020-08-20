@@ -26,7 +26,7 @@ const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
 const CURRENT_SUBMITS_DATA_KEY = "data-current-submissions";
 const MAX_SUBMITS_DATA_KEY = "data-submission-limit";
 const NO_SUBMISSION_LIMIT = -1;
-
+const EDITOR_LOOK_FOR_CHANGES_OFFSET = 1000;
 const msgs = {
   try_again_later: "Please try again later.",
   duplicate_filename:
@@ -48,7 +48,7 @@ const msgs = {
   error_submit: "Submission failed.\n%message%",
   error_save_before_submit:
     "Submission failed. Could not save files before submitting.\n%message%",
-  error_unknown: "Unknown error"
+  error_unknown: "Unknown error",
 };
 
 const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
@@ -283,9 +283,11 @@ class TabBar {
     this.tabs = [];
     this.tabId = 0;
     this.editor = new InloopEditor();
-    this.editor.addOnChangeListener(function () {
-      hashComparator.lookForChanges(fileBuilder.files);
-    });
+    const debouncedLookForChanges = debounce(
+      () => hashComparator.lookForChanges(fileBuilder.files),
+      EDITOR_LOOK_FOR_CHANGES_OFFSET
+    );
+    this.editor.addOnChangeListener(debouncedLookForChanges);
     this.renameFileButton = document.getElementById(BTN_RENAME_FILE_ID);
     this.deleteFileButton = document.getElementById(BTN_DELETE_FILE_ID);
     this.renameFileButton.addEventListener("click", () => this.renameFile());
@@ -891,6 +893,19 @@ class Toolbar {
     document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = isEditor ? "none" : "block";
     if (!isEditor) tabBar.editor.focus();
   }
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return (...args) => {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 function init() {
