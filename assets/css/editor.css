@@ -129,14 +129,15 @@ main > div:last-child {
   background: #eee;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   margin-bottom: .6rem;
   padding-right: .6rem;
-  height: 2.2rem;
 }
 
-#editor-tabbar > div {
+#editor-tabbar > div:last-child {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: .4rem;
 }
 
 #editor-tabbar button:hover,
@@ -145,12 +146,13 @@ main > div:last-child {
 }
 
 #editor-tabbar-files {
-  flex: auto;
+  flex-wrap: wrap;  
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: row;
   list-style: none;
+  margin-bottom: -2px;
 }
 
 #editor-tabbar-files > li {
@@ -158,10 +160,11 @@ main > div:last-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: .6rem .6rem .4rem .6rem;
+  padding: .4rem .6rem .2rem .6rem;
   cursor: pointer;
   border-bottom: 3px solid;
   border-bottom-color: #dfdfdf;
+  margin-bottom: 2px;
 }
 
 #editor-tabbar-files > li.active,
