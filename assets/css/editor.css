@@ -70,7 +70,6 @@ main > div:last-child {
 }
 
 .toolbar > div:first-child > * {
-  line-height: 1;
   font-weight: bold;
   font-size: 1.2rem;
   margin: 0;
@@ -78,6 +77,10 @@ main > div:last-child {
 
 .deadline-attention {
   color: red;
+}
+
+#toolbar-buttons--right .glyphicon {
+  margin-right: .3rem;
 }
 
 main {
@@ -246,3 +249,19 @@ main > div:last-child {
   filter: alpha(opacity=0);
   cursor: pointer;
 }
+
+
+@media only screen and (max-width: 1200px) {
+  #toolbar-buttons--right .glyphicon {
+    display: none;
+  }
+
+  .toolbar > div:first-child > * {
+    font-size: 1rem;
+  }
+
+  .toolbar button.btn {
+    padding: 4px 8px 2px 8px;
+  }
+}
+
