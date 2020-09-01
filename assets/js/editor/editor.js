@@ -896,14 +896,16 @@ class Toolbar {
 }
 
 function debounce(func, wait) {
-  let timeout;
+  let timeout = null;
   return () => {
     const later = () => {
       clearTimeout(timeout);
       func();
     };
 
-    clearTimeout(timeout);
+    if (timeout != null) {
+      clearTimeout(timeout);
+    }
     timeout = setTimeout(later, wait);
   };
 }
