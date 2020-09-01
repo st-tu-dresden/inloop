@@ -308,7 +308,6 @@ def get_last_checkpoint(request, slug):
         })
     return JsonResponse({
         'success': True,
-        'checksum': str(last_checkpoint.md5),
         'files': checkpoint_files,
     })
 

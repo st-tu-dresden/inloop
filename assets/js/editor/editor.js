@@ -49,8 +49,6 @@ const msgs = {
   error_unknown: "Unknown error",
 };
 
-const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-
 function getString(string, extra) {
   if (extra) {
     return string.replace(/\%.*\%/, extra);
@@ -138,10 +136,11 @@ class HashComparator {
    * Creates a hash comparator.
    *
    * @constructor
-   * @param {string} hash - The SHA1 hash of the files as an initial value.
+   * @param {Array} files - The initial files to create the hash for.
+   * @param {function} hasChangesCallback - Function to call when changes are detected.
    */
-  constructor(hash, hasChangesCallback) {
-    this.hash = hash;
+  constructor(files, hasChangesCallback) {
+    this.hash = this.computeHash(files);
     this.hasChangesCallback = hasChangesCallback;
   }
 
@@ -930,13 +929,11 @@ function init() {
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
     let files = [];
-    let checksum = EMPTY_STRING_SHA1;
     if (data && data.success && data.files) {
       files = data.files.map((file) => new File(file.name, file.contents));
-      checksum = data.checksum;
     }
     fileBuilder = new FileBuilder(files);
-    hashComparator = new HashComparator(checksum, (hasChanges) =>
+    hashComparator = new HashComparator(files, (hasChanges) =>
       toolbar.setSaveButtonEnabled(hasChanges)
     );
     hashComparator.lookForChanges(files);
