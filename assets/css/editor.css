@@ -231,6 +231,7 @@ main > div:last-child {
 
 #manual-upload-file-input {
   width: 100%;
+  height: 10vh;
   padding: 5px;
   border: 2px dashed #3867d6;
   color: #666;
