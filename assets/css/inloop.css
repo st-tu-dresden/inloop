@@ -131,6 +131,7 @@ code {
 #file-input {
   width: 100%;
   padding: 5px;
+  height: 10vh;
   border: 2px dashed #3867d6;
   color: #666;
   cursor: pointer;

@@ -17,8 +17,6 @@ const BTN_SYNTAX_ID = "toolbar-btn--syntax";
 const BTN_SWITCH_TO_EDITOR = "toolbar-switch-btn--editor";
 const BTN_SWITCH_TO_UPLOAD = "toolbar-switch-btn--manual";
 const DEADLINE_ID = "task-deadline";
-const MANUAL_UPLOAD_INPUT_ID = "manual-upload-file-input";
-const MANUAL_UPLOAD_FORM_ID = "manual-upload-form";
 const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
 const CONSOLE_CONTAINER_ID = "console";
 const CONSOLE_CONTENT_ID = "console-content";
@@ -920,11 +918,6 @@ function debounce(func, wait) {
 }
 
 function init() {
-  const uploadInputElement = document.getElementById(MANUAL_UPLOAD_INPUT_ID);
-  uploadInputElement &&
-    uploadInputElement.addEventListener("change", function () {
-      document.getElementById(MANUAL_UPLOAD_FORM_ID).submit();
-    });
 
   toolbar = new Toolbar(
     DEADLINE_ID,
