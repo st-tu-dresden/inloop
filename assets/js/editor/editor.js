@@ -26,7 +26,7 @@ const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
 const CURRENT_SUBMITS_DATA_KEY = "data-current-submissions";
 const MAX_SUBMITS_DATA_KEY = "data-submission-limit";
 const NO_SUBMISSION_LIMIT = -1;
-const EDITOR_LOOK_FOR_CHANGES_OFFSET = 1000;
+const EDITOR_LOOK_FOR_CHANGES_OFFSET = 300;
 const msgs = {
   try_again_later: "Please try again later.",
   duplicate_filename:
