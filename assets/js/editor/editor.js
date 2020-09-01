@@ -131,14 +131,14 @@ class Tab {
 }
 
 /**
- * Represents a hash based comparator for files.
+ * Implements change detection for files with the SHA1 hash function from Rusha.js.
  */
 class HashComparator {
   /**
    * Creates a hash comparator.
    *
    * @constructor
-   * @param {string} hash - The MD5 hash of the files as an initial value.
+   * @param {string} hash - The SHA1 hash of the files as an initial value.
    */
   constructor(hash, hasChangesCallback) {
     this.hash = hash;
@@ -146,20 +146,20 @@ class HashComparator {
   }
 
   /**
-   * Updates the MD5 hash.
+   * Updates the SHA1 hash.
    *
-   * @param {string} hash - The new MD5 hash.
+   * @param {string} hash - The new SHA1 hash.
    */
   updateHash(hash) {
     this.hash = hash;
   }
 
   /**
-   * Computes the MD5 hash of the given files by
+   * Computes the SHA1 hash of the given files by
    * file content and file name concatenation.
    *
-   * @param {Array} files - The files on which the MD5 hash should be computed.
-   * @returns {string} - The computed MD5 hash.
+   * @param {Array} files - The files on which the SHA1 hash should be computed.
+   * @returns {string} - The computed SHA1 hash.
    */
   computeHash(files) {
     const hasher = Rusha.createHash();
@@ -171,10 +171,10 @@ class HashComparator {
   }
 
   /**
-   * Compute the MD5 hash of the given files and compare
+   * Compute the SHA1 hash of the given files and compare
    * it with the stored (class attribute) hash.
    *
-   * @param {Array} files - The files on which the MD5 hash should be computed.
+   * @param {Array} files - The files on which the SHA1 hash should be computed.
    * @returns {boolean} - Returns true if and only if the given files are unchanged.
    */
   lookForChanges(files) {
@@ -553,7 +553,7 @@ class Communicator {
   constructor() {}
 
   /**
-   * Loads files and their MD5 hash from the last checkpoint asynchronously.
+   * Loads files and their SHA1 hash from the last checkpoint asynchronously.
    * Returns a promise containing the response's content.
    * If request fails, alert is shown and nothin is returned.
    */
