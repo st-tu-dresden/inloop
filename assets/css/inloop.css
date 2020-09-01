@@ -128,10 +128,18 @@ code {
 /* @end */
 
 /* Upload form */
-#upload-btn {
-  opacity: 0;
-  filter: alpha(opacity=0);
+#file-input {
+  width: 100%;
+  padding: 5px;
+  border: 2px dashed #3867d6;
+  color: #666;
   cursor: pointer;
+}
+
+#file-upload-form > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 0;
 }
 
 /* @begin solution list view styles */
@@ -297,24 +305,6 @@ a {
 
 code {
   color: #3867d6;
-}
-
-/* Dropzone Style */
-.upload-drop-zone {
-  height: 200px;
-  border-width: 2px;
-  margin-bottom: 20px;
-}
-
-.upload-drop-zone {
-  color: #ccc;
-  border: dashed #3867d6;
-  line-height: 200px;
-  text-align: center
-}
-.upload-drop-zone.drop {
-  color: #222;
-  border-color: #222;
 }
 
 .full {

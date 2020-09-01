@@ -1,20 +1,25 @@
 {% extends "tasks/base.html" %}
 {% load static %}
+{% load solution_extras %}
 
 {% block title %}Solution upload - {{ task.title }} {% endblock %}
 
 {% block tab_content %}
 {% if not task.is_expired %}
 <p class="help-block">
-  To upload more than one file, just click <i>Choose files...</i> and mark multiple files by holding
-  down <kbd>ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload.
+  You can add one or more files by dragging them to the area marked in blue. Alternatively, you can use the button inside the box to select the files via a selection dialog. Multiple files can be selected by holding
+  down <kbd>ctrl</kbd> (or <kbd>cmd</kbd> on a Mac) while you click the files you want to upload. <strong><u>Attention</u>: Do not forget to press the <i>Submit</i> button after having selected the files.</strong>
 </p>
-<form id="submit" class="form-inline" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
+<form id="file-upload-form" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
       method="post" enctype="multipart/form-data">
   {% csrf_token %}
-  <div class="form-group upload-drop-zone" style="position: relative; width: 100%">
-    <input id="upload-btn" class="full" style="position: absolute; z-index: 1;" name="uploads" type="file" multiple>
-    <label for="upload-btn">Choose files...</label>
+  <div class="form-group" style="position: relative; width: 100%">
+    <label for="file-input">Add your <code>.java</code> files here:</label>
+    <input id="file-input" class="upload-drop-zone" name="uploads" type="file" multiple>
+  </div>
+  <div>
+    {# progress_info is created in the parent template #}
+    <button id="submit-button" class="btn btn-default" type="submit" {% if progress_info.limit_reached %} disabled{% endif %}>Submit{{ progress_info|format_if:' ({current}/{limit})' }}</button>
   </div>
 </form>
 {% else %}
@@ -22,8 +27,4 @@
   The deadline for this task has passed. You cannot submit new solutions.
 </p>
 {% endif %}
-{% endblock %}
-
-{% block extrabody %}
-<script src="{% static 'js/upload-form.js' %}"></script>
 {% endblock %}
