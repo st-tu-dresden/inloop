@@ -251,10 +251,6 @@ class Checkpoint(models.Model):
     """
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    md5 = models.CharField(
-        'MD5 Hash of all associated checkpoint files', max_length=40
-    )
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -262,11 +258,10 @@ class Checkpoint(models.Model):
 
     class Manager(models.Manager):
         def save_checkpoint(self, json_data, task, user):
-            checksum = json_data['checksum']
             files = json_data['files']
             with atomic():
                 self.filter(author=user, task=task).delete()
-                checkpoint = self.create(author=user, task=task, md5=checksum)
+                checkpoint = self.create(author=user, task=task)
                 CheckpointFile.objects.bulk_create([
                     CheckpointFile(
                         checkpoint=checkpoint,

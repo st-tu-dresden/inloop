@@ -573,7 +573,6 @@ class Communicator {
   async saveFiles(saveBeforeSubmit = false) {
     const checksum = hashComparator.computeHash(fileBuilder.files);
     const payload = {
-      checksum: checksum,
       files: fileBuilder.files.map((file) => {
         return { name: file.fileName, contents: file.fileContent };
       }),
