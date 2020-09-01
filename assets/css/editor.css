@@ -229,30 +229,19 @@ main > div:last-child {
   color: rgb(255, 206, 206)
 }
 
-/* Dropzone Style */
-.upload-drop-zone {
-  height: 200px;
-  border-width: 2px;
-  margin-bottom: 20px;
-}
-
-.upload-drop-zone {
-  color: #ccc;
-  border: dashed #3867d6;
-  line-height: 200px;
-  text-align: center
-}
-.upload-drop-zone.drop {
-  color: #222;
-  border-color: #222;
-}
-
 #manual-upload-file-input {
-  opacity: 0;
-  filter: alpha(opacity=0);
+  width: 100%;
+  padding: 5px;
+  border: 2px dashed #3867d6;
+  color: #666;
   cursor: pointer;
 }
 
+#manual-upload-form > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 0;
+}
 
 @media only screen and (max-width: 1200px) {
   #toolbar-buttons--right .glyphicon {
@@ -267,4 +256,3 @@ main > div:last-child {
     padding: 4px 8px 2px 8px;
   }
 }
-
