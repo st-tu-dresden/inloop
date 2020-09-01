@@ -1,7 +1,7 @@
 import os
 import string
-from io import BytesIO
 from contextlib import suppress
+from io import BytesIO
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
