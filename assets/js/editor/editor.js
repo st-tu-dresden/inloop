@@ -141,7 +141,6 @@ class HashComparator {
    * @param {string} hash - The MD5 hash of the files as an initial value.
    */
   constructor(hash, hasChangesCallback) {
-    this.rusha = new Rusha();
     this.hash = hash;
     this.hasChangesCallback = hasChangesCallback;
   }
@@ -163,12 +162,12 @@ class HashComparator {
    * @returns {string} - The computed MD5 hash.
    */
   computeHash(files) {
-    let concatenatedContents = "";
-    for (let f of files) {
-      concatenatedContents += f.fileContent;
-      concatenatedContents += f.fileName;
+    const hasher = Rusha.createHash();
+    for (let file of files) {
+      hasher.update(file.fileContent);
+      hasher.update(file.fileName);
     }
-    return this.rusha.digest(concatenatedContents);
+    return hasher.digest('hex');
   }
 
   /**
