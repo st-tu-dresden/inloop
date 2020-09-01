@@ -309,27 +309,24 @@ def get_last_checkpoint(request, slug):
 
 @login_required
 def save_checkpoint(request, slug):
-    if not request.method == 'POST':
+    if request.method != 'POST':
         return JsonResponse({'success': False})
-
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-
     try:
         Checkpoint.objects.save_checkpoint(data, task, request.user)
     except KeyError:
         return JsonResponse({'success': False})
-
     return JsonResponse({'success': True})
 
 
 @csrf_exempt
 def mock_syntax_check(request):
     """Temporary endpoint that outputs some fake syntax check results."""
-    if not request.method == 'POST':
+    if request.method != 'POST':
         return JsonResponse({'success': False})
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
         return JsonResponse({

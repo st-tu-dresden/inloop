@@ -892,10 +892,10 @@ class Toolbar {
 
 /**
  * Forces the function `func` to wait a certain amount of time (`wait`) before running again.
- * It limits the number of times `func` is called.  
+ * It limits the number of times `func` is called.
  * @param {function} func - Function which should be called after the given timeout
  * @param {number} wait - Time in ms after which func should be called
- * 
+ *
  * @returns {funcion} Closure function which sets a timeout handing over a function, which
  * clears that timeout and calls `func`.
  */
