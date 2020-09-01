@@ -261,20 +261,6 @@ class Checkpoint(models.Model):
         ordering = ['created_at']
 
     class Manager(models.Manager):
-        def sync_checkpoint(self, json_data, task, user):
-            md5 = json_data.get('md5')
-            files = json_data.get('files')
-            if md5 is None or files is None or len(md5) != 40:
-                raise ValueError('Invalid JSON')
-            with atomic():
-                self.filter(author=user, task=task).delete()
-                checkpoint = self.create(author=user, task=task, md5=md5)
-                CheckpointFile.objects.bulk_create([
-                    CheckpointFile(checkpoint=checkpoint, name=name, contents=contents)
-                    for name, contents in files.items()
-                ])
-            return checkpoint
-
         def save_checkpoint(self, json_data, task, user):
             checksum = json_data['checksum']
             files = json_data['files']
