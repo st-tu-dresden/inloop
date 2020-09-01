@@ -2,8 +2,10 @@ import json
 import logging
 from json import JSONDecodeError
 
+from django.db.transaction import atomic
+
 from inloop.gitload.signals import repository_loaded
-from inloop.tasks.models import Category, Task
+from inloop.tasks.models import Category, FileTemplate, Task
 
 LOG = logging.getLogger(__name__)
 
@@ -37,13 +39,22 @@ def load_task(task_file):
 
 def update_or_create(task_dir, meta, task_text):
     category, _ = Category.objects.get_or_create(name=meta['category'])
-    Task.objects.update_or_create(system_name=task_dir.name, defaults={
+    task, _ = Task.objects.update_or_create(system_name=task_dir.name, defaults={
         'category': category,
         'title': meta['title'],
         'pubdate': meta['pubdate'],
         'deadline': meta.get('deadline'),
         'description': task_text,
     })
+    load_task_templates(task, task_dir)
+
+
+@atomic
+def load_task_templates(task, task_dir):
+    FileTemplate.objects.filter(task=task).delete()
+    for template in task_dir.glob('templates/*.java'):
+        with open(template) as stream:
+            FileTemplate.objects.create(name=template.name, task=task, contents=stream.read())
 
 
 def parse_metafile(task_dir):
