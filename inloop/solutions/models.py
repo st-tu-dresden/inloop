@@ -44,6 +44,22 @@ def get_upload_path(obj, filename):
     })
 
 
+def get_prunable_solutions(*, users, tasks, max_keep):
+    """
+    Yield querysets of solutions that can be deleted if only max_keep solutions
+    should be retained per user and task of the given user and task querysets.
+
+    `max_keep` should be chosen such that it is not smaller than the current
+    highest submission limit for a task, because this breaks some assumptions
+    made about counting the submissions.
+    """
+    for user in users:
+        for task in tasks:
+            solutions = Solution.objects.filter(task=task, author=user)
+            solutions_to_keep = solutions.order_by('-id')[:max_keep]
+            yield solutions.exclude(id__in=solutions_to_keep)
+
+
 def get_archive_upload_path(solution, filename):
     """
     Return an upload file path of the archive
