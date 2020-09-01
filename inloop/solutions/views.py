@@ -26,7 +26,7 @@ from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_a
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
-from inloop.tasks.models import Task
+from inloop.tasks.models import FileTemplate, Task
 
 logger = logging.getLogger(__name__)
 
@@ -298,18 +298,13 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 def get_last_checkpoint(request, slug):
     task = get_object_or_404(Task.objects.published(), slug=slug)
     last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
-    if not last_checkpoint:
-        return JsonResponse({'success': True, 'files': None})
-    checkpoint_files = []
-    for checkpoint_file in last_checkpoint.checkpointfile_set.order_by('id'):
-        checkpoint_files.append({
-            'name': checkpoint_file.name,
-            'contents': checkpoint_file.contents
-        })
-    return JsonResponse({
-        'success': True,
-        'files': checkpoint_files,
-    })
+    queryset = []
+    if last_checkpoint:
+        queryset = last_checkpoint.checkpointfile_set.order_by('id')
+    if not queryset:
+        queryset = FileTemplate.objects.filter(task=task)
+    files = [{'name': _file.name, 'contents': _file.contents} for _file in queryset]
+    return JsonResponse({'success': True, 'files': files})
 
 
 @login_required
