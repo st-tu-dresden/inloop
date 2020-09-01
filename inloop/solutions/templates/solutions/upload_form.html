@@ -17,8 +17,8 @@
     <label for="file-input">Add your <code>.java</code> files here:</label>
     <input id="file-input" class="upload-drop-zone" name="uploads" type="file" multiple>
   </div>
-  {% get_submission_progress task as progress_info %}
   <div>
+    {# progress_info is created in the parent template #}
     <button id="submit-button" class="btn btn-default" type="submit" {% if progress_info.limit_reached %} disabled{% endif %}>Submit{{ progress_info|format_if:' ({current}/{limit})' }}</button>
   </div>
 </form>
