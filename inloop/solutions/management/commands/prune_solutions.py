@@ -11,7 +11,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--max_keep',
-            help='Number of solutions to retain.',
+            help='Number of solutions to retain (default is 10).',
             default=10,
             type=int
         )
