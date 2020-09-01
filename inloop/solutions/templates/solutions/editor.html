@@ -88,7 +88,7 @@
       <form id="manual-upload-form" action="{% url 'solutions:upload' task.slug %}" accept-charset="utf-8"
             method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="form-group" style="position: relative; width: 100%">
+        <div class="form-group">
           <label for="manual-upload-file-input">Add your <code>.java</code> files here:</label>
           <input id="manual-upload-file-input" class="upload-drop-zone" name="uploads" type="file" multiple>
         </div>
