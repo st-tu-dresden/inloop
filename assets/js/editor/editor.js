@@ -475,7 +475,7 @@ class InloopEditor {
       enableLiveAutocompletion: false,
       fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
       fontSize: "10.5pt",
-      value: "// Select or create files to continue",
+      value: "// You can create new files with 'Add file'",
     };
   }
 
