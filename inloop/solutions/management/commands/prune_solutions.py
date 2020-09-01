@@ -29,4 +29,7 @@ class Command(BaseCommand):
         for solutions in solutions_to_delete:
             num_deleted += solutions.count()
             solutions.delete()
-        self.stdout.write(f'Pruned {num_deleted} solution(s).')
+        self.stdout.write(f'Pruned {num_deleted} solution(s) from the database.')
+        self.stdout.write('If the unix uid that ran this command was not the owner of the ')
+        self.stdout.write('MEDIA_ROOT/solutions folder, you need to review and delete files ')
+        self.stdout.write('manually using the unreferenced_files management command.')
