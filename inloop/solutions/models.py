@@ -1,6 +1,7 @@
 import os
 import string
 from io import BytesIO
+from contextlib import suppress
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -191,7 +192,8 @@ def auto_delete_archive_on_delete(sender, instance, **kwargs):
     Removes archive from filesystem when corresponding Solution object is deleted.
     """
     if instance.archive and os.path.isfile(instance.archive.path):
-        os.remove(instance.archive.path)
+        with suppress(PermissionError):
+            os.remove(instance.archive.path)
 
 
 class SolutionFile(models.Model):
@@ -235,7 +237,8 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     Removes file from filesystem when corresponding Solution object is deleted.
     """
     if instance.file and os.path.isfile(instance.file.path):
-        os.remove(instance.file.path)
+        with suppress(PermissionError):
+            os.remove(instance.file.path)
 
 
 class Checkpoint(models.Model):
