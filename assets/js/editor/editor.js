@@ -49,8 +49,6 @@ const msgs = {
   error_unknown: "Unknown error",
 };
 
-const EMPTY_STRING_SHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-
 function getString(string, extra) {
   if (extra) {
     return string.replace(/\%.*\%/, extra);
@@ -131,51 +129,51 @@ class Tab {
 }
 
 /**
- * Represents a hash based comparator for files.
+ * Implements change detection for files with the SHA1 hash function from Rusha.js.
  */
 class HashComparator {
   /**
    * Creates a hash comparator.
    *
    * @constructor
-   * @param {string} hash - The MD5 hash of the files as an initial value.
+   * @param {Array} files - The initial files to create the hash for.
+   * @param {function} hasChangesCallback - Function to call when changes are detected.
    */
-  constructor(hash, hasChangesCallback) {
-    this.rusha = new Rusha();
-    this.hash = hash;
+  constructor(files, hasChangesCallback) {
+    this.hash = this.computeHash(files);
     this.hasChangesCallback = hasChangesCallback;
   }
 
   /**
-   * Updates the MD5 hash.
+   * Updates the SHA1 hash.
    *
-   * @param {string} hash - The new MD5 hash.
+   * @param {string} hash - The new SHA1 hash.
    */
   updateHash(hash) {
     this.hash = hash;
   }
 
   /**
-   * Computes the MD5 hash of the given files by
+   * Computes the SHA1 hash of the given files by
    * file content and file name concatenation.
    *
-   * @param {Array} files - The files on which the MD5 hash should be computed.
-   * @returns {string} - The computed MD5 hash.
+   * @param {Array} files - The files on which the SHA1 hash should be computed.
+   * @returns {string} - The computed SHA1 hash.
    */
   computeHash(files) {
-    let concatenatedContents = "";
-    for (let f of files) {
-      concatenatedContents += f.fileContent;
-      concatenatedContents += f.fileName;
+    const hasher = Rusha.createHash();
+    for (let file of files) {
+      hasher.update(file.fileContent);
+      hasher.update(file.fileName);
     }
-    return this.rusha.digest(concatenatedContents);
+    return hasher.digest('hex');
   }
 
   /**
-   * Compute the MD5 hash of the given files and compare
+   * Compute the SHA1 hash of the given files and compare
    * it with the stored (class attribute) hash.
    *
-   * @param {Array} files - The files on which the MD5 hash should be computed.
+   * @param {Array} files - The files on which the SHA1 hash should be computed.
    * @returns {boolean} - Returns true if and only if the given files are unchanged.
    */
   lookForChanges(files) {
@@ -554,7 +552,7 @@ class Communicator {
   constructor() {}
 
   /**
-   * Loads files and their MD5 hash from the last checkpoint asynchronously.
+   * Loads files and their SHA1 hash from the last checkpoint asynchronously.
    * Returns a promise containing the response's content.
    * If request fails, alert is shown and nothin is returned.
    */
@@ -575,7 +573,6 @@ class Communicator {
   async saveFiles(saveBeforeSubmit = false) {
     const checksum = hashComparator.computeHash(fileBuilder.files);
     const payload = {
-      checksum: checksum,
       files: fileBuilder.files.map((file) => {
         return { name: file.fileName, contents: file.fileContent };
       }),
@@ -895,10 +892,10 @@ class Toolbar {
 
 /**
  * Forces the function `func` to wait a certain amount of time (`wait`) before running again.
- * It limits the number of times `func` is called.  
+ * It limits the number of times `func` is called.
  * @param {function} func - Function which should be called after the given timeout
  * @param {number} wait - Time in ms after which func should be called
- * 
+ *
  * @returns {funcion} Closure function which sets a timeout handing over a function, which
  * clears that timeout and calls `func`.
  */
@@ -931,13 +928,11 @@ function init() {
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
     let files = [];
-    let checksum = EMPTY_STRING_SHA1;
     if (data && data.success && data.files) {
       files = data.files.map((file) => new File(file.name, file.contents));
-      checksum = data.checksum;
     }
     fileBuilder = new FileBuilder(files);
-    hashComparator = new HashComparator(checksum, (hasChanges) =>
+    hashComparator = new HashComparator(files, (hasChanges) =>
       toolbar.setSaveButtonEnabled(hasChanges)
     );
     hashComparator.lookForChanges(files);

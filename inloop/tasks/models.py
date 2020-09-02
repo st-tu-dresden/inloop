@@ -154,3 +154,14 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class FileTemplate(models.Model):
+    """File to be used as a starting point when working on a task."""
+
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    contents = models.TextField()
+
+    def __str__(self):
+        return self.name

@@ -7,7 +7,9 @@ from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.encoding import force_text
 
-from inloop.solutions.models import Solution, SolutionFile, create_archive
+from inloop.solutions.models import (Checkpoint, CheckpointFile, Solution,
+                                     SolutionFile, create_archive)
+from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
 from tests.accounts.mixins import AccountsData, SimpleAccountsData
@@ -242,3 +244,63 @@ class SolutionFileViewTest(AccountsData, TaskData, TestCase):
             'pk': self.solution_file.pk
         }))
         self.assertEqual(response.status_code, 302)
+
+
+class GetCheckpointTests(AccountsData, TaskData, TestCase):
+    urlname = 'solutions:get-last-checkpoint'
+
+    def setUp(self):
+        self.assertTrue(self.client.login(username='alice', password='secret'))
+
+    def test_returns_dont_cache_headers(self):
+        response = self.client.get(reverse(self.urlname, kwargs={
+            'slug': self.published_task1.slug,
+        }))
+        self.assertIn('Cache-Control', response)
+        self.assertIn('no-cache', response['Cache-Control'])
+        self.assertIn('max-age=0', response['Cache-Control'])
+
+    def test_returns_empty_filelist(self):
+        response = self.client.get(reverse(self.urlname, kwargs={
+            'slug': self.published_task1.slug,
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'success': True,
+            'files': [],
+        })
+
+    def test_returns_saved_files(self):
+        # also create a template to ensure it is ignored
+        FileTemplate.objects.create(task=self.published_task1, name='Foo.java', contents='Foo')
+        checkpoint = Checkpoint.objects.create(author=self.alice, task=self.published_task1)
+        # create files in reverse alphabetical order
+        # to test ordering by id instead of name
+        CheckpointFile.objects.create(checkpoint=checkpoint, name='B.java', contents='B')
+        CheckpointFile.objects.create(checkpoint=checkpoint, name='A.java', contents='A')
+        response = self.client.get(reverse(self.urlname, kwargs={
+            'slug': self.published_task1.slug,
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'success': True,
+            'files': [
+                {'name': 'B.java', 'contents': 'B'},
+                {'name': 'A.java', 'contents': 'A'},
+            ],
+        })
+
+    def test_returns_file_templates(self):
+        FileTemplate.objects.create(task=self.published_task1, name='Foo.java', contents='Foo')
+        FileTemplate.objects.create(task=self.published_task1, name='Bar.java', contents='Bar')
+        response = self.client.get(reverse(self.urlname, kwargs={
+            'slug': self.published_task1.slug,
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'success': True,
+            'files': [
+                {'name': 'Foo.java', 'contents': 'Foo'},
+                {'name': 'Bar.java', 'contents': 'Bar'},
+            ],
+        })

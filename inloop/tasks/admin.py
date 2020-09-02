@@ -1,9 +1,10 @@
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
+from django.utils.text import Truncator
 
 from inloop.grading.admin import PlagiarismAdmin
 from inloop.grading.copypasta import jplag_check_async
-from inloop.tasks.models import Category, Task
+from inloop.tasks.models import Category, FileTemplate, Task
 
 User = get_user_model()
 
@@ -53,3 +54,13 @@ class CategoryAdmin(PlagiarismAdmin):
         self.message_user(request, msg, messages.SUCCESS)
 
     jplag_check_category.short_description = 'Check selected categories for plagiarism'
+
+
+@admin.register(FileTemplate)
+class FileTemplateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'task', 'contents_preview']
+    list_filter = ['task']
+    search_fields = ['name', 'contents']
+
+    def contents_preview(self, file):
+        return Truncator(file.contents).chars(40)

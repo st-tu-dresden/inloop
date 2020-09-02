@@ -26,7 +26,7 @@ from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_a
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
-from inloop.tasks.models import Task
+from inloop.tasks.models import FileTemplate, Task
 
 logger = logging.getLogger(__name__)
 
@@ -297,49 +297,36 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 @login_required
 def get_last_checkpoint(request, slug):
     task = get_object_or_404(Task.objects.published(), slug=slug)
-
-    checkpoints = Checkpoint.objects.filter(author=request.user, task=task)
-    if not checkpoints.exists():
-        return JsonResponse({'success': True, 'files': None})
-
-    last_checkpoint = checkpoints.last()
-    checkpoint_files = []
-    for checkpoint_file in last_checkpoint.checkpointfile_set.order_by('id'):
-        checkpoint_files.append({
-            'name': checkpoint_file.name,
-            'contents': checkpoint_file.contents
-        })
-
-    return JsonResponse({
-        'success': True,
-        'checksum': str(last_checkpoint.md5),
-        'files': checkpoint_files,
-    })
+    last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
+    queryset = []
+    if last_checkpoint:
+        queryset = last_checkpoint.checkpointfile_set.order_by('id')
+    if not queryset:
+        queryset = FileTemplate.objects.filter(task=task)
+    files = [{'name': _file.name, 'contents': _file.contents} for _file in queryset]
+    return JsonResponse({'success': True, 'files': files})
 
 
 @login_required
 def save_checkpoint(request, slug):
-    if not request.method == 'POST':
+    if request.method != 'POST':
         return JsonResponse({'success': False})
-
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-
     try:
         Checkpoint.objects.save_checkpoint(data, task, request.user)
     except KeyError:
         return JsonResponse({'success': False})
-
     return JsonResponse({'success': True})
 
 
 @csrf_exempt
 def mock_syntax_check(request):
     """Temporary endpoint that outputs some fake syntax check results."""
-    if not request.method == 'POST':
+    if request.method != 'POST':
         return JsonResponse({'success': False})
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
         return JsonResponse({
