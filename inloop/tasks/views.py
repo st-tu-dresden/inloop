@@ -79,7 +79,7 @@ class TaskDetailView(LoginRequiredMixin, View):
     """
 
     def get(self, request, slug_or_name):
-        qs = Task.objects.published()
+        qs = Task.objects.visible(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
         except ObjectDoesNotExist:

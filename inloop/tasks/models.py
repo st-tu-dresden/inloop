@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import Group
 from django.db import models
+from django.db.models import Q
 from django.db.models.expressions import Value
 from django.db.models.fields import BooleanField
 from django.utils import timezone
@@ -42,6 +43,9 @@ class TaskQuerySet(models.QuerySet):
 
     def published(self):
         return self.filter(pubdate__lt=timezone.now())
+
+    def visible(self, *, user):
+        return self.published().filter(Q(group__in=user.groups.all()) | Q(group=None))
 
     def completed_by(self, user):
         return self.filter(solution__passed=True, solution__author=user).distinct()

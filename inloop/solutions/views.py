@@ -50,8 +50,8 @@ class SubmissionError(Exception):
 
 
 class SolutionSubmitMixin:
-    def get_task(self, slug):
-        task = get_object_or_404(Task.objects.published(), slug=slug)
+    def get_task(self, request, slug):
+        task = get_object_or_404(Task.objects.visible(user=request.user), slug=slug)
         if task.is_expired:
             raise SubmissionError('The deadline for this task has passed.')
         return task
@@ -96,7 +96,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         Show the side-by-side editor for the task referenced by slug or system_name.
         Requests with a non-slug url are redirected to their slug url equivalent.
         """
-        qs = Task.objects.published()
+        qs = Task.objects.visible(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
         except ObjectDoesNotExist:
@@ -114,7 +114,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         """
         try:
             # if it's a name and not a slug, get_task(…) will make it fail with 404
-            task = self.get_task(slug_or_name)
+            task = self.get_task(request, slug_or_name)
             json_data = json.loads(request.body)
             uploads = json_data.get('uploads', {})
             files = [
@@ -144,7 +144,7 @@ class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
 
     def post(self, request, slug):
         try:
-            task = self.get_task(slug)
+            task = self.get_task(request, slug)
             files = request.FILES.getlist('uploads', default=[])
             self.submit(files, request.user, task)
         except SubmissionError as error:
