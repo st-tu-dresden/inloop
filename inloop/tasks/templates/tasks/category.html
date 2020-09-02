@@ -20,7 +20,9 @@
       {% if have_deadlines %}
       <th>Deadline</th>
       {% endif %}
+      {% if show_progress %}
       <th>Completed</th>
+      {% endif %}
     </tr>
     </thead>
 
@@ -29,10 +31,11 @@
     {% for task in tasks %}
     <tr>
       <td>{{ task.title }} [<a href="{% url 'solutions:editor' task.slug %}">open</a> | <a href="{% url 'solutions:list' task.slug %}">my solutions</a>]</td>
-      <td>{% firstof task.pubdate|date:"d-m-Y" "-" %}</td>
+      <td>{% firstof task.pubdate|date:"d-m-Y H:i" "-" %}</td>
       {% if have_deadlines %}
-      <td>{% firstof task.deadline|date:"d-m-Y" "-"  %}</td>
+      <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
       {% endif %}
+      {% if show_progress %}
       <td>
       {% if task.completed %}
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -42,16 +45,18 @@
         <span class="sr-only">No</span>
       {% endif %}
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
 
     {% for task in unpublished_tasks %}
     <tr style="color: lightgrey;">
       <td>{{ task.title }}</td>
-      <td>{% firstof task.pubdate|date:"d-m-Y" "-" %}</td>
+      <td>{% firstof task.pubdate|date:"d-m-Y H:i" "-" %}</td>
       {% if have_deadlines %}
-      <td>{% firstof task.deadline|date:"d-m-Y" "-"  %}</td>
+      <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
       {% endif %}
+      {% if show_progress %}
       <td>
       {% if task.completed %}
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -61,6 +66,7 @@
         <span class="sr-only">No</span>
       {% endif %}
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
 

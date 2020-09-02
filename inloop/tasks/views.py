@@ -18,12 +18,17 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic import View
 
+from constance import config
+
 from inloop.common.sendfile import sendfile
 from inloop.tasks.models import Category, Task
 
 
 @login_required
 def index(request):
+    exam_category_slug = config.EXAM_CATEGORY_SLUG
+    if exam_category_slug:
+        return category(request, exam_category_slug)
     return TemplateResponse(request, 'tasks/index.html', {
         'categories': Category.objects.order_by('display_order', 'name'),
     })
@@ -46,6 +51,7 @@ def category(request, slug):
         'tasks': tasks,
         'unpublished_tasks': unpublished_tasks,
         'have_deadlines': have_deadlines,
+        'show_progress': config.IMMEDIATE_FEEDBACK,
     })
 
 

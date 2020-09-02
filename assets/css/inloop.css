@@ -160,6 +160,10 @@ code {
 	content: "\e014"
 }
 
+.solution-saved:before {
+	content: "\e173"
+}
+
 .solution-error:before,
 .solution-killed:before,
 .solution-lost:before,
