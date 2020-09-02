@@ -1,4 +1,5 @@
 {% extends "tasks/base.html" %}
+{% load cache %}
 {% load markdown %}
 {% load static %}
 
@@ -6,7 +7,9 @@
 {% block body_classes %}autolink{% endblock %}
 {% block tab_content %}
 <h1>{{ task.title }}</h1>
+{% cache 120 task_description task.slug %}
 {{ task.description|markdown }}
+{% endcache %}
 {% endblock %}
 
 {% block extrabody %}
