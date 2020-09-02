@@ -12,14 +12,14 @@ User = get_user_model()
 @admin.register(Task)
 class TaskAdmin(PlagiarismAdmin):
     fieldsets = [(None, {
-        'fields': ['slug', 'title', 'category', 'max_submissions']
+        'fields': ['slug', 'title', 'category', 'max_submissions', 'group']
     }), ('Date Information', {
         'fields': ['pubdate', 'deadline']
     }), ('Content', {
         'fields': ['description']
     })]
     list_display = ['title', 'category', 'pubdate', 'deadline']
-    list_filter = ['pubdate', 'deadline', 'category']
+    list_filter = ['pubdate', 'deadline', 'category', 'group']
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title', )}
     actions = PlagiarismAdmin.actions + ['jplag_check_tasks']

@@ -3,7 +3,7 @@ from datetime import timedelta
 from io import StringIO
 from unittest import mock
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.management import call_command
@@ -19,8 +19,6 @@ from inloop.accounts.models import (Course, StudentDetails,
 from inloop.accounts.tasks import autoprune_invalid_users
 
 from tests.accounts.mixins import SimpleAccountsData
-
-User = get_user_model()
 
 
 class AccountModelsTest(TestCase):
@@ -137,6 +135,35 @@ class PruneInvalidUsersTest(TestCase):
             autoprune_invalid_users.call_local()
         self.assertIn('Pruned 1 invalid account(s)', capture_logs.output[0])
         self.assertFalse(User.objects.filter(username='bob').exists())
+
+
+class AssignUsersTest(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.bob = User.objects.create_user('bob', 'bob@example.com', 'secret')
+        self.alice = User.objects.create_user('alice', 'alice@example.com', 'secret')
+        self.frank = User.objects.create_user('frank', 'frank@example.com', 'secret')
+
+    def test_initial_assign_to_group(self):
+        stdout = StringIO()
+        call_command('assign_groups', 'Group1', 'Group2', stdout=stdout)
+        self.assertEqual(1, self.bob.groups.count())
+        self.assertIn(self.bob.groups.first().name, ['Group1', 'Group2'])
+        self.assertEqual(1, self.alice.groups.count())
+        self.assertIn(self.alice.groups.first().name, ['Group1', 'Group2'])
+        self.assertEqual(1, self.frank.groups.count())
+        self.assertIn(self.frank.groups.first().name, ['Group1', 'Group2'])
+
+    def test_existing_assign_to_group(self):
+        self.bob.groups.add(Group.objects.create(name='Already assigned group'))
+        stdout = StringIO()
+        call_command('assign_groups', 'Group1', 'Group2', stdout=stdout)
+        self.assertEqual(1, self.bob.groups.count())
+        self.assertEqual(self.bob.groups.first().name, 'Already assigned group')
+        self.assertEqual(1, self.alice.groups.count())
+        self.assertIn(self.alice.groups.first().name, ['Group1', 'Group2'])
+        self.assertEqual(1, self.frank.groups.count())
+        self.assertIn(self.frank.groups.first().name, ['Group1', 'Group2'])
 
 
 class StudentDetailsFormTest(TestCase):

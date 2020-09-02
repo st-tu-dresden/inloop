@@ -24,24 +24,22 @@ from inloop.tasks.models import Category, Task
 
 @login_required
 def index(request):
-    categories = [
-        (category, category.completion_info(request.user))
-        for category in Category.objects.order_by('display_order', 'name')
-    ]
     return TemplateResponse(request, 'tasks/index.html', {
-        'categories': categories,
+        'categories': Category.objects.order_by('display_order', 'name'),
     })
 
 
 @login_required
 def category(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    tasks = category.task_set.published().completed_by_values(
-        request.user, order_by='pubdate'
-    )
-    unpublished_tasks = category.task_set.unpublished().completed_by_values(
-        request.user, order_by='pubdate'
-    )
+    tasks = category.task_set \
+        .published() \
+        .visible_by(user=request.user) \
+        .completed_by_values(request.user, order_by='pubdate')
+    unpublished_tasks = category.task_set \
+        .unpublished() \
+        .visible_by(user=request.user) \
+        .completed_by_values(request.user, order_by='pubdate')
     have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(request, 'tasks/category.html', {
         'category': category,
@@ -79,7 +77,7 @@ class TaskDetailView(LoginRequiredMixin, View):
     """
 
     def get(self, request, slug_or_name):
-        qs = Task.objects.published()
+        qs = Task.objects.published().visible_by(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
         except ObjectDoesNotExist:

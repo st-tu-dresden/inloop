@@ -2,7 +2,9 @@ import itertools
 import re
 from datetime import timedelta
 
+from django.contrib.auth.models import Group
 from django.db import models
+from django.db.models import Q
 from django.db.models.expressions import Value
 from django.db.models.fields import BooleanField
 from django.utils import timezone
@@ -41,6 +43,9 @@ class TaskQuerySet(models.QuerySet):
 
     def published(self):
         return self.filter(pubdate__lt=timezone.now())
+
+    def visible_by(self, *, user):
+        return self.filter(Q(group__in=user.groups.all()) | Q(group=None))
 
     def completed_by(self, user):
         return self.filter(solution__passed=True, solution__author=user).distinct()
@@ -104,6 +109,13 @@ class Task(models.Model):
         null=True,
         blank=True,
         help_text='Submission limit (per user, -1 means unlimited, null means default)'
+    )
+    group = models.ForeignKey(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text='Make the task only available to the chosen group, or all users if unset'
     )
 
     objects = TaskQuerySet.as_manager()
