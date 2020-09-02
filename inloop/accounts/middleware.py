@@ -1,6 +1,7 @@
 from django.db.models import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from constance import config
 
@@ -8,8 +9,14 @@ from constance import config
 class RequireOwnWorkDeclaration:
     def __init__(self, get_response):
         self.get_response = get_response
-        self.redirect_url = reverse('accounts:confirm_ownwork')
-        self.exclude_paths = [reverse('login'), reverse('logout'), self.redirect_url]
+
+    @cached_property
+    def redirect_url(self):
+        return reverse('accounts:confirm_ownwork')
+
+    @cached_property
+    def exclude_paths(self):
+        return [reverse('login'), reverse('logout'), self.redirect_url]
 
     def __call__(self, request):
         response = self.get_response(request)
