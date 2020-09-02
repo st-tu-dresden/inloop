@@ -63,7 +63,8 @@ class SolutionSubmitMixin:
             validate_filenames([file.name for file in files])
             self.check_submission_limit(author, task)
             solution = self.atomic_submit(files, author, task)
-            solution_submitted.send(sender=self.__class__, solution=solution)
+            if config.IMMEDIATE_FEEDBACK:
+                solution_submitted.send(sender=self.__class__, solution=solution)
         except ValidationError as error:
             raise SubmissionError(str(error))
         except IntegrityError:

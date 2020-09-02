@@ -16,6 +16,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
+from constance import config
 from huey.contrib.djhuey import db_task, lock_task
 
 from inloop.tasks.models import Task
@@ -143,14 +144,16 @@ class Solution(models.Model):
         """
         Query the status of this Solution.
 
-        Possible states are: success, failure, error, lost, killed, pending. State
-        `failure` means that a solution did not pass a test. In contrast to a
+        Possible states are: saved, success, failure, error, lost, killed, pending.
+        State `failure` means that a solution did not pass a test. In contrast to a
         `failure`, an `error` signals an internal, server-side bug or
         misconfiguration encountered during test execution.
 
         State `lost` means there was no response from the background queue
         after a reasonable amount of time.
         """
+        if not config.IMMEDIATE_FEEDBACK:
+            return 'saved'
         result = self.testresult_set.last()
         if result:
             return result.status()
