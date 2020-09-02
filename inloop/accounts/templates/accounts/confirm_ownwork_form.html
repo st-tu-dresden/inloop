@@ -12,7 +12,7 @@
 
 {% block content %}
 <div class="center-box-md">
-  <p>{{ intro_text|markdown }}</p>
+  {{ intro_text|markdown }}
   <form action="{% url 'accounts:confirm_ownwork' %}" method="post" accept-charset="utf-8">
     {% for form in forms %}
       {% include "includes/form.html" %}
