@@ -26,6 +26,9 @@ from inloop.tasks.models import Category, Task
 
 @login_required
 def index(request):
+    exam_category_slug = config.EXAM_CATEGORY_SLUG
+    if exam_category_slug:
+        return category(request, exam_category_slug)
     return TemplateResponse(request, 'tasks/index.html', {
         'categories': Category.objects.order_by('display_order', 'name'),
     })
