@@ -1,4 +1,5 @@
 from datetime import timedelta
+from random import choice
 
 from django.conf import settings
 from django.contrib import messages
@@ -49,6 +50,17 @@ def prune_invalid_users():
     )
     _, removals_by_type = invalid_users.delete()
     return removals_by_type.get(settings.AUTH_USER_MODEL, 0)
+
+
+def assign_to_groups(*, users, groups):
+    """Randomly assign the given groups to the given users if they not already have a group."""
+    num_assignments = 0
+    for user in users:
+        if user.groups.exists():
+            continue
+        user.groups.add(choice(groups))
+        num_assignments += 1
+    return num_assignments
 
 
 class Course(models.Model):
