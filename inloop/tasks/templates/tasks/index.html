@@ -9,73 +9,16 @@
   <li class="active">Tasks</li>
 </ol>
 
-{% if categories %}
-  <table class="table table-align-pretty">
-    <thead>
-    <tr>
-      <th>Category</th>
-      <th>Progress</th>
-      <th class="tasks-progressbar-col"></th>
-      <th>Completed</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    {% for category, category_data in categories %}
-    {% if category_data.num_published > 0 %}
-    <tr>
-      <td>
-        <a href="{% url 'tasks:category' category.slug %}">{{ category.name }}</a><br>
-        {{ category.description|markdown }}
-      </td>
-      <td>{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
-      <td>
-        <div class="progress">
-          <div class="progress-bar progress-bar-inloop" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
-              aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
-          </div><!--/.progress-bar-->
-        </div><!--/.progress-->
-      </td>
-      <td>
-      {% if category_data.is_completed %}
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-        <span class="sr-only">Yes</span>
-      {% else %}
-        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-        <span class="sr-only">No</span>
-      {% endif %}
-      </td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-
-    {% for category, category_data in categories %}
-    {% if category_data.num_published == 0 %}
-    <tr>
-      <td>
-        <p style="color: lightgrey">{{ category.name }}</p><br>
-        {{ category.description|markdown }}
-      </td>
-      <td style="color: lightgrey">{{ category_data.num_completed }} / {{ category_data.num_published }}</td>
-      <td>
-        <div style="color: lightgrey" class="progress">
-          <div class="progress-bar progress-bar-inloop" role="progressbar" aria-valuenow="{{ category_data.num_completed }}"
-              aria-valuemin="0" aria-valuemax="{{ category_data.num_published }}" style="width: {{ category_data.progress }}%;">
-          </div><!--/.progress-bar-->
-        </div><!--/.progress-->
-      </td>
-      <td>
-        <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-        <span class="sr-only">To be published</span>
-      </td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <div class="alert alert-info">There are currently no tasks in the system.</div>
-{% endif %}
-
+{% for category in categories %}
+<div class="category">
+  <h3 class="category-title"><a href="{% url 'tasks:category' category.slug %}">{{category.name}}</a>
+{% with num_tasks=category.task_set.published.count %}
+    <span class="category-info">({{ num_tasks }} task{{ num_tasks|pluralize }})</span></h3>
+{% endwith %}
+  <p class="category-description">{{ category.description|markdown }}</p>
+</div>
+{% empty %}
+<p>There are currently no tasks in the system.</p>
+{% endfor %}
 
 {% endblock %}
