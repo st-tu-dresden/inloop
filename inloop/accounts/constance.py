@@ -18,10 +18,23 @@ config['EMAIL_HELP_TEXT'] = ('', mark_safe(
 config['EMAIL_ERROR_MESSAGE'] = ('', mark_safe(
     "Form field error message in case <code>EMAIL_PATTERN</code> doesn't match."
 ))
+config['REQUIRE_OWNWORK_DECLARATION'] = (False, mark_safe(
+    'If checked, users need to confirm the own work declaration to proceed.'
+))
+config['OWNWORK_DECLARATION_INTRO'] = ('', mark_safe(
+    'Text that will be displayed above the own work confirmation form '
+    '(supports Markdown).'
+))
+config['OWNWORK_DECLARATION'] = ('', mark_safe(
+    'Text that will be displayed next to the own work confirmation checkbox '
+    '(supports Markdown).'
+))
 
 fieldsets = {
     'Signup form settings': ['SIGNUP_ALLOWED', 'EMAIL_PATTERN',
-                             'EMAIL_HELP_TEXT', 'EMAIL_ERROR_MESSAGE']
+                             'EMAIL_HELP_TEXT', 'EMAIL_ERROR_MESSAGE'],
+    'Own work declaration': ['REQUIRE_OWNWORK_DECLARATION', 'OWNWORK_DECLARATION_INTRO',
+                             'OWNWORK_DECLARATION']
 }
 
 fields = {

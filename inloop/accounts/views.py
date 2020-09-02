@@ -13,7 +13,8 @@ from django_registration.backends.activation.views import (ActivationView as Hma
                                                            RegistrationView as
                                                            HmacRegistrationView)
 
-from inloop.accounts.forms import SignupForm, StudentDetailsForm, UserChangeForm
+from inloop.accounts.forms import (ConfirmStudentDetailsForm, SignupForm,
+                                   StudentDetailsForm, UserChangeForm)
 from inloop.accounts.models import StudentDetails
 
 
@@ -66,8 +67,46 @@ class ProfileView(LoginRequiredMixin, View):
         return HttpResponseRedirect(self.success_url)
 
 
+class ConfirmOwnWorkView(LoginRequiredMixin, View):
+    template_name = 'accounts/confirm_ownwork_form.html'
+    success_url = reverse_lazy('tasks:index')
+
+    def get(self, request):
+        return TemplateResponse(request, self.template_name, context={
+            'forms': self.get_forms(),
+            'intro_text': config.OWNWORK_DECLARATION_INTRO,
+        })
+
+    def post(self, request):
+        forms = self.get_forms(data=request.POST)
+        if all(form.is_valid() for form in forms):
+            return self.forms_valid(forms)
+        return self.forms_invalid(forms)
+
+    def get_forms(self, data=None):
+        # StudentDetails may not yet exist for this user:
+        details = StudentDetails.objects.get_or_create(user=self.request.user)[0]
+        return [
+            UserChangeForm(instance=self.request.user, data=data),
+            ConfirmStudentDetailsForm(instance=details, data=data)
+        ]
+
+    def forms_invalid(self, forms):
+        return TemplateResponse(self.request, self.template_name, context={
+            'forms': forms,
+            'intro_text': config.OWNWORK_DECLARATION_INTRO,
+        })
+
+    def forms_valid(self, forms):
+        for form in forms:
+            form.save()
+        messages.success(self.request, 'Thanks! Your details have been saved successfully.')
+        return HttpResponseRedirect(self.success_url)
+
+
 password_change = PasswordChangeView.as_view()
 profile = ProfileView.as_view()
+confirm_ownwork = ConfirmOwnWorkView.as_view()
 
 
 class SignupView(HmacRegistrationView):
