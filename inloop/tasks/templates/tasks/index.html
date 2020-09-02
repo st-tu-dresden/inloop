@@ -15,7 +15,7 @@
 {% with num_tasks=category.task_set.published.count %}
     <span class="category-info">({{ num_tasks }} task{{ num_tasks|pluralize }})</span></h3>
 {% endwith %}
-  <p class="category-description">{{ category.description|markdown }}</p>
+  <div class="category-description">{{ category.description|markdown }}</div>
 </div>
 {% empty %}
 <p>There are currently no tasks in the system.</p>
