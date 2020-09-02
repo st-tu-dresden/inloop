@@ -18,6 +18,8 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic import View
 
+from constance import config
+
 from inloop.common.sendfile import sendfile
 from inloop.tasks.models import Category, Task
 
@@ -46,6 +48,7 @@ def category(request, slug):
         'tasks': tasks,
         'unpublished_tasks': unpublished_tasks,
         'have_deadlines': have_deadlines,
+        'show_progress': config.IMMEDIATE_FEEDBACK,
     })
 
 

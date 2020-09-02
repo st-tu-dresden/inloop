@@ -20,7 +20,9 @@
       {% if have_deadlines %}
       <th>Deadline</th>
       {% endif %}
+      {% if show_progress %}
       <th>Completed</th>
+      {% endif %}
     </tr>
     </thead>
 
@@ -33,6 +35,7 @@
       {% if have_deadlines %}
       <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
       {% endif %}
+      {% if show_progress %}
       <td>
       {% if task.completed %}
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -42,6 +45,7 @@
         <span class="sr-only">No</span>
       {% endif %}
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
 
@@ -52,6 +56,7 @@
       {% if have_deadlines %}
       <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
       {% endif %}
+      {% if show_progress %}
       <td>
       {% if task.completed %}
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -61,6 +66,7 @@
         <span class="sr-only">No</span>
       {% endif %}
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
 
