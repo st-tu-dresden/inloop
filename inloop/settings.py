@@ -62,12 +62,12 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'inloop.accounts.middleware.RequireOwnWorkDeclaration',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'inloop.accounts.middleware.RequireOwnWorkDeclaration',
 ]
 
 LOGIN_REDIRECT_URL = reverse_lazy('home')
