@@ -362,3 +362,11 @@ code {
   padding-top: 8px;
   top: 0;
 }
+
+.category {
+	padding: 0 10px;
+}
+
+.category-info {
+	font-size: 70%;
+}
