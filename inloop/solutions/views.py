@@ -51,7 +51,7 @@ class SubmissionError(Exception):
 
 class SolutionSubmitMixin:
     def get_task(self, request, slug):
-        task = get_object_or_404(Task.objects.visible(user=request.user), slug=slug)
+        task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
         if task.is_expired:
             raise SubmissionError('The deadline for this task has passed.')
         return task
@@ -96,7 +96,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         Show the side-by-side editor for the task referenced by slug or system_name.
         Requests with a non-slug url are redirected to their slug url equivalent.
         """
-        qs = Task.objects.visible(user=request.user)
+        qs = Task.objects.published().visible_by(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
         except ObjectDoesNotExist:

@@ -44,8 +44,8 @@ class TaskQuerySet(models.QuerySet):
     def published(self):
         return self.filter(pubdate__lt=timezone.now())
 
-    def visible(self, *, user):
-        return self.published().filter(Q(group__in=user.groups.all()) | Q(group=None))
+    def visible_by(self, *, user):
+        return self.filter(Q(group__in=user.groups.all()) | Q(group=None))
 
     def completed_by(self, user):
         return self.filter(solution__passed=True, solution__author=user).distinct()
