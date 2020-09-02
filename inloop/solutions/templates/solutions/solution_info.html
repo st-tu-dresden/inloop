@@ -1,0 +1,56 @@
+{% extends "base_site.html" %}
+
+{% load static %}
+
+{% block title %}Solution
+#{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# Breadcrumb #}
+{% with task=solution.task %}
+<ol class="breadcrumb colorful-nav">
+  <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
+  <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
+  <li><a href="{% url 'solutions:editor' task.slug %}">{{ task.title }}</a></li>
+  <li class="active">Solution
+#{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
+  </li>
+</ol>
+{% endwith %}
+{# /Breadcrumb #}
+
+{% if impersonate %}
+<div class="alert alert-info }}" role="alert">
+  {% with author=solution.author %}
+  You are viewing a solution authored by
+  <a href="mailto:{{ author.email }}">{% firstof author.get_full_name author.get_username %}</a>.
+  {% endwith %}
+</div>
+{% endif %}
+
+{% if files %}
+  <div class="list-group">
+  {% for file in files %}
+    <a class="list-group-item" href="{% url 'solutions:showfile' file.id %}">
+      <h4 class="list-group-item-heading">{{ file.name }}</h4>
+      <p class="list-group-item-text">{{ file.size|filesizeformat }}</p>
+    </a>
+  {% endfor %}
+  </div>
+{% else %}
+  <p>No files to show here.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'vendor/js/prism.js' %}"></script>
+<script src="{% static 'vendor/js/prism-java.min.js' %}"></script>
+<script src="{% static 'vendor/js/prism-line-numbers.min.js' %}"></script>
+{% endblock %}

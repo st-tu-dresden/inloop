@@ -234,6 +234,14 @@ class SolutionDetailView(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         solution = self.get_object(**kwargs)
 
+        if not config.IMMEDIATE_FEEDBACK:
+            context = {
+                'solution': solution,
+                'files': solution.solutionfile_set.all()
+            }
+            context.update(self.get_context_data())
+            return TemplateResponse(request, 'solutions/solution_info.html', context)
+
         if solution.status() == 'pending':
             messages.info(request, 'This solution is still being checked. Please try again later.')
             return redirect('solutions:list', slug=solution.task.slug)
