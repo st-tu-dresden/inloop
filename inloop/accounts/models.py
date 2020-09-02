@@ -90,6 +90,7 @@ class StudentDetails(models.Model):
         ]
     )
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)
+    ownwork_confirmed = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.user)
