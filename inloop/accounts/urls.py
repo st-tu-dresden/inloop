@@ -13,6 +13,7 @@ urlpatterns = [
 
     url(r'^profile/$', views.profile, name='profile'),
     url(r'^password/$', views.password_change, name='password_change'),
+    url(r'^confirm_ownwork/$', views.confirm_ownwork, name='confirm_ownwork'),
 
     url(r'^password_reset/$', views.password_reset, name='password_reset'),
     url(r'^password_reset_done/', views.password_reset_done, name='password_reset_done'),

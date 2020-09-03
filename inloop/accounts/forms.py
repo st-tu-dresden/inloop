@@ -61,6 +61,17 @@ class StudentDetailsForm(forms.ModelForm):
         fields = ['matnum', 'course']
 
 
+class ConfirmStudentDetailsForm(forms.ModelForm):
+    ownwork_confirmed = forms.BooleanField(
+        help_text=lambda: markdown(config.OWNWORK_DECLARATION),
+        required=True,
+    )
+
+    class Meta:
+        model = StudentDetails
+        fields = ['matnum', 'ownwork_confirmed']
+
+
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User

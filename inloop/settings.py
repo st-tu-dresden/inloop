@@ -67,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'inloop.accounts.middleware.RequireOwnWorkDeclaration',
 ]
 
 LOGIN_REDIRECT_URL = reverse_lazy('home')

@@ -13,6 +13,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from constance import config
+
 INCOMPLETE_HINT = (
     'Your user profile is incomplete. To ensure we can award bonus points to you, please '
     'set your name and matriculation number on <a href="%s">My Profile</a>.'
@@ -22,10 +24,11 @@ INCOMPLETE_HINT = (
 @receiver(user_logged_in, dispatch_uid='complete_profile_hint')
 def complete_profile_hint(sender, user, request, **kwargs):
     """Show logged in users a hint if they do not have a complete profile."""
-    if not user_profile_complete(user):
-        message = mark_safe(INCOMPLETE_HINT % reverse('accounts:profile'))
-        # fail_silently needs to be set for unit tests using RequestFactory
-        messages.warning(request, message, fail_silently=True)
+    if config.REQUIRE_OWNWORK_DECLARATION or user_profile_complete(user):
+        return
+    message = mark_safe(INCOMPLETE_HINT % reverse('accounts:profile'))
+    # fail_silently needs to be set for unit tests using RequestFactory
+    messages.warning(request, message, fail_silently=True)
 
 
 def user_profile_complete(user):
@@ -90,6 +93,7 @@ class StudentDetails(models.Model):
         ]
     )
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)
+    ownwork_confirmed = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.user)

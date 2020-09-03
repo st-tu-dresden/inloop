@@ -1,0 +1,25 @@
+{% extends 'base_site.html' %}
+{% load markdown %}
+
+{% block title %}Own work confirmation{% endblock %}
+
+{% block messages %}
+{{ block.super }}
+{% for form in forms %}
+  {% include "includes/form_message.html" %}
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="center-box-md">
+  {{ intro_text|markdown }}
+  <form action="{% url 'accounts:confirm_ownwork' %}" method="post" accept-charset="utf-8">
+    {% for form in forms %}
+      {% include "includes/form.html" %}
+    {% endfor %}
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" value="submit">Confirm</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
