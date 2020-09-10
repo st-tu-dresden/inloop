@@ -227,7 +227,7 @@ class SolutionFile(models.Model):
 
     @property
     def contents(self):
-        with open(self.absolute_path) as stream:
+        with open(self.absolute_path, errors='replace') as stream:
             return stream.read()
 
     def __str__(self):
