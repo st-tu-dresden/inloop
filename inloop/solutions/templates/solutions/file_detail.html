@@ -30,7 +30,7 @@
 {# /Breadcrumb #}
 
 {% if impersonate %}
-<div class="alert alert-info }}" role="alert">
+<div class="alert alert-info" role="alert">
   {% with author=solution.author %}
   You are viewing a file authored by
   <a href="mailto:{{ author.email }}">{% firstof author.get_full_name author.get_username %}</a>.
