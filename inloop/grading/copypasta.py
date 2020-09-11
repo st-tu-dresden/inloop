@@ -1,7 +1,5 @@
 """
 Plagiarism detection support using JPlag.
-
-Assumes that the JPlag JAR archive is on the CLASSPATH.
 """
 
 import re
