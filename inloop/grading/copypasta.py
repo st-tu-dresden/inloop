@@ -1,7 +1,5 @@
 """
 Plagiarism detection support using JPlag.
-
-Assumes that the JPlag JAR archive is on the CLASSPATH.
 """
 
 import re
@@ -44,7 +42,7 @@ def jplag_check_async(users, tasks):
     jplag_check(users, tasks)
 
 
-def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
+def jplag_check(users, tasks, min_similarity=None, result_dir=None):
     """
     Check solutions of the given users for the given tasks with JPlag.
 
@@ -59,6 +57,8 @@ def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_d
     Returns:
         A set containing the solutions that have been identified as plagiarism.
     """
+    if min_similarity is None:
+        min_similarity = settings.JPLAG_DEFAULT_SIMILARITY
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir)
         plagiarism_set = set()
@@ -87,6 +87,8 @@ def jplag_check_task(users, task, min_similarity, result_path):
     with TemporaryDirectory() as tmpdir:
         root_path = Path(tmpdir)
         last_solutions = get_last_solutions(users, task)
+        if len(last_solutions) < 2:
+            return set()
         prepare_directories(root_path, last_solutions)
         output = exec_jplag(min_similarity, root_path, result_path.joinpath(task.slug))
     return parse_output(output, min_similarity, last_solutions)
@@ -146,12 +148,10 @@ def exec_jplag(min_similarity, root_path, result_path):
     """
     Execute the JPlag Java program with the given parameters and return its output.
     """
-    args = ['java']
-    args += ['-cp', settings.JPLAG_JAR_PATH]
-    args += ['jplag.JPlag']
-    args += ['-vl']
-    args += ['-l', 'java17']
-    args += ['-m', f'{min_similarity}%']
-    args += ['-r', str(result_path)]
-    args += [str(root_path)]
+    args = ['java', '-cp', settings.JPLAG_JAR_PATH, 'jplag.JPlag']
+    args.append('-vl')
+    args.extend(['-l', 'java19'])
+    args.extend(['-m', f'{min_similarity}%'])
+    args.extend(['-r', f'{result_path}'])
+    args.append(f'{root_path}')
     return subprocess.check_output(args, stderr=subprocess.DEVNULL, universal_newlines=True)
