@@ -223,5 +223,5 @@ CONSTANCE_CONFIG_FIELDSETS.update(solutions_constance.fieldsets)
 CONSTANCE_CONFIG.update(tasks_constance.config)
 CONSTANCE_CONFIG_FIELDSETS.update(tasks_constance.fieldsets)
 
-JPLAG_JAR_PATH = str(BASE_DIR / 'lib' / 'jplag-2.11.9-SNAPSHOT.jar')
+JPLAG_JAR_PATH = str(BASE_DIR / 'lib' / 'jplag-2.12.1-SNAPSHOT.jar')
 JPLAG_SIMILARITY = 90
