@@ -42,7 +42,7 @@ def jplag_check_async(users, tasks):
     jplag_check(users, tasks)
 
 
-def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_dir=None):
+def jplag_check(users, tasks, min_similarity=None, result_dir=None):
     """
     Check solutions of the given users for the given tasks with JPlag.
 
@@ -57,6 +57,8 @@ def jplag_check(users, tasks, min_similarity=settings.JPLAG_SIMILARITY, result_d
     Returns:
         A set containing the solutions that have been identified as plagiarism.
     """
+    if min_similarity is None:
+        min_similarity = settings.JPLAG_DEFAULT_SIMILARITY
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir)
         plagiarism_set = set()
