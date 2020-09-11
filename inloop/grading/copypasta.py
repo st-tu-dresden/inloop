@@ -85,6 +85,8 @@ def jplag_check_task(users, task, min_similarity, result_path):
     with TemporaryDirectory() as tmpdir:
         root_path = Path(tmpdir)
         last_solutions = get_last_solutions(users, task)
+        if len(last_solutions) < 2:
+            return set()
         prepare_directories(root_path, last_solutions)
         output = exec_jplag(min_similarity, root_path, result_path.joinpath(task.slug))
     return parse_output(output, min_similarity, last_solutions)
