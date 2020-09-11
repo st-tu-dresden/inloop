@@ -87,7 +87,6 @@ if DEBUG:
         HTMLVALIDATOR_ENABLED = True
         HTMLVALIDATOR_OUTPUT = 'stdout'
         MIDDLEWARE.append('htmlvalidator.middleware.HTMLValidator')
-    SHELL_PLUS_PRINT_SQL = True
 
 TIME_ZONE = env('TIME_ZONE', default='Europe/Berlin')
 USE_TZ = True
