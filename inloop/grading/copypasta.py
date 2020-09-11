@@ -146,7 +146,7 @@ def exec_jplag(min_similarity, root_path, result_path):
     """
     args = ['java', '-cp', settings.JPLAG_JAR_PATH, 'jplag.JPlag']
     args.append('-vl')
-    args.extend(['-l', 'java17'])
+    args.extend(['-l', 'java19'])
     args.extend(['-m', f'{min_similarity}%'])
     args.extend(['-r', f'{result_path}'])
     args.append(f'{root_path}')
