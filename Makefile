@@ -16,7 +16,7 @@ init:
 	docker build -t $(IMAGE) tests/testrunner
 
 run:
-	poetry run honcho start
+	poetry run honcho -f Procfile.dev start
 
 loaddb:
 	poetry run ./manage.py migrate

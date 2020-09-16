@@ -43,7 +43,8 @@ Using the command line, a development instance can be set up as follows:
    [build-requirements.txt](build-requirements.txt).
 
 2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
-   `./support/scripts/macos_setup.sh` (macOS).
+   `./support/scripts/macos_setup.sh` (macOS). On Linux, you need to manually install the
+   [`watchexec` tool](https://github.com/watchexec/watchexec).
 
 3. On macOS, please run:
 
