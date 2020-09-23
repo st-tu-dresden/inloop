@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import reverse
+from django.utils.html import format_html
 
 from inloop.testrunner.models import TestOutput, TestResult
 
@@ -20,9 +21,9 @@ class TestResultAdmin(admin.ModelAdmin):
     ]
     exclude = ['passed', 'time_taken', 'solution']
 
-    def linked_solution(self, obj):
-        link = reverse('admin:solutions_solution_change', args=[obj.solution_id])
-        return f'<a href="{link}">{obj.solution}</a>'
+    def linked_solution(self, test_result):
+        solution_id = test_result.solution_id
+        url = reverse('admin:solutions_solution_change', args=[solution_id])
+        return format_html('<a href="{url}">{solution_id}</a>', url=url, solution_id=solution_id)
 
-    linked_solution.allow_tags = True
-    linked_solution.short_description = 'Solution'
+    linked_solution.short_description = 'Solution id'
