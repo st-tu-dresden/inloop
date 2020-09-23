@@ -130,7 +130,7 @@ class DockerTestRunner:
                 storage_dir, filesize_limit=self.config['filesize_limit']
             )
         if len(ignored_files) > 0:
-            LOG.info(f'Ignored {len(ignored_files)} because they were too large.')
+            LOG.info(f'Ignored {len(ignored_files)} output file(s) because they were too large.')
         return TestOutput(rc, stdout, stderr, duration, files)
 
     def subpath_check(self, path1, path2):
