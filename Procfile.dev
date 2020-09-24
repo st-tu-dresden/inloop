@@ -1,4 +1,4 @@
 web:    PYTHONUNBUFFERED=1 ./manage.py runserver
 worker: PYTHONUNBUFFERED=1 watchexec -w inloop -e py -r -- ./manage.py run_huey --workers=2
 vnu:    ./vnu.sh
-redis:  redis-server --dbfilename inloop.rdb --bind 127.0.0.1 --port 6380
+redis:  redis-server --dbfilename inloop.rdb --save 10 1 --bind 127.0.0.1 --port 6380
