@@ -247,7 +247,7 @@ Installation
     units](../support/etc/systemd/system) to their appropriate places. For `systemd` systems:
 
         sudo cp ~/inloop/support/etc/systemd/system/*.service /etc/systemd/system
-        sudo systemctl enable gunicorn.service huey-helper.service
+        sudo systemctl enable --now gunicorn.service huey-helper.service
 
     For `upstart` systems:
 
