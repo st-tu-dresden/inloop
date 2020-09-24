@@ -1,10 +1,11 @@
-import multiprocessing
+from multiprocessing import cpu_count
+from os import environ
 
 # listen _only_ on local interface
-bind = ["127.0.0.1:8000"]
+bind = ['127.0.0.1:8000']
 
-# baseline, can be adjusted at runtime using TTIN/TTOU signals
-workers = multiprocessing.cpu_count() * 2 + 1
+# can also be adjusted at runtime using TTIN/TTOU signals
+workers = int(environ.get('WEB_CONCURRENCY', cpu_count() * 2))
 threads = 1
 
 # rejuvenation to prevent memory leaks

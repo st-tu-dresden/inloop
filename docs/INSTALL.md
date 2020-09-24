@@ -330,7 +330,7 @@ Name              | Description (default value)
 `PROXY_ENABLED`   | Must be set to `True` if running behind nginx (`False`)
 `SECURE_COOKIES`  | Enable SSL/TLS protection for session and CSRF cookies (`True`)
 `TIME_ZONE`       | The time zone used for displayed dates (`Europe/Berlin`)
-`WEB_CONCURRENCY` | The number of Gunicorn workers to start (`1`)
+`WEB_CONCURRENCY` | The number of Gunicorn workers to start (`cpu_count() * 2`)
 `X_ACCEL_LOCATION`| The internal `X-Accel-Redirect` location for nginx, e.g. `/sendfile`, must be set if `PROXY_ENABLED` is `True`
 
 Additionally, the setproctitle library (which is used by Gunicorn) recognizes `SPT_NOENV`. If set,
