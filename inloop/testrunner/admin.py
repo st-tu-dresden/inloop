@@ -25,7 +25,7 @@ class TestResultAdmin(admin.ModelAdmin):
     readonly_fields = [
         'linked_solution', 'created_at', 'runtime', 'return_code', 'is_success', 'stdout', 'stderr'
     ]
-    exclude = ['passed', 'time_taken', 'solution']
+    exclude = ['time_taken', 'solution']
 
     def linked_solution(self, test_result):
         solution_id = test_result.solution_id

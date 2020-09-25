@@ -62,9 +62,6 @@ class TestResult(models.Model):
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
 
-    # to be removed:
-    passed = models.BooleanField(default=False)
-
     def is_success(self):
         return self.return_code == 0
 
