@@ -62,20 +62,11 @@ class TestResult(models.Model):
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
 
-    # to be removed:
-    passed = models.BooleanField(default=False)
-
     def is_success(self):
         return self.return_code == 0
 
     is_success.boolean = True
     is_success.short_description = 'Successful'
-
-    def runtime(self):
-        return f'{self.time_taken:.2f}'
-
-    runtime.admin_order_field = 'time_taken'
-    runtime.short_description = 'Runtime (seconds)'
 
     def status(self):
         if self.return_code == 0:
@@ -87,8 +78,7 @@ class TestResult(models.Model):
         return 'failure'
 
     def __repr__(self):
-        return '<%s: solution_id=%r return_code=%r>' %\
-            (self.__class__.__name__, self.solution_id, self.return_code)
+        return f'<{type(self).__name__}: solution={self.solution_id} rc={self.return_code}>'
 
     def __str__(self):
         return f'Result #{self.id}'
