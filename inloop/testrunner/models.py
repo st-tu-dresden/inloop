@@ -68,12 +68,6 @@ class TestResult(models.Model):
     is_success.boolean = True
     is_success.short_description = 'Successful'
 
-    def runtime(self):
-        return f'{self.time_taken:.2f}'
-
-    runtime.admin_order_field = 'time_taken'
-    runtime.short_description = 'Runtime (seconds)'
-
     def status(self):
         if self.return_code == 0:
             return 'success'

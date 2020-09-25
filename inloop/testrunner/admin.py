@@ -33,3 +33,9 @@ class TestResultAdmin(admin.ModelAdmin):
         return format_html('<a href="{url}">{solution_id}</a>', url=url, solution_id=solution_id)
 
     linked_solution.short_description = 'Solution id'
+
+    def runtime(self, test_result):
+        return f'{test_result.time_taken:.2f}'
+
+    runtime.admin_order_field = 'time_taken'
+    runtime.short_description = 'Runtime (seconds)'
