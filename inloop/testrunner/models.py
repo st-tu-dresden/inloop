@@ -84,8 +84,7 @@ class TestResult(models.Model):
         return 'failure'
 
     def __repr__(self):
-        return '<%s: solution_id=%r return_code=%r>' %\
-            (self.__class__.__name__, self.solution_id, self.return_code)
+        return f'<{type(self).__name__}: solution={self.solution_id} rc={self.return_code}>'
 
     def __str__(self):
         return f'Result #{self.id}'
