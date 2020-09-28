@@ -32,7 +32,7 @@ class ArgumentCheckTest(TestCase):
 
     def test_empty_url_raises_valueerror(self):
         with self.assertRaisesRegex(ValueError, 'url must not be empty'):
-            GitRepository(TESTREPO_PATH, url='', branch='master')
+            GitRepository(TESTREPO_PATH, url='', branch='main')
 
     def test_empty_branch_raises_valueerror(self):
         with self.assertRaisesRegex(ValueError, 'branch must not be empty'):

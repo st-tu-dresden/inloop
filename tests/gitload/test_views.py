@@ -27,7 +27,7 @@ class SignatureTest(TestCase):
     # path must be non-empty, but should not be accessed
     # during this test because the function is a mock
     GITLOAD_URL='file:///nonexistent/path/to/repo.git',
-    GITLOAD_BRANCH='master'
+    GITLOAD_BRANCH='main'
 )
 class WebhookHandlerTest(TestCase):
     FACTORY = RequestFactory()
@@ -40,7 +40,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_push_with_valid_signature(self, mock):
-        data = b'{"ref": "refs/heads/master"}'
+        data = b'{"ref": "refs/heads/main"}'
         request = self.FACTORY.post('/', data=data, content_type='application/json')
         request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
         request.META['HTTP_X_GITHUB_EVENT'] = 'push'
@@ -49,7 +49,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 1)
 
     def test_push_with_invalid_signature(self, mock):
-        data = b'{"ref": "refs/heads/master"}'
+        data = b'{"ref": "refs/heads/main"}'
         request = self.FACTORY.post('/', data=data, content_type='application/json')
         request.META['HTTP_X_HUB_SIGNATURE'] = 'invalid'
         request.META['HTTP_X_GITHUB_EVENT'] = 'push'
@@ -59,7 +59,7 @@ class WebhookHandlerTest(TestCase):
         self.assertEqual(mock.call_count, 0)
 
     def test_not_modified_when_event_not_push(self, mock):
-        data = b'{"ref": "refs/heads/master"}'
+        data = b'{"ref": "refs/heads/main"}'
         request = self.FACTORY.post('/', data=data, content_type='application/json')
         request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
         request.META['HTTP_X_GITHUB_EVENT'] = 'ping'
@@ -67,7 +67,7 @@ class WebhookHandlerTest(TestCase):
         self.assertContains(response, 'Event ignored')
         self.assertEqual(mock.call_count, 0)
 
-    def test_not_modified_when_ref_not_master(self, mock):
+    def test_not_modified_when_ref_not_main(self, mock):
         data = b'{"ref": "refs/heads/develop"}'
         request = self.FACTORY.post('/', data=data, content_type='application/json')
         request.META['HTTP_X_HUB_SIGNATURE'] = compute_signature(data, self.KEY)
