@@ -15,12 +15,12 @@ class GitRepositoryTest(TestCase):
         self.repo1 = GitRepository(
             self.tmpdir.name,
             url='https://github.com/st-tu-dresden/inloop.git',
-            branch='master'
+            branch='main'
         )
         self.repo2 = GitRepository(
             self.tmpdir.name,
             url='https://github.com/st-tu-dresden/inloop-java-repository-example.git',
-            branch='master'
+            branch='main'
         )
 
     def tearDown(self):

@@ -11,7 +11,7 @@ Overview
 
 Although INLOOP is a Python application, it cannot simply be installed using `pip install`.
 Instead, we use a Git based deployment and perform a checkout of the latest stable code from the
-`master` branch.
+`main` branch.
 
 INLOOP is a divided into several components and depends on multiple third-party components. Each
 one will run as a separate operating system process. The following diagram shows their
@@ -263,7 +263,7 @@ will start automatically at boot.
 Updates
 -------
 
-1. Load the latest code from the INLOOP `master` branch:
+1. Load the latest code from the INLOOP `main` branch:
 
         cd ~/inloop
         git pull

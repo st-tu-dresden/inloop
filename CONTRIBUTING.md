@@ -108,7 +108,7 @@ in addition to `poetry.lock`, and thus both need to be included in your
 
 Do one thing at a time and don't bite off more than you can chew. Long living branches are
 usually a sign that a feature needs to be split up. Furthermore, chances are high that such a
-branch will be hard to integrate into `master`. Divide and conquer!
+branch will be hard to integrate into `main`. Divide and conquer!
 
 
 ### Coding conventions
