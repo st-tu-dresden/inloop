@@ -16,8 +16,10 @@ const BTN_DELETE_FILE_ID = "editor-tabbar-btn--delete";
 const BTN_SYNTAX_ID = "toolbar-btn--syntax";
 const BTN_SWITCH_TO_EDITOR = "toolbar-switch-btn--editor";
 const BTN_SWITCH_TO_UPLOAD = "toolbar-switch-btn--manual";
+const BTN_SWITCH_TO_TASKONLY = "toolbar-switch-btn--taskonly";
 const DEADLINE_ID = "task-deadline";
 const TOOLBAR_BUTTONS_RIGHT_ID = "toolbar-buttons--right";
+const TOOLBAR_BTN_GROUP_SWITCH_VIEW_ID = "toolbar-button-group--switch-view";
 const CONSOLE_CONTAINER_ID = "console";
 const CONSOLE_CONTENT_ID = "console-content";
 const CONSOLE_HIDE_BUTTON_ID = "console-btn--hide";
@@ -768,16 +770,14 @@ class Toolbar {
     addFileButtonId,
     submitButtonId,
     syntaxButtonId,
-    switchToEditorButtonId,
-    switchToUploadButtonId
+    switchViewButtonGroupId
   ) {
     this.deadlineElement = document.getElementById(deadlineId);
     this.saveButton = document.getElementById(saveButtonId);
     this.addFileButton = document.getElementById(addFileButtonId);
     this.submitButton = document.getElementById(submitButtonId);
     this.syntaxButton = document.getElementById(syntaxButtonId);
-    this.switchToEditorButton = document.getElementById(switchToEditorButtonId);
-    this.switchToUploadButton = document.getElementById(switchToUploadButtonId);
+    this.switchViewButtonGroup = document.getElementById(switchViewButtonGroupId);
   }
 
   init() {
@@ -788,9 +788,8 @@ class Toolbar {
     if (this.syntaxButton) {
       this.syntaxButton.addEventListener("click", () => this.checkSyntax());
     }
-    this.switchToEditorButton.addEventListener("click", () => this.toggleEditorUpload());
-    this.switchToUploadButton.addEventListener("click", () => this.toggleEditorUpload());
-    this.switchToEditorButton.disabled = true;
+    this.switchViewButtonGroup.addEventListener("click", (e) => this.toggleView(e));
+    this.switchViewButtonGroup.querySelector(`#${BTN_SWITCH_TO_EDITOR}`).disabled = true;
     if (this.deadlineElement !== null) {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
@@ -879,14 +878,17 @@ class Toolbar {
     this.saveButton.disabled = !enable;
   }
 
-  toggleEditorUpload() {
-    const isEditor = this.switchToEditorButton.disabled;
-    this.switchToEditorButton.disabled = !isEditor;
-    this.switchToUploadButton.disabled = isEditor;
-    document.getElementById("manual-upload").style.display = isEditor ? "flex" : "none";
-    document.getElementById("editor").style.display = isEditor ? "none" : "flex";
-    document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = isEditor ? "none" : "block";
-    if (!isEditor) tabBar.editor.focus();
+  toggleView(event) {
+    const target = event.target;
+    target.disabled = true;
+    this.switchViewButtonGroup.querySelectorAll(`button:not(#${target.id})`).forEach(button => button.disabled = false);
+    document.querySelector("main > div:last-child").style.display = target.id == BTN_SWITCH_TO_TASKONLY ? "none" : "flex";
+    document.getElementById("editor").style.display = target.id == BTN_SWITCH_TO_EDITOR ? "flex" : "none";
+    document.getElementById("manual-upload").style.display = target.id == BTN_SWITCH_TO_UPLOAD ? "flex" : "none";
+    document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = target.id == BTN_SWITCH_TO_EDITOR ? "block" : "none";
+    if (target.id == BTN_SWITCH_TO_EDITOR) {
+      tabBar.editor.focus();
+    }
   }
 }
 
@@ -922,8 +924,7 @@ function init() {
     BTN_ADD_FILE_ID,
     BTN_SUBMIT_ID,
     BTN_SYNTAX_ID,
-    BTN_SWITCH_TO_EDITOR,
-    BTN_SWITCH_TO_UPLOAD
+    TOOLBAR_BTN_GROUP_SWITCH_VIEW_ID
   );
   toolbar.init();
   communicator.getLastCheckpoint().then((data) => {
