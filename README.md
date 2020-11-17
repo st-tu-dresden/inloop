@@ -8,7 +8,7 @@
        \/__/     \/__/     \/__/   \/__/     \/__/
 
 
-[![Build Status](https://travis-ci.org/st-tu-dresden/inloop.svg?branch=main)](https://travis-ci.org/st-tu-dresden/inloop)
+[![Build Status](https://api.travis-ci.com/st-tu-dresden/inloop.svg?branch=main)](https://travis-ci.com/github/st-tu-dresden/inloop)
 
 INLOOP, the *INteractive Learning center for Object-Oriented Programming*, is a Python web
 application to manage online programming courses, powered by Git, Django and Docker:
