@@ -56,7 +56,6 @@ def lint(session):
         '--check-only',
         '--diff',
         '--quiet',
-        '--recursive',
         *locations,
     )
     session.run('flake8', *locations)

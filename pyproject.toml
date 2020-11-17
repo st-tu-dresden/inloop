@@ -33,8 +33,26 @@ flake8 = "^3.7.9"
 flake8-docstrings = "^1.5.0"
 honcho = "^1.0.1"
 ipython = "^7.13.0"
-isort = "^4.3.21"
+isort = "^5.6.4"
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.isort]
+profile = "black"
+line_length = 99
+skip_gitignore = true
+skip = ["migrations"]
+known_first_party = "inloop"
+known_django = "django"
+known_tests = "tests"
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "DJANGO",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "TESTS",
+    "LOCALFOLDER"
+]
