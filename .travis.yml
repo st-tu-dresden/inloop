@@ -20,6 +20,8 @@ jobs:
 
 cache: pip
 
-install: pip install -r build-requirements.txt
+install:
+- pip install -r build-requirements.txt
+- poetry config experimental.new-installer false
 
 script: nox
