@@ -6,4 +6,4 @@ class GitloadAppConfig(AppConfig):
     verbose_name = 'Gitload'
 
     def ready(self):
-        from . import signals   # noqa
+        from . import signals  # noqa

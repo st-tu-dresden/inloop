@@ -8,8 +8,13 @@ from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.encoding import force_text
 
-from inloop.solutions.models import (Checkpoint, CheckpointFile, Solution,
-                                     SolutionFile, create_archive)
+from inloop.solutions.models import (
+    Checkpoint,
+    CheckpointFile,
+    Solution,
+    SolutionFile,
+    create_archive,
+)
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 

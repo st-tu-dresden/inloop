@@ -14,8 +14,12 @@ from django.urls import reverse
 from constance.test import override_config
 
 from inloop.accounts.forms import SignupForm, StudentDetailsForm
-from inloop.accounts.models import (Course, StudentDetails,
-                                    prune_invalid_users, user_profile_complete)
+from inloop.accounts.models import (
+    Course,
+    StudentDetails,
+    prune_invalid_users,
+    user_profile_complete,
+)
 from inloop.accounts.tasks import autoprune_invalid_users
 
 from tests.accounts.mixins import SimpleAccountsData

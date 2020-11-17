@@ -1,11 +1,20 @@
 from django.conf.urls import url
 
-from inloop.solutions.views import (NewSolutionArchiveView, SideBySideEditorView,
-                                    SolutionArchiveDownloadView, SolutionArchiveStatusView,
-                                    SolutionDetailView, SolutionFileView, SolutionListView,
-                                    SolutionStatusView, SolutionUploadView,
-                                    StaffSolutionDetailView, get_last_checkpoint,
-                                    mock_syntax_check, save_checkpoint)
+from inloop.solutions.views import (
+    NewSolutionArchiveView,
+    SideBySideEditorView,
+    SolutionArchiveDownloadView,
+    SolutionArchiveStatusView,
+    SolutionDetailView,
+    SolutionFileView,
+    SolutionListView,
+    SolutionStatusView,
+    SolutionUploadView,
+    StaffSolutionDetailView,
+    get_last_checkpoint,
+    mock_syntax_check,
+    save_checkpoint,
+)
 from inloop.tasks.views import serve_attachment
 
 app_name = 'solutions'

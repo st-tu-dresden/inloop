@@ -8,8 +8,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from inloop.solutions.models import (Solution, SolutionFile, create_archive,
-                                     get_archive_upload_path, get_upload_path)
+from inloop.solutions.models import (
+    Solution,
+    SolutionFile,
+    create_archive,
+    get_archive_upload_path,
+    get_upload_path,
+)
 
 from tests.accounts.mixins import SimpleAccountsData
 from tests.solutions.mixins import SimpleTaskData, SolutionsData

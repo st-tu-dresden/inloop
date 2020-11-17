@@ -6,4 +6,4 @@ class TestRunnerConfig(AppConfig):
     verbose_name = 'Test runner'
 
     def ready(self):
-        from . import signals   # noqa
+        from . import signals  # noqa

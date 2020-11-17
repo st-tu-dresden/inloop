@@ -1,20 +1,27 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import (PasswordChangeView as DjangoPasswordChangeView,
-                                       PasswordResetCompleteView, PasswordResetConfirmView,
-                                       PasswordResetDoneView, PasswordResetView)
+from django.contrib.auth.views import PasswordChangeView as DjangoPasswordChangeView
+from django.contrib.auth.views import (
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
 
 from constance import config
-from django_registration.backends.activation.views import (ActivationView as HmacActivationView,
-                                                           RegistrationView as
-                                                           HmacRegistrationView)
+from django_registration.backends.activation.views import ActivationView as HmacActivationView
+from django_registration.backends.activation.views import RegistrationView as HmacRegistrationView
 
-from inloop.accounts.forms import (ConfirmStudentDetailsForm, SignupForm,
-                                   StudentDetailsForm, UserChangeForm)
+from inloop.accounts.forms import (
+    ConfirmStudentDetailsForm,
+    SignupForm,
+    StudentDetailsForm,
+    UserChangeForm,
+)
 from inloop.accounts.models import StudentDetails
 
 
