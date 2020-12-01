@@ -4,6 +4,10 @@ language: python
 
 os: linux
 
+env:
+  global:
+  - VIRTUALENV_NO_DOWNLOAD=true
+
 jobs:
   include:
   - name: Python 3.8 tests
