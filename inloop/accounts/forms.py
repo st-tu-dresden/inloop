@@ -26,7 +26,7 @@ class SignupForm(RegistrationFormUniqueEmail):
         required=True,
         validators=[
             validators.validate_confusables_email,
-        ]
+        ],
     )
 
     privacy_consent = forms.BooleanField(
@@ -37,7 +37,7 @@ class SignupForm(RegistrationFormUniqueEmail):
     def clean_email(self):
         """Perform additional email validation if configured in the admin interface."""
         pattern = config.EMAIL_PATTERN
-        email = self.cleaned_data['email']
+        email = self.cleaned_data["email"]
         if pattern:
             # The pattern is always validated in the admin interface by testing if
             # re.compile() succeeds. If it fails to compile now, there must be some
@@ -49,16 +49,16 @@ class SignupForm(RegistrationFormUniqueEmail):
 
     def clean_username(self):
         """Ensure no duplicate user names exist, using case-insensitive comparison."""
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data.get("username")
         if User.objects.filter(username__iexact=username):
-            raise forms.ValidationError('A user with that username already exists.')
+            raise forms.ValidationError("A user with that username already exists.")
         return username
 
 
 class StudentDetailsForm(forms.ModelForm):
     class Meta:
         model = StudentDetails
-        fields = ['matnum', 'course']
+        fields = ["matnum", "course"]
 
 
 class ConfirmStudentDetailsForm(forms.ModelForm):
@@ -69,10 +69,10 @@ class ConfirmStudentDetailsForm(forms.ModelForm):
 
     class Meta:
         model = StudentDetails
-        fields = ['matnum', 'ownwork_confirmed']
+        fields = ["matnum", "ownwork_confirmed"]
 
 
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name']
+        fields = ["first_name", "last_name"]

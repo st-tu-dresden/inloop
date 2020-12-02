@@ -8,4 +8,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         num_deleted = prune_invalid_users()
-        self.stdout.write(f'Pruned {num_deleted} invalid account(s).')
+        self.stdout.write(f"Pruned {num_deleted} invalid account(s).")

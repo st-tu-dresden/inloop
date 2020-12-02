@@ -36,14 +36,16 @@ def get_upload_path(obj, filename):
     All files related to a specific solution will share a common base directory.
     """
     s = obj.solution
-    return 'solutions/{year}/{slug}/{hash}/{id}/{filename}'.format_map({
-        'year': s.submission_date.year,
-        'slug': s.task.slug,
-        # another "random" level to avoid too many files per slug directory
-        'hash': hash32(s.author),
-        'id': s.id,
-        'filename': filename
-    })
+    return "solutions/{year}/{slug}/{hash}/{id}/{filename}".format_map(
+        {
+            "year": s.submission_date.year,
+            "slug": s.task.slug,
+            # another "random" level to avoid too many files per slug directory
+            "hash": hash32(s.author),
+            "id": s.id,
+            "filename": filename,
+        }
+    )
 
 
 def get_prunable_solutions(*, users, tasks, max_keep):
@@ -58,7 +60,7 @@ def get_prunable_solutions(*, users, tasks, max_keep):
     for user in users:
         for task in tasks:
             solutions = Solution.objects.filter(task=task, author=user)
-            solutions_to_keep = solutions.order_by('-id')[:max_keep]
+            solutions_to_keep = solutions.order_by("-id")[:max_keep]
             yield solutions.exclude(id__in=solutions_to_keep)
 
 
@@ -67,7 +69,7 @@ def get_archive_upload_path(solution, filename):
     Return an upload file path of the archive
     generated from a given solution.
     """
-    return f'archives/{solution.author}/{solution.id}/{filename}'
+    return f"archives/{solution.author}/{solution.id}/{filename}"
 
 
 def create_archive(solution):
@@ -77,15 +79,12 @@ def create_archive(solution):
     if solution.archive:
         return
     stream = BytesIO()
-    stream.name = f'Solution_{solution.scoped_id}_{solution.task.underscored_title}.zip'
-    with ZipFile(stream, mode='w', compression=ZIP_DEFLATED) as zipfile:
+    stream.name = f"Solution_{solution.scoped_id}_{solution.task.underscored_title}.zip"
+    with ZipFile(stream, mode="w", compression=ZIP_DEFLATED) as zipfile:
         for solution_file in solution.solutionfile_set.all():
-            zipfile.write(
-                filename=solution_file.absolute_path,
-                arcname=solution_file.name
-            )
+            zipfile.write(filename=solution_file.absolute_path, arcname=solution_file.name)
     solution.archive = SimpleUploadedFile(
-        name=stream.name, content=stream.getvalue(), content_type='application/zip'
+        name=stream.name, content=stream.getvalue(), content_type="application/zip"
     )
     solution.save()
 
@@ -109,12 +108,10 @@ class Solution(models.Model):
     """
 
     scoped_id = models.PositiveIntegerField(
-        help_text='Solution id unique for task and author',
-        editable=False
+        help_text="Solution id unique for task and author", editable=False
     )
     submission_date = models.DateTimeField(
-        help_text='When was the solution submitted?',
-        auto_now_add=True
+        help_text="When was the solution submitted?", auto_now_add=True
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
@@ -126,19 +123,19 @@ class Solution(models.Model):
     TIMEOUT = timezone.timedelta(minutes=5)
 
     class Meta:
-        unique_together = ('author', 'scoped_id', 'task')
-        index_together = ['author', 'scoped_id', 'task']
+        unique_together = ("author", "scoped_id", "task")
+        index_together = ["author", "scoped_id", "task"]
 
     @property
     def path(self):
         # derive the directory from the first associated SolutionFile
         solution_file = self.solutionfile_set.first()
         if not solution_file:
-            raise AssertionError(f'Empty solution: {self!r}')
+            raise AssertionError(f"Empty solution: {self!r}")
         return solution_file.absolute_path.parent
 
     def get_absolute_url(self):
-        return reverse('solutions:staffdetail', kwargs={'id': self.id})
+        return reverse("solutions:staffdetail", kwargs={"id": self.id})
 
     def status(self):
         """
@@ -153,21 +150,20 @@ class Solution(models.Model):
         after a reasonable amount of time.
         """
         if not config.IMMEDIATE_FEEDBACK:
-            return 'saved'
+            return "saved"
         result = self.testresult_set.last()
         if result:
             return result.status()
         if self.submission_date + self.TIMEOUT < timezone.now():
-            return 'lost'
-        return 'pending'
+            return "lost"
+        return "pending"
 
     def get_next_scoped_id(self):
         """Compute the next scoped_id."""
-        query = (
-            Solution.objects.filter(author=self.author, task=self.task)
-            .aggregate(next_scoped_id=(Coalesce(Max('scoped_id'), 0) + 1))
+        query = Solution.objects.filter(author=self.author, task=self.task).aggregate(
+            next_scoped_id=(Coalesce(Max("scoped_id"), 0) + 1)
         )
-        return query['next_scoped_id']
+        return query["next_scoped_id"]
 
     def save(self, *args, **kwargs):
         """
@@ -182,14 +178,18 @@ class Solution(models.Model):
         return super().save(*args, **kwargs)
 
     def __repr__(self):
-        return '<%s: id=%r author=%r task=%r>' %\
-            (self.__class__.__name__, self.id, str(self.author), str(self.task))
+        return "<%s: id=%r author=%r task=%r>" % (
+            self.__class__.__name__,
+            self.id,
+            str(self.author),
+            str(self.task),
+        )
 
     def __str__(self):
-        return f'Solution #{self.id:d}'
+        return f"Solution #{self.id:d}"
 
 
-@receiver(post_delete, sender=Solution, dispatch_uid='delete_solutionfile')
+@receiver(post_delete, sender=Solution, dispatch_uid="delete_solutionfile")
 def auto_delete_archive_on_delete(sender, instance, **kwargs):
     """
     Removes archive from filesystem when corresponding Solution object is deleted.
@@ -227,14 +227,14 @@ class SolutionFile(models.Model):
 
     @property
     def contents(self):
-        with open(self.absolute_path, errors='replace') as stream:
+        with open(self.absolute_path, errors="replace") as stream:
             return stream.read()
 
     def __str__(self):
         return self.name
 
 
-@receiver(post_delete, sender=SolutionFile, dispatch_uid='delete_solutionfile')
+@receiver(post_delete, sender=SolutionFile, dispatch_uid="delete_solutionfile")
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Removes file from filesystem when corresponding Solution object is deleted.
@@ -252,42 +252,44 @@ class Checkpoint(models.Model):
     a checkpoint is created. This checkpoint can be used to restore
     the last workstate in the online code editor.
     """
+
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
     class Manager(models.Manager):
         def save_checkpoint(self, json_data, task, user):
-            files = json_data['files']
+            files = json_data["files"]
             with atomic():
                 self.filter(author=user, task=task).delete()
                 checkpoint = self.create(author=user, task=task)
-                CheckpointFile.objects.bulk_create([
-                    CheckpointFile(
-                        checkpoint=checkpoint,
-                        name=file['name'],
-                        contents=file['contents']
-                    )
-                    for file in files
-                ])
+                CheckpointFile.objects.bulk_create(
+                    [
+                        CheckpointFile(
+                            checkpoint=checkpoint, name=file["name"], contents=file["contents"]
+                        )
+                        for file in files
+                    ]
+                )
 
     objects = Manager()
 
     def __str__(self):
-        return f'task_id={self.task_id}, author_id={self.author_id}'
+        return f"task_id={self.task_id}, author_id={self.author_id}"
 
 
 class CheckpointFile(models.Model):
     """Represents a single file as part of a checkpoint."""
+
     checkpoint = models.ForeignKey(Checkpoint, on_delete=models.CASCADE)
     name = models.TextField()
     contents = models.TextField()
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
-        return f'{self.name}'
+        return f"{self.name}"

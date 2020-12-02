@@ -38,12 +38,14 @@ def check_solution(solution):
             stdout=test_output.stdout,
             stderr=test_output.stderr,
             return_code=test_output.rc,
-            time_taken=test_output.duration
+            time_taken=test_output.duration,
         )
-        TestOutput.objects.bulk_create([
-            TestOutput(result=test_result, name=name, output=content)
-            for name, content in test_output.files.items()
-        ])
+        TestOutput.objects.bulk_create(
+            [
+                TestOutput(result=test_result, name=name, output=content)
+                for name, content in test_output.files.items()
+            ]
+        )
         solution.passed = test_result.is_success()
         solution.save()
     return test_result
@@ -55,10 +57,11 @@ class TestResult(models.Model):
 
     This currently includes the process' stdout, stderr, return code and wall time.
     """
+
     solution = models.ForeignKey(Solution, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    stdout = models.TextField(default='')
-    stderr = models.TextField(default='')
+    stdout = models.TextField(default="")
+    stderr = models.TextField(default="")
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
 
@@ -66,22 +69,22 @@ class TestResult(models.Model):
         return self.return_code == 0
 
     is_success.boolean = True
-    is_success.short_description = 'Successful'
+    is_success.short_description = "Successful"
 
     def status(self):
         if self.return_code == 0:
-            return 'success'
+            return "success"
         if self.return_code == signal.SIGKILL:
-            return 'killed'
+            return "killed"
         if self.return_code in (125, 126, 127):
-            return 'error'
-        return 'failure'
+            return "error"
+        return "failure"
 
     def __repr__(self):
-        return f'<{type(self).__name__}: solution={self.solution_id} rc={self.return_code}>'
+        return f"<{type(self).__name__}: solution={self.solution_id} rc={self.return_code}>"
 
     def __str__(self):
-        return f'Result #{self.id}'
+        return f"Result #{self.id}"
 
 
 class TestOutput(models.Model):
@@ -92,6 +95,7 @@ class TestOutput(models.Model):
     execution (for instance: compiler output, JUnit logs). This output is
     intended to be interpreted later by parsers/pretty printers/etc.
     """
+
     result = models.ForeignKey(TestResult, on_delete=models.CASCADE)
     name = models.CharField(max_length=60)
     output = models.TextField()

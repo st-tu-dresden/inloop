@@ -17,7 +17,7 @@ MARKDOWN_TABLE = """
 
 class TestMarkdownFilter(TestCase):
     def test_autoids(self):
-        html = markdown('# Heading')
+        html = markdown("# Heading")
         self.assertTrue('<h1 id="heading">Heading</h1>' in html)
 
     def test_fenced_code(self):
@@ -27,12 +27,12 @@ class TestMarkdownFilter(TestCase):
     def test_markdown_tables(self):
         html = markdown(MARKDOWN_TABLE)
         signature_expressions = [
-            '<table>',
-            '<thead>',
-            '<tr>',
-            '<th>A</th>',
-            '<tbody>',
-            '<td>Test 1</td>'
+            "<table>",
+            "<thead>",
+            "<tr>",
+            "<th>A</th>",
+            "<tbody>",
+            "<td>Test 1</td>",
         ]
         for expression in signature_expressions:
             self.assertTrue(expression in html)

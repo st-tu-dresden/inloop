@@ -10,27 +10,25 @@ from inloop.tasks import urls as task_urls
 from inloop.views import home, login, logout
 
 urlpatterns = [
-    url(r'^$', home, name='home'),
-    url(r'^login/$', login, name='login'),
-    url(r'^logout/$', logout, name='logout'),
-
-    url(r'^account/', include(account_urls)),
-    url(r'^gitload/', include(gitload_urls)),
-    url(r'^solutions/', include(solution_urls)),
-    url(r'^tasks/', include(task_urls)),
-    url(r'^statistics/', include(statistics_urls)),
-
+    url(r"^$", home, name="home"),
+    url(r"^login/$", login, name="login"),
+    url(r"^logout/$", logout, name="logout"),
+    url(r"^account/", include(account_urls)),
+    url(r"^gitload/", include(gitload_urls)),
+    url(r"^solutions/", include(solution_urls)),
+    url(r"^tasks/", include(task_urls)),
+    url(r"^statistics/", include(statistics_urls)),
     # explicitly override the admin logout url
-    url(r'^admin/logout/$', logout),
-    url(r'^admin/', admin.site.urls),
+    url(r"^admin/logout/$", logout),
+    url(r"^admin/", admin.site.urls),
 ]
 
 # flatpages catchall pattern
 urlpatterns += [
-    url(r'^(?P<url>.*/)$', flatpage),
+    url(r"^(?P<url>.*/)$", flatpage),
 ]
 
 # customized titles and headers for the generated admin site
-admin.site.site_header = 'INLOOP administration'
-admin.site.site_title = 'INLOOP'
-admin.site.index_title = 'Manage accounts, tasks and solutions'
+admin.site.site_header = "INLOOP administration"
+admin.site.site_title = "INLOOP"
+admin.site.index_title = "Manage accounts, tasks and solutions"

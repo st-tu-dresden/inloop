@@ -121,10 +121,12 @@ branch will be hard to integrate into `main`. Divide and conquer!
   * Document _what_ your code does in doc comments (not _how_ it does something).
 * Python:
   * Use Python 3.
-  * Code must be formatted according to [PEP8][pep8] and a maximum line length of 99 characters.
+  * Code must be (auto-)formatted according to the [black code style][black-style] (which in turn
+    formats code to conform to [PEP-8][pep8]) and a maximum line length of 99 characters.
+    * This will be enforced by the CI build.
+    * Be sure to configure your editor to do this for you. Modern editors such as VS Code can be
+      configured to automatically invoke the `black` code formatter when a file is saved.
   * Don't use relative imports.
-  * Use single quoted string literals preferably (good: `'some string'`), unless the string contains
-    a single quote itself (good: `"a hard day's night"`, bad: `'a hard day\'s night'`).
   * Docstrings must follow the [Google Python Style Guide for Comments][google-style] and be
     surrounded by three double quotes (`"""`). Don't use reStructured Text style comments.
 * HTML (Django templates):
@@ -190,3 +192,4 @@ For example, take a look at the following commits in our repo:
 [good-commits2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [nu-validator]: https://validator.w3.org/nu/
 [jsdoc]: https://devdocs.io/jsdoc/
+[black-style]: https://black.readthedocs.io/en/stable/the_black_code_style.html

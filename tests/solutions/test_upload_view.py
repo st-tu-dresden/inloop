@@ -60,13 +60,13 @@ class MessageTestCase(TestCase):
                 return
         msg = self._formatMessage(
             msg,
-            'The given response did not contain a message '
-            'with text "{}" and level "{}"'.format(text, level)
+            "The given response did not contain a message "
+            'with text "{}" and level "{}"'.format(text, level),
         )
         raise self.failureException(msg)
 
 
-@tag('slow')
+@tag("slow")
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class SolutionUploadTest(SolutionsData, MessageTestCase):
     @classmethod
@@ -75,51 +75,44 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
 
     def setUp(self):
         super().setUp()
-        self.assertTrue(self.client.login(username='bob', password='secret'))
-        self.url = reverse('solutions:upload', kwargs={'slug': self.task.slug})
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        self.url = reverse("solutions:upload", kwargs={"slug": self.task.slug})
 
     def test_solution_upload_without_files(self):
         """Validate that if no files were uploaded, a meaningful message is emitted."""
         response = self.client.post(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertResponseContainsMessage(
-            "You haven't uploaded any files.",
-            self.Levels.ERROR,
-            response
+            "You haven't uploaded any files.", self.Levels.ERROR, response
         )
 
     def test_solution_upload_with_multiple_files(self):
         """Test the solution upload."""
-        file_1 = SimpleUploadedFile('Fibonacci1.java', b'class Fibonacci1 {}')
-        file_2 = SimpleUploadedFile('Fibonacci2.java', b'class Fibonacci2 {}')
-        with patch('inloop.solutions.views.solution_submitted') as mocked_signal:
-            response = self.client.post(self.url, data={
-                'uploads': [file_1, file_2]
-            }, follow=True)
+        file_1 = SimpleUploadedFile("Fibonacci1.java", b"class Fibonacci1 {}")
+        file_2 = SimpleUploadedFile("Fibonacci2.java", b"class Fibonacci2 {}")
+        with patch("inloop.solutions.views.solution_submitted") as mocked_signal:
+            response = self.client.post(self.url, data={"uploads": [file_1, file_2]}, follow=True)
         mocked_signal.send.assert_called_once()
         self.assertResponseContainsMessage(
-            'Your solution has been submitted to the checker.',
-            self.Levels.SUCCESS,
-            response
+            "Your solution has been submitted to the checker.", self.Levels.SUCCESS, response
         )
         # Extract all files in media root
         file_names = [
-            item for sublist in list(l for _, _, l in os.walk(TEST_MEDIA_ROOT))
-            for item in sublist
+            item for sublist in list(l for _, _, l in os.walk(TEST_MEDIA_ROOT)) for item in sublist
         ]
-        self.assertIn('Fibonacci1.java', file_names)
-        self.assertIn('Fibonacci2.java', file_names)
+        self.assertIn("Fibonacci1.java", file_names)
+        self.assertIn("Fibonacci2.java", file_names)
 
     def test_integrity_error_is_handled(self):
-        sample_file = SimpleUploadedFile('Foo.java', b'public class Foo {}')
-        post_data = {'uploads': [sample_file]}
+        sample_file = SimpleUploadedFile("Foo.java", b"public class Foo {}")
+        post_data = {"uploads": [sample_file]}
         solution_count_before = Solution.objects.count()
-        with patch('inloop.solutions.models.Solution.get_next_scoped_id', return_value=1):
+        with patch("inloop.solutions.models.Solution.get_next_scoped_id", return_value=1):
             # mocked bogus scoped_id should force an IntegrityError
-            with self.assertLogs(level='ERROR') as capture_logs:
+            with self.assertLogs(level="ERROR") as capture_logs:
                 response = self.client.post(self.url, data=post_data, follow=True)
-        self.assertIn('db constraint violation', capture_logs.output[0])
-        self.assertContains(response, 'Concurrent submission')
+        self.assertIn("db constraint violation", capture_logs.output[0])
+        self.assertContains(response, "Concurrent submission")
         self.assertEqual(solution_count_before, Solution.objects.count())
 
     @classmethod
@@ -138,37 +131,32 @@ class SolutionDetailViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.category = Category.objects.create(id=1337, name='Category 1')
+        cls.category = Category.objects.create(id=1337, name="Category 1")
         cls.task = Task.objects.create(
-            pubdate='2000-01-01 00:00Z',
-            category=cls.category,
-            title='Fibonacci',
-            slug='task'
+            pubdate="2000-01-01 00:00Z", category=cls.category, title="Fibonacci", slug="task"
         )
         cls.bob = User.objects.create_user(
-            username='bob',
-            email='bob@example.org',
-            password='secret'
+            username="bob", email="bob@example.org", password="secret"
         )
         cls.solution = Solution.objects.create(author=cls.bob, task=cls.task, passed=True)
         cls.solution_file = SolutionFile.objects.create(
-            solution=cls.solution,
-            file=SimpleUploadedFile('Fibonacci.java', FIBONACCI.encode())
+            solution=cls.solution, file=SimpleUploadedFile("Fibonacci.java", FIBONACCI.encode())
         )
         cls.test_result = TestResult.objects.create(
             solution=cls.solution,
-            stdout='This is the STDOUT output.',
-            stderr='This is the STDERR output.',
+            stdout="This is the STDOUT output.",
+            stderr="This is the STDERR output.",
             return_code=0,
-            time_taken=1.0
+            time_taken=1.0,
         )
-        cls.test_output = TestOutput.objects.create(result=cls.test_result, name='', output='')
+        cls.test_output = TestOutput.objects.create(result=cls.test_result, name="", output="")
 
     def setUp(self):
-        self.assertTrue(self.client.login(username='bob', password='secret'))
-        self.url = reverse('solutions:detail', kwargs={
-            'slug': self.task.slug, 'scoped_id': self.solution.scoped_id
-        })
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        self.url = reverse(
+            "solutions:detail",
+            kwargs={"slug": self.task.slug, "scoped_id": self.solution.scoped_id},
+        )
         super().setUp()
 
     def test_displayed_media(self):
@@ -176,8 +164,8 @@ class SolutionDetailViewTest(TestCase):
 
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Congratulations, your solution passed all tests.')
-        self.assertContains(response, 'Fibonacci.java')
+        self.assertContains(response, "Congratulations, your solution passed all tests.")
+        self.assertContains(response, "Fibonacci.java")
 
     @classmethod
     def tearDownClass(cls):

@@ -12,11 +12,11 @@ class RequireOwnWorkDeclaration:
 
     @cached_property
     def redirect_url(self):
-        return reverse('accounts:confirm_ownwork')
+        return reverse("accounts:confirm_ownwork")
 
     @cached_property
     def exclude_paths(self):
-        return [reverse('login'), reverse('logout'), self.redirect_url]
+        return [reverse("login"), reverse("logout"), self.redirect_url]
 
     def __call__(self, request):
         response = self.get_response(request)

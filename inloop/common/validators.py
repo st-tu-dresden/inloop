@@ -13,4 +13,4 @@ class RegexSyntaxValidator:
         try:
             re.compile(regex, self.flags)
         except re.error as error:
-            raise ValidationError(f'Invalid regex: {error}')
+            raise ValidationError(f"Invalid regex: {error}")

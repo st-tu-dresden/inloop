@@ -7,7 +7,7 @@ from django.views.decorators.cache import never_cache
 
 from inloop.tasks.views import index as task_index
 
-login = LoginView.as_view(extra_context={'hide_login_link': True})
+login = LoginView.as_view(extra_context={"hide_login_link": True})
 
 
 def home(request):
@@ -19,8 +19,8 @@ def home(request):
 @never_cache
 def logout(request):
     """Logout the user, allowing HTTP POST only."""
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'], 'Logout only possible via POST.')
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"], "Logout only possible via POST.")
     auth_logout(request)
-    messages.success(request, 'You have been logged out. We hope to see you soon again!')
-    return HttpResponseRedirect(reverse('home'))
+    messages.success(request, "You have been logged out. We hope to see you soon again!")
+    return HttpResponseRedirect(reverse("home"))

@@ -5,21 +5,21 @@ from inloop.accounts.models import assign_to_groups
 
 
 class Command(BaseCommand):
-    help = 'Randomly assign the given groups to users that do not already have a group.'
+    help = "Randomly assign the given groups to users that do not already have a group."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'groups',
-            nargs='+',
-            metavar='GROUP',
-            help='The names of the groups to assign users to.',
+            "groups",
+            nargs="+",
+            metavar="GROUP",
+            help="The names of the groups to assign users to.",
             type=str,
         )
 
     def handle(self, *args, **options):
-        groups = self.get_groups(options['groups'])
+        groups = self.get_groups(options["groups"])
         num_users = assign_to_groups(users=User.objects.all(), groups=groups)
-        self.stdout.write(f'Distributed {num_users} users to {len(groups)} groups.')
+        self.stdout.write(f"Distributed {num_users} users to {len(groups)} groups.")
 
     def get_groups(self, group_names):
         groups = []

@@ -14,17 +14,12 @@ class SimpleTaskData:
     """
     Set up a simple task and assign a category.
     """
+
     @classmethod
     def setUpTestData(cls):
-        cls.category = Category.objects.create(
-            id=1337,
-            name='Test Category'
-        )
+        cls.category = Category.objects.create(id=1337, name="Test Category")
         cls.task = Task.objects.create(
-            pubdate='2000-01-01 00:00Z',
-            category_id=1337,
-            title='Fibonacci',
-            slug='task'
+            pubdate="2000-01-01 00:00Z", category_id=1337, title="Fibonacci", slug="task"
         )
 
 
@@ -32,6 +27,7 @@ class SolutionsData(SimpleAccountsData, SimpleTaskData):
     """
     Set up simple solutions.
     """
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()

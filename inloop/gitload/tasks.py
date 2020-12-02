@@ -9,9 +9,9 @@ from inloop.gitload.repo import GitRepository
 
 @db_task()
 def load_tasks_async():
-    with HUEY.lock_task('import-lock'):
-        load_tasks(GitRepository(
-            settings.REPOSITORY_ROOT,
-            url=config.GITLOAD_URL,
-            branch=config.GITLOAD_BRANCH
-        ))
+    with HUEY.lock_task("import-lock"):
+        load_tasks(
+            GitRepository(
+                settings.REPOSITORY_ROOT, url=config.GITLOAD_URL, branch=config.GITLOAD_BRANCH
+            )
+        )

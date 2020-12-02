@@ -29,30 +29,40 @@ def index(request):
     exam_category_slug = config.EXAM_CATEGORY_SLUG
     if exam_category_slug:
         return category(request, exam_category_slug)
-    return TemplateResponse(request, 'tasks/index.html', {
-        'categories': Category.objects.order_by('display_order', 'name'),
-    })
+    return TemplateResponse(
+        request,
+        "tasks/index.html",
+        {
+            "categories": Category.objects.order_by("display_order", "name"),
+        },
+    )
 
 
 @login_required
 def category(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    tasks = category.task_set \
-        .published() \
-        .visible_by(user=request.user) \
-        .completed_by_values(request.user, order_by='pubdate')
-    unpublished_tasks = category.task_set \
-        .unpublished() \
-        .visible_by(user=request.user) \
-        .completed_by_values(request.user, order_by='pubdate')
+    tasks = (
+        category.task_set.published()
+        .visible_by(user=request.user)
+        .completed_by_values(request.user, order_by="pubdate")
+    )
+    unpublished_tasks = (
+        category.task_set.unpublished()
+        .visible_by(user=request.user)
+        .completed_by_values(request.user, order_by="pubdate")
+    )
     have_deadlines = any(task.deadline for task in tasks)
-    return TemplateResponse(request, 'tasks/category.html', {
-        'category': category,
-        'tasks': tasks,
-        'unpublished_tasks': unpublished_tasks,
-        'have_deadlines': have_deadlines,
-        'show_progress': config.IMMEDIATE_FEEDBACK,
-    })
+    return TemplateResponse(
+        request,
+        "tasks/category.html",
+        {
+            "category": category,
+            "tasks": tasks,
+            "unpublished_tasks": unpublished_tasks,
+            "have_deadlines": have_deadlines,
+            "show_progress": config.IMMEDIATE_FEEDBACK,
+        },
+    )
 
 
 @login_required
@@ -62,10 +72,10 @@ def serve_attachment(request, slug, path):
 
     Access is granted exclusively to whitelisted subdirectories.
     """
-    if re.search('^(images|attachments)/', path) is None:
+    if re.search("^(images|attachments)/", path) is None:
         raise PermissionDenied
 
-    if '..' in unquote(path):
+    if ".." in unquote(path):
         raise PermissionDenied
 
     # translate the slug into the internal task name
@@ -90,6 +100,6 @@ class TaskDetailView(LoginRequiredMixin, View):
             raise Http404
 
         if slug_or_name != task.slug:
-            return HttpResponseRedirect(reverse('tasks:detail', args=[task.slug]))
+            return HttpResponseRedirect(reverse("tasks:detail", args=[task.slug]))
 
-        return TemplateResponse(request, 'tasks/detail.html', {'task': task, 'active_tab': 0})
+        return TemplateResponse(request, "tasks/detail.html", {"task": task, "active_tab": 0})

@@ -1,8 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-ALLOWED_TRUNCATOR_IDENTIFIERS = ['minute', 'hour', 'day', 'month', 'year']
-VALID_DATETIME_FORMATS = ['%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']
+ALLOWED_TRUNCATOR_IDENTIFIERS = ["minute", "hour", "day", "month", "year"]
+VALID_DATETIME_FORMATS = ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%d"]
 
 
 def validate_granularity(value):
@@ -12,8 +12,8 @@ def validate_granularity(value):
     """
     if value not in ALLOWED_TRUNCATOR_IDENTIFIERS:
         raise ValidationError(
-            f'Granularity was supplied with the value {value} but is not allowed. '
-            f'Allowed granularities are {ALLOWED_TRUNCATOR_IDENTIFIERS}.'
+            f"Granularity was supplied with the value {value} but is not allowed. "
+            f"Allowed granularities are {ALLOWED_TRUNCATOR_IDENTIFIERS}."
         )
 
 

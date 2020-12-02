@@ -20,12 +20,11 @@ def bad_request(reason: str) -> JsonResponse:
     The returned JsonResponse has the HTTP response code 400 and
     contains a configurable reason, which can be taken for error handling.
     """
-    return JsonResponse({'reason': reason}, status=HTTPStatus.BAD_REQUEST)
+    return JsonResponse({"reason": reason}, status=HTTPStatus.BAD_REQUEST)
 
 
 def queryset_limit_reached(
-    queryset_count: int,
-    reason: str = 'Queryset limit reached'
+    queryset_count: int, reason: str = "Queryset limit reached"
 ) -> JsonResponse:
     """
     Return a JsonResponse to indicate that the queryset limit was reached.
@@ -36,10 +35,9 @@ def queryset_limit_reached(
     return this response to indicate to the client that an arbitrary
     object limit was reached, so that the client can react accordingly.
     """
-    return JsonResponse({
-        'queryset_count': queryset_count,
-        'reason': reason
-    }, status=HTTPStatus.BAD_REQUEST)
+    return JsonResponse(
+        {"queryset_count": queryset_count, "reason": reason}, status=HTTPStatus.BAD_REQUEST
+    )
 
 
 class AdminView(UserPassesTestMixin, LoginRequiredMixin, View):
@@ -61,27 +59,30 @@ class StatisticsIndexTemplateView(AdminView, TemplateView):
     The statistics index view provides a frame
     for other modular statistics views.
     """
-    template_name = 'statistics/index.html'
+
+    template_name = "statistics/index.html"
 
 
 class SubmissionsHistogramTemplateView(AdminView, TemplateView):
     """
     Provide the template for the modular submissions histogram.
     """
-    template_name = 'statistics/submissions_histogram.html'
+
+    template_name = "statistics/submissions_histogram.html"
 
     def get_context_data(self) -> dict:
-        return {'categories': Category.objects.all()}
+        return {"categories": Category.objects.all()}
 
 
 class AttemptsHistogramTemplateView(AdminView, TemplateView):
     """
     Provide the template for the modular attempts histogram.
     """
-    template_name = 'statistics/attempts_histogram.html'
+
+    template_name = "statistics/attempts_histogram.html"
 
     def get_context_data(self) -> dict:
-        return {'tasks': Task.objects.all()}
+        return {"tasks": Task.objects.all()}
 
 
 class SubmissionsHistogramJsonView(AdminView):
@@ -107,16 +108,16 @@ class SubmissionsHistogramJsonView(AdminView):
         """
         form = SubmissionsHistogramForm(request.GET)
         if not form.is_valid():
-            return bad_request('The supplied form was invalid.')
+            return bad_request("The supplied form was invalid.")
 
-        queryset_limit = form.cleaned_data.get('queryset_limit')
-        from_timestamp = form.cleaned_data.get('from_timestamp')
-        to_timestamp = form.cleaned_data.get('to_timestamp')
-        passed = form.cleaned_data.get('passed')
-        category_id = form.cleaned_data.get('category_id')
-        granularity = form.cleaned_data.get('granularity', 'minute')
+        queryset_limit = form.cleaned_data.get("queryset_limit")
+        from_timestamp = form.cleaned_data.get("from_timestamp")
+        to_timestamp = form.cleaned_data.get("to_timestamp")
+        passed = form.cleaned_data.get("passed")
+        category_id = form.cleaned_data.get("category_id")
+        granularity = form.cleaned_data.get("granularity", "minute")
 
-        truncator = functions.Trunc('submission_date', granularity)
+        truncator = functions.Trunc("submission_date", granularity)
 
         queryset = Solution.objects
         if from_timestamp:
@@ -133,14 +134,11 @@ class SubmissionsHistogramJsonView(AdminView):
         if queryset_limit is not None and queryset_count > queryset_limit:
             return queryset_limit_reached(queryset_count)
 
-        histogram_queryset = queryset \
-            .annotate(date=truncator) \
-            .values('date') \
-            .annotate(count=models.Count('pk'))
+        histogram_queryset = (
+            queryset.annotate(date=truncator).values("date").annotate(count=models.Count("pk"))
+        )
 
-        return JsonResponse({
-            'histogram': list(histogram_queryset)
-        })
+        return JsonResponse({"histogram": list(histogram_queryset)})
 
 
 class AttemptsHistogramJsonView(AdminView):
@@ -169,22 +167,21 @@ class AttemptsHistogramJsonView(AdminView):
         """
         form = AttemptsHistogramForm(request.GET)
         if not form.is_valid():
-            return bad_request('The supplied form was invalid.')
+            return bad_request("The supplied form was invalid.")
 
-        queryset_limit = form.cleaned_data.get('queryset_limit')
-        task_id = form.cleaned_data['task_id']
+        queryset_limit = form.cleaned_data.get("queryset_limit")
+        task_id = form.cleaned_data["task_id"]
 
-        queryset = Solution.objects \
-            .filter(passed=True, task_id=task_id) \
-            .values('author_id') \
-            .annotate(num_trials=models.Min('scoped_id'))
+        queryset = (
+            Solution.objects.filter(passed=True, task_id=task_id)
+            .values("author_id")
+            .annotate(num_trials=models.Min("scoped_id"))
+        )
 
         # Check the queryset count before any expensive computing is done
         queryset_count = queryset.count()
         if queryset_limit is not None and queryset_count > queryset_limit:
             return queryset_limit_reached(queryset_count)
 
-        histogram = Counter(queryset.values_list('num_trials', flat=True))
-        return JsonResponse({
-            'histogram': histogram
-        })
+        histogram = Counter(queryset.values_list("num_trials", flat=True))
+        return JsonResponse({"histogram": histogram})
