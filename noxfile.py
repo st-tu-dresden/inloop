@@ -18,44 +18,44 @@ def install_with_constraints(session, *args, **kwargs):
         # This approach is by Claudio Jolowicz, see his excellect
         # example at github.com/cjolowicz/hypermodern-python.
         session.run(
-            'poetry',
-            'export',
-            '--dev',
-            '--without-hashes',
-            '--format=requirements.txt',
-            f'--output={requirements.name}',
-            external=True
+            "poetry",
+            "export",
+            "--dev",
+            "--without-hashes",
+            "--format=requirements.txt",
+            f"--output={requirements.name}",
+            external=True,
         )
-        session.install(f'--constraint={requirements.name}', *args, **kwargs)
+        session.install(f"--constraint={requirements.name}", *args, **kwargs)
 
 
-@nox.session(python=['3.7', '3.8'])
+@nox.session(python=["3.7", "3.8"])
 def tests(session):
     """Run the complete test suite without dev dependencies."""
-    args = session.posargs or ['-v2', '--failfast']
+    args = session.posargs or ["-v2", "--failfast"]
     session.run(
-        'docker',
-        'build',
-        '--tag',
-        'inloop-integration-test',
-        'tests/testrunner',
+        "docker",
+        "build",
+        "--tag",
+        "inloop-integration-test",
+        "tests/testrunner",
         external=True,
     )
-    session.run('poetry', 'install', '--no-dev', external=True)
-    install_with_constraints(session, 'coverage[toml]')
-    session.run('coverage', 'run', './manage.py', 'test', *args)
-    session.run('coverage', 'report')
+    session.run("poetry", "install", "--no-dev", external=True)
+    install_with_constraints(session, "coverage[toml]")
+    session.run("coverage", "run", "./manage.py", "test", *args)
+    session.run("coverage", "report")
 
 
-@nox.session(python=['3.7'])
+@nox.session(python=["3.7"])
 def lint(session):
     """Check code style with flake8 and isort."""
-    locations = 'inloop', 'tests', 'noxfile.py', 'manage.py'
+    locations = "inloop", "tests", "noxfile.py", "manage.py"
     install_with_constraints(
         session,
-        'flake8',
-        'flake8-black',
-        'flake8-docstrings',
-        'flake8-isort',
+        "flake8",
+        "flake8-black",
+        "flake8-docstrings",
+        "flake8-isort",
     )
-    session.run('flake8', *locations)
+    session.run("flake8", *locations)

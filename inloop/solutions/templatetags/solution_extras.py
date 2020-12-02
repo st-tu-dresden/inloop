@@ -47,13 +47,13 @@ def format_if(progress, format_str):
     current number of submissions and `limit` for the submission limit.
     """
     if not isinstance(progress, ProgressInfo):
-        raise ValueError('progress must be of type ProgressInfo')
+        raise ValueError("progress must be of type ProgressInfo")
     if progress.has_limit:
         return format_str.format(current=progress.current, limit=progress.limit)
-    return ''
+    return ""
 
 
 @register.simple_tag(takes_context=True)
 def get_submission_progress(context, task):
     """Return progress information for a task."""
-    return ProgressInfo(user=context['user'], task=task)
+    return ProgressInfo(user=context["user"], task=task)

@@ -22,8 +22,8 @@ def export_bonuspoints(category_name, date, zeroes=False):
     """Conveniently execute the bonus points export management command."""
     stdout = StringIO()
     with TemporaryDirectory() as tmpdir:
-        output_path = Path(tmpdir, 'output')
-        args = [category_name, date.strftime('%Y-%m-%d'), output_path]
+        output_path = Path(tmpdir, "output")
+        args = [category_name, date.strftime("%Y-%m-%d"), output_path]
         call_command(tud_export_bonuspoints_csv.Command(), *args, stdout=stdout, zeroes=zeroes)
         with open(output_path) as stream:
             return stdout.getvalue(), stream.readlines(), output_path
@@ -47,10 +47,12 @@ class BasicBonuspointCalculationTest(SolutionsData, TestCase):
         Verify that grades are computed correctly
         according to a given grading function.
         """
+
         def preferred_grading(user):
             if user == self.alice:
                 return 1000
             return 0
+
         for row in calculate_grades([self.alice, self.bob], preferred_grading):
             if row[2] == self.alice.username:
                 self.assertEqual(row[-1], 1000)
@@ -63,9 +65,7 @@ class BasicBonuspointCalculationTest(SolutionsData, TestCase):
         legitimate solutions.
         """
         points_for_alice = points_for_completed_tasks(
-            self.category.name,
-            datetime(1970, 1, 1),
-            10
+            self.category.name, datetime(1970, 1, 1), 10
         )(self.alice)
         self.assertEqual(points_for_alice, 1)
 
@@ -74,11 +74,9 @@ class BasicBonuspointCalculationTest(SolutionsData, TestCase):
         Verify that the maximum bonus point
         amount is taken into account.
         """
-        points_for_alice = points_for_completed_tasks(
-            self.category.name,
-            datetime(1970, 1, 1),
-            0
-        )(self.alice)
+        points_for_alice = points_for_completed_tasks(self.category.name, datetime(1970, 1, 1), 0)(
+            self.alice
+        )
         self.assertEqual(points_for_alice, 0)
 
     def test_filter_zeroes(self):
@@ -88,12 +86,12 @@ class BasicBonuspointCalculationTest(SolutionsData, TestCase):
         management command.
         """
         mocked_grade_sequence = [
-            (None, None, 'Alice', None, 0),
-            (None, None, 'Bob', None, 1),
-            (None, None, 'Charles', None, -1),
+            (None, None, "Alice", None, 0),
+            (None, None, "Bob", None, 1),
+            (None, None, "Charles", None, -1),
         ]
         filtered_grade_sequence = list(filter_zeroes(mocked_grade_sequence))
-        self.assertNotIn((None, None, 'Alice', None, 0), filtered_grade_sequence)
+        self.assertNotIn((None, None, "Alice", None, 0), filtered_grade_sequence)
         self.assertEqual(len(filtered_grade_sequence), 2)
 
 
@@ -104,16 +102,16 @@ class BonusPointsExportTest(SolutionsData, TestCase):
             self.task.category.name, datetime(1970, 1, 1)
         )
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 1)
 
-        rows = ''.join(file_contents)
+        rows = "".join(file_contents)
 
-        self.assertIn('alice', rows)
-        self.assertIn('alice@example.org', rows)
-        self.assertIn('1', rows, 'The user alice should get 1 bonus point')
-        self.assertNotIn('0', rows, 'Users with 0 bonus points should be excluded')
-        self.assertNotIn('2', rows, 'No user should get 2 bonus points')
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("1", rows, "The user alice should get 1 bonus point")
+        self.assertNotIn("0", rows, "Users with 0 bonus points should be excluded")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
     def test_export_bonus_points_with_zeroes(self):
         """
@@ -124,18 +122,18 @@ class BonusPointsExportTest(SolutionsData, TestCase):
             self.task.category.name, datetime(1970, 1, 1), zeroes=True
         )
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 2)
 
-        rows = ''.join(file_contents)
+        rows = "".join(file_contents)
 
-        self.assertIn('alice', rows)
-        self.assertIn('alice@example.org', rows)
-        self.assertIn('bob', rows)
-        self.assertIn('bob@example.org', rows)
-        self.assertIn('1', rows, 'The user alice should get 1 bonus point')
-        self.assertIn('0', rows, 'The user bob should get no bonus points')
-        self.assertNotIn('2', rows, 'No user should get 2 bonus points')
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("bob", rows)
+        self.assertIn("bob@example.org", rows)
+        self.assertIn("1", rows, "The user alice should get 1 bonus point")
+        self.assertIn("0", rows, "The user bob should get no bonus points")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
 class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, TestCase):
@@ -148,13 +146,13 @@ class PlagiarismBonusPointsExportTest(DetectedPlagiarismData, TestCase):
             self.task.category.name, datetime(1970, 1, 1)
         )
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 0)
 
-        merged_file_contents = ''.join(file_contents)
+        merged_file_contents = "".join(file_contents)
 
-        self.assertNotIn('alice', merged_file_contents)
-        self.assertNotIn('bob', merged_file_contents)
+        self.assertNotIn("alice", merged_file_contents)
+        self.assertNotIn("bob", merged_file_contents)
 
 
 class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, TestCase):
@@ -181,18 +179,18 @@ class PlagiarismVetoBonusPointsExportTest(PlagiarismTestData, TestCase):
             self.task.category.name, datetime(1970, 1, 1)
         )
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 2)
 
-        rows = ''.join(file_contents)
+        rows = "".join(file_contents)
 
-        self.assertIn('alice', rows)
-        self.assertIn('alice@example.org', rows)
-        self.assertIn('bob', rows)
-        self.assertIn('bob@example.org', rows)
-        self.assertIn('1', rows, 'Each user should get 1 bonus point')
-        self.assertNotIn('0', rows, 'No user should get 0 bonus points')
-        self.assertNotIn('2', rows, 'No user should get 2 bonus points')
+        self.assertIn("alice", rows)
+        self.assertIn("alice@example.org", rows)
+        self.assertIn("bob", rows)
+        self.assertIn("bob@example.org", rows)
+        self.assertIn("1", rows, "Each user should get 1 bonus point")
+        self.assertNotIn("0", rows, "No user should get 0 bonus points")
+        self.assertNotIn("2", rows, "No user should get 2 bonus points")
 
 
 class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, TestCase):
@@ -215,16 +213,14 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, TestCase):
         Validate that only the most recent passed solution
         is taken into account for bonus points calculation.
         """
-        stdout, file_contents, path = export_bonuspoints(
-            self.task.category.name, datetime.now()
-        )
+        stdout, file_contents, path = export_bonuspoints(self.task.category.name, datetime.now())
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 1)
 
-        merged_file_contents = ''.join(file_contents)
+        merged_file_contents = "".join(file_contents)
 
-        self.assertIn('alice', merged_file_contents)
+        self.assertIn("alice", merged_file_contents)
 
     def test_export_bonus_points_future_start_date(self):
         """
@@ -235,17 +231,15 @@ class BonusPointsExportTimingTest(SimpleAccountsData, SimpleTaskData, TestCase):
             self.task.category.name, datetime.now() + timedelta(days=1337)
         )
 
-        self.assertIn('Successfully created {}'.format(path), stdout)
+        self.assertIn("Successfully created {}".format(path), stdout)
         self.assertEqual(len(file_contents), 0)
 
-        merged_file_contents = ''.join(file_contents)
+        merged_file_contents = "".join(file_contents)
 
-        self.assertNotIn('alice', merged_file_contents)
+        self.assertNotIn("alice", merged_file_contents)
 
 
-class BonusPointsExportPlagiarismTimingTest(
-    PassedSolutionsData, TemporaryMediaRootTestCase
-):
+class BonusPointsExportPlagiarismTimingTest(PassedSolutionsData, TemporaryMediaRootTestCase):
     def test_use_only_most_recent_plagiarism_test(self):
         """
         Validate that only the most recent plagiarism test
@@ -255,10 +249,10 @@ class BonusPointsExportPlagiarismTimingTest(
         stdout, file_contents, path = export_bonuspoints(
             self.published_task1.category.name, datetime.now()
         )
-        rows = ''.join(file_contents)
+        rows = "".join(file_contents)
 
-        self.assertIn('alice', rows)
-        self.assertIn('bob', rows)
+        self.assertIn("alice", rows)
+        self.assertIn("bob", rows)
 
         test = PlagiarismTest.objects.create()
         DetectedPlagiarism.objects.create(test=test, solution=self.passed_solution_bob)
@@ -266,7 +260,7 @@ class BonusPointsExportPlagiarismTimingTest(
         stdout, file_contents, path = export_bonuspoints(
             self.published_task1.category.name, datetime.now()
         )
-        rows = ''.join(file_contents)
+        rows = "".join(file_contents)
 
-        self.assertIn('alice', rows)
-        self.assertNotIn('bob', rows, 'Bob should get no bonus for his plagiated solution!')
+        self.assertIn("alice", rows)
+        self.assertNotIn("bob", rows, "Bob should get no bonus for his plagiated solution!")

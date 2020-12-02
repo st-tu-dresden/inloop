@@ -15,11 +15,11 @@ from tests.tasks.mixins import TaskData
 class TaskTests(SimpleAccountsData, TaskData, TestCase):
     def test_slugify_on_save(self):
         task = Task.objects.create(
-            title='Some Task III (winter term 2010/2011)',
+            title="Some Task III (winter term 2010/2011)",
             category=self.category1,
-            pubdate=timezone.now()
+            pubdate=timezone.now(),
         )
-        self.assertEqual(task.slug, 'some-task-iii')
+        self.assertEqual(task.slug, "some-task-iii")
 
     def test_is_published(self):
         self.assertTrue(self.published_task1.is_published)
@@ -32,10 +32,10 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
     def test_is_expired_with_no_tolerance(self):
         now = timezone.now()
         task = Task.objects.create(
-            title='Test Task',
+            title="Test Task",
             category=self.category1,
             pubdate=now,
-            deadline=(now - timedelta(seconds=1))
+            deadline=(now - timedelta(seconds=1)),
         )
         self.assertTrue(task.is_expired)
 
@@ -43,10 +43,10 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
     def test_is_expired_with_tolerance(self):
         now = timezone.now()
         task = Task.objects.create(
-            title='Test Task',
+            title="Test Task",
             category=self.category1,
             pubdate=now,
-            deadline=(now - timedelta(seconds=31))
+            deadline=(now - timedelta(seconds=31)),
         )
         self.assertTrue(task.is_expired)
 
@@ -54,10 +54,10 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
     def test_is_not_expired_with_tolerance(self):
         now = timezone.now()
         task = Task.objects.create(
-            title='Test Task',
+            title="Test Task",
             category=self.category1,
             pubdate=now,
-            deadline=(now - timedelta(seconds=29))
+            deadline=(now - timedelta(seconds=29)),
         )
         self.assertFalse(task.is_expired)
 
@@ -87,18 +87,18 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
 
     def test_submission_limit_local_override(self):
         task1 = Task.objects.create(
-            title='Test Task 1',
-            system_name='TestTask1',
+            title="Test Task 1",
+            system_name="TestTask1",
             category=self.category1,
             pubdate=timezone.now(),
-            max_submissions=0
+            max_submissions=0,
         )
         task2 = Task.objects.create(
-            title='Test Task 2',
-            system_name='TestTask2',
+            title="Test Task 2",
+            system_name="TestTask2",
             category=self.category1,
             pubdate=timezone.now(),
-            max_submissions=10
+            max_submissions=10,
         )
         self.assertEqual(task1.submission_limit, 0)
         self.assertTrue(task1.has_submission_limit)
@@ -108,11 +108,11 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
     @override_config(MAX_SUBMISSIONS=10)
     def test_custom_submission_limit_local_override(self):
         task = Task.objects.create(
-            title='Test Task',
-            system_name='TestTask',
+            title="Test Task",
+            system_name="TestTask",
             category=self.category1,
             pubdate=timezone.now(),
-            max_submissions=15
+            max_submissions=15,
         )
         self.assertEqual(task.submission_limit, 15)
         self.assertTrue(task.has_submission_limit)
@@ -120,24 +120,20 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
 
 class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
     def test_slugify_on_save(self):
-        category = Category.objects.create(name='Test category')
-        self.assertEqual(category.slug, 'test-category')
+        category = Category.objects.create(name="Test category")
+        self.assertEqual(category.slug, "test-category")
 
     def test_completion_info_initial(self):
         for user in [self.bob, self.alice]:
-            self.assertDictEqual(self.category1.completion_info(user), {
-                'num_completed': 0,
-                'num_published': 2,
-                'is_completed': False,
-                'progress': 0
-            })
+            self.assertDictEqual(
+                self.category1.completion_info(user),
+                {"num_completed": 0, "num_published": 2, "is_completed": False, "progress": 0},
+            )
         for user in [self.bob, self.alice]:
-            self.assertDictEqual(self.category2.completion_info(user), {
-                'num_completed': 0,
-                'num_published': 0,
-                'is_completed': True,
-                'progress': 0
-            })
+            self.assertDictEqual(
+                self.category2.completion_info(user),
+                {"num_completed": 0, "num_published": 0, "is_completed": True, "progress": 0},
+            )
 
     def test_completion_info(self):
         for _ in range(2):
@@ -145,24 +141,20 @@ class TaskCategoryTests(SimpleAccountsData, TaskData, TestCase):
             Solution.objects.create(author=self.alice, task=self.published_task1, passed=True)
 
         for user in [self.bob, self.alice]:
-            self.assertDictEqual(self.category1.completion_info(user), {
-                'num_completed': 1,
-                'num_published': 2,
-                'is_completed': False,
-                'progress': 50
-            })
+            self.assertDictEqual(
+                self.category1.completion_info(user),
+                {"num_completed": 1, "num_published": 2, "is_completed": False, "progress": 50},
+            )
 
         for _ in range(2):
             Solution.objects.create(author=self.bob, task=self.published_task2, passed=True)
             Solution.objects.create(author=self.alice, task=self.published_task2, passed=True)
 
         for user in [self.bob, self.alice]:
-            self.assertDictEqual(self.category1.completion_info(user), {
-                'num_completed': 2,
-                'num_published': 2,
-                'is_completed': True,
-                'progress': 100
-            })
+            self.assertDictEqual(
+                self.category1.completion_info(user),
+                {"num_completed": 2, "num_published": 2, "is_completed": True, "progress": 100},
+            )
 
 
 class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
@@ -207,12 +199,14 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
 
     def test_inverse_op(self):
         Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
-        self.assertSequenceEqual(Task.objects.not_completed_by(self.bob), [
-            self.published_task2, self.unpublished_task1, self.unpublished_task2
-        ])
-        self.assertSequenceEqual(self.category1.task_set.not_completed_by(self.bob), [
-            self.published_task2, self.unpublished_task1, self.unpublished_task2
-        ])
+        self.assertSequenceEqual(
+            Task.objects.not_completed_by(self.bob),
+            [self.published_task2, self.unpublished_task1, self.unpublished_task2],
+        )
+        self.assertSequenceEqual(
+            self.category1.task_set.not_completed_by(self.bob),
+            [self.published_task2, self.unpublished_task1, self.unpublished_task2],
+        )
         self.assertEqual(len(self.category2.task_set.not_completed_by(self.bob)), 0)
 
     def test_issue184(self):

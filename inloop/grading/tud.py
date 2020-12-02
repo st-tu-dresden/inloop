@@ -20,7 +20,7 @@ def get_user_data(user):
         matnum = user.studentdetails.matnum
         course = user.studentdetails.course
     except ObjectDoesNotExist:
-        matnum = course = ''
+        matnum = course = ""
     if not user.last_name:
         first_name, last_name = guess_name_from_email(user.email)
     else:
@@ -32,13 +32,13 @@ def guess_name_from_email(email):
     """
     Try to guess first and last name from email and return it as a tuple.
     """
-    name, domain = email.split('@', 1)
-    if domain != 'mailbox.tu-dresden.de':
-        return '', ''
-    first_name, last_name = name.split('.', 1)
-    first_name = first_name.replace('_', ' ')
-    last_name = last_name.replace('_', ' ')
-    last_name = re.sub(r'[1-9]$', '', last_name)
+    name, domain = email.split("@", 1)
+    if domain != "mailbox.tu-dresden.de":
+        return "", ""
+    first_name, last_name = name.split(".", 1)
+    first_name = first_name.replace("_", " ")
+    last_name = last_name.replace("_", " ")
+    last_name = re.sub(r"[1-9]$", "", last_name)
     return capwords(first_name), capwords(last_name)
 
 
@@ -54,13 +54,15 @@ def points_for_completed_tasks(category_name, start_date, max_points):
     start_date = make_aware(start_date)
 
     def func(user):
-        points = len(category.task_set.exclude(
-            id__in=get_ripoff_tasks_for_user(user)
-        ).filter(
-            solution__passed=True,
-            solution__author=user,
-            solution__submission_date__gte=start_date
-        ).distinct())
+        points = len(
+            category.task_set.exclude(id__in=get_ripoff_tasks_for_user(user))
+            .filter(
+                solution__passed=True,
+                solution__author=user,
+                solution__submission_date__gte=start_date,
+            )
+            .distinct()
+        )
         return min(points, max_points)
 
     return func
@@ -72,4 +74,4 @@ def calculate_grades(users, gradefunc):
     the given user query set and grading function.
     """
     for user in users:
-        yield get_user_data(user) + (gradefunc(user), )
+        yield get_user_data(user) + (gradefunc(user),)

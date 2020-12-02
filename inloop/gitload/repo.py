@@ -16,10 +16,10 @@ class Repository:
         to not exist yet on the file system.
         """
         if not path:
-            raise ValueError('path must not be empty')
+            raise ValueError("path must not be empty")
         _path = Path(path)
         if not _path.is_absolute():
-            raise ValueError('path must be absolute')
+            raise ValueError("path must be absolute")
         self._path = _path
 
     @property
@@ -38,17 +38,17 @@ class Repository:
 
     def call_make(self, timeout=300):
         """Call the `make` command in this repository's directory."""
-        subprocess.check_call(['make', '--silent'], cwd=self.path_s, timeout=timeout)
+        subprocess.check_call(["make", "--silent"], cwd=self.path_s, timeout=timeout)
 
     def synchronize(self):
         """Synchronize files with a remote source (optional)."""
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.path_s!r})'
+        return f"{self.__class__.__name__}({self.path_s!r})"
 
 
 _GIT_ENVIRON = os.environ.copy()
-_GIT_ENVIRON['GIT_SSH_COMMAND'] = 'ssh -F/dev/null -oBatchMode=yes -oStrictHostKeyChecking=no'
+_GIT_ENVIRON["GIT_SSH_COMMAND"] = "ssh -F/dev/null -oBatchMode=yes -oStrictHostKeyChecking=no"
 
 
 class GitRepository(Repository):
@@ -64,9 +64,9 @@ class GitRepository(Repository):
         """
         super().__init__(path)
         if not url:
-            raise ValueError('url must not be empty')
+            raise ValueError("url must not be empty")
         if not branch:
-            raise ValueError('branch must not be empty')
+            raise ValueError("branch must not be empty")
         self.url = url
         self.branch = branch
         self.timeout = timeout
@@ -76,24 +76,29 @@ class GitRepository(Repository):
         Perform the equivalent of a `git pull` in this git clone, which must already be
         initialized, using a failure-resistant strategy (currently fetch + hard reset).
         """
-        self.git('remote', 'set-url', 'origin', self.url)
-        self.git('fetch', '--quiet', '--depth=1', 'origin', '+refs/heads/*:refs/remotes/origin/*')
-        self.git('stash', '-u')
-        self.git('reset', '--hard', f'origin/{self.branch}')
+        self.git("remote", "set-url", "origin", self.url)
+        self.git("fetch", "--quiet", "--depth=1", "origin", "+refs/heads/*:refs/remotes/origin/*")
+        self.git("stash", "-u")
+        self.git("reset", "--hard", f"origin/{self.branch}")
 
     def initialize(self):
         """Initialize the git clone for this repository."""
         self.path.mkdir(parents=True, exist_ok=True)
-        self.git('clone', '--quiet', '--depth=1', '--branch', self.branch, self.url, '.')
+        self.git("clone", "--quiet", "--depth=1", "--branch", self.branch, self.url, ".")
 
     def git(self, *args):
         """Perform given `git` subcommand (and arguments) in this git clone."""
-        subprocess.check_call(['git'] + list(args), cwd=self.path_s, env=_GIT_ENVIRON,
-                              stdout=subprocess.DEVNULL, timeout=self.timeout)
+        subprocess.check_call(
+            ["git"] + list(args),
+            cwd=self.path_s,
+            env=_GIT_ENVIRON,
+            stdout=subprocess.DEVNULL,
+            timeout=self.timeout,
+        )
 
     def synchronize(self):
         """Synchronize files with the remote git repository."""
-        if self.path.joinpath('.git').is_dir():
+        if self.path.joinpath(".git").is_dir():
             self.update()
         else:
             self.initialize()

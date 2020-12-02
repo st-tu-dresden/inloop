@@ -33,16 +33,17 @@ logger = logging.getLogger(__name__)
 
 class HttpResponseBadJsonRequest(JsonResponse):
     """Response that indicates an invalid JSON request made by the client."""
+
     status_code = 400
 
     def __init__(self):
-        super().__init__({'error': 'invalid json'})
+        super().__init__({"error": "invalid json"})
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
     def get(self, request, id):
         solution = get_object_or_404(Solution, pk=id, author=request.user)
-        return JsonResponse({'solution_id': solution.id, 'status': solution.status()})
+        return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
 
 class SubmissionError(Exception):
@@ -53,7 +54,7 @@ class SolutionSubmitMixin:
     def get_task(self, request, slug):
         task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
         if task.is_expired:
-            raise SubmissionError('The deadline for this task has passed.')
+            raise SubmissionError("The deadline for this task has passed.")
         return task
 
     def submit(self, files, author, task):
@@ -68,8 +69,8 @@ class SolutionSubmitMixin:
         except ValidationError as error:
             raise SubmissionError(str(error))
         except IntegrityError:
-            logger.exception('db constraint violation occurred')
-            raise SubmissionError('Concurrent submission is not possible.')
+            logger.exception("db constraint violation occurred")
+            raise SubmissionError("Concurrent submission is not possible.")
 
     def check_submission_limit(self, author, task):
         """
@@ -79,15 +80,15 @@ class SolutionSubmitMixin:
             count = Solution.objects.filter(author=author, task=task).count()
             limit = task.submission_limit
             if count >= limit:
-                suffix = 's' if limit > 1 else ''
-                raise SubmissionError(f'You cannot submit more than {limit} solution{suffix}.')
+                suffix = "s" if limit > 1 else ""
+                raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
 
     @transaction.atomic()
     def atomic_submit(self, files, author, task):
         solution = Solution.objects.create(author=author, task=task)
-        SolutionFile.objects.bulk_create([
-            SolutionFile(solution=solution, file=file) for file in files
-        ])
+        SolutionFile.objects.bulk_create(
+            [SolutionFile(solution=solution, file=file) for file in files]
+        )
         return solution
 
 
@@ -103,11 +104,12 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         except ObjectDoesNotExist:
             raise Http404
         if slug_or_name != task.slug:
-            return HttpResponseRedirect(reverse('solutions:editor', args=[task.slug]))
-        return TemplateResponse(request, 'solutions/editor.html', {
-            'task': task,
-            'syntax_check_endpoint': config.SYNTAX_CHECK_ENDPOINT
-        })
+            return HttpResponseRedirect(reverse("solutions:editor", args=[task.slug]))
+        return TemplateResponse(
+            request,
+            "solutions/editor.html",
+            {"task": task, "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT},
+        )
 
     def post(self, request, slug_or_name):
         """
@@ -117,42 +119,47 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             # if it's a name and not a slug, get_task(…) will make it fail with 404
             task = self.get_task(request, slug_or_name)
             json_data = json.loads(request.body)
-            uploads = json_data.get('uploads', {})
+            uploads = json_data.get("uploads", {})
             files = [
                 SimpleUploadedFile(filename, content.encode())
                 for filename, content in uploads.items()
             ]
             self.submit(files, request.user, task)
             if not task.has_submission_limit:
-                return JsonResponse({'success': True})
-            return JsonResponse({
-                'success': True,
-                'submission_limit': task.submission_limit,
-                'num_submissions': Solution.objects.filter(author=request.user, task=task).count()
-            })
+                return JsonResponse({"success": True})
+            return JsonResponse(
+                {
+                    "success": True,
+                    "submission_limit": task.submission_limit,
+                    "num_submissions": Solution.objects.filter(
+                        author=request.user, task=task
+                    ).count(),
+                }
+            )
         except SubmissionError as error:
-            return JsonResponse({'success': False, 'reason': str(error)})
+            return JsonResponse({"success": False, "reason": str(error)})
         except JSONDecodeError:
             return HttpResponseBadJsonRequest()
 
 
 class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
     def get(self, request, slug):
-        return TemplateResponse(request, 'solutions/upload_form.html', {
-            'task': get_object_or_404(Task.objects.published(), slug=slug),
-            'active_tab': 2
-        })
+        return TemplateResponse(
+            request,
+            "solutions/upload_form.html",
+            {"task": get_object_or_404(Task.objects.published(), slug=slug), "active_tab": 2},
+        )
 
     def post(self, request, slug):
         try:
             task = self.get_task(request, slug)
-            files = request.FILES.getlist('uploads', default=[])
+            files = request.FILES.getlist("uploads", default=[])
             self.submit(files, request.user, task)
         except SubmissionError as error:
             messages.error(request, str(error))
-            return redirect('solutions:upload', slug=slug)
-        messages.success(request, 'Your solution has been submitted to the checker.')
-        return redirect('solutions:list', slug=slug)
+            return redirect("solutions:upload", slug=slug)
+        messages.success(request, "Your solution has been submitted to the checker.")
+        return redirect("solutions:list", slug=slug)
 
 
 def access_solution_or_404(user: User, solution_id: int) -> Solution:
@@ -173,51 +180,56 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 class NewSolutionArchiveView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
-            raise Http404('No solution id was supplied.')
+            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
-            return JsonResponse({'status': 'available'})
+            return JsonResponse({"status": "available"})
         try:
             create_archive_async(solution)
         except TaskLockedException:
-            return JsonResponse({'status': 'already running'})
-        return JsonResponse({'status': 'initiated'})
+            return JsonResponse({"status": "already running"})
+        return JsonResponse({"status": "initiated"})
 
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
-            raise Http404('No solution id was supplied.')
+            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
-            return JsonResponse({'status': 'available'})
-        return JsonResponse({'status': 'unavailable'})
+            return JsonResponse({"status": "available"})
+        return JsonResponse({"status": "unavailable"})
 
 
 class SolutionArchiveDownloadView(LoginRequiredMixin, View):
     def get(self, request, solution_id):
         if not solution_id:
-            raise Http404('No solution id was supplied.')
+            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
-            response = HttpResponse(solution.archive, content_type='application/zip')
-            attachment = 'attachment; filename=%s' % basename(solution.archive.name)
-            response['Content-Disposition'] = attachment
+            response = HttpResponse(solution.archive, content_type="application/zip")
+            attachment = "attachment; filename=%s" % basename(solution.archive.name)
+            response["Content-Disposition"] = attachment
             return response
-        return redirect('solutions:detail', slug=solution.task.slug, scoped_id=solution.scoped_id)
+        return redirect("solutions:detail", slug=solution.task.slug, scoped_id=solution.scoped_id)
 
 
 class SolutionListView(LoginRequiredMixin, View):
     def get(self, request, slug):
         task = get_object_or_404(Task.objects.published(), slug=slug)
-        solutions = Solution.objects\
-            .select_related('task')\
-            .filter(task=task, author=request.user)\
-            .order_by('-id')[:5]
-        return TemplateResponse(request, 'solutions/solution_list.html', {
-            'task': task,
-            'solutions': solutions,
-        })
+        solutions = (
+            Solution.objects.select_related("task")
+            .filter(task=task, author=request.user)
+            .order_by("-id")[:5]
+        )
+        return TemplateResponse(
+            request,
+            "solutions/solution_list.html",
+            {
+                "task": task,
+                "solutions": solutions,
+            },
+        )
 
 
 class SolutionDetailView(LoginRequiredMixin, View):
@@ -225,9 +237,9 @@ class SolutionDetailView(LoginRequiredMixin, View):
         return {}
 
     def get_object(self, **kwargs):
-        task = get_object_or_404(Task.objects.published(), slug=kwargs['slug'])
+        task = get_object_or_404(Task.objects.published(), slug=kwargs["slug"])
         self.solution = get_object_or_404(
-            Solution, author=self.request.user, task=task, scoped_id=kwargs['scoped_id']
+            Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
         )
         return self.solution
 
@@ -235,24 +247,21 @@ class SolutionDetailView(LoginRequiredMixin, View):
         solution = self.get_object(**kwargs)
 
         if not config.IMMEDIATE_FEEDBACK:
-            context = {
-                'solution': solution,
-                'files': solution.solutionfile_set.all()
-            }
+            context = {"solution": solution, "files": solution.solutionfile_set.all()}
             context.update(self.get_context_data())
-            return TemplateResponse(request, 'solutions/solution_info.html', context)
+            return TemplateResponse(request, "solutions/solution_info.html", context)
 
-        if solution.status() == 'pending':
-            messages.info(request, 'This solution is still being checked. Please try again later.')
-            return redirect('solutions:list', slug=solution.task.slug)
+        if solution.status() == "pending":
+            messages.info(request, "This solution is still being checked. Please try again later.")
+            return redirect("solutions:list", slug=solution.task.slug)
 
-        if solution.status() in ['lost', 'error']:
+        if solution.status() in ["lost", "error"]:
             messages.warning(
                 request,
-                'Sorry, but the server had trouble checking this solution. Please try '
-                'to upload it again or contact the administrator if the problem persists.'
+                "Sorry, but the server had trouble checking this solution. Please try "
+                "to upload it again or contact the administrator if the problem persists.",
             )
-            return redirect('solutions:list', slug=solution.task.slug)
+            return redirect("solutions:list", slug=solution.task.slug)
 
         result = solution.testresult_set.last()
 
@@ -260,15 +269,15 @@ class SolutionDetailView(LoginRequiredMixin, View):
         testsuites = [xml_to_dict(xml) for xml in xml_reports_junit]
 
         context = {
-            'solution': solution,
-            'result': result,
-            'testsuites': testsuites,
-            'files': solution.solutionfile_set.all(),
-            'requested_archive': kwargs.get('requested_archive')
+            "solution": solution,
+            "result": result,
+            "testsuites": testsuites,
+            "files": solution.solutionfile_set.all(),
+            "requested_archive": kwargs.get("requested_archive"),
         }
         context.update(self.get_context_data())
 
-        return TemplateResponse(request, 'solutions/solution_detail.html', context)
+        return TemplateResponse(request, "solutions/solution_detail.html", context)
 
 
 class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
@@ -277,17 +286,17 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
 
     def get_context_data(self):
         return {
-            'impersonate': self.request.user != self.solution.author,
+            "impersonate": self.request.user != self.solution.author,
         }
 
     def get_object(self, **kwargs):
-        self.solution = get_object_or_404(Solution, pk=kwargs['id'])
+        self.solution = get_object_or_404(Solution, pk=kwargs["id"])
         return self.solution
 
 
 class SolutionFileView(LoginRequiredMixin, DetailView):
-    context_object_name = 'file'
-    template_name = 'solutions/file_detail.html'
+    context_object_name = "file"
+    template_name = "solutions/file_detail.html"
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -297,8 +306,8 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user != self.object.solution.author:
-            context['impersonate'] = True
-        context['solution'] = self.object.solution
+            context["impersonate"] = True
+        context["solution"] = self.object.solution
         return context
 
 
@@ -309,17 +318,17 @@ def get_last_checkpoint(request, slug):
     last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
     queryset = []
     if last_checkpoint:
-        queryset = last_checkpoint.checkpointfile_set.order_by('id')
+        queryset = last_checkpoint.checkpointfile_set.order_by("id")
     if not queryset:
         queryset = FileTemplate.objects.filter(task=task)
-    files = [{'name': _file.name, 'contents': _file.contents} for _file in queryset]
-    return JsonResponse({'success': True, 'files': files})
+    files = [{"name": _file.name, "contents": _file.contents} for _file in queryset]
+    return JsonResponse({"success": True, "files": files})
 
 
 @login_required
 def save_checkpoint(request, slug):
-    if request.method != 'POST':
-        return JsonResponse({'success': False})
+    if request.method != "POST":
+        return JsonResponse({"success": False})
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
@@ -328,20 +337,17 @@ def save_checkpoint(request, slug):
     try:
         Checkpoint.objects.save_checkpoint(data, task, request.user)
     except KeyError:
-        return JsonResponse({'success': False})
-    return JsonResponse({'success': True})
+        return JsonResponse({"success": False})
+    return JsonResponse({"success": True})
 
 
 @csrf_exempt
 def mock_syntax_check(request):
     """Temporary endpoint that outputs some fake syntax check results."""
-    if request.method != 'POST':
-        return JsonResponse({'success': False})
+    if request.method != "POST":
+        return JsonResponse({"success": False})
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
-        return JsonResponse({
-            'success': False,
-            'reason': 'bad configuration'
-        })
+        return JsonResponse({"success": False, "reason": "bad configuration"})
     try:
         mocked_data = json.loads(config.SYNTAX_CHECK_MOCK_VALUE)
         return JsonResponse(mocked_data)
