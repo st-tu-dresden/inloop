@@ -54,6 +54,7 @@ def lint(session):
     install_with_constraints(
         session,
         'flake8',
+        'flake8-black',
         'flake8-docstrings',
         'flake8-isort',
     )
