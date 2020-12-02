@@ -6,7 +6,11 @@ from django.conf import settings
 
 from markdown import Markdown
 
-from inloop.common.templatetags.markdown import GitVersionProvider, ImageVersionExtension
+from inloop.common.templatetags.markdown import (
+    GitVersionProvider,
+    ImageVersionExtension,
+    VersionProvider,
+)
 
 
 class GitVersionProviderTest(TestCase):
@@ -25,7 +29,7 @@ class GitVersionProviderTest(TestCase):
         self.assertRegex(version, r"^[0-9a-z]{4,}$")
 
 
-class DummyVersionProvider:
+class DummyVersionProvider(VersionProvider):
     def get_version(self):
         return "cafebabe"
 
@@ -77,7 +81,7 @@ class ImageVersioningTest(TestCase):
         self.assertNotIn("v=cafebabe", html)
 
 
-class NoneVersionProvider:
+class NoneVersionProvider(VersionProvider):
     def get_version(self):
         return None
 
