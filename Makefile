@@ -31,6 +31,6 @@ coverage:
 	poetry run coverage report
 
 lint:
-	poetry run $(SHELL) -c 'isort --check-only $(SOURCES) && flake8 $(SOURCES)'
+	poetry run flake8 $(SOURCES)
 
 .PHONY: init loaddb test coverage lint

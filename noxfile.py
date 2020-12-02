@@ -51,12 +51,10 @@ def tests(session):
 def lint(session):
     """Check code style with flake8 and isort."""
     locations = 'inloop', 'tests', 'noxfile.py', 'manage.py'
-    install_with_constraints(session, 'flake8', 'flake8-docstrings', 'isort')
-    session.run(
-        'isort',
-        '--check-only',
-        '--diff',
-        '--quiet',
-        *locations,
+    install_with_constraints(
+        session,
+        'flake8',
+        'flake8-docstrings',
+        'flake8-isort',
     )
     session.run('flake8', *locations)
