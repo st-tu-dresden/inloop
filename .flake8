@@ -2,3 +2,4 @@
 ignore = D,E203
 exclude = migrations
 max-line-length = 99
+max-complexity = 10
