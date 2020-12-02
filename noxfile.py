@@ -42,7 +42,7 @@ def tests(session):
         external=True,
     )
     session.run('poetry', 'install', '--no-dev', external=True)
-    install_with_constraints(session, 'coverage')
+    install_with_constraints(session, 'coverage[toml]')
     session.run('coverage', 'run', './manage.py', 'test', *args)
     session.run('coverage', 'report')
 

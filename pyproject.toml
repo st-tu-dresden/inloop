@@ -26,7 +26,7 @@ redis = "^3.4.1"
 setproctitle = "^1.1.10"
 
 [tool.poetry.dev-dependencies]
-coverage = "^5.0.3"
+coverage = {version = "^5.3", extras = ["toml"]}
 django-debug-toolbar = "^2.2"
 django-html-validator = "^0.5.1"
 flake8 = "^3.7.9"
@@ -56,3 +56,15 @@ sections = [
     "TESTS",
     "LOCALFOLDER"
 ]
+
+[tool.coverage.run]
+branch = true
+source = ["inloop"]
+data_file = ".coverage.dat"
+
+[tool.coverage.report]
+omit = ["*/migrations/*", "inloop/urls_debug.py"]
+
+[tool.coverage.html]
+directory = "htmlcov"
+title = "INLOOP test coverage report"
