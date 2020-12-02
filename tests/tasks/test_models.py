@@ -185,13 +185,13 @@ class CompletedByTests(SimpleAccountsData, TaskData, TestCase):
         self.assertEqual(len(self.category1.task_set.completed_by(self.alice)), 0)
 
     def test_completed_same_task(self):
-        for i in range(3):
+        for _ in range(3):
             Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
         completed = Task.objects.completed_by(self.bob)
         self.assertSequenceEqual(completed, [self.published_task1])
 
     def test_completed_different_tasks(self):
-        for i in range(3):
+        for _ in range(3):
             Solution.objects.create(author=self.bob, task=self.published_task1, passed=True)
             Solution.objects.create(author=self.bob, task=self.published_task2, passed=True)
         completed = self.category1.task_set.completed_by(self.bob)
