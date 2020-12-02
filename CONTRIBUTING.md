@@ -65,7 +65,7 @@ reproducible installations.
   * This will only work if poetry was installed with the recommended installation method
     and _not_ with `pip` or `pipx`.
   * In our CI setup, poetry is installed with `pip` and the version is pinned in
-    [build-requirements.txt](build-requirements.txt).
+    [tools/ci-requirements.txt](tools/ci-requirements.txt).
 
 ### Dependency update process
 

@@ -41,7 +41,7 @@ Using the command line, a development instance can be set up as follows:
 
 1. If you don't have it already, install [poetry](https://python-poetry.org/docs/#installation).
    If you run into trouble, the known "good" versions of the build tools are listed in
-   [build-requirements.txt](build-requirements.txt).
+   [tools/ci-requirements.txt](tools/ci-requirements.txt).
 
 2. Install required software with `./support/scripts/debian_setup.sh` (Debian/Ubuntu) or
    `./support/scripts/macos_setup.sh` (macOS). On Linux, you need to manually install the
