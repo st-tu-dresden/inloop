@@ -1,17 +1,21 @@
+from __future__ import annotations
+
 import json
 import logging
 from json import JSONDecodeError
 from os.path import basename
+from typing import Any, Dict, Iterable
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.db import IntegrityError, transaction
 from django.db.models import ObjectDoesNotExist, Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.db.models.query import QuerySet
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -36,12 +40,12 @@ class HttpResponseBadJsonRequest(JsonResponse):
 
     status_code = 400
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__({"error": "invalid json"})
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
-    def get(self, request, id):
+    def get(self, request: HttpRequest, id: str) -> JsonResponse:
         solution = get_object_or_404(Solution, pk=id, author=request.user)
         return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
@@ -51,13 +55,13 @@ class SubmissionError(Exception):
 
 
 class SolutionSubmitMixin:
-    def get_task(self, request, slug):
+    def get_task(self, request: HttpRequest, slug: str) -> Task:
         task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
         if task.is_expired:
             raise SubmissionError("The deadline for this task has passed.")
         return task
 
-    def submit(self, files, author, task):
+    def submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> None:
         if not files:
             raise SubmissionError("You haven't uploaded any files.")
         try:
@@ -72,7 +76,7 @@ class SolutionSubmitMixin:
             logger.exception("db constraint violation occurred")
             raise SubmissionError("Concurrent submission is not possible.")
 
-    def check_submission_limit(self, author, task):
+    def check_submission_limit(self, author: User, task: Task) -> None:
         """
         Ensure that the author is within the submission limit for the task (if any).
         """
@@ -84,7 +88,7 @@ class SolutionSubmitMixin:
                 raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
 
     @transaction.atomic()
-    def atomic_submit(self, files, author, task):
+    def atomic_submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> Solution:
         solution = Solution.objects.create(author=author, task=task)
         SolutionFile.objects.bulk_create(
             [SolutionFile(solution=solution, file=file) for file in files]
@@ -93,7 +97,7 @@ class SolutionSubmitMixin:
 
 
 class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
-    def get(self, request, slug_or_name):
+    def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Show the side-by-side editor for the task referenced by slug or system_name.
         Requests with a non-slug url are redirected to their slug url equivalent.
@@ -111,7 +115,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             {"task": task, "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT},
         )
 
-    def post(self, request, slug_or_name):
+    def post(self, request: HttpRequest, slug_or_name: str) -> JsonResponse:
         """
         Handle JSON-encoded POST submission requests from the side-by-side editor.
         """
@@ -143,14 +147,14 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
 
 
 class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
-    def get(self, request, slug):
+    def get(self, request: HttpRequest, slug: str) -> HttpResponse:
         return TemplateResponse(
             request,
             "solutions/upload_form.html",
             {"task": get_object_or_404(Task.objects.published(), slug=slug), "active_tab": 2},
         )
 
-    def post(self, request, slug):
+    def post(self, request: HttpRequest, slug: str) -> HttpResponse:
         try:
             task = self.get_task(request, slug)
             files = request.FILES.getlist("uploads", default=[])
@@ -178,7 +182,7 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
-    def get(self, request, solution_id):
+    def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
@@ -192,7 +196,7 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
 
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
-    def get(self, request, solution_id):
+    def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
@@ -202,7 +206,7 @@ class SolutionArchiveStatusView(LoginRequiredMixin, View):
 
 
 class SolutionArchiveDownloadView(LoginRequiredMixin, View):
-    def get(self, request, solution_id):
+    def get(self, request: HttpRequest, solution_id: str) -> HttpResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
@@ -215,7 +219,7 @@ class SolutionArchiveDownloadView(LoginRequiredMixin, View):
 
 
 class SolutionListView(LoginRequiredMixin, View):
-    def get(self, request, slug):
+    def get(self, request: HttpRequest, slug: str) -> HttpResponse:
         task = get_object_or_404(Task.objects.published(), slug=slug)
         solutions = (
             Solution.objects.select_related("task")
@@ -233,17 +237,17 @@ class SolutionListView(LoginRequiredMixin, View):
 
 
 class SolutionDetailView(LoginRequiredMixin, View):
-    def get_context_data(self):
+    def get_context_data(self) -> Dict[Any, Any]:
         return {}
 
-    def get_object(self, **kwargs):
+    def get_object(self, **kwargs: Dict[str, Any]) -> Solution:
         task = get_object_or_404(Task.objects.published(), slug=kwargs["slug"])
         self.solution = get_object_or_404(
             Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
         )
         return self.solution
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs: Dict[str, Any]) -> HttpResponse:
         solution = self.get_object(**kwargs)
 
         if not config.IMMEDIATE_FEEDBACK:
@@ -281,15 +285,15 @@ class SolutionDetailView(LoginRequiredMixin, View):
 
 
 class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
-    def test_func(self):
+    def test_func(self) -> bool:
         return self.request.user.is_staff
 
-    def get_context_data(self):
+    def get_context_data(self) -> Dict[str, Any]:
         return {
             "impersonate": self.request.user != self.solution.author,
         }
 
-    def get_object(self, **kwargs):
+    def get_object(self, **kwargs: Dict[str, Any]) -> Solution:
         self.solution = get_object_or_404(Solution, pk=kwargs["id"])
         return self.solution
 
@@ -298,12 +302,12 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
     context_object_name = "file"
     template_name = "solutions/file_detail.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         if self.request.user.is_staff:
             return SolutionFile.objects.all()
         return SolutionFile.objects.filter(solution__author=self.request.user)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         if self.request.user != self.object.solution.author:
             context["impersonate"] = True
@@ -313,7 +317,7 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 
 @never_cache
 @login_required
-def get_last_checkpoint(request, slug):
+def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
     queryset = []
@@ -326,7 +330,7 @@ def get_last_checkpoint(request, slug):
 
 
 @login_required
-def save_checkpoint(request, slug):
+def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
     if request.method != "POST":
         return JsonResponse({"success": False})
     task = get_object_or_404(Task.objects.published(), slug=slug)
@@ -342,7 +346,7 @@ def save_checkpoint(request, slug):
 
 
 @csrf_exempt
-def mock_syntax_check(request):
+def mock_syntax_check(request: HttpRequest) -> JsonResponse:
     """Temporary endpoint that outputs some fake syntax check results."""
     if request.method != "POST":
         return JsonResponse({"success": False})

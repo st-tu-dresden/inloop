@@ -10,11 +10,15 @@ Javadoc for the class
 which is part of Ant (see https://github.com/apache/ant).
 """
 import re
+from typing import Any, Dict, List, Optional
+from xml.etree.ElementTree import Element
+
+from django.db.models import QuerySet
 
 from defusedxml import ElementTree as ET
 
 
-def checkeroutput_filter(queryset):
+def checkeroutput_filter(queryset: QuerySet) -> List[str]:
     """
     Return a list of XML reports filtered from the CheckerOutput queryset.
 
@@ -26,12 +30,12 @@ def checkeroutput_filter(queryset):
     )
 
 
-def xml_to_dict(xml_report):
+def xml_to_dict(xml_report: str) -> Dict[str, Any]:
     """Parse the given JUnit XML string and return a dict representation."""
     return testsuite_to_dict(ET.fromstring(xml_report))
 
 
-def testsuite_to_dict(testsuite):
+def testsuite_to_dict(testsuite: Element) -> Dict[str, Any]:
     """Return a dict representation of the given <testsuite/> Element."""
     if testsuite.tag != "testsuite":
         raise ValueError("The root tag must be a <testsuite/>.")
@@ -46,14 +50,14 @@ def testsuite_to_dict(testsuite):
     return ts
 
 
-def get_text_safe(element):
+def get_text_safe(element: Optional[Element]) -> Optional[str]:
     """Return the element's text attribute if possible, otherwise None."""
     if element is not None:
         return element.text
     return None
 
 
-def testcase_to_dict(testcase):
+def testcase_to_dict(testcase: Element) -> Dict[str, Any]:
     """Return a dict representation of the given <testcase/> Element."""
     testcase_dict = dict(testcase.attrib)
     for tag in ["failure", "error"]:
@@ -75,7 +79,7 @@ IGNORE_LINE_REGEXES = [
 ]
 
 
-def filter_stacktrace(trace):
+def filter_stacktrace(trace: str) -> str:
     """
     Clean the stracktrace from JDK and StructAssert internals.
     Filtering of JDK lines is necessary because Ant doesn't filter
@@ -84,6 +88,6 @@ def filter_stacktrace(trace):
     return "\n".join(line for line in trace.splitlines() if not filter_line(line))
 
 
-def filter_line(line):
+def filter_line(line: str) -> bool:
     """Return True if the line should be filtered."""
     return any(regex.search(line) for regex in IGNORE_LINE_REGEXES)

@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import os
 import string
 from contextlib import suppress
 from io import BytesIO
 from pathlib import Path
+from typing import Any, Dict, Iterable, Iterator, Type, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete
@@ -24,13 +29,13 @@ from inloop.tasks.models import Task
 hash_chars = string.digits + string.ascii_lowercase[:22]
 
 
-def hash32(obj):
+def hash32(obj: Union[str, User]) -> str:
     """Map the given object to one of 32 possible characters."""
     # take advantage of Python's string hashing
     return hash_chars[hash(str(obj)) % 32]
 
 
-def get_upload_path(obj, filename):
+def get_upload_path(obj: SolutionFile, filename: str) -> str:
     """
     Return an upload file path.
     All files related to a specific solution will share a common base directory.
@@ -48,7 +53,9 @@ def get_upload_path(obj, filename):
     )
 
 
-def get_prunable_solutions(*, users, tasks, max_keep):
+def get_prunable_solutions(
+    *, users: Iterable[User], tasks: Iterable[Task], max_keep: int
+) -> Iterator[QuerySet]:
     """
     Yield querysets of solutions that can be deleted if only max_keep solutions
     should be retained per user and task of the given user and task querysets.
@@ -64,7 +71,7 @@ def get_prunable_solutions(*, users, tasks, max_keep):
             yield solutions.exclude(id__in=solutions_to_keep)
 
 
-def get_archive_upload_path(solution, filename):
+def get_archive_upload_path(solution: Solution, filename: str) -> str:
     """
     Return an upload file path of the archive
     generated from a given solution.
@@ -72,7 +79,7 @@ def get_archive_upload_path(solution, filename):
     return f"archives/{solution.author}/{solution.id}/{filename}"
 
 
-def create_archive(solution):
+def create_archive(solution: Solution) -> None:
     """
     Create zip archive of all files associated with a solution.
     """
@@ -90,7 +97,7 @@ def create_archive(solution):
 
 
 @db_task()
-def create_archive_async(solution):
+def create_archive_async(solution: Solution) -> None:
     """
     Create zip archive of all files associated with a solution asynchronously.
     """
@@ -127,17 +134,17 @@ class Solution(models.Model):
         index_together = ["author", "scoped_id", "task"]
 
     @property
-    def path(self):
+    def path(self) -> Path:
         # derive the directory from the first associated SolutionFile
         solution_file = self.solutionfile_set.first()
         if not solution_file:
             raise AssertionError(f"Empty solution: {self!r}")
         return solution_file.absolute_path.parent
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("solutions:staffdetail", kwargs={"id": self.id})
 
-    def status(self):
+    def status(self) -> str:
         """
         Query the status of this Solution.
 
@@ -158,14 +165,14 @@ class Solution(models.Model):
             return "lost"
         return "pending"
 
-    def get_next_scoped_id(self):
+    def get_next_scoped_id(self) -> int:
         """Compute the next scoped_id."""
         query = Solution.objects.filter(author=self.author, task=self.task).aggregate(
             next_scoped_id=(Coalesce(Max("scoped_id"), 0) + 1)
         )
         return query["next_scoped_id"]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         """
         Save this solution and ensure a scoped_id is assigned.
         Calculation and storage of scoped_id is not atomic, callers
@@ -177,7 +184,7 @@ class Solution(models.Model):
             self.scoped_id = self.get_next_scoped_id()
         return super().save(*args, **kwargs)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s: id=%r author=%r task=%r>" % (
             self.__class__.__name__,
             self.id,
@@ -185,12 +192,14 @@ class Solution(models.Model):
             str(self.task),
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Solution #{self.id:d}"
 
 
 @receiver(post_delete, sender=Solution, dispatch_uid="delete_solutionfile")
-def auto_delete_archive_on_delete(sender, instance, **kwargs):
+def auto_delete_archive_on_delete(
+    sender: Type[Solution], instance: Solution, **kwargs: Any
+) -> None:
     """
     Removes archive from filesystem when corresponding Solution object is deleted.
     """
@@ -206,36 +215,38 @@ class SolutionFile(models.Model):
     file = models.FileField(upload_to=get_upload_path)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the basename of the file."""
         return self.relative_path.name
 
     @property
-    def relative_path(self):
+    def relative_path(self) -> Path:
         """Return the file path relative to settings.MEDIA_ROOT."""
         return Path(self.file.name)
 
     @property
-    def absolute_path(self):
+    def absolute_path(self) -> Path:
         """Return the absolute file path as seen on the file system."""
         return Path(self.file.path)
 
     @property
-    def size(self):
+    def size(self) -> int:
         """Return the size of the file in bytes."""
         return self.absolute_path.stat().st_size
 
     @property
-    def contents(self):
+    def contents(self) -> str:
         with open(self.absolute_path, errors="replace") as stream:
             return stream.read()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 @receiver(post_delete, sender=SolutionFile, dispatch_uid="delete_solutionfile")
-def auto_delete_file_on_delete(sender, instance, **kwargs):
+def auto_delete_file_on_delete(
+    sender: Type[SolutionFile], instance: SolutionFile, **kwargs: Any
+) -> None:
     """
     Removes file from filesystem when corresponding Solution object is deleted.
     """
@@ -261,7 +272,7 @@ class Checkpoint(models.Model):
         ordering = ["created_at"]
 
     class Manager(models.Manager):
-        def save_checkpoint(self, json_data, task, user):
+        def save_checkpoint(self, json_data: Dict[str, Any], task: Task, user: User) -> None:
             files = json_data["files"]
             with atomic():
                 self.filter(author=user, task=task).delete()
@@ -277,7 +288,7 @@ class Checkpoint(models.Model):
 
     objects = Manager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"task_id={self.task_id}, author_id={self.author_id}"
 
 
@@ -291,5 +302,5 @@ class CheckpointFile(models.Model):
     class Meta:
         ordering = ["name"]
 
-    def __str__(self):
-        return f"{self.name}"
+    def __str__(self) -> str:
+        return self.name
