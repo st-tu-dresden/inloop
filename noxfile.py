@@ -72,3 +72,12 @@ def pytype(session: Session) -> None:
     session.run("poetry", "install", "--no-dev", external=True)
     install_with_constraints(session, "pytype")
     session.run("pytype", *args)
+
+
+@nox.session(python=["3.7"])
+def typeguard(session: Session) -> None:
+    """Run the test suite with run-time type checking of PEP-484 annotations."""
+    args = session.posargs or ["-v2", "--failfast"]
+    session.run("poetry", "install", "--no-dev", external=True)
+    install_with_constraints(session, "typeguard")
+    session.run("python", "runtests.py", "--with-typeguard", "--", *args)
