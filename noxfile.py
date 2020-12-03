@@ -45,14 +45,14 @@ def tests(session: Session) -> None:
     )
     session.run("poetry", "install", "--no-dev", external=True)
     install_with_constraints(session, "coverage[toml]")
-    session.run("coverage", "run", "./manage.py", "test", *args)
+    session.run("coverage", "run", "./runtests.py", "--", *args)
     session.run("coverage", "report")
 
 
 @nox.session(python=["3.7"])
 def lint(session: Session) -> None:
     """Check code style with flake8 and isort."""
-    locations = "inloop", "tests", "noxfile.py", "manage.py"
+    locations = "inloop", "tests", "noxfile.py", "manage.py", "runtests.py"
     install_with_constraints(
         session,
         "flake8",
