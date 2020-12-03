@@ -4,6 +4,11 @@
 #
 
 
+from typing import Callable
+
+from django.http import HttpRequest, HttpResponse
+
+
 class SetRemoteAddrFromForwardedFor:
     """
     Middleware that sets REMOTE_ADDR based on HTTP_X_FORWARDED_FOR, if the
@@ -11,10 +16,10 @@ class SetRemoteAddrFromForwardedFor:
     causes each request's REMOTE_ADDR to be set to 127.0.0.1.
     """
 
-    def __init__(self, get_response):
+    def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse:
         try:
             forwarded_for = request.META["HTTP_X_FORWARDED_FOR"]
         except KeyError:
