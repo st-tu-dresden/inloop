@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 import os
 from shutil import make_archive
+from typing import Any, Set, Type
 
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from inloop.solutions.models import Solution
 
 
-def zipfile_upload_path(test, filename):
+def zipfile_upload_path(test: PlagiarismTest, filename: str) -> str:
     """Return upload file paths for the PlagiarismTest.zip_file field."""
     timestamp = test.created_at.strftime("%Y%m%d-%H%M")
     return f"plagiarism_tests/jplag-results-{timestamp}.zip"
@@ -20,17 +25,19 @@ class PlagiarismTest(models.Model):
     command = models.TextField(default="", help_text="Command that was used to perform the test")
     zip_file = models.FileField(upload_to=zipfile_upload_path, null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Plagiarism test #{self.id}"
 
     @property
-    def all_detected_plagiarisms(self):
+    def all_detected_plagiarisms(self) -> QuerySet:
         """Get all detected plagiarisms for this test."""
         return self.detectedplagiarism_set.filter(veto=False)
 
 
 @receiver(post_delete, sender=PlagiarismTest, dispatch_uid="delete_plagiarism_file")
-def auto_delete_file_on_delete(sender, instance, **kwargs):
+def auto_delete_file_on_delete(
+    sender: Type[PlagiarismTest], instance: PlagiarismTest, **kwargs: Any
+) -> None:
     """
     Removes the zip file when its corresponding PlagiarismTest object is deleted.
     """
@@ -49,11 +56,11 @@ class DetectedPlagiarism(models.Model):
     )
     veto = models.BooleanField(default=False, help_text="Cancel this detection")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"solution #{self.solution_id:d}"
 
 
-def get_ripoff_tasks_for_user(user):
+def get_ripoff_tasks_for_user(user: User) -> QuerySet:
     """Return tasks for which rip-offs were detected for this user."""
     return (
         DetectedPlagiarism.objects.filter(solution__author=user, veto=False)
@@ -62,7 +69,7 @@ def get_ripoff_tasks_for_user(user):
     )
 
 
-def save_plagiarism_set(plagiarism_set, result_dir):
+def save_plagiarism_set(plagiarism_set: Set[Solution], result_dir: str) -> None:
     """Save the detected plagiarisms and zip file to the database."""
     path_to_zip = make_archive(result_dir, "zip", result_dir)
     with open(path_to_zip, mode="rb") as stream:

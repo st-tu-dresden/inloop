@@ -7,19 +7,24 @@ import subprocess
 from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
+from typing import Dict, Iterable, Optional, Set
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db.models import QuerySet
 
+from huey.api import TaskResultWrapper
 from huey.contrib.djhuey import db_task
 
 from inloop.grading.models import save_plagiarism_set
 from inloop.solutions.models import Solution
+from inloop.tasks.models import Task
 
 LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
 @db_task()
-def jplag_check_async(users, tasks):
+def jplag_check_async(users: QuerySet, tasks: QuerySet) -> TaskResultWrapper:
     """
     Submit a job to check solutions using the jplag_check function.
 
@@ -42,7 +47,12 @@ def jplag_check_async(users, tasks):
     jplag_check(users, tasks)
 
 
-def jplag_check(users, tasks, min_similarity=None, result_dir=None):
+def jplag_check(
+    users: QuerySet,
+    tasks: QuerySet,
+    min_similarity: Optional[int] = None,
+    result_dir: Optional[str] = None,
+) -> Set[Solution]:
     """
     Check solutions of the given users for the given tasks with JPlag.
 
@@ -70,7 +80,12 @@ def jplag_check(users, tasks, min_similarity=None, result_dir=None):
         return plagiarism_set
 
 
-def jplag_check_task(users, task, min_similarity, result_path):
+def jplag_check_task(
+    users: Iterable[User],
+    task: Task,
+    min_similarity: int,
+    result_path: Path,
+) -> Set[Solution]:
     """
     Check solutions of the given users for the given single task with JPlag.
 
@@ -94,7 +109,7 @@ def jplag_check_task(users, task, min_similarity, result_path):
     return parse_output(output, min_similarity, last_solutions)
 
 
-def get_last_solutions(users, task):
+def get_last_solutions(users: Iterable[User], task: Task) -> Dict[str, Solution]:
     """
     Get the last valid solution of the given users for a given task.
     """
@@ -109,7 +124,7 @@ def get_last_solutions(users, task):
     return last_solutions
 
 
-def prepare_directories(root_path, last_solutions):
+def prepare_directories(root_path: Path, last_solutions: Dict[str, Solution]) -> None:
     """
     Copy the given solutions to root_path, using the folder structure expected by JPlag.
 
@@ -127,7 +142,11 @@ def prepare_directories(root_path, last_solutions):
         copytree(src=last_solution.path, dst=root_path.joinpath(username))
 
 
-def parse_output(output, min_similarity, last_solutions):
+def parse_output(
+    output: str,
+    min_similarity: int,
+    last_solutions: Dict[str, Solution],
+) -> Set[Solution]:
     """
     Extract plagiarism check results from the given JPlag command line output.
 
@@ -144,7 +163,7 @@ def parse_output(output, min_similarity, last_solutions):
     return plagiarism_set
 
 
-def exec_jplag(min_similarity, root_path, result_path):
+def exec_jplag(min_similarity: int, root_path: Path, result_path: Path) -> str:
     """
     Execute the JPlag Java program with the given parameters and return its output.
     """
