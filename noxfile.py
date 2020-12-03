@@ -63,3 +63,12 @@ def lint(session: Session) -> None:
         "flake8-isort",
     )
     session.run("flake8", *locations)
+
+
+@nox.session(python=["3.7"])
+def pytype(session: Session) -> None:
+    """Statically check for type errors with pytype."""
+    args = session.posargs or ["--config", "pytype.cfg"]
+    session.run("poetry", "install", "--no-dev", external=True)
+    install_with_constraints(session, "pytype")
+    session.run("pytype", *args)
