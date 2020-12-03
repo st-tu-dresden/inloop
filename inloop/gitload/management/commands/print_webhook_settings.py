@@ -2,7 +2,7 @@ from typing import Any
 
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from inloop.gitload.secrets import GITHUB_KEY
 
