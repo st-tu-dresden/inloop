@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import ObjectDoesNotExist, Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -25,7 +25,7 @@ from inloop.tasks.models import Category, Task
 
 
 @login_required
-def index(request):
+def index(request: HttpRequest) -> HttpResponse:
     exam_category_slug = config.EXAM_CATEGORY_SLUG
     if exam_category_slug:
         return category(request, exam_category_slug)
@@ -39,7 +39,7 @@ def index(request):
 
 
 @login_required
-def category(request, slug):
+def category(request: HttpRequest, slug: str) -> HttpResponse:
     category = get_object_or_404(Category, slug=slug)
     tasks = (
         category.task_set.published()
@@ -66,7 +66,7 @@ def category(request, slug):
 
 
 @login_required
-def serve_attachment(request, slug, path):
+def serve_attachment(request: HttpRequest, slug: str, path: str) -> HttpResponse:
     """
     Serve static files from a task subdirectory.
 
@@ -92,7 +92,7 @@ class TaskDetailView(LoginRequiredMixin, View):
     Requests with a non-slug url are redirected to their slug url equivalent.
     """
 
-    def get(self, request, slug_or_name):
+    def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         qs = Task.objects.published().visible_by(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
