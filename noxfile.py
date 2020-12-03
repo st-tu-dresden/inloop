@@ -8,11 +8,13 @@ The sessions are primarily used in our .travis-ci.yml.
 """
 
 from tempfile import NamedTemporaryFile
+from typing import Any
 
 import nox
+from nox.sessions import Session
 
 
-def install_with_constraints(session, *args, **kwargs):
+def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> None:
     """Install packages constrained by poetry's lockfile."""
     with NamedTemporaryFile() as requirements:
         # This approach is by Claudio Jolowicz, see his excellect
@@ -30,7 +32,7 @@ def install_with_constraints(session, *args, **kwargs):
 
 
 @nox.session(python=["3.7", "3.8"])
-def tests(session):
+def tests(session: Session) -> None:
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ["-v2", "--failfast"]
     session.run(
@@ -48,7 +50,7 @@ def tests(session):
 
 
 @nox.session(python=["3.7"])
-def lint(session):
+def lint(session: Session) -> None:
     """Check code style with flake8 and isort."""
     locations = "inloop", "tests", "noxfile.py", "manage.py"
     install_with_constraints(
