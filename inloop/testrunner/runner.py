@@ -8,11 +8,12 @@ from collections import namedtuple
 from os.path import isabs, isdir, join, normpath, realpath
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any, Dict, Set, Tuple
 
 LOG = logging.getLogger(__name__)
 
 
-def collect_files(path, *, filesize_limit):
+def collect_files(path: str, *, filesize_limit: int) -> Tuple[Dict, Set]:
     """
     Collect files into a dictionary that contains immediate children
     of the given path, mapping file name to file content.
@@ -57,7 +58,7 @@ class DockerTestRunner:
 
     TRUNCATION_MARKER = b"\n\n[--- output truncated 8< ---]\n"
 
-    def __init__(self, config):
+    def __init__(self, config: Dict[str, Any]) -> None:
         """
         Initialize the tester with a dict-like config and the name of the Docker image.
 
@@ -84,7 +85,7 @@ class DockerTestRunner:
         config.setdefault("filesize_limit", config["output_limit"])
         self.config = config
 
-    def ensure_absolute_dir(self, path):
+    def ensure_absolute_dir(self, path: str) -> None:
         """
         Tests if the given path is absolute and a directory, raises ValueError otherwise.
         """
@@ -93,7 +94,7 @@ class DockerTestRunner:
         if not isdir(path):
             raise ValueError(f"not a directory: {path}")
 
-    def check_task(self, task_name, input_path):
+    def check_task(self, task_name: str, input_path: str) -> TestOutput:
         """
         Execute a check for the given task name using the files under the path specified
         by input_path.
@@ -133,7 +134,7 @@ class DockerTestRunner:
             LOG.info(f"Ignored {len(ignored_files)} output file(s) because they were too large.")
         return TestOutput(rc, stdout, stderr, duration, files)
 
-    def subpath_check(self, path1, path2):
+    def subpath_check(self, path1: str, path2: str) -> None:
         """
         Tests if paths are not a subdirectory of each other, raises ValueError otherwise.
         """
@@ -142,7 +143,7 @@ class DockerTestRunner:
         if path1.startswith(path2) or path2.startswith(path1):
             raise ValueError("a mountpoint must not be a subdirectory of another mountpoint")
 
-    def clean_stream(self, stream):
+    def clean_stream(self, stream: bytes) -> str:
         """
         Prepare the stream so it can be processed further in a safe manner.
         Convert bytes to UTF-8.
@@ -153,7 +154,9 @@ class DockerTestRunner:
             stream = stream[:limit] + self.TRUNCATION_MARKER
         return stream.decode("utf-8", errors="replace")
 
-    def communicate(self, task_name, input_path, output_path):
+    def communicate(
+        self, task_name: str, input_path: str, output_path: str
+    ) -> Tuple[int, str, str]:
         """
         Creates the container and communicates inputs and outputs.
         """
@@ -189,7 +192,7 @@ class DockerTestRunner:
             # kills the client
             proc.kill()
             stdout, stderr = proc.communicate()
-            rc = signal.SIGKILL
+            rc = int(signal.SIGKILL)
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
             LOG.debug("removing timed out container %s", ctr_id)
