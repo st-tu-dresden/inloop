@@ -8,7 +8,7 @@ from inloop.gitload.repo import GitRepository
 
 
 @db_task()
-def load_tasks_async():
+def load_tasks_async() -> None:
     with HUEY.lock_task("import-lock"):
         load_tasks(
             GitRepository(

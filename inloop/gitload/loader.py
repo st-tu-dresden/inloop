@@ -1,9 +1,12 @@
 import json
 import logging
 from json import JSONDecodeError
+from pathlib import Path
+from typing import Dict
 
 from django.db.transaction import atomic
 
+from inloop.gitload.repo import Repository
 from inloop.gitload.signals import repository_loaded
 from inloop.tasks.models import Category, FileTemplate, Task
 
@@ -14,7 +17,7 @@ class InvalidTask(Exception):
     pass
 
 
-def load_tasks(repository):
+def load_tasks(repository: Repository) -> None:
     repository.synchronize()
     repository.call_make()
     for task_file in repository.find_files("*/task.md"):
@@ -25,7 +28,7 @@ def load_tasks(repository):
     repository_loaded.send(__name__, repository=repository)
 
 
-def load_task(task_file):
+def load_task(task_file: Path) -> None:
     task_dir = task_file.parent
     meta = parse_metafile(task_dir)
     if meta.get("disabled"):
@@ -37,7 +40,7 @@ def load_task(task_file):
         raise InvalidTask(f"{task_dir.name}: missing required field {key}")
 
 
-def update_or_create(task_dir, meta, task_text):
+def update_or_create(task_dir: Path, meta: Dict[str, str], task_text: str) -> None:
     category, _ = Category.objects.get_or_create(name=meta["category"])
     task, _ = Task.objects.update_or_create(
         system_name=task_dir.name,
@@ -53,14 +56,14 @@ def update_or_create(task_dir, meta, task_text):
 
 
 @atomic
-def load_task_templates(task, task_dir):
+def load_task_templates(task: Task, task_dir: Path) -> None:
     FileTemplate.objects.filter(task=task).delete()
     for template in task_dir.glob("templates/*.java"):
         with open(template) as stream:
             FileTemplate.objects.create(name=template.name, task=task, contents=stream.read())
 
 
-def parse_metafile(task_dir):
+def parse_metafile(task_dir: Path) -> Dict[str, str]:
     try:
         with open(task_dir / "meta.json") as stream:
             return json.load(stream)
