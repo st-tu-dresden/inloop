@@ -34,7 +34,7 @@ class SignupForm(RegistrationFormUniqueEmail):
         required=True,
     )
 
-    def clean_email(self):
+    def clean_email(self) -> str:
         """Perform additional email validation if configured in the admin interface."""
         pattern = config.EMAIL_PATTERN
         email = self.cleaned_data["email"]
@@ -47,7 +47,7 @@ class SignupForm(RegistrationFormUniqueEmail):
                 raise ValidationError(markdown(config.EMAIL_ERROR_MESSAGE))
         return email
 
-    def clean_username(self):
+    def clean_username(self) -> str:
         """Ensure no duplicate user names exist, using case-insensitive comparison."""
         username = self.cleaned_data.get("username")
         if User.objects.filter(username__iexact=username):

@@ -9,6 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 @db_periodic_task(crontab(minute="*/30"))
-def autoprune_invalid_users():
+def autoprune_invalid_users() -> None:
     num_deleted = prune_invalid_users()
     logger.info(f"Pruned {num_deleted} invalid account(s).")
