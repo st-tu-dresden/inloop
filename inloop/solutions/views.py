@@ -185,7 +185,7 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, solution_id)
+        solution = access_solution_or_404(request.user, int(solution_id))
         if solution.archive:
             return JsonResponse({"status": "available"})
         try:
@@ -199,7 +199,7 @@ class SolutionArchiveStatusView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, solution_id)
+        solution = access_solution_or_404(request.user, int(solution_id))
         if solution.archive:
             return JsonResponse({"status": "available"})
         return JsonResponse({"status": "unavailable"})
@@ -209,7 +209,7 @@ class SolutionArchiveDownloadView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: str) -> HttpResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, solution_id)
+        solution = access_solution_or_404(request.user, int(solution_id))
         if solution.archive:
             response = HttpResponse(solution.archive, content_type="application/zip")
             attachment = "attachment; filename=%s" % basename(solution.archive.name)
