@@ -2,7 +2,7 @@ import json
 import logging
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 from django.db.transaction import atomic
 
@@ -63,7 +63,7 @@ def load_task_templates(task: Task, task_dir: Path) -> None:
             FileTemplate.objects.create(name=template.name, task=task, contents=stream.read())
 
 
-def parse_metafile(task_dir: Path) -> Dict[str, str]:
+def parse_metafile(task_dir: Path) -> Dict[str, Any]:
     try:
         with open(task_dir / "meta.json") as stream:
             return json.load(stream)
