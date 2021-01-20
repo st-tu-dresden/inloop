@@ -31,10 +31,8 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
         session.install(f"--constraint={requirements.name}", *args, **kwargs)
 
 
-@nox.session(python=["3.7", "3.8"])
-def tests(session: Session) -> None:
-    """Run the complete test suite without dev dependencies."""
-    args = session.posargs or ["-v2", "--failfast"]
+def build_docker_image(session: Session) -> None:
+    """Build the image required by our docker integration tests."""
     session.run(
         "docker",
         "build",
@@ -43,7 +41,19 @@ def tests(session: Session) -> None:
         "tests/testrunner",
         external=True,
     )
+
+
+def poetry_install(session: Session) -> None:
+    """Install the runtime dependencies with poetry."""
     session.run("poetry", "install", "--no-dev", external=True)
+
+
+@nox.session(python=["3.7", "3.8"])
+def tests(session: Session) -> None:
+    """Run the complete test suite without dev dependencies."""
+    args = session.posargs or ["-v2", "--failfast"]
+    build_docker_image(session)
+    poetry_install(session)
     install_with_constraints(session, "coverage[toml]")
     session.run("coverage", "run", "./runtests.py", "--", *args)
     session.run("coverage", "report")
@@ -69,7 +79,7 @@ def lint(session: Session) -> None:
 def pytype(session: Session) -> None:
     """Statically check for type errors with pytype."""
     args = session.posargs or ["--config", "pytype.cfg"]
-    session.run("poetry", "install", "--no-dev", external=True)
+    poetry_install(session)
     install_with_constraints(session, "pytype")
     session.run("pytype", *args)
 
@@ -78,6 +88,7 @@ def pytype(session: Session) -> None:
 def typeguard(session: Session) -> None:
     """Run the test suite with run-time type checking of PEP-484 annotations."""
     args = session.posargs or ["-v2", "--failfast"]
-    session.run("poetry", "install", "--no-dev", external=True)
+    build_docker_image(session)
+    poetry_install(session)
     install_with_constraints(session, "typeguard")
     session.run("python", "runtests.py", "--with-typeguard", "--", *args)
