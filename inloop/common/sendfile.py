@@ -1,11 +1,14 @@
 from os.path import isabs, join, relpath
+from typing import Optional
 
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.views.static import serve
 
 
-def sendfile_nginx(request, path, document_root=None):
+def sendfile_nginx(
+    request: HttpRequest, path: str, document_root: Optional[str] = None
+) -> HttpResponse:
     """
     Serve a file via Nginx' X-Accel-Redirect header.
 

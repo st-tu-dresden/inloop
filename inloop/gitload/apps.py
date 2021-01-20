@@ -5,5 +5,5 @@ class GitloadAppConfig(AppConfig):
     name = "inloop.gitload"
     verbose_name = "Gitload"
 
-    def ready(self):
+    def ready(self) -> None:
         from . import signals  # noqa

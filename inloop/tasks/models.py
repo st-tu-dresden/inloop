@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import itertools
 import re
 from datetime import timedelta
+from typing import Any, Dict, Iterable
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db import models
 from django.db.models import Q
 from django.db.models.expressions import Value
@@ -24,48 +27,48 @@ class Category(models.Model):
     display_order = models.IntegerField(default=0, help_text="Display order (lower values first)")
     description = models.TextField(default="", help_text="Short category description")
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def completion_info(self, user):
+    def completion_info(self, user: User) -> Dict[str, Any]:
         return self.task_set.completion_info(user)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class TaskQuerySet(models.QuerySet):
     """Enhances QuerySet with convenience methods to get task completion status."""
 
-    def unpublished(self):
+    def unpublished(self) -> TaskQuerySet:
         return self.filter(pubdate__gte=timezone.now())
 
-    def published(self):
+    def published(self) -> TaskQuerySet:
         return self.filter(pubdate__lt=timezone.now())
 
-    def visible_by(self, *, user):
+    def visible_by(self, *, user: User) -> TaskQuerySet:
         return self.filter(Q(group__in=user.groups.all()) | Q(group=None))
 
-    def completed_by(self, user):
+    def completed_by(self, user: User) -> TaskQuerySet:
         return self.filter(solution__passed=True, solution__author=user).distinct()
 
-    def not_completed_by(self, user):
+    def not_completed_by(self, user: User) -> TaskQuerySet:
         return self.exclude(id__in=self.completed_by(user).values("id"))
 
-    def completed_by_values(self, user, *, order_by):
+    def completed_by_values(self, user: User, *, order_by: str) -> Iterable[Task]:
         qs = self.order_by(order_by)
         qs1 = qs.completed_by(user).annotate(completed=Value(True, BooleanField()))
         qs2 = qs.not_completed_by(user).annotate(completed=Value(False, BooleanField()))
         reverse = order_by.startswith("-")
         order_by = order_by.lstrip("-")
 
-        def keyfunc(task):
+        def keyfunc(task: Task) -> Any:
             return getattr(task, order_by)
 
         return sorted(itertools.chain(qs1, qs2), key=keyfunc, reverse=reverse)
 
-    def completion_info(self, user):
+    def completion_info(self, user: User) -> Dict[str, Any]:
         qs = self.published()
         num_published = len(qs)
         if num_published > 0:
@@ -119,50 +122,50 @@ class Task(models.Model):
     objects = TaskQuerySet.as_manager()
 
     @property
-    def is_published(self):
+    def is_published(self) -> bool:
         """Return True if the task is already visible to the users."""
         return timezone.now() > self.pubdate
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         """Return True if the task has passed its optional deadline and the tolerance."""
         if self.deadline:
             tolerance = timedelta(seconds=config.DEADLINE_TOLERANCE)
             return timezone.now() > (self.deadline + tolerance)
         return False
 
-    def is_completed_by(self, user):
+    def is_completed_by(self, user: User) -> bool:
         return self.id in Task.objects.completed_by(user).values_list("id", flat=True)
 
     @property
-    def submission_limit(self):
+    def submission_limit(self) -> int:
         """Return the max_submissions of this task or the overall limit, if not set."""
         if self.max_submissions is not None:
             return self.max_submissions
         return config.MAX_SUBMISSIONS
 
     @property
-    def has_submission_limit(self):
+    def has_submission_limit(self) -> bool:
         return self.submission_limit != -1
 
     @property
-    def sluggable_title(self):
+    def sluggable_title(self) -> str:
         """Return the title with anything between parentheses removed."""
         return re.sub(r"\(.*?\)", "", self.title)
 
     @property
-    def underscored_title(self):
+    def underscored_title(self) -> str:
         """
         Return a sluggable title for this task
         with all whitespace replaced by underscores.
         """
         return self.sluggable_title.replace(" ", "_")
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         self.slug = slugify(self.sluggable_title)
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -173,5 +176,5 @@ class FileTemplate(models.Model):
     name = models.CharField(max_length=100)
     contents = models.TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

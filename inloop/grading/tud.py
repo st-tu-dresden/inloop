@@ -3,8 +3,11 @@ Bonus point grading specific to TU Dresden.
 """
 
 import re
+from datetime import datetime
 from string import capwords
+from typing import Callable, Iterable, Iterator, Tuple
 
+from django.contrib.auth.models import User
 from django.db.models import ObjectDoesNotExist
 from django.utils.timezone import make_aware
 
@@ -12,7 +15,7 @@ from inloop.grading.models import get_ripoff_tasks_for_user
 from inloop.tasks.models import Category
 
 
-def get_user_data(user):
+def get_user_data(user: User) -> Tuple[str, str, str, str, str, str]:
     """
     Return student data as a tuple (empty fields are guessed if possible).
     """
@@ -28,7 +31,7 @@ def get_user_data(user):
     return (last_name, first_name, user.username, user.email, matnum, course)
 
 
-def guess_name_from_email(email):
+def guess_name_from_email(email: str) -> Tuple[str, str]:
     """
     Try to guess first and last name from email and return it as a tuple.
     """
@@ -42,7 +45,9 @@ def guess_name_from_email(email):
     return capwords(first_name), capwords(last_name)
 
 
-def points_for_completed_tasks(category_name, start_date, max_points):
+def points_for_completed_tasks(
+    category_name: str, start_date: datetime, max_points: int
+) -> Callable[[User], int]:
     """
     Return a function that calculates points based on the number of
     solved tasks in a category.
@@ -53,7 +58,7 @@ def points_for_completed_tasks(category_name, start_date, max_points):
     category = Category.objects.get(name=category_name)
     start_date = make_aware(start_date)
 
-    def func(user):
+    def func(user: User) -> int:
         points = len(
             category.task_set.exclude(id__in=get_ripoff_tasks_for_user(user))
             .filter(
@@ -68,7 +73,7 @@ def points_for_completed_tasks(category_name, start_date, max_points):
     return func
 
 
-def calculate_grades(users, gradefunc):
+def calculate_grades(users: Iterable[User], gradefunc: Callable[[User], int]) -> Iterator:
     """
     Generate a sequence of tuples with user data and the resulting grade using
     the given user query set and grading function.

@@ -1,7 +1,9 @@
 from os.path import basename
+from typing import Dict, Optional
 
 from django.contrib import admin, messages
-from django.http import HttpResponse
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse
 
 from inloop.grading.models import DetectedPlagiarism, PlagiarismTest
 
@@ -17,7 +19,9 @@ class PlagiarismAdmin(admin.ModelAdmin):
 
     change_list_template = "admin/tasks/plagiarism.html"
 
-    def changelist_view(self, request, extra_context=None):
+    def changelist_view(
+        self, request: HttpRequest, extra_context: Optional[Dict] = None
+    ) -> HttpResponse:
         last_plagiarism_test = PlagiarismTest.objects.last()
         extra = {
             "test": last_plagiarism_test,
@@ -37,7 +41,7 @@ class PlagiarismTestsAdmin(PlagiarismAdmin):
     list_display = ["id", "created_at", "command", "all_detected_plagiarisms"]
     actions = PlagiarismAdmin.actions + ["download_jplag_zip"]
 
-    def download_jplag_zip(self, request, queryset):
+    def download_jplag_zip(self, request: HttpRequest, queryset: QuerySet) -> HttpResponse:
         """
         Fetch the stored JPlag zip file and return it as a download.
         """

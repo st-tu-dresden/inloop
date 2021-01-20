@@ -1,5 +1,7 @@
+from typing import Any
+
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from inloop.solutions.models import get_prunable_solutions
 from inloop.tasks.models import Task
@@ -8,7 +10,7 @@ from inloop.tasks.models import Task
 class Command(BaseCommand):
     help = "Tidy up solutions to keep just the last max_keep solutions per user and task."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             "--max_keep",
             help="Number of solutions to retain (default is 10).",
@@ -16,7 +18,7 @@ class Command(BaseCommand):
             type=int,
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: str, **options: Any) -> None:
         max_keep = options["max_keep"]
         if max_keep < 1:
             raise CommandError("max_keep must be >= 1.")

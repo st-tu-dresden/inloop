@@ -1,5 +1,8 @@
 [flake8]
-ignore = D,E203
+ignore = ANN101,ANN102,D,E203
 exclude = migrations
 max-line-length = 99
 max-complexity = 10
+per-file-ignores =
+    # type annotations are not required in tests
+    tests/*: ANN

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import signal
 
 from django.conf import settings
@@ -11,7 +13,7 @@ from inloop.testrunner.runner import DockerTestRunner
 
 
 @db_task()
-def check_solution_async(solution_id):
+def check_solution_async(solution_id: int) -> int:
     """
     Submit a job to check the solution specified by the given solution id.
 
@@ -24,7 +26,7 @@ def check_solution_async(solution_id):
     return check_solution(Solution.objects.get(pk=solution_id)).id
 
 
-def check_solution(solution):
+def check_solution(solution: Solution) -> TestResult:
     """
     Check the given solution with the test runner and return a TestResult.
 
@@ -65,13 +67,13 @@ class TestResult(models.Model):
     return_code = models.SmallIntegerField(default=-1)
     time_taken = models.FloatField(default=0.0)
 
-    def is_success(self):
+    def is_success(self) -> bool:
         return self.return_code == 0
 
     is_success.boolean = True
     is_success.short_description = "Successful"
 
-    def status(self):
+    def status(self) -> str:
         if self.return_code == 0:
             return "success"
         if self.return_code == signal.SIGKILL:
@@ -80,10 +82,10 @@ class TestResult(models.Model):
             return "error"
         return "failure"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{type(self).__name__}: solution={self.solution_id} rc={self.return_code}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Result #{self.id}"
 
 
@@ -100,5 +102,5 @@ class TestOutput(models.Model):
     name = models.CharField(max_length=60)
     output = models.TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

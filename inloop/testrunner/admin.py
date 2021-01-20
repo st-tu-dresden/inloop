@@ -33,14 +33,14 @@ class TestResultAdmin(admin.ModelAdmin):
     ]
     exclude = ["time_taken", "solution"]
 
-    def linked_solution(self, test_result):
+    def linked_solution(self, test_result: TestResult) -> str:
         solution_id = test_result.solution_id
         url = reverse("admin:solutions_solution_change", args=[solution_id])
         return format_html('<a href="{url}">{solution_id}</a>', url=url, solution_id=solution_id)
 
     linked_solution.short_description = "Solution id"
 
-    def runtime(self, test_result):
+    def runtime(self, test_result: TestResult) -> str:
         return f"{test_result.time_taken:.2f}"
 
     runtime.admin_order_field = "time_taken"

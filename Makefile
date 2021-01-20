@@ -24,10 +24,10 @@ loaddb:
 	poetry run ./manage.py loaddata demo_accounts development_site
 
 test:
-	poetry run ./manage.py test $(TESTOPTS)
+	poetry run ./runtests.py -- $(TESTOPTS)
 
 coverage:
-	poetry run coverage run ./manage.py test $(TESTOPTS)
+	poetry run coverage run ./runtests.py -- $(TESTOPTS)
 	poetry run coverage report
 
 lint:

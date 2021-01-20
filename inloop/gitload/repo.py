@@ -5,12 +5,13 @@ Classes dealing with task repositories and their synchronization.
 import os
 import subprocess
 from pathlib import Path
+from typing import Any, Iterator, Optional, Union
 
 
 class Repository:
     """Local task repository that does not perform synchronization."""
 
-    def __init__(self, path):
+    def __init__(self, path: Union[str, Path]) -> None:
         """
         Create a repository with the given absolute directory path, which is allowed
         to not exist yet on the file system.
@@ -23,27 +24,27 @@ class Repository:
         self._path = _path
 
     @property
-    def path(self):
+    def path(self) -> Path:
         """Return the path of this repository as a pathlib.Path object."""
         return self._path
 
     @property
-    def path_s(self):
+    def path_s(self) -> str:
         """Return the path of this repository as a string."""
         return str(self._path)
 
-    def find_files(self, glob_pattern):
+    def find_files(self, glob_pattern: str) -> Iterator[Any]:
         """Yield all existing files in this repository which match the given pattern."""
         return self._path.glob(glob_pattern)
 
-    def call_make(self, timeout=300):
+    def call_make(self, timeout: int = 300) -> None:
         """Call the `make` command in this repository's directory."""
         subprocess.check_call(["make", "--silent"], cwd=self.path_s, timeout=timeout)
 
-    def synchronize(self):
+    def synchronize(self) -> None:
         """Synchronize files with a remote source (optional)."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.path_s!r})"
 
 
@@ -54,7 +55,9 @@ _GIT_ENVIRON["GIT_SSH_COMMAND"] = "ssh -F/dev/null -oBatchMode=yes -oStrictHostK
 class GitRepository(Repository):
     """Local task repository that can be synchronized with a remote git repository."""
 
-    def __init__(self, path, *, url, branch, timeout=30):
+    def __init__(
+        self, path: Union[str, Path], *, url: str, branch: str, timeout: Optional[int] = 30
+    ) -> None:
         """
         Create a repository that can be synchronized with the given git url and branch,
         which must be passed as keyword arguments. The path must be absolute and may
@@ -71,7 +74,7 @@ class GitRepository(Repository):
         self.branch = branch
         self.timeout = timeout
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform the equivalent of a `git pull` in this git clone, which must already be
         initialized, using a failure-resistant strategy (currently fetch + hard reset).
@@ -81,12 +84,12 @@ class GitRepository(Repository):
         self.git("stash", "-u")
         self.git("reset", "--hard", f"origin/{self.branch}")
 
-    def initialize(self):
+    def initialize(self) -> None:
         """Initialize the git clone for this repository."""
         self.path.mkdir(parents=True, exist_ok=True)
         self.git("clone", "--quiet", "--depth=1", "--branch", self.branch, self.url, ".")
 
-    def git(self, *args):
+    def git(self, *args: str) -> None:
         """Perform given `git` subcommand (and arguments) in this git clone."""
         subprocess.check_call(
             ["git"] + list(args),
@@ -96,7 +99,7 @@ class GitRepository(Repository):
             timeout=self.timeout,
         )
 
-    def synchronize(self):
+    def synchronize(self) -> None:
         """Synchronize files with the remote git repository."""
         if self.path.joinpath(".git").is_dir():
             self.update()

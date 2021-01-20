@@ -1,10 +1,12 @@
 import functools
 import random
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Any, Sequence
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.db.transaction import atomic
 from django.utils import timezone
 
@@ -18,7 +20,7 @@ class Command(BaseCommand):
     MAX_USERS = 10 ** 4
     AVG_SOLUTIONS_PER_HOUR = 0.5
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             "--success_rate",
             help="Ratio of solutions to mark as passed (e.g., 0.25)",
@@ -28,7 +30,7 @@ class Command(BaseCommand):
         parser.add_argument("num_users", help="Number of users to generate", type=int)
         parser.add_argument("num_solutions", help="Number of solutions to generate", type=int)
 
-    def handle(self, *args, **options):
+    def handle(self, *args: str, **options: Any) -> None:
         success_rate = options["success_rate"]
         num_solutions = options["num_solutions"]
         num_users = options["num_users"]
@@ -45,7 +47,9 @@ class Command(BaseCommand):
         self.stdout.write(f"Successfully created {num_users} user(s).")
         self.stdout.write(f"Successfully created {num_solutions} solution(s).")
 
-    def generate_submissions(self, num_users, num_solutions, success_rate):
+    def generate_submissions(
+        self, num_users: int, num_solutions: int, success_rate: float
+    ) -> None:
         if Solution.objects.exists():
             raise CommandError("The solutions table must be empty.")
         tasks = Task.objects.all()
@@ -69,7 +73,7 @@ class Command(BaseCommand):
             seconds_to_add = random.randint(0, int(2 * 3600 / self.AVG_SOLUTIONS_PER_HOUR))
             start_date += timedelta(seconds=seconds_to_add)
 
-    def generate_users(self, num_users, *, date_joined):
+    def generate_users(self, num_users: int, *, date_joined: datetime) -> Sequence[User]:
         usernames = [f"student{n:04d}" for n in random.sample(range(self.MAX_USERS), num_users)]
         create_user = functools.partial(
             get_user_model().objects.get_or_create, date_joined=date_joined, password="secret"

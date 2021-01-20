@@ -5,7 +5,7 @@ ALLOWED_TRUNCATOR_IDENTIFIERS = ["minute", "hour", "day", "month", "year"]
 VALID_DATETIME_FORMATS = ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%d"]
 
 
-def validate_granularity(value):
+def validate_granularity(value: str) -> None:
     """
     Validate that a given value corresponds to
     a supported SQL truncator identifier.

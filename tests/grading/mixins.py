@@ -48,9 +48,9 @@ class DetectedPlagiarismData(PlagiarismTestData):
         super().setUpTestData()
         cls.detected_plagiarism_alice = DetectedPlagiarism.objects.create(
             test=cls.plagiarism_test,
-            solution=cls.passed_solution_alice,
+            solution=cls.passed_solution_alice,  # pytype: disable=attribute-error
         )
         cls.detected_plagiarism_bob = DetectedPlagiarism.objects.create(
             test=cls.plagiarism_test,
-            solution=cls.passed_solution_bob,
+            solution=cls.passed_solution_bob,  # pytype: disable=attribute-error
         )

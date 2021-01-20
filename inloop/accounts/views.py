@@ -1,5 +1,9 @@
+from typing import Any, Dict, Iterable, Optional
+
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordChangeView as DjangoPasswordChangeView
 from django.contrib.auth.views import (
     PasswordResetCompleteView,
@@ -7,6 +11,9 @@ from django.contrib.auth.views import (
     PasswordResetDoneView,
     PasswordResetView,
 )
+from django.forms import ModelForm
+from django.http import HttpRequest, HttpResponse
+from django.http.request import QueryDict
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
@@ -29,7 +36,7 @@ class PasswordChangeView(DjangoPasswordChangeView):
     success_url = reverse_lazy("accounts:profile")
     template_name = "accounts/password_change_form.html"
 
-    def form_valid(self, form):
+    def form_valid(self, form: PasswordChangeForm) -> HttpResponse:
         response = super().form_valid(form)
         messages.success(self.request, "Your password has been updated successfully.")
         return response
@@ -43,27 +50,27 @@ class ProfileView(LoginRequiredMixin, View):
     template_name = "accounts/profile_form.html"
     success_url = reverse_lazy("accounts:profile")
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         return TemplateResponse(request, self.template_name, context={"forms": self.get_forms()})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         forms = self.get_forms(data=request.POST)
         if all(form.is_valid() for form in forms):
             return self.forms_valid(forms)
         return self.forms_invalid(forms)
 
-    def get_forms(self, data=None):
+    def get_forms(self, data: Optional[QueryDict] = None) -> Iterable[ModelForm]:
         # StudentDetails may not yet exist for this user:
         details = StudentDetails.objects.get_or_create(user=self.request.user)[0]
-        return [
+        return (
             UserChangeForm(instance=self.request.user, data=data),
             StudentDetailsForm(instance=details, data=data),
-        ]
+        )
 
-    def forms_invalid(self, forms):
+    def forms_invalid(self, forms: Iterable[ModelForm]) -> HttpResponse:
         return TemplateResponse(self.request, self.template_name, context={"forms": forms})
 
-    def forms_valid(self, forms):
+    def forms_valid(self, forms: Iterable[ModelForm]) -> HttpResponse:
         for form in forms:
             form.save()
         messages.success(self.request, "Your profile has been updated successfully.")
@@ -74,7 +81,7 @@ class ConfirmOwnWorkView(LoginRequiredMixin, View):
     template_name = "accounts/confirm_ownwork_form.html"
     success_url = reverse_lazy("tasks:index")
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         return TemplateResponse(
             request,
             self.template_name,
@@ -84,13 +91,13 @@ class ConfirmOwnWorkView(LoginRequiredMixin, View):
             },
         )
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         forms = self.get_forms(data=request.POST)
         if all(form.is_valid() for form in forms):
             return self.forms_valid(forms)
         return self.forms_invalid(forms)
 
-    def get_forms(self, data=None):
+    def get_forms(self, data: Optional[QueryDict] = None) -> Iterable[ModelForm]:
         # StudentDetails may not yet exist for this user:
         details = StudentDetails.objects.get_or_create(user=self.request.user)[0]
         return [
@@ -98,7 +105,7 @@ class ConfirmOwnWorkView(LoginRequiredMixin, View):
             ConfirmStudentDetailsForm(instance=details, data=data),
         ]
 
-    def forms_invalid(self, forms):
+    def forms_invalid(self, forms: Iterable[ModelForm]) -> HttpResponse:
         return TemplateResponse(
             self.request,
             self.template_name,
@@ -108,7 +115,7 @@ class ConfirmOwnWorkView(LoginRequiredMixin, View):
             },
         )
 
-    def forms_valid(self, forms):
+    def forms_valid(self, forms: Iterable[ModelForm]) -> HttpResponse:
         for form in forms:
             form.save()
         messages.success(self.request, "Thanks! Your details have been saved successfully.")
@@ -127,27 +134,27 @@ class SignupView(HmacRegistrationView):
     email_subject_template = "accounts/activation_email_subject.txt"
     disallowed_url = reverse_lazy("accounts:signup_closed")
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("home"))
         return super().dispatch(request, *args, **kwargs)
 
-    def get_email_context(self, activation_key):
+    def get_email_context(self, activation_key: str) -> Dict[str, Any]:
         context = super().get_email_context(activation_key)
         context["request"] = self.request
         return context
 
-    def get_success_url(self, user):
+    def get_success_url(self, user: User) -> str:
         return reverse("accounts:signup_complete")
 
-    def registration_allowed(self):
+    def registration_allowed(self) -> bool:
         return config.SIGNUP_ALLOWED
 
 
 class ActivationView(HmacActivationView):
     template_name = "accounts/activation_failed.html"
 
-    def get_success_url(self, user):
+    def get_success_url(self, user: User) -> str:
         return reverse("accounts:activation_complete")
 
 

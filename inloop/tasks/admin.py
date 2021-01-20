@@ -1,10 +1,12 @@
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
+from django.http import HttpRequest
 from django.utils.text import Truncator
 
 from inloop.grading.admin import PlagiarismAdmin
 from inloop.grading.copypasta import jplag_check_async
-from inloop.tasks.models import Category, FileTemplate, Task
+from inloop.tasks.models import Category, FileTemplate, Task, TaskQuerySet
 
 User = get_user_model()
 
@@ -23,7 +25,7 @@ class TaskAdmin(PlagiarismAdmin):
     actions = PlagiarismAdmin.actions + ["jplag_check_tasks"]
     ordering = ["pubdate", "deadline", "title"]
 
-    def jplag_check_tasks(self, request, queryset):
+    def jplag_check_tasks(self, request: HttpRequest, queryset: TaskQuerySet) -> None:
         """
         Admin action which starts a plagiarism check on the selected tasks.
         """
@@ -42,7 +44,7 @@ class CategoryAdmin(PlagiarismAdmin):
     prepopulated_fields = {"slug": ("name",)}
     actions = PlagiarismAdmin.actions + ["jplag_check_category"]
 
-    def jplag_check_category(self, request, queryset):
+    def jplag_check_category(self, request: HttpRequest, queryset: QuerySet) -> None:
         """
         Admin action which starts a plagiarism check on the selected categories.
         """
@@ -60,5 +62,5 @@ class FileTemplateAdmin(admin.ModelAdmin):
     list_filter = ["task"]
     search_fields = ["name", "contents"]
 
-    def contents_preview(self, file):
+    def contents_preview(self, file: FileTemplate) -> str:
         return Truncator(file.contents).chars(40)

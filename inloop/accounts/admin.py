@@ -20,13 +20,13 @@ class StudentDetailsAdmin(admin.ModelAdmin):
     fields = ["user", "email", "first_name", "last_name", "matnum", "course", "ownwork_confirmed"]
     readonly_fields = ["user", "email", "first_name", "last_name"]
 
-    def first_name(self, obj):
+    def first_name(self, obj: StudentDetails) -> str:
         return obj.user.first_name
 
-    def last_name(self, obj):
+    def last_name(self, obj: StudentDetails) -> str:
         return obj.user.last_name
 
-    def email(self, obj):
+    def email(self, obj: StudentDetails) -> str:
         return format_html('<a href="mailto:{email}">{email}</a>', email=obj.user.email)
 
     first_name.admin_order_field = "user__first_name"

@@ -1,14 +1,17 @@
 from datetime import timedelta
 from random import choice
+from typing import Any, Iterable, Sequence, Type
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.signals import user_logged_in
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import ObjectDoesNotExist
 from django.dispatch import receiver
+from django.http.request import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -22,7 +25,9 @@ INCOMPLETE_HINT = (
 
 
 @receiver(user_logged_in, dispatch_uid="complete_profile_hint")
-def complete_profile_hint(sender, user, request, **kwargs):
+def complete_profile_hint(
+    sender: Type[User], user: User, request: HttpRequest, **kwargs: Any
+) -> None:
     """Show logged in users a hint if they do not have a complete profile."""
     if config.REQUIRE_OWNWORK_DECLARATION or user_profile_complete(user):
         return
@@ -31,7 +36,7 @@ def complete_profile_hint(sender, user, request, **kwargs):
     messages.warning(request, message, fail_silently=True)
 
 
-def user_profile_complete(user):
+def user_profile_complete(user: User) -> bool:
     """Return True if the given user has set matnum, first and last name."""
     try:
         return all((user.first_name, user.last_name, user.studentdetails.matnum))
@@ -39,7 +44,7 @@ def user_profile_complete(user):
         return False
 
 
-def prune_invalid_users():
+def prune_invalid_users() -> int:
     """
     Delete accounts that haven't been activated in time.
     Return the number of deleted accounts.
@@ -53,7 +58,7 @@ def prune_invalid_users():
     return removals_by_type.get(settings.AUTH_USER_MODEL, 0)
 
 
-def assign_to_groups(*, users, groups):
+def assign_to_groups(*, users: Iterable[User], groups: Sequence[Group]) -> int:
     """Randomly assign the given groups to the given users if they not already have a group."""
     num_assignments = 0
     for user in users:
@@ -69,11 +74,11 @@ class Course(models.Model):
 
     name = models.CharField(max_length=64, unique=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
-def default_course():
+def default_course() -> int:
     course, _ = Course.objects.get_or_create(name="Other")
     return course.id
 
@@ -96,5 +101,5 @@ class StudentDetails(models.Model):
     course = models.ForeignKey(Course, default=default_course, on_delete=models.PROTECT)
     ownwork_confirmed = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.user)

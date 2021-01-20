@@ -6,7 +6,7 @@ from inloop.tasks.models import Category, Task
 class CategoryData:
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super().setUpTestData()  # pytype: disable=attribute-error
         cls.category1 = Category.objects.create(name="Category 1")
         cls.category2 = Category.objects.create(name="Category 2")
 
