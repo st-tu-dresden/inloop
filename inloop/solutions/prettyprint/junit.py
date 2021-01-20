@@ -10,15 +10,15 @@ Javadoc for the class
 which is part of Ant (see https://github.com/apache/ant).
 """
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, Optional, Union
 from xml.etree.ElementTree import Element
 
-from django.db.models import QuerySet
+from django.db.models import Manager, QuerySet
 
 from defusedxml import ElementTree as ET
 
 
-def checkeroutput_filter(queryset: QuerySet) -> List[str]:
+def checkeroutput_filter(queryset: Union[QuerySet, Manager]) -> Iterable[str]:
     """
     Return a list of XML reports filtered from the CheckerOutput queryset.
 

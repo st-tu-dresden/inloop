@@ -28,6 +28,7 @@ class Command(BaseCommand):
     def handle(self, *args: str, **options: Any) -> None:
         users = User.objects.filter(is_staff=False)
         tasks = Task.objects.filter(category__name=options["category_name"])
-        if Path(options["result_dir"]).exists():
+        result_dir = Path(options["result_dir"])
+        if result_dir.exists():
             raise CommandError("result_dir already exists")
-        jplag_check(users, tasks, options["min_similarity"], options["result_dir"])
+        jplag_check(users, tasks, options["min_similarity"], result_dir)

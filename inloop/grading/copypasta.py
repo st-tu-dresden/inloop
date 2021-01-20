@@ -48,17 +48,17 @@ def jplag_check_async(users: QuerySet, tasks: QuerySet) -> TaskResultWrapper:
 
 
 def jplag_check(
-    users: QuerySet,
-    tasks: QuerySet,
+    users: Iterable[User],
+    tasks: Iterable[Task],
     min_similarity: Optional[int] = None,
-    result_dir: Optional[str] = None,
+    result_dir: Optional[Path] = None,
 ) -> Set[Solution]:
     """
     Check solutions of the given users for the given tasks with JPlag.
 
     Args:
-        users: A User queryset.
-        tasks: A Task queryset.
+        users: A User iterable (e.g., queryset).
+        tasks: A Task iterable (e.g., queryset).
         min_similarity: Minimum solution similarity after which two solutions
             shall be regarded as plagiarism (optional).
         result_dir: Directory where JPlag HTML files shall be saved to (optional).

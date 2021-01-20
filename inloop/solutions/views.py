@@ -237,17 +237,17 @@ class SolutionListView(LoginRequiredMixin, View):
 
 
 class SolutionDetailView(LoginRequiredMixin, View):
-    def get_context_data(self) -> Dict[Any, Any]:
+    def get_context_data(self) -> Dict[str, Any]:
         return {}
 
-    def get_object(self, **kwargs: Dict[str, Any]) -> Solution:
+    def get_object(self, **kwargs: Any) -> Solution:
         task = get_object_or_404(Task.objects.published(), slug=kwargs["slug"])
         self.solution = get_object_or_404(
             Solution, author=self.request.user, task=task, scoped_id=kwargs["scoped_id"]
         )
         return self.solution
 
-    def get(self, request: HttpRequest, **kwargs: Dict[str, Any]) -> HttpResponse:
+    def get(self, request: HttpRequest, **kwargs: Any) -> HttpResponse:
         solution = self.get_object(**kwargs)
 
         if not config.IMMEDIATE_FEEDBACK:
@@ -293,7 +293,7 @@ class StaffSolutionDetailView(UserPassesTestMixin, SolutionDetailView):
             "impersonate": self.request.user != self.solution.author,
         }
 
-    def get_object(self, **kwargs: Dict[str, Any]) -> Solution:
+    def get_object(self, **kwargs: Any) -> Solution:
         self.solution = get_object_or_404(Solution, pk=kwargs["id"])
         return self.solution
 
