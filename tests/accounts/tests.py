@@ -290,7 +290,7 @@ class SignupWorkflowTest(TestCase):
         link = re.search(r"https?://example\.com/account/activate/[-:\w]+/", body)
         self.assertIsNotNone(link, "The mail should contain an activation link")
 
-        url = re.sub(r"https?://example\.com", "", link.group())
+        url = re.sub(r"https?://example\.com", "", link.group())  # pytype: disable=attribute-error
         response = self.client.get(url, follow=True)
         self.assertContains(response, "Your account has been activated.")
 
@@ -350,7 +350,7 @@ class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
         )
         self.assertIsNotNone(link, "The mail should contain a password reset link")
 
-        url = re.sub(r"https?://example\.com", "", link.group())
+        url = re.sub(r"https?://example\.com", "", link.group())  # pytype: disable=attribute-error
         response = self.client.get(url, follow=True)
         self.assertContains(response, "Set a new password")
         self.assertTrue(response.redirect_chain)

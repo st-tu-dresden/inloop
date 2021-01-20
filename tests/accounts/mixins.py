@@ -17,7 +17,7 @@ class SimpleAccountsData:
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super().setUpTestData()  # pytype: disable=attribute-error
         cls.bob = User.objects.create_user(
             username="bob", email="bob@example.org", password="secret"
         )
