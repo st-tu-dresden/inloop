@@ -37,7 +37,7 @@ class DummyVersionProvider(VersionProvider):
 class ImageVersioningTest(TestCase):
     def setUp(self):
         self.md = Markdown(
-            output_format="html5", extensions=[ImageVersionExtension(DummyVersionProvider())]
+            output_format="html", extensions=[ImageVersionExtension(DummyVersionProvider())]
         )
 
     def test_version_is_appended1(self):
@@ -89,7 +89,7 @@ class NoneVersionProvider(VersionProvider):
 class NoopImageVersioningTest(TestCase):
     def setUp(self):
         self.md = Markdown(
-            output_format="html5", extensions=[ImageVersionExtension(NoneVersionProvider())]
+            output_format="html", extensions=[ImageVersionExtension(NoneVersionProvider())]
         )
 
     def test_no_version_is_appended(self):

@@ -11,7 +11,8 @@ from django.template import Library
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import SafeText, mark_safe
 
-from markdown import Extension, Markdown
+from markdown import Markdown
+from markdown.extensions import Extension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.treeprocessors import Treeprocessor
 
@@ -59,7 +60,7 @@ class ImageVersionExtension(Extension):
 
     def extendMarkdown(self, md: Markdown, md_globals: Dict) -> None:
         """Wrap the custom image version treeprocessor."""
-        md.treeprocessors.add(
+        md.treeprocessors.add(  # pytype: disable=attribute-error
             "image_version_extension", ImageVersionTreeprocessor(self.version_provider, md), "_end"
         )
 
@@ -91,7 +92,7 @@ class GitVersionProvider(VersionProvider):
 
 register = Library()
 convert = Markdown(
-    output_format="html5",
+    output_format="html",
     extensions=[
         "markdown.extensions.toc",
         "markdown.extensions.smarty",
