@@ -685,11 +685,14 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 
 [[package]]
 name = "setproctitle"
-version = "1.1.10"
+version = "1.2.1"
 description = "A Python module to customize the process title"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
+
+[package.extras]
+test = ["pytest (>=6.1,<6.2)"]
 
 [[package]]
 name = "six"
@@ -1175,8 +1178,15 @@ requests = [
     {file = "requests-2.24.0.tar.gz", hash = "sha256:b3559a131db72c33ee969480840fff4bb6dd111de7dd27c8ee1f820f4f00231b"},
 ]
 setproctitle = [
-    {file = "setproctitle-1.1.10.tar.gz", hash = "sha256:6283b7a58477dd8478fbb9e76defb37968ee4ba47b05ec1c053cb39638bd7398"},
-    {file = "setproctitle-1.1.10.zip", hash = "sha256:6a035eddac62898786aed2c2eee7334c28cfc8106e8eb29fdd117cac56c6cdf0"},
+    {file = "setproctitle-1.2.1-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:9c7bf0dc84739d321921f122ba50f3a88e1de3886de85b331cd555e8aa5b3bd9"},
+    {file = "setproctitle-1.2.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:34b24fefc6612099cb41102e9d2b92859bc997a0553b7605fe51fb21a5b5c4d6"},
+    {file = "setproctitle-1.2.1-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:9b79419d6e964643431e37da033c1f53c5399f2521dbd68d417ee023630a8ec8"},
+    {file = "setproctitle-1.2.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:5ec8edbf3170d95fd21424b2c6f537dfd1311bb027ab2a94f48b7c0ce2052a6a"},
+    {file = "setproctitle-1.2.1-cp38-cp38-manylinux1_i686.whl", hash = "sha256:9f16239e7d927b39b62a29a07eb11a991ddc7d9aebe3d758b8288106ff48d493"},
+    {file = "setproctitle-1.2.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:21d434a918eb44af5e3cef40fd67d55162344e4cf1048dbcb0bb10ae1e4f0437"},
+    {file = "setproctitle-1.2.1-cp39-cp39-manylinux1_i686.whl", hash = "sha256:8e91d0d6741b3d55c2b890b0706b4a57ab22aac067d9b5ffd620dc8be3a78628"},
+    {file = "setproctitle-1.2.1-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:ab42aa209d21a056f886ab053788ca5599fe97c3aa0e5db93d3779771bfc6500"},
+    {file = "setproctitle-1.2.1.tar.gz", hash = "sha256:5f0eecb27815e31799a69eb6a06b4d375d38887d079d410565b0be82da65c950"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
