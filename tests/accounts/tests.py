@@ -344,8 +344,7 @@ class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
 
         link = re.search(
             r"https?://example\.com/account/password_reset_confirm/"
-            r"(?P<uidb64>[0-9A-Za-z_\-]+)/"
-            r"(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/",
+            r"(?P<uidb64>[^/]+)/(?P<token>[^/]+)/",
             body,
         )
         self.assertIsNotNone(link, "The mail should contain a password reset link")
