@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from inloop.solutions.models import (
     Checkpoint,
@@ -32,7 +32,7 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
         response = self.client.get(reverse("solutions:status", kwargs={"id": self.solution.id}))
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
-            force_text(response.content),
+            force_str(response.content),
             '{"status": "pending", "solution_id": %d}' % self.solution.id,
         )
 

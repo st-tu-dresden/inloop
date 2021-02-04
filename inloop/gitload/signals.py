@@ -5,7 +5,7 @@ from django.dispatch import Signal, receiver
 from constance import config
 from constance.signals import config_updated
 
-repository_loaded = Signal(providing_args=["repository"])
+repository_loaded = Signal()
 
 
 @receiver(config_updated, dispatch_uid="gitload_config_updated")
