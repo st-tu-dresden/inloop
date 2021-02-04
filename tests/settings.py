@@ -2,7 +2,7 @@
 from inloop.settings import *  # noqa isort:skip
 
 HUEY = {
-    "always_eager": True,
+    "immediate": True,
 }
 
 PASSWORD_HASHERS = [

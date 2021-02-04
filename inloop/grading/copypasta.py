@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 
-from huey.api import TaskResultWrapper
+from huey.api import Result
 from huey.contrib.djhuey import db_task
 
 from inloop.grading.models import save_plagiarism_set
@@ -24,7 +24,7 @@ LINE_REGEX = re.compile(r"Comparing (.*?)-(.*?): (\d+\.\d+)")
 
 
 @db_task()
-def jplag_check_async(users: QuerySet, tasks: QuerySet) -> TaskResultWrapper:
+def jplag_check_async(users: QuerySet, tasks: QuerySet) -> Result:
     """
     Submit a job to check solutions using the jplag_check function.
 
@@ -42,7 +42,7 @@ def jplag_check_async(users: QuerySet, tasks: QuerySet) -> TaskResultWrapper:
         tasks: A Task queryset.
 
     Returns:
-        A huey TaskResultWrapper object.
+        A huey Result object.
     """
     jplag_check(users, tasks)
 

@@ -176,7 +176,7 @@ if env.bool("SECURE_COOKIES", default=True):
 CSRF_COOKIE_HTTPONLY = True
 
 HUEY = {
-    "always_eager": False,
+    "immediate": False,
     "url": env("REDIS_URL"),
 }
 
