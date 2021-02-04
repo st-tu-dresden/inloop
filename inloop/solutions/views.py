@@ -45,7 +45,7 @@ class HttpResponseBadJsonRequest(JsonResponse):
 
 
 class SolutionStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, id: str) -> JsonResponse:
+    def get(self, request: HttpRequest, id: int) -> JsonResponse:
         solution = get_object_or_404(Solution, pk=id, author=request.user)
         return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
@@ -182,10 +182,10 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
+    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, int(solution_id))
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
         try:
@@ -196,20 +196,20 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
 
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: str) -> JsonResponse:
+    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, int(solution_id))
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
         return JsonResponse({"status": "unavailable"})
 
 
 class SolutionArchiveDownloadView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: str) -> HttpResponse:
+    def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
         if not solution_id:
             raise Http404("No solution id was supplied.")
-        solution = access_solution_or_404(request.user, int(solution_id))
+        solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             response = HttpResponse(solution.archive, content_type="application/zip")
             attachment = "attachment; filename=%s" % basename(solution.archive.name)

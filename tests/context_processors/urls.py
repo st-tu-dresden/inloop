@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import current_site_response
 
 urlpatterns = [
-    url(r"^current_site_response/$", current_site_response),
+    path("current_site_response/", current_site_response),
 ]

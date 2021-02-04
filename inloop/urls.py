@@ -1,6 +1,6 @@
-from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.flatpages.views import flatpage
+from django.urls import include, path, re_path
 
 from inloop.accounts import urls as account_urls
 from inloop.gitload import urls as gitload_urls
@@ -10,22 +10,22 @@ from inloop.tasks import urls as task_urls
 from inloop.views import home, login, logout
 
 urlpatterns = [
-    url(r"^$", home, name="home"),
-    url(r"^login/$", login, name="login"),
-    url(r"^logout/$", logout, name="logout"),
-    url(r"^account/", include(account_urls)),
-    url(r"^gitload/", include(gitload_urls)),
-    url(r"^solutions/", include(solution_urls)),
-    url(r"^tasks/", include(task_urls)),
-    url(r"^statistics/", include(statistics_urls)),
+    path("", home, name="home"),
+    path("login/", login, name="login"),
+    path("logout/", logout, name="logout"),
+    path("account/", include(account_urls)),
+    path("gitload/", include(gitload_urls)),
+    path("solutions/", include(solution_urls)),
+    path("tasks/", include(task_urls)),
+    path("statistics/", include(statistics_urls)),
     # explicitly override the admin logout url
-    url(r"^admin/logout/$", logout),
-    url(r"^admin/", admin.site.urls),
+    path("admin/logout/", logout),
+    path("admin/", admin.site.urls),
 ]
 
 # flatpages catchall pattern
 urlpatterns += [
-    url(r"^(?P<url>.*/)$", flatpage),
+    re_path(r"^(?P<url>.*/)$", flatpage),
 ]
 
 # customized titles and headers for the generated admin site
