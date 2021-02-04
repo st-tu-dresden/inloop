@@ -13,7 +13,6 @@ from django.utils.safestring import SafeText, mark_safe
 
 from markdown import Markdown
 from markdown.extensions import Extension
-from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.treeprocessors import Treeprocessor
 
 
@@ -98,7 +97,6 @@ convert = Markdown(
         "markdown.extensions.smarty",
         "markdown.extensions.fenced_code",
         "markdown.extensions.tables",
-        CodeHiliteExtension(use_pygments=False),
         ImageVersionExtension(GitVersionProvider(settings.REPOSITORY_ROOT)),
     ],
 ).convert
