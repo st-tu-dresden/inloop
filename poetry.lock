@@ -353,17 +353,15 @@ export = ["jinja2 (>=2.7,<2.8)"]
 
 [[package]]
 name = "huey"
-version = "1.11.0"
+version = "2.3.0"
 description = "huey, a little task queue"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.extras]
-backends = ["peewee", "redis (>=3.0.0)", "simpledb"]
+backends = ["redis (>=3.0.0)"]
 redis = ["redis (>=3.0.0)"]
-simpledb = ["simpledb"]
-sqlite = ["peewee"]
 
 [[package]]
 name = "idna"
@@ -832,7 +830,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b8eebf3a8655047605e052748309040efeefd43bebc957e4a7218d26c4bb3cdd"
+content-hash = "3d9f42d2384905f2a428e48c4e3e7b98c713ad56c7135cf5c64cc709e29fe05b"
 
 [metadata.files]
 appdirs = [
@@ -1004,7 +1002,7 @@ honcho = [
     {file = "honcho-1.0.1.tar.gz", hash = "sha256:c189402ad2e337777283c6a12d0f4f61dc6dd20c254c9a3a4af5087fc66cea6e"},
 ]
 huey = [
-    {file = "huey-1.11.0.tar.gz", hash = "sha256:c59c35370309ffd9773e4fd0f2ca6e408eca0949aee69bf201f58729c5ef0cd1"},
+    {file = "huey-2.3.0.tar.gz", hash = "sha256:76978840a875607cd77c283c4ebf3ea5071b2ec06a1ac428d63be0d88f1e7070"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
