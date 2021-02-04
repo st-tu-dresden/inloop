@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 from xml.etree.ElementTree import Element
 
 from django.conf import settings
@@ -13,7 +13,6 @@ from django.utils.safestring import SafeText, mark_safe
 
 from markdown import Markdown
 from markdown.extensions import Extension
-from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.treeprocessors import Treeprocessor
 
 
@@ -58,10 +57,11 @@ class ImageVersionExtension(Extension):
         self.version_provider = version_provider
         super().__init__(*args, **kwargs)
 
-    def extendMarkdown(self, md: Markdown, md_globals: Dict) -> None:
+    def extendMarkdown(self, md: Markdown) -> None:
         """Wrap the custom image version treeprocessor."""
-        md.treeprocessors.add(  # pytype: disable=attribute-error
-            "image_version_extension", ImageVersionTreeprocessor(self.version_provider, md), "_end"
+        processor = ImageVersionTreeprocessor(self.version_provider, md)
+        md.treeprocessors.register(  # pytype: disable=attribute-error
+            processor, "image_version_extension", 0
         )
 
 
@@ -98,7 +98,6 @@ convert = Markdown(
         "markdown.extensions.smarty",
         "markdown.extensions.fenced_code",
         "markdown.extensions.tables",
-        CodeHiliteExtension(use_pygments=False),
         ImageVersionExtension(GitVersionProvider(settings.REPOSITORY_ROOT)),
     ],
 ).convert
