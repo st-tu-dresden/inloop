@@ -44,14 +44,14 @@ class HttpResponseBadJsonRequest(JsonResponse):
         super().__init__({"error": "invalid json"})
 
 
-class SolutionStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, id: int) -> JsonResponse:
-        solution = get_object_or_404(Solution, pk=id, author=request.user)
-        return JsonResponse({"solution_id": solution.id, "status": solution.status()})
-
-
 class SubmissionError(Exception):
     pass
+
+
+@login_required
+def solution_status(request: HttpRequest, id: int) -> JsonResponse:
+    solution = get_object_or_404(Solution, pk=id, author=request.user)
+    return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
 
 class SolutionSubmitMixin:
