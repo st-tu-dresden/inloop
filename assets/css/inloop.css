@@ -209,6 +209,10 @@ code {
 }
 /* @end */
 
+.tasks-unpublished {
+  color: #d3d3d3;
+}
+
 /* @begin <pre> styles for console outputs, stack traces, etc. */
 .console-output {
   font-size: 86%;

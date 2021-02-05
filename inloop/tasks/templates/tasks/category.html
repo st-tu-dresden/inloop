@@ -11,7 +11,7 @@
 
 <h2>{{ category.name }} tasks</h2>
 
-{% if tasks %}
+{% if tasks or unpublished_tasks %}
   <table class="table table-align-pretty">
     <thead>
     <tr>
@@ -50,7 +50,7 @@
     {% endfor %}
 
     {% for task in unpublished_tasks %}
-    <tr style="color: lightgrey;">
+    <tr class="tasks-unpublished">
       <td>{{ task.title }}</td>
       <td>{% firstof task.pubdate|date:"d-m-Y H:i" "-" %}</td>
       {% if have_deadlines %}
@@ -72,9 +72,7 @@
 
     </tbody>
   </table>
-{% endif %}
-
-{% if not tasks %}
+{% else %}
   <div class="alert alert-info">You are lucky! Nothing to do here.</div>
 {% endif %}
 
