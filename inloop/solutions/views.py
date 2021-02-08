@@ -46,55 +46,72 @@ class HttpResponseBadJsonRequest(JsonResponse):
 
 
 class SubmissionError(Exception):
-    pass
+    """
+    Used by submit(…) to signal user error conditions that can occur during
+    a submission, such as passed deadlines, missing files, and so on.
+    """
 
 
 @login_required
 def solution_status(request: HttpRequest, id: int) -> JsonResponse:
+    """
+    Return the JSON encoded status for the given solution. The solution list
+    view contains Javascript that polls this endpoint asynchronously.
+    """
     solution = get_object_or_404(Solution, pk=id, author=request.user)
     return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
 
-class SolutionSubmitMixin:
-    def get_task(self, request: HttpRequest, slug: str) -> Task:
-        task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
-        if task.is_expired:
-            raise SubmissionError("The deadline for this task has passed.")
-        return task
+def get_visible_task_or_404(user: User, slug: str) -> Task:
+    """
+    Return the task identified by the slug if it exists and if it is visible
+    for the given user, raise Http404 otherwise.
+    """
+    return get_object_or_404(Task.objects.published().visible_by(user=user), slug=slug)
 
-    def submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> None:
-        if not files:
-            raise SubmissionError("You haven't uploaded any files.")
-        try:
-            validate_filenames([file.name for file in files])
-            self.check_submission_limit(author, task)
-            solution = self.atomic_submit(files, author, task)
-            if config.IMMEDIATE_FEEDBACK:
-                solution_submitted.send(sender=self.__class__, solution=solution)
-        except ValidationError as error:
-            raise SubmissionError(str(error))
-        except IntegrityError:
-            logger.exception("db constraint violation occurred")
-            raise SubmissionError("Concurrent submission is not possible.")
 
-    def check_submission_limit(self, author: User, task: Task) -> None:
-        """
-        Ensure that the author is within the submission limit for the task (if any).
-        """
-        if task.has_submission_limit:
-            count = Solution.objects.filter(author=author, task=task).count()
-            limit = task.submission_limit
-            if count >= limit:
-                suffix = "" if limit == 1 else "s"
-                raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
+def submit(files: Iterable[UploadedFile], author: User, task: Task) -> None:
+    """
+    Perform the core workflow of a solution submit: validate it, save it to
+    the DB and propagate the event to other components (e.g., the testrunner).
+    """
+    if task.is_expired:
+        raise SubmissionError("The deadline for this task has passed.")
+    if not files:
+        raise SubmissionError("You haven't uploaded any files.")
+    _check_submission_limit(author, task)
+    try:
+        validate_filenames([file.name for file in files])
+        solution = _atomic_submit(files, author, task)
+        if config.IMMEDIATE_FEEDBACK:
+            solution_submitted.send(sender=__name__, solution=solution)
+    except ValidationError as error:
+        raise SubmissionError(str(error))
+    except IntegrityError:
+        logger.exception("db constraint violation occurred")
+        raise SubmissionError("Concurrent submission is not possible.")
 
-    @transaction.atomic()
-    def atomic_submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> Solution:
-        solution = Solution.objects.create(author=author, task=task)
-        SolutionFile.objects.bulk_create(
-            [SolutionFile(solution=solution, file=file) for file in files]
-        )
-        return solution
+
+def _check_submission_limit(author: User, task: Task) -> None:
+    """
+    Ensure that the author is within the submission limit for the task (if any).
+    """
+    if task.has_submission_limit:
+        count = Solution.objects.filter(author=author, task=task).count()
+        limit = task.submission_limit
+        if count >= limit:
+            suffix = "" if limit == 1 else "s"
+            raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
+
+
+@transaction.atomic()
+def _atomic_submit(files: Iterable[UploadedFile], author: User, task: Task) -> Solution:
+    """Save all submission objects in a single database transaction."""
+    solution = Solution.objects.create(author=author, task=task)
+    SolutionFile.objects.bulk_create(
+        [SolutionFile(solution=solution, file=file) for file in files]
+    )
+    return solution
 
 
 def parse_submit_message(payload: bytes) -> Dict[str, Any]:
@@ -105,7 +122,7 @@ def parse_submit_message(payload: bytes) -> Dict[str, Any]:
     return data
 
 
-class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
+class SideBySideEditorView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Show the side-by-side editor for the task referenced by slug or system_name.
@@ -129,14 +146,14 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         Handle JSON-encoded POST submission requests from the side-by-side editor.
         """
         try:
-            # if it's a name and not a slug, get_task(…) will make it fail with 404
-            task = self.get_task(request, slug_or_name)
+            # if it's a name and not a slug, get_visible_task_or_404(…) will make it fail with 404
+            task = get_visible_task_or_404(request.user, slug_or_name)
             data = parse_submit_message(request.body)
             files = [
                 SimpleUploadedFile(filename, content.encode())
                 for filename, content in data["uploads"].items()
             ]
-            self.submit(files, request.user, task)
+            submit(files, request.user, task)
             if not task.has_submission_limit:
                 return JsonResponse({"success": True})
             return JsonResponse(
@@ -154,7 +171,7 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             return HttpResponseBadJsonRequest()
 
 
-class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
+class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, slug: str) -> HttpResponse:
         return TemplateResponse(
             request,
@@ -164,9 +181,9 @@ class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
 
     def post(self, request: HttpRequest, slug: str) -> HttpResponse:
         try:
-            task = self.get_task(request, slug)
+            task = get_visible_task_or_404(request.user, slug)
             files = request.FILES.getlist("uploads", default=[])
-            self.submit(files, request.user, task)
+            submit(files, request.user, task)
         except SubmissionError as error:
             messages.error(request, str(error))
             return redirect("solutions:upload", slug=slug)
