@@ -84,7 +84,7 @@ class SolutionSubmitMixin:
             count = Solution.objects.filter(author=author, task=task).count()
             limit = task.submission_limit
             if count >= limit:
-                suffix = "s" if limit > 1 else ""
+                suffix = "" if limit == 1 else "s"
                 raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
 
     @transaction.atomic()
@@ -94,6 +94,14 @@ class SolutionSubmitMixin:
             [SolutionFile(solution=solution, file=file) for file in files]
         )
         return solution
+
+
+def parse_submit_message(payload: bytes) -> Dict[str, Any]:
+    """Unwrap and validate the JSON encoded submit message."""
+    data = json.loads(payload)
+    if not (isinstance(data, dict) and isinstance(data.get("uploads"), dict)):
+        raise SubmissionError("invalid data")
+    return data
 
 
 class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
@@ -122,11 +130,10 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
         try:
             # if it's a name and not a slug, get_task(…) will make it fail with 404
             task = self.get_task(request, slug_or_name)
-            json_data = json.loads(request.body)
-            uploads = json_data.get("uploads", {})
+            data = parse_submit_message(request.body)
             files = [
                 SimpleUploadedFile(filename, content.encode())
-                for filename, content in uploads.items()
+                for filename, content in data["uploads"].items()
             ]
             self.submit(files, request.user, task)
             if not task.has_submission_limit:

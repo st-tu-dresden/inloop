@@ -1,12 +1,19 @@
 import os
 import shutil
+from datetime import timedelta
+from json import JSONDecodeError
 from tempfile import mkdtemp
+from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_str
+
+from constance.test import override_config
 
 from inloop.solutions.models import (
     Checkpoint,
@@ -15,6 +22,7 @@ from inloop.solutions.models import (
     SolutionFile,
     create_archive,
 )
+from inloop.solutions.views import SubmissionError, parse_submit_message
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
@@ -33,7 +41,7 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             force_str(response.content),
-            '{"status": "pending", "solution_id": %d}' % self.solution.id,
+            {"status": "pending", "solution_id": self.solution.id},
         )
 
     def test_only_owner_can_access(self):
@@ -354,3 +362,124 @@ class EditorVisibilityTest(SimpleAccountsData, TaskData, TestCase):
         self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.client.get(reverse("solutions:editor", args=["task-1"]))
         self.assertEqual(response.status_code, 404)
+
+
+class JsonValidationTest(TestCase):
+    def test_invalid_json(self):
+        with self.assertRaises(JSONDecodeError):
+            parse_submit_message(b"{ not json }")
+
+    def test_wrong_type1(self):
+        with self.assertRaises(SubmissionError):
+            parse_submit_message(b"[]")
+
+    def test_wrong_type2(self):
+        with self.assertRaises(SubmissionError):
+            parse_submit_message(b'{"uploads": []}')
+
+    def test_missing_key(self):
+        with self.assertRaises(SubmissionError):
+            parse_submit_message(b"{}")
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
+    urlname = "solutions:editor"
+
+    def setUp(self):
+        # sync in-memory model state after transaction rollbacks
+        self.published_task1.refresh_from_db()
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+
+    def assertJsonResponse(self, response, expected, *, status_code=200):
+        self.assertEqual(response.status_code, status_code)
+        self.assertJSONEqual(force_str(response.content), expected)
+
+    def test_lgin_required(self):
+        self.client.logout()
+        url = reverse(self.urlname, args=["task-1"])
+        self.assertRedirects(self.client.post(url), f"{settings.LOGIN_URL}?next={url}")
+
+    def test_invalid_json(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data="{ not json }",
+        )
+        self.assertJsonResponse(response, {"error": "invalid json"}, status_code=400)
+
+    def test_invalid_data(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"uploads": "foo"},
+        )
+        self.assertJsonResponse(response, {"success": False, "reason": "invalid data"})
+
+    @override_config(ALLOWED_FILENAME_EXTENSIONS=".py")
+    def test_wrong_file_extension(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"uploads": {"Example.java": ""}},
+        )
+        self.assertContains(response, "files contain disallowed filename extensions")
+
+    def test_deadline_expired(self):
+        self.published_task1.deadline = timezone.now() - timedelta(seconds=1)
+        self.published_task1.save()
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"uploads": {}},
+        )
+        self.assertJsonResponse(
+            response, {"success": False, "reason": "The deadline for this task has passed."}
+        )
+
+    def test_submission_limit_exceeded(self):
+        self.published_task1.max_submissions = 0
+        self.published_task1.save()
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"uploads": {"Example.java": ""}},
+        )
+        self.assertJsonResponse(
+            response, {"success": False, "reason": "You cannot submit more than 0 solutions."}
+        )
+
+    def test_successful_submit_with_limit(self):
+        self.published_task1.max_submissions = 2
+        self.published_task1.save()
+        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"uploads": {"Example.java": ""}},
+            )
+            signal_mock.send.assert_called_once()
+        self.assertJsonResponse(
+            response, {"success": True, "submission_limit": 2, "num_submissions": 1}
+        )
+
+    def test_successful_submit_without_limit(self):
+        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"uploads": {"Example.java": ""}},
+            )
+            signal_mock.send.assert_called_once()
+        self.assertJsonResponse(response, {"success": True})
+
+    @override_config(IMMEDIATE_FEEDBACK=False)
+    def test_feedback_disabled(self):
+        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"uploads": {"Example.java": ""}},
+            )
+            signal_mock.send.assert_not_called()
+        self.assertJsonResponse(response, {"success": True})
