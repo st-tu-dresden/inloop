@@ -190,8 +190,6 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -204,8 +202,6 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -214,8 +210,6 @@ class SolutionArchiveStatusView(LoginRequiredMixin, View):
 
 class SolutionArchiveDownloadView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             response = HttpResponse(solution.archive, content_type="application/zip")
