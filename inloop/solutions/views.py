@@ -21,6 +21,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, View
 
 from constance import config
@@ -330,10 +331,9 @@ def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
     return JsonResponse({"success": True, "files": files})
 
 
+@require_POST
 @login_required
 def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
-    if request.method != "POST":
-        return JsonResponse({"success": False})
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
@@ -346,11 +346,10 @@ def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
     return JsonResponse({"success": True})
 
 
+@require_POST
 @csrf_exempt
 def mock_syntax_check(request: HttpRequest) -> JsonResponse:
     """Temporary endpoint that outputs some fake syntax check results."""
-    if request.method != "POST":
-        return JsonResponse({"success": False})
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
         return JsonResponse({"success": False, "reason": "bad configuration"})
     try:
