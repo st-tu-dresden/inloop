@@ -53,7 +53,7 @@ class SubmissionError(Exception):
 
 
 @login_required
-def solution_status(request: HttpRequest, id: int) -> JsonResponse:
+def solution_status(request: HttpRequest, id: int) -> HttpResponse:
     """
     Return the JSON encoded status for the given solution. The solution list
     view contains Javascript that polls this endpoint asynchronously.
@@ -141,7 +141,7 @@ class SideBySideEditorView(LoginRequiredMixin, View):
             {"task": task, "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT},
         )
 
-    def post(self, request: HttpRequest, slug_or_name: str) -> JsonResponse:
+    def post(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Handle JSON-encoded POST submission requests from the side-by-side editor.
         """
@@ -207,7 +207,7 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
+    def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -219,7 +219,7 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
 
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
+    def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -336,7 +336,7 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 
 @never_cache
 @login_required
-def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
+def get_last_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
     queryset = []
@@ -350,7 +350,7 @@ def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
 
 @require_POST
 @login_required
-def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
+def save_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
         data = json.loads(request.body)
@@ -365,7 +365,7 @@ def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
 
 @require_POST
 @csrf_exempt
-def mock_syntax_check(request: HttpRequest) -> JsonResponse:
+def mock_syntax_check(request: HttpRequest) -> HttpResponse:
     """Temporary endpoint that outputs some fake syntax check results."""
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
         return JsonResponse({"success": False, "reason": "bad configuration"})
