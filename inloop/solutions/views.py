@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import json
-import logging
 from json import JSONDecodeError
 from os.path import basename
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.db import IntegrityError, transaction
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import ObjectDoesNotExist, Q
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -31,15 +29,13 @@ from inloop.solutions.models import (
     Checkpoint,
     Solution,
     SolutionFile,
+    SubmissionError,
     create_archive_async,
     create_checkpoint,
+    submit,
 )
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
-from inloop.solutions.signals import solution_submitted
-from inloop.solutions.validators import validate_filenames
 from inloop.tasks.models import FileTemplate, Task
-
-logger = logging.getLogger(__name__)
 
 
 class HttpResponseBadJsonRequest(JsonResponse):
@@ -49,13 +45,6 @@ class HttpResponseBadJsonRequest(JsonResponse):
 
     def __init__(self) -> None:
         super().__init__({"error": "invalid json"})
-
-
-class SubmissionError(Exception):
-    """
-    Used by submit(…) to signal user error conditions that can occur during
-    a submission, such as passed deadlines, missing files, and so on.
-    """
 
 
 @login_required
@@ -76,55 +65,11 @@ def get_visible_task_or_404(user: User, slug: str) -> Task:
     return get_object_or_404(Task.objects.published().visible_by(user=user), slug=slug)
 
 
-def submit(files: Iterable[UploadedFile], author: User, task: Task) -> None:
-    """
-    Perform the core workflow of a solution submit: validate it, save it to
-    the DB and propagate the event to other components (e.g., the testrunner).
-    """
-    if task.is_expired:
-        raise SubmissionError("The deadline for this task has passed.")
-    if not files:
-        raise SubmissionError("You haven't uploaded any files.")
-    _check_submission_limit(author, task)
-    try:
-        validate_filenames([file.name for file in files])
-        solution = _atomic_submit(files, author, task)
-        if config.IMMEDIATE_FEEDBACK:
-            solution_submitted.send(sender=__name__, solution=solution)
-    except ValidationError as error:
-        raise SubmissionError(str(error))
-    except IntegrityError:
-        logger.exception("db constraint violation occurred")
-        raise SubmissionError("Concurrent submission is not possible.")
-
-
-def _check_submission_limit(author: User, task: Task) -> None:
-    """
-    Ensure that the author is within the submission limit for the task (if any).
-    """
-    if task.has_submission_limit:
-        count = Solution.objects.filter(author=author, task=task).count()
-        limit = task.submission_limit
-        if count >= limit:
-            suffix = "" if limit == 1 else "s"
-            raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
-
-
-@transaction.atomic()
-def _atomic_submit(files: Iterable[UploadedFile], author: User, task: Task) -> Solution:
-    """Save all submission objects in a single database transaction."""
-    solution = Solution.objects.create(author=author, task=task)
-    SolutionFile.objects.bulk_create(
-        [SolutionFile(solution=solution, file=file) for file in files]
-    )
-    return solution
-
-
 def parse_submit_message(payload: bytes) -> Dict[str, Any]:
     """Unwrap and validate the JSON encoded submit message."""
     data = json.loads(payload)
     if not (isinstance(data, dict) and isinstance(data.get("uploads"), dict)):
-        raise SubmissionError("invalid data")
+        raise ValidationError("invalid data")
     return data
 
 
@@ -171,6 +116,10 @@ class SideBySideEditorView(LoginRequiredMixin, View):
                     ).count(),
                 }
             )
+        except ValidationError as error:
+            # flake8 warning B306 doesn't apply here, because ValidationError
+            # declares the "message" attribute explicitly
+            return JsonResponse({"success": False, "reason": error.message})  # noqa: B306
         except SubmissionError as error:
             return JsonResponse({"success": False, "reason": str(error)})
         except JSONDecodeError:

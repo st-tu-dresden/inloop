@@ -90,7 +90,7 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         """Test the solution upload."""
         file_1 = SimpleUploadedFile("Fibonacci1.java", b"class Fibonacci1 {}")
         file_2 = SimpleUploadedFile("Fibonacci2.java", b"class Fibonacci2 {}")
-        with patch("inloop.solutions.views.solution_submitted") as mocked_signal:
+        with patch("inloop.solutions.models.solution_submitted") as mocked_signal:
             response = self.client.post(self.url, data={"uploads": [file_1, file_2]}, follow=True)
         mocked_signal.send.assert_called_once()
         self.assertResponseContainsMessage(

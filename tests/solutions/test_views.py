@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
@@ -22,7 +23,7 @@ from inloop.solutions.models import (
     SolutionFile,
     create_archive,
 )
-from inloop.solutions.views import SubmissionError, parse_submit_message
+from inloop.solutions.views import parse_submit_message
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
@@ -375,15 +376,15 @@ class JsonValidationTest(TestCase):
             parse_submit_message(b"{ not json }")
 
     def test_wrong_type1(self):
-        with self.assertRaises(SubmissionError):
+        with self.assertRaises(ValidationError):
             parse_submit_message(b"[]")
 
     def test_wrong_type2(self):
-        with self.assertRaises(SubmissionError):
+        with self.assertRaises(ValidationError):
             parse_submit_message(b'{"uploads": []}')
 
     def test_missing_key(self):
-        with self.assertRaises(SubmissionError):
+        with self.assertRaises(ValidationError):
             parse_submit_message(b"{}")
 
 
@@ -457,7 +458,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
     def test_successful_submit_with_limit(self):
         self.published_task1.max_submissions = 2
         self.published_task1.save()
-        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
@@ -469,7 +470,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
         )
 
     def test_successful_submit_without_limit(self):
-        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
@@ -480,7 +481,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
 
     @override_config(IMMEDIATE_FEEDBACK=False)
     def test_feedback_disabled(self):
-        with patch("inloop.solutions.views.solution_submitted") as signal_mock:
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
