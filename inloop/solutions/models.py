@@ -311,6 +311,7 @@ def auto_delete_file_on_delete(
 
 @atomic
 def create_checkpoint(files: Iterable[Dict], task: Task, user: User) -> None:
+    validate_filenames([file["name"] for file in files])
     Checkpoint.objects.filter(author=user, task=task).delete()
     checkpoint = Checkpoint.objects.create(author=user, task=task)
     CheckpointFile.objects.bulk_create(

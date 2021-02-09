@@ -22,8 +22,6 @@ def validate_filenames(filenames: List[str]) -> None:
     allowed_filename_extensions = tuple(_get_allowed_filename_extensions())
     if not allowed_filename_extensions:
         raise ValidationError("Currently no filename extensions are accepted.")
-    if not filenames:
-        raise ValidationError("No files were supplied.")
     for filename in filenames:
         if not filename.lower().endswith(allowed_filename_extensions):
             raise ValidationError(

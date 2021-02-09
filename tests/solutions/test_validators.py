@@ -28,8 +28,7 @@ class FileNameExtensionValidationTest(TestCase):
             validate_filenames(filenames)
 
     def test_no_filenames(self):
-        with self.assertRaises(ValidationError):
-            validate_filenames([])
+        validate_filenames([])
 
     def test_case_insensitivity(self):
         filenames = ["First.java", "Second.JAVA", "Third.jAvA"]

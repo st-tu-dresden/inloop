@@ -113,6 +113,7 @@ class SideBySideEditorView(LoginRequiredMixin, View):
             # if it's a name and not a slug, get_visible_task_or_404(…) will make it fail with 404
             task = get_visible_task_or_404(request.user, slug_or_name)
             data = parse_json_payload(request.body)
+            create_checkpoint(data["files"], task, request.user)
             files = [
                 SimpleUploadedFile(file["name"], file["contents"].encode())
                 for file in data["files"]
@@ -132,9 +133,11 @@ class SideBySideEditorView(LoginRequiredMixin, View):
         except ValidationError as error:
             # flake8 warning B306 doesn't apply here, because ValidationError
             # declares the "message" attribute explicitly
-            return JsonResponse({"success": False, "reason": error.message})  # noqa: B306
+            return JsonResponse(
+                {"success": False, "saved": False, "reason": error.message}  # noqa: B306
+            )
         except SubmissionError as error:
-            return JsonResponse({"success": False, "reason": str(error)})
+            return JsonResponse({"success": False, "saved": True, "reason": str(error)})
         except JSONDecodeError:
             return HttpResponseBadJsonRequest()
 
