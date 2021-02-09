@@ -255,6 +255,18 @@ def auto_delete_file_on_delete(
             os.remove(instance.file.path)
 
 
+@atomic
+def create_checkpoint(files: Iterable[Dict], task: Task, user: User) -> None:
+    Checkpoint.objects.filter(author=user, task=task).delete()
+    checkpoint = Checkpoint.objects.create(author=user, task=task)
+    CheckpointFile.objects.bulk_create(
+        [
+            CheckpointFile(checkpoint=checkpoint, name=file["name"], contents=file["contents"])
+            for file in files
+        ]
+    )
+
+
 class Checkpoint(models.Model):
     """
     Represents an editor checkpoint.
@@ -270,23 +282,6 @@ class Checkpoint(models.Model):
 
     class Meta:
         ordering = ["created_at"]
-
-    class Manager(models.Manager):
-        def save_checkpoint(self, json_data: Dict[str, Any], task: Task, user: User) -> None:
-            files = json_data["files"]
-            with atomic():
-                self.filter(author=user, task=task).delete()
-                checkpoint = self.create(author=user, task=task)
-                CheckpointFile.objects.bulk_create(
-                    [
-                        CheckpointFile(
-                            checkpoint=checkpoint, name=file["name"], contents=file["contents"]
-                        )
-                        for file in files
-                    ]
-                )
-
-    objects = Manager()
 
     def __str__(self) -> str:
         return f"task_id={self.task_id}, author_id={self.author_id}"

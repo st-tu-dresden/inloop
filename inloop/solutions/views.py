@@ -27,7 +27,13 @@ from django.views.generic import DetailView, View
 from constance import config
 from huey.exceptions import TaskLockedException
 
-from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
+from inloop.solutions.models import (
+    Checkpoint,
+    Solution,
+    SolutionFile,
+    create_archive_async,
+    create_checkpoint,
+)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
 from inloop.solutions.signals import solution_submitted
 from inloop.solutions.validators import validate_filenames
@@ -353,11 +359,10 @@ def get_last_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
 def save_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
-        data = json.loads(request.body)
+        files = json.loads(request.body)["files"]
+        create_checkpoint(files, task, request.user)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-    try:
-        Checkpoint.objects.save_checkpoint(data, task, request.user)
     except KeyError:
         return JsonResponse({"success": False})
     return JsonResponse({"success": True})
