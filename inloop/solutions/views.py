@@ -65,10 +65,23 @@ def get_visible_task_or_404(user: User, slug: str) -> Task:
     return get_object_or_404(Task.objects.published().visible_by(user=user), slug=slug)
 
 
-def parse_submit_message(payload: bytes) -> Dict[str, Any]:
-    """Unwrap and validate the JSON encoded submit message."""
+def _is_valid_file_item(item: Any) -> bool:
+    """Return True if the given file item conforms to the expected schema."""
+    return (
+        isinstance(item, dict)
+        and isinstance(item.get("name"), str)
+        and isinstance(item.get("contents"), str)
+    )
+
+
+def parse_json_payload(payload: bytes) -> Dict[str, Any]:
+    """Unwrap and validate the JSON encoded file payload."""
     data = json.loads(payload)
-    if not (isinstance(data, dict) and isinstance(data.get("uploads"), dict)):
+    if not (
+        isinstance(data, dict)
+        and isinstance(data.get("files"), list)
+        and all(_is_valid_file_item(item) for item in data["files"])
+    ):
         raise ValidationError("invalid data")
     return data
 
@@ -99,10 +112,10 @@ class SideBySideEditorView(LoginRequiredMixin, View):
         try:
             # if it's a name and not a slug, get_visible_task_or_404(…) will make it fail with 404
             task = get_visible_task_or_404(request.user, slug_or_name)
-            data = parse_submit_message(request.body)
+            data = parse_json_payload(request.body)
             files = [
-                SimpleUploadedFile(filename, content.encode())
-                for filename, content in data["uploads"].items()
+                SimpleUploadedFile(file["name"], file["contents"].encode())
+                for file in data["files"]
             ]
             submit(files, request.user, task)
             if not task.has_submission_limit:
@@ -308,11 +321,11 @@ def get_last_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
 def save_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
-        files = json.loads(request.body)["files"]
+        files = parse_json_payload(request.body)["files"]
         create_checkpoint(files, task, request.user)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-    except KeyError:
+    except ValidationError:
         return JsonResponse({"success": False})
     return JsonResponse({"success": True})
 

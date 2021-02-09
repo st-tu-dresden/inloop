@@ -23,7 +23,7 @@ from inloop.solutions.models import (
     SolutionFile,
     create_archive,
 )
-from inloop.solutions.views import parse_submit_message
+from inloop.solutions.views import parse_json_payload
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
@@ -373,19 +373,27 @@ class EditorVisibilityTest(SimpleAccountsData, TaskData, TestCase):
 class JsonValidationTest(TestCase):
     def test_invalid_json(self):
         with self.assertRaises(JSONDecodeError):
-            parse_submit_message(b"{ not json }")
+            parse_json_payload(b"{ not json }")
 
     def test_wrong_type1(self):
         with self.assertRaises(ValidationError):
-            parse_submit_message(b"[]")
+            parse_json_payload(b"[]")
 
     def test_wrong_type2(self):
         with self.assertRaises(ValidationError):
-            parse_submit_message(b'{"uploads": []}')
+            parse_json_payload(b'{"files": {}}')
 
-    def test_missing_key(self):
+    def test_wrong_type3(self):
         with self.assertRaises(ValidationError):
-            parse_submit_message(b"{}")
+            parse_json_payload(b'{"files": {"name": "", "contents": false}}')
+
+    def test_missing_key1(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b"{}")
+
+    def test_missing_key2(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b'{"files": {"name": "", "wrong_key": ""}}')
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
@@ -418,7 +426,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.post(
             reverse(self.urlname, args=["task-1"]),
             content_type="application/json",
-            data={"uploads": "foo"},
+            data={"files": "foo"},
         )
         self.assertJsonResponse(response, {"success": False, "reason": "invalid data"})
 
@@ -427,7 +435,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.post(
             reverse(self.urlname, args=["task-1"]),
             content_type="application/json",
-            data={"uploads": {"Example.java": ""}},
+            data={"files": [{"name": "Example.java", "contents": ""}]},
         )
         self.assertContains(response, "files contain disallowed filename extensions")
 
@@ -437,7 +445,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.post(
             reverse(self.urlname, args=["task-1"]),
             content_type="application/json",
-            data={"uploads": {}},
+            data={"files": []},
         )
         self.assertJsonResponse(
             response, {"success": False, "reason": "The deadline for this task has passed."}
@@ -449,7 +457,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.post(
             reverse(self.urlname, args=["task-1"]),
             content_type="application/json",
-            data={"uploads": {"Example.java": ""}},
+            data={"files": [{"name": "Example.java", "contents": ""}]},
         )
         self.assertJsonResponse(
             response, {"success": False, "reason": "You cannot submit more than 0 solutions."}
@@ -462,7 +470,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
-                data={"uploads": {"Example.java": ""}},
+                data={"files": [{"name": "Example.java", "contents": ""}]},
             )
             signal_mock.send.assert_called_once()
         self.assertJsonResponse(
@@ -474,7 +482,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
-                data={"uploads": {"Example.java": ""}},
+                data={"files": [{"name": "Example.java", "contents": ""}]},
             )
             signal_mock.send.assert_called_once()
         self.assertJsonResponse(response, {"success": True})
@@ -485,7 +493,7 @@ class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
             response = self.client.post(
                 reverse(self.urlname, args=["task-1"]),
                 content_type="application/json",
-                data={"uploads": {"Example.java": ""}},
+                data={"files": [{"name": "Example.java", "contents": ""}]},
             )
             signal_mock.send.assert_not_called()
         self.assertJsonResponse(response, {"success": True})

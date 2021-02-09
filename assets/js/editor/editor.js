@@ -624,10 +624,11 @@ class Communicator {
     if (!saveResult || !saveResult.success) {
       return;
     }
-    const payload = { uploads: {} };
-    for (let file of files) {
-      payload.uploads[file.fileName] = file.fileContent;
-    }
+    const payload = {
+      files: files.map((file) => {
+        return { name: file.fileName, contents: file.fileContent };
+      }),
+    };
     const requestConfig = {
       method: "POST",
       headers: {
