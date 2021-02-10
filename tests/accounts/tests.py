@@ -168,6 +168,40 @@ class AssignUsersTest(TestCase):
         self.assertIn(self.frank.groups.first().name, ["Group1", "Group2"])
 
 
+class AutoGroupAssignTest(TestCase):
+    def setUp(self):
+        self.alice = User.objects.create_user("alice", "alice@example.com", "secret")
+        self.group_names = ["G1", "G2", "G3"]
+        for group_name in self.group_names:
+            Group.objects.create(name=group_name)
+
+    @override_config(AUTO_ASSIGN_GROUPS="G1 G2 G3")
+    def test_assign_when_user_has_no_groups(self):
+        self.assertFalse(self.alice.groups.exists())
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertEqual(self.alice.groups.count(), 1)
+        self.assertIn(self.alice.groups.first().name, self.group_names)
+
+    @override_config(AUTO_ASSIGN_GROUPS="G1 G2 G3")
+    def test_no_assign_when_user_has_groups(self):
+        existing_group = Group.objects.create(name="existing group")
+        self.alice.groups.add(existing_group)
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertEqual(list(self.alice.groups.all()), [existing_group])
+
+    @override_config(AUTO_ASSIGN_GROUPS="")
+    def test_no_assign_when_config_empty(self):
+        self.assertFalse(self.alice.groups.exists())
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertFalse(self.alice.groups.exists())
+
+    @override_config(AUTO_ASSIGN_GROUPS="unkown1 unknown2 unknown3")
+    def test_graceful_handling_when_group_not_exists(self):
+        self.assertFalse(self.alice.groups.exists())
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertFalse(self.alice.groups.exists())
+
+
 class StudentDetailsFormTest(TestCase):
     def test_matnum_validation(self):
         form1 = StudentDetailsForm(data={"matnum": "invalid"})

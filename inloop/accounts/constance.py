@@ -43,6 +43,13 @@ config["OWNWORK_DECLARATION"] = (
         "(supports Markdown)."
     ),
 )
+config["AUTO_ASSIGN_GROUPS"] = (
+    "",
+    mark_safe(
+        "If not empty, users which have not yet a group will be assigned to one of "
+        "the listed groups randomly on login. Group names are separated by spaces."
+    ),
+)
 
 fieldsets = {
     "Signup form settings": [
@@ -56,6 +63,7 @@ fieldsets = {
         "OWNWORK_DECLARATION_INTRO",
         "OWNWORK_DECLARATION",
     ],
+    "Group assignments": ["AUTO_ASSIGN_GROUPS"],
 }
 
 fields = {

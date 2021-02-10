@@ -58,6 +58,21 @@ def prune_invalid_users() -> int:
     return removals_by_type.get(settings.AUTH_USER_MODEL, 0)
 
 
+@receiver(user_logged_in, dispatch_uid="assign_to_group_on_login")
+def auto_assign_to_group(
+    sender: Type[User], user: User, request: HttpRequest, **kwargs: Any
+) -> None:
+    """Automatically assign users without a group to a random group on login."""
+    groups_to_assign = config.AUTO_ASSIGN_GROUPS
+    if not groups_to_assign or user.groups.exists():
+        return
+    group_name = choice(groups_to_assign.split())
+    try:
+        user.groups.add(Group.objects.get(name=group_name))
+    except Group.DoesNotExist:
+        pass
+
+
 def assign_to_groups(*, users: Iterable[User], groups: Sequence[Group]) -> int:
     """Randomly assign the given groups to the given users if they not already have a group."""
     num_assignments = 0
