@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import HttpRequest
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils import timezone
@@ -23,7 +24,7 @@ from inloop.solutions.models import (
     SolutionFile,
     create_archive,
 )
-from inloop.solutions.views import parse_json_payload
+from inloop.solutions.views import _get_layout_preference, parse_json_payload
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
@@ -376,6 +377,27 @@ class EditorTest(SimpleAccountsData, TaskData, TestCase):
         self.assertIn("Cache-Control", response)
         self.assertIn("no-cache", response["Cache-Control"])
         self.assertIn("max-age=0", response["Cache-Control"])
+
+    def test_body_layout_class(self):
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        response = self.client.get(reverse("solutions:editor", args=["task-1"]))
+        self.assertContains(response, '<body class="editor layout-editor">')
+
+
+class EditorLayoutPrefTest(TestCase):
+    def setUp(self):
+        self.request = HttpRequest()
+
+    def test_layout_unset(self):
+        self.assertEqual(_get_layout_preference(self.request), "editor")
+
+    def test_layout_unknown(self):
+        self.request.COOKIES["layout"] = "unkown"
+        self.assertEqual(_get_layout_preference(self.request), "editor")
+
+    def test_non_default_layout(self):
+        self.request.COOKIES["layout"] = "taskonly"
+        self.assertEqual(_get_layout_preference(self.request), "taskonly")
 
 
 class JsonValidationTest(TestCase):

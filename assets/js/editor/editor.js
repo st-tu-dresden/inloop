@@ -786,7 +786,6 @@ class Toolbar {
       this.syntaxButton.addEventListener("click", () => this.checkSyntax());
     }
     this.switchViewButtonGroup.addEventListener("click", (e) => this.toggleView(e));
-    this.switchViewButtonGroup.querySelector(`#${BTN_SWITCH_TO_EDITOR}`).disabled = true;
     if (this.deadlineElement !== null) {
       this.endtime = this.deadlineElement.getAttribute("datetime");
       this.startDeadlineCounter();
@@ -879,13 +878,30 @@ class Toolbar {
     const target = event.target;
     target.disabled = true;
     this.switchViewButtonGroup.querySelectorAll(`button:not(#${target.id})`).forEach(button => button.disabled = false);
-    document.querySelector("main > div:last-child").style.display = target.id == BTN_SWITCH_TO_TASKONLY ? "none" : "flex";
-    document.getElementById("editor").style.display = target.id == BTN_SWITCH_TO_EDITOR ? "flex" : "none";
-    document.getElementById("manual-upload").style.display = target.id == BTN_SWITCH_TO_UPLOAD ? "flex" : "none";
-    document.getElementById(TOOLBAR_BUTTONS_RIGHT_ID).style.display = target.id == BTN_SWITCH_TO_EDITOR ? "block" : "none";
-    if (target.id == BTN_SWITCH_TO_EDITOR) {
+    let body = document.body;
+
+    if (target.id == BTN_SWITCH_TO_TASKONLY) {
+      body.className = "editor layout-taskonly";
+    } else if (target.id == BTN_SWITCH_TO_UPLOAD) {
+      body.className = "editor layout-upload";
+    } else if (target.id == BTN_SWITCH_TO_EDITOR) {
+      body.className = "editor layout-editor";
       tabBar.editor.focus();
+    } else {
+      console.error("toggleView(…) received an unknown event target id: " + target.id)
     }
+    this.saveLayoutPreference(target.id);
+  }
+
+  saveLayoutPreference(id) {
+    let value = "editor";
+    if (id == BTN_SWITCH_TO_TASKONLY) {
+      value = "taskonly";
+    } else if (id == BTN_SWITCH_TO_UPLOAD) {
+      value = "upload";
+    }
+    let secure = (document.location.protocol == "https:") ? ";secure" : "";
+    document.cookie = `layout=${value};path=/;samesite=lax${secure}`;
   }
 }
 

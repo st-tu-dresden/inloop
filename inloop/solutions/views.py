@@ -87,6 +87,14 @@ def parse_json_payload(payload: bytes) -> Dict[str, Any]:
     return data
 
 
+def _get_layout_preference(request: HttpRequest) -> str:
+    """Determine which editor view the user prefers (i.e., used last time)."""
+    layout = request.COOKIES.get("layout")
+    if layout not in ["editor", "upload", "taskonly"]:
+        layout = "editor"
+    return layout
+
+
 class SideBySideEditorView(LoginRequiredMixin, View):
     # with never_cache we instruct the browser to fetch fresh data
     # even when this view is accessed via the back button
@@ -103,11 +111,12 @@ class SideBySideEditorView(LoginRequiredMixin, View):
             raise Http404
         if slug_or_name != task.slug:
             return HttpResponseRedirect(reverse("solutions:editor", args=[task.slug]))
-        return TemplateResponse(
-            request,
-            "solutions/editor.html",
-            {"task": task, "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT},
-        )
+        context = {
+            "task": task,
+            "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT,
+            "layout": _get_layout_preference(request),
+        }
+        return TemplateResponse(request, "solutions/editor.html", context)
 
     def post(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """

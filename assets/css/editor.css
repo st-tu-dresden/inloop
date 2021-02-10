@@ -95,15 +95,16 @@ main {
   font-size: 80%;
 }
 
-main > div:first-child {
+#editor-left-side {
   overflow-y: auto;
 }
 
-main > div:last-child {
+#editor-right-side {
   display: flex;
   flex-direction: column;
   padding-bottom: .6rem;
 }
+
 
 #editor {
   display: flex;
@@ -120,9 +121,23 @@ main > div:last-child {
 }
 
 #manual-upload {
-  display: none;
+  display: flex;
   flex: auto;
   flex-direction: column;
+}
+
+.layout-editor #manual-upload {
+  display: none;
+}
+
+.layout-upload #editor,
+.layout-upload #toolbar-buttons--right {
+  display: none;
+}
+
+.layout-taskonly #editor-right-side,
+.layout-taskonly #toolbar-buttons--right {
+  display: none;
 }
 
 #editor-tabbar {
@@ -146,7 +161,7 @@ main > div:last-child {
 }
 
 #editor-tabbar-files {
-  flex-wrap: wrap;  
+  flex-wrap: wrap;
   margin: 0;
   padding: 0;
   display: flex;

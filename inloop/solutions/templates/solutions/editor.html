@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/syntax.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/editor.css' %}">
 {% endblock %}
-{% block body_classes %}editor{% endblock %}
+{% block body_classes %}editor layout-{{ layout }}{% endblock %}
 {% block navbar_container_classes %}container-fluid{% endblock  %}
 {% block container_classes %}container-fluid{% endblock %}
 
@@ -32,9 +32,9 @@
 
   <div>
     <div id="toolbar-button-group--switch-view" class="btn-group btn-group-sm" role="group">
-      <button id="toolbar-switch-btn--editor" title="Switch to editor view" type="button" class="btn btn-default" disabled>Editor</button>
-      <button id="toolbar-switch-btn--manual" title="Switch to manual upload view" type="button" class="btn btn-default">Manual upload</button>
-      <button id="toolbar-switch-btn--taskonly" title="Switch to task only view" type="button" class="btn btn-default">Task only</button>
+      <button id="toolbar-switch-btn--editor" title="Switch to editor view" type="button" class="btn btn-default"{% if layout == "editor" %} disabled{% endif %}>Editor</button>
+      <button id="toolbar-switch-btn--manual" title="Switch to manual upload view" type="button" class="btn btn-default"{% if layout == "upload" %} disabled{% endif %}>Manual upload</button>
+      <button id="toolbar-switch-btn--taskonly" title="Switch to task only view" type="button" class="btn btn-default"{% if layout == "taskonly" %} disabled{% endif %}>Task only</button>
     </div>
     <div id="toolbar-buttons--right">
       <button id="toolbar-btn--save" title="Save current solution" type="button" class="btn btn-success btn-sm" disabled>
@@ -58,7 +58,7 @@
 </header>
 
 <main>
-  <div>
+  <div id="editor-left-side">
     <p class="editor-task-hints">
       <a href="{% url 'tasks:detail' task.slug %}"
          title="Show only the task without the editor">[view printable version]</a>
@@ -67,7 +67,7 @@
 {{ task.description|markdown }}
 {% endcache %}
   </div>
-  <div>
+  <div id="editor-right-side">
     <div id="editor">
       <div id="editor-tabbar">
         <ul id="editor-tabbar-files"></ul>
