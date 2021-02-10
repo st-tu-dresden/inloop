@@ -572,7 +572,7 @@ class Communicator {
    * The current editor state is stored as a checkpoint
    * via AJAX in the backend.
    */
-  async saveFiles(saveBeforeSubmit = false) {
+  async saveFiles() {
     const checksum = hashComparator.computeHash(fileBuilder.files);
     const payload = {
       files: fileBuilder.files.map((file) => {
@@ -593,10 +593,7 @@ class Communicator {
     );
     if (!response.status || response.status !== 200) {
       showAlert(
-        getString(
-          saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save,
-          errorMsg || `${response.status} ${response.statusText}`
-        )
+        getString(msgs.error_save, errorMsg || `${response.status} ${response.statusText}`)
       );
       return;
     }
@@ -605,11 +602,8 @@ class Communicator {
       hashComparator.updateHash(checksum);
       hashComparator.lookForChanges(fileBuilder.files);
     } else {
-      showAlert(getString(saveBeforeSubmit ? msgs.error_save_before_submit : msgs.error_save));
+      showAlert(getString(msgs.error_save, data.reason || msgs.error_unknown));
       return;
-    }
-    if (saveBeforeSubmit) {
-      return data;
     }
   }
 
@@ -620,14 +614,12 @@ class Communicator {
    * @param {Array} files - The files to be uploaded.
    */
   async submitFiles(files) {
-    const saveResult = await this.saveFiles(true);
-    if (!saveResult || !saveResult.success) {
-      return;
-    }
-    const payload = { uploads: {} };
-    for (let file of files) {
-      payload.uploads[file.fileName] = file.fileContent;
-    }
+    const checksum = hashComparator.computeHash(files);
+    const payload = {
+      files: files.map((file) => {
+        return { name: file.fileName, contents: file.fileContent };
+      }),
+    };
     const requestConfig = {
       method: "POST",
       headers: {
@@ -646,7 +638,12 @@ class Communicator {
       );
       return;
     }
-    return await response.json();
+    const data = await response.json();
+    if (data.success || data.saved) {
+      hashComparator.updateHash(checksum);
+      hashComparator.lookForChanges(files);
+    }
+    return data;
   }
 
   async checkSyntax() {

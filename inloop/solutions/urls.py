@@ -8,12 +8,12 @@ from inloop.solutions.views import (
     SolutionDetailView,
     SolutionFileView,
     SolutionListView,
-    SolutionStatusView,
     SolutionUploadView,
     StaffSolutionDetailView,
     get_last_checkpoint,
     mock_syntax_check,
     save_checkpoint,
+    solution_status,
 )
 from inloop.tasks.views import serve_attachment
 
@@ -23,7 +23,7 @@ urlpatterns = [
     re_path(r"^editor/(?P<slug>[-\w]+)/(?P<path>.*)$", serve_attachment, name="serve_attachment"),
     path("detail/<slug:slug>/<int:scoped_id>/", SolutionDetailView.as_view(), name="detail"),
     path("staffdetail/<int:id>/", StaffSolutionDetailView.as_view(), name="staffdetail"),
-    path("status/<int:id>/", SolutionStatusView.as_view(), name="status"),
+    path("status/<int:id>/", solution_status, name="status"),
     path("file/<int:pk>/", SolutionFileView.as_view(), name="showfile"),
     path("list/<slug:slug>/", SolutionListView.as_view(), name="list"),
     path("upload/<slug:slug>/", SolutionUploadView.as_view(), name="upload"),

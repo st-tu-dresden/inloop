@@ -1,12 +1,20 @@
 import os
 import shutil
+from datetime import timedelta
+from json import JSONDecodeError
 from tempfile import mkdtemp
+from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_str
+
+from constance.test import override_config
 
 from inloop.solutions.models import (
     Checkpoint,
@@ -15,6 +23,7 @@ from inloop.solutions.models import (
     SolutionFile,
     create_archive,
 )
+from inloop.solutions.views import parse_json_payload
 from inloop.tasks.models import FileTemplate
 from inloop.testrunner.models import TestResult
 
@@ -33,7 +42,7 @@ class SolutionStatusViewTest(TaskData, SimpleAccountsData, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             force_str(response.content),
-            '{"status": "pending", "solution_id": %d}' % self.solution.id,
+            {"status": "pending", "solution_id": self.solution.id},
         )
 
     def test_only_owner_can_access(self):
@@ -354,3 +363,252 @@ class EditorVisibilityTest(SimpleAccountsData, TaskData, TestCase):
         self.assertTrue(self.client.login(username="bob", password="secret"))
         response = self.client.get(reverse("solutions:editor", args=["task-1"]))
         self.assertEqual(response.status_code, 404)
+
+    def test_redirect_to_slug(self):
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        response = self.client.get(reverse("solutions:editor", args=["Task1"]))
+        self.assertRedirects(response, reverse("solutions:editor", args=["task-1"]))
+
+
+class JsonValidationTest(TestCase):
+    def test_invalid_json(self):
+        with self.assertRaises(JSONDecodeError):
+            parse_json_payload(b"{ not json }")
+
+    def test_wrong_type1(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b"[]")
+
+    def test_wrong_type2(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b'{"files": {}}')
+
+    def test_wrong_type3(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b'{"files": {"name": "", "contents": false}}')
+
+    def test_missing_key1(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b"{}")
+
+    def test_missing_key2(self):
+        with self.assertRaises(ValidationError):
+            parse_json_payload(b'{"files": {"name": "", "wrong_key": ""}}')
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class EditorSubmitTest(SimpleAccountsData, TaskData, TestCase):
+    urlname = "solutions:editor"
+
+    def setUp(self):
+        # sync in-memory model state after transaction rollbacks
+        self.published_task1.refresh_from_db()
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    def assertJsonResponse(self, response, expected, *, status_code=200):
+        self.assertEqual(response.status_code, status_code)
+        self.assertJSONEqual(force_str(response.content), expected)
+
+    def count_checkpoints(self):
+        return Checkpoint.objects.filter(author=self.alice, task=self.published_task1).count()
+
+    def test_login_required(self):
+        self.client.logout()
+        url = reverse(self.urlname, args=["task-1"])
+        self.assertRedirects(self.client.post(url), f"{settings.LOGIN_URL}?next={url}")
+
+    def test_invalid_json(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data="{ not json }",
+        )
+        self.assertEqual(self.count_checkpoints(), 0)
+        self.assertJsonResponse(response, {"error": "invalid json"}, status_code=400)
+
+    def test_invalid_data(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": "foo"},
+        )
+        self.assertEqual(self.count_checkpoints(), 0)
+        self.assertJsonResponse(
+            response,
+            {
+                "success": False,
+                "saved": False,
+                "reason": "invalid data",
+            },
+        )
+
+    @override_config(ALLOWED_FILENAME_EXTENSIONS=".py")
+    def test_wrong_file_extension(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": [{"name": "Example.java", "contents": ""}]},
+        )
+        self.assertEqual(self.count_checkpoints(), 0)
+        reason = "One or more files contain disallowed filename extensions. (Allowed: .py)"
+        self.assertJsonResponse(
+            response,
+            {
+                "success": False,
+                "saved": False,
+                "reason": reason,
+            },
+        )
+
+    def test_deadline_expired(self):
+        self.published_task1.deadline = timezone.now() - timedelta(seconds=1)
+        self.published_task1.save()
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": []},
+        )
+        self.assertEqual(self.count_checkpoints(), 1)
+        self.assertJsonResponse(
+            response,
+            {
+                "success": False,
+                "saved": True,
+                "reason": "The deadline for this task has passed.",
+            },
+        )
+
+    def test_submission_limit_exceeded(self):
+        self.published_task1.max_submissions = 0
+        self.published_task1.save()
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": [{"name": "Example.java", "contents": ""}]},
+        )
+        self.assertEqual(self.count_checkpoints(), 1)
+        self.assertJsonResponse(
+            response,
+            {
+                "success": False,
+                "saved": True,
+                "reason": "You cannot submit more than 0 solutions.",
+            },
+        )
+
+    def test_successful_submit_with_limit(self):
+        self.published_task1.max_submissions = 2
+        self.published_task1.save()
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"files": [{"name": "Example.java", "contents": ""}]},
+            )
+            signal_mock.send.assert_called_once()
+        self.assertEqual(self.count_checkpoints(), 1)
+        self.assertJsonResponse(
+            response, {"success": True, "submission_limit": 2, "num_submissions": 1}
+        )
+
+    def test_successful_submit_without_limit(self):
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"files": [{"name": "Example.java", "contents": ""}]},
+            )
+            signal_mock.send.assert_called_once()
+        self.assertEqual(self.count_checkpoints(), 1)
+        self.assertJsonResponse(response, {"success": True})
+
+    @override_config(IMMEDIATE_FEEDBACK=False)
+    def test_feedback_disabled(self):
+        with patch("inloop.solutions.models.solution_submitted") as signal_mock:
+            response = self.client.post(
+                reverse(self.urlname, args=["task-1"]),
+                content_type="application/json",
+                data={"files": [{"name": "Example.java", "contents": ""}]},
+            )
+            signal_mock.send.assert_not_called()
+        self.assertEqual(self.count_checkpoints(), 1)
+        self.assertJsonResponse(response, {"success": True})
+
+
+class EditorSaveTest(SimpleAccountsData, TaskData, TestCase):
+    urlname = "solutions:save-checkpoint"
+
+    def setUp(self):
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    def count_checkpoints(self):
+        return Checkpoint.objects.filter(author=self.alice, task=self.published_task1).count()
+
+    def test_login_required(self):
+        self.client.logout()
+        url = reverse(self.urlname, args=["task-1"])
+        self.assertRedirects(self.client.post(url), f"{settings.LOGIN_URL}?next={url}")
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    def test_post_required(self):
+        response = self.client.get(reverse(self.urlname, args=["task-1"]))
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    def test_invalid_json(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data="{ not json }",
+        )
+        self.assertContains(response, "invalid json", status_code=400)
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    @override_config(ALLOWED_FILENAME_EXTENSIONS=".py")
+    def test_invalid_filenames_are_not_saved(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": [{"name": "foo.txt", "contents": ""}]},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["success"])
+        self.assertEqual(self.count_checkpoints(), 0)
+
+    @override_config(ALLOWED_FILENAME_EXTENSIONS=".txt")
+    def test_files_are_saved(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": [{"name": "foo.txt", "contents": "bar"}]},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+        checkpoint = Checkpoint.objects.get(task=self.published_task1, author=self.alice)
+        files = list(checkpoint.checkpointfile_set.all())
+        self.assertEqual(len(files), 1)
+        self.assertEqual(files[0].name, "foo.txt")
+        self.assertEqual(files[0].contents, "bar")
+
+    def test_save_empty_fileset(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"files": []},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+        checkpoint = Checkpoint.objects.get(task=self.published_task1, author=self.alice)
+        self.assertEqual(list(checkpoint.checkpointfile_set.all()), [])
+
+    def test_incomplete_json(self):
+        response = self.client.post(
+            reverse(self.urlname, args=["task-1"]),
+            content_type="application/json",
+            data={"wrong_key": []},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["success"])
+        self.assertEqual(self.count_checkpoints(), 0)

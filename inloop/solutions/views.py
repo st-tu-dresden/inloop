@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import json
-import logging
 from json import JSONDecodeError
 from os.path import basename
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.db import IntegrityError, transaction
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import ObjectDoesNotExist, Q
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -21,18 +19,23 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, View
 
 from constance import config
 from huey.exceptions import TaskLockedException
 
-from inloop.solutions.models import Checkpoint, Solution, SolutionFile, create_archive_async
+from inloop.solutions.models import (
+    Checkpoint,
+    Solution,
+    SolutionFile,
+    SubmissionError,
+    create_archive_async,
+    create_checkpoint,
+    submit,
+)
 from inloop.solutions.prettyprint.junit import checkeroutput_filter, xml_to_dict
-from inloop.solutions.signals import solution_submitted
-from inloop.solutions.validators import validate_filenames
 from inloop.tasks.models import FileTemplate, Task
-
-logger = logging.getLogger(__name__)
 
 
 class HttpResponseBadJsonRequest(JsonResponse):
@@ -44,59 +47,46 @@ class HttpResponseBadJsonRequest(JsonResponse):
         super().__init__({"error": "invalid json"})
 
 
-class SolutionStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, id: int) -> JsonResponse:
-        solution = get_object_or_404(Solution, pk=id, author=request.user)
-        return JsonResponse({"solution_id": solution.id, "status": solution.status()})
+@login_required
+def solution_status(request: HttpRequest, id: int) -> HttpResponse:
+    """
+    Return the JSON encoded status for the given solution. The solution list
+    view contains Javascript that polls this endpoint asynchronously.
+    """
+    solution = get_object_or_404(Solution, pk=id, author=request.user)
+    return JsonResponse({"solution_id": solution.id, "status": solution.status()})
 
 
-class SubmissionError(Exception):
-    pass
+def get_visible_task_or_404(user: User, slug: str) -> Task:
+    """
+    Return the task identified by the slug if it exists and if it is visible
+    for the given user, raise Http404 otherwise.
+    """
+    return get_object_or_404(Task.objects.published().visible_by(user=user), slug=slug)
 
 
-class SolutionSubmitMixin:
-    def get_task(self, request: HttpRequest, slug: str) -> Task:
-        task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
-        if task.is_expired:
-            raise SubmissionError("The deadline for this task has passed.")
-        return task
-
-    def submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> None:
-        if not files:
-            raise SubmissionError("You haven't uploaded any files.")
-        try:
-            validate_filenames([file.name for file in files])
-            self.check_submission_limit(author, task)
-            solution = self.atomic_submit(files, author, task)
-            if config.IMMEDIATE_FEEDBACK:
-                solution_submitted.send(sender=self.__class__, solution=solution)
-        except ValidationError as error:
-            raise SubmissionError(str(error))
-        except IntegrityError:
-            logger.exception("db constraint violation occurred")
-            raise SubmissionError("Concurrent submission is not possible.")
-
-    def check_submission_limit(self, author: User, task: Task) -> None:
-        """
-        Ensure that the author is within the submission limit for the task (if any).
-        """
-        if task.has_submission_limit:
-            count = Solution.objects.filter(author=author, task=task).count()
-            limit = task.submission_limit
-            if count >= limit:
-                suffix = "s" if limit > 1 else ""
-                raise SubmissionError(f"You cannot submit more than {limit} solution{suffix}.")
-
-    @transaction.atomic()
-    def atomic_submit(self, files: Iterable[UploadedFile], author: User, task: Task) -> Solution:
-        solution = Solution.objects.create(author=author, task=task)
-        SolutionFile.objects.bulk_create(
-            [SolutionFile(solution=solution, file=file) for file in files]
-        )
-        return solution
+def _is_valid_file_item(item: Any) -> bool:
+    """Return True if the given file item conforms to the expected schema."""
+    return (
+        isinstance(item, dict)
+        and isinstance(item.get("name"), str)
+        and isinstance(item.get("contents"), str)
+    )
 
 
-class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
+def parse_json_payload(payload: bytes) -> Dict[str, Any]:
+    """Unwrap and validate the JSON encoded file payload."""
+    data = json.loads(payload)
+    if not (
+        isinstance(data, dict)
+        and isinstance(data.get("files"), list)
+        and all(_is_valid_file_item(item) for item in data["files"])
+    ):
+        raise ValidationError("invalid data")
+    return data
+
+
+class SideBySideEditorView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Show the side-by-side editor for the task referenced by slug or system_name.
@@ -115,20 +105,20 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
             {"task": task, "syntax_check_endpoint": config.SYNTAX_CHECK_ENDPOINT},
         )
 
-    def post(self, request: HttpRequest, slug_or_name: str) -> JsonResponse:
+    def post(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Handle JSON-encoded POST submission requests from the side-by-side editor.
         """
         try:
-            # if it's a name and not a slug, get_task(…) will make it fail with 404
-            task = self.get_task(request, slug_or_name)
-            json_data = json.loads(request.body)
-            uploads = json_data.get("uploads", {})
+            # if it's a name and not a slug, get_visible_task_or_404(…) will make it fail with 404
+            task = get_visible_task_or_404(request.user, slug_or_name)
+            data = parse_json_payload(request.body)
+            create_checkpoint(data["files"], task, request.user)
             files = [
-                SimpleUploadedFile(filename, content.encode())
-                for filename, content in uploads.items()
+                SimpleUploadedFile(file["name"], file["contents"].encode())
+                for file in data["files"]
             ]
-            self.submit(files, request.user, task)
+            submit(files, request.user, task)
             if not task.has_submission_limit:
                 return JsonResponse({"success": True})
             return JsonResponse(
@@ -140,13 +130,19 @@ class SideBySideEditorView(LoginRequiredMixin, SolutionSubmitMixin, View):
                     ).count(),
                 }
             )
+        except ValidationError as error:
+            # flake8 warning B306 doesn't apply here, because ValidationError
+            # declares the "message" attribute explicitly
+            return JsonResponse(
+                {"success": False, "saved": False, "reason": error.message}  # noqa: B306
+            )
         except SubmissionError as error:
-            return JsonResponse({"success": False, "reason": str(error)})
+            return JsonResponse({"success": False, "saved": True, "reason": str(error)})
         except JSONDecodeError:
             return HttpResponseBadJsonRequest()
 
 
-class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
+class SolutionUploadView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, slug: str) -> HttpResponse:
         return TemplateResponse(
             request,
@@ -156,9 +152,9 @@ class SolutionUploadView(LoginRequiredMixin, SolutionSubmitMixin, View):
 
     def post(self, request: HttpRequest, slug: str) -> HttpResponse:
         try:
-            task = self.get_task(request, slug)
+            task = get_visible_task_or_404(request.user, slug)
             files = request.FILES.getlist("uploads", default=[])
-            self.submit(files, request.user, task)
+            submit(files, request.user, task)
         except SubmissionError as error:
             messages.error(request, str(error))
             return redirect("solutions:upload", slug=slug)
@@ -182,9 +178,7 @@ def access_solution_or_404(user: User, solution_id: int) -> Solution:
 
 
 class NewSolutionArchiveView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
+    def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -196,9 +190,7 @@ class NewSolutionArchiveView(LoginRequiredMixin, View):
 
 
 class SolutionArchiveStatusView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, solution_id: int) -> JsonResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
+    def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             return JsonResponse({"status": "available"})
@@ -207,8 +199,6 @@ class SolutionArchiveStatusView(LoginRequiredMixin, View):
 
 class SolutionArchiveDownloadView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, solution_id: int) -> HttpResponse:
-        if not solution_id:
-            raise Http404("No solution id was supplied.")
         solution = access_solution_or_404(request.user, solution_id)
         if solution.archive:
             response = HttpResponse(solution.archive, content_type="application/zip")
@@ -317,7 +307,7 @@ class SolutionFileView(LoginRequiredMixin, DetailView):
 
 @never_cache
 @login_required
-def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
+def get_last_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     last_checkpoint = Checkpoint.objects.filter(author=request.user, task=task).last()
     queryset = []
@@ -329,27 +319,24 @@ def get_last_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
     return JsonResponse({"success": True, "files": files})
 
 
+@require_POST
 @login_required
-def save_checkpoint(request: HttpRequest, slug: str) -> JsonResponse:
-    if request.method != "POST":
-        return JsonResponse({"success": False})
+def save_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
     task = get_object_or_404(Task.objects.published(), slug=slug)
     try:
-        data = json.loads(request.body)
+        files = parse_json_payload(request.body)["files"]
+        create_checkpoint(files, task, request.user)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-    try:
-        Checkpoint.objects.save_checkpoint(data, task, request.user)
-    except KeyError:
-        return JsonResponse({"success": False})
+    except ValidationError as error:
+        return JsonResponse({"success": False, "reason": error.message})  # noqa: B306
     return JsonResponse({"success": True})
 
 
+@require_POST
 @csrf_exempt
-def mock_syntax_check(request: HttpRequest) -> JsonResponse:
+def mock_syntax_check(request: HttpRequest) -> HttpResponse:
     """Temporary endpoint that outputs some fake syntax check results."""
-    if request.method != "POST":
-        return JsonResponse({"success": False})
     if not (config.SYNTAX_CHECK_ENDPOINT and config.SYNTAX_CHECK_MOCK_VALUE):
         return JsonResponse({"success": False, "reason": "bad configuration"})
     try:
