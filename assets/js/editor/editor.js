@@ -775,6 +775,8 @@ class Toolbar {
     this.submitButton = document.getElementById(submitButtonId);
     this.syntaxButton = document.getElementById(syntaxButtonId);
     this.switchViewButtonGroup = document.getElementById(switchViewButtonGroupId);
+    this.oneMinuteWarningShown = false;
+    this.fiveMinuteWarningShown = false;
   }
 
   init() {
@@ -849,14 +851,28 @@ class Toolbar {
     } else {
       elem.innerText = format(t.hours) + ":" + format(t.minutes) + ":" + format(t.seconds);
     }
-    const fiveMinutesInMillis = 5 * 60 * 1000;
-    if (t.total < fiveMinutesInMillis && !elem.classList.contains("deadline-attention")) {
+    const oneMinuteInMillis = 60 * 1000;
+    if (t.total < 5 * oneMinuteInMillis && !elem.classList.contains("deadline-attention")) {
       elem.classList.add("deadline-attention");
+    }
+    if (!this.fiveMinuteWarningShown && 4 * oneMinuteInMillis < t.total && t.total < 5 * oneMinuteInMillis) {
+      this.fiveMinuteWarningShown = this.notify("Attention! Less than five minutes remaining.");
+    }
+    if (!this.oneMinuteWarningShown && 0 < t.total && t.total < oneMinuteInMillis) {
+      this.oneMinuteWarningShown = this.notify("Attention! Less than one minute remaining.");
     }
     if (t.total <= 0) {
       elem.innerText = getString(msgs.deadline_expired);
       clearInterval(this.timeinterval);
     }
+  }
+
+  notify(message) {
+    const granted = Notification.permission == "granted";
+    if (granted) {
+      new Notification(message);
+    }
+    return granted;
   }
 
   setSubmitButtonEnabled(enable) {
