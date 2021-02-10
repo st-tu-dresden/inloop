@@ -17,6 +17,7 @@ from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -87,6 +88,9 @@ def parse_json_payload(payload: bytes) -> Dict[str, Any]:
 
 
 class SideBySideEditorView(LoginRequiredMixin, View):
+    # with never_cache we instruct the browser to fetch fresh data
+    # even when this view is accessed via the back button
+    @method_decorator(never_cache)
     def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
         """
         Show the side-by-side editor for the task referenced by slug or system_name.

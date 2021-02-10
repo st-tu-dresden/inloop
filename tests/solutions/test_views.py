@@ -351,7 +351,7 @@ class GetCheckpointTests(AccountsData, TaskData, TestCase):
         )
 
 
-class EditorVisibilityTest(SimpleAccountsData, TaskData, TestCase):
+class EditorTest(SimpleAccountsData, TaskData, TestCase):
     def test_group_access(self):
         group = Group.objects.create(name="Group1")
         self.published_task1.group = group
@@ -368,6 +368,14 @@ class EditorVisibilityTest(SimpleAccountsData, TaskData, TestCase):
         self.assertTrue(self.client.login(username="alice", password="secret"))
         response = self.client.get(reverse("solutions:editor", args=["Task1"]))
         self.assertRedirects(response, reverse("solutions:editor", args=["task-1"]))
+
+    def test_is_never_cached(self):
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        response = self.client.get(reverse("solutions:editor", args=["task-1"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Cache-Control", response)
+        self.assertIn("no-cache", response["Cache-Control"])
+        self.assertIn("max-age=0", response["Cache-Control"])
 
 
 class JsonValidationTest(TestCase):
