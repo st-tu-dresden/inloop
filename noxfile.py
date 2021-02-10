@@ -84,7 +84,7 @@ def pytype(session: Session) -> None:
     session.run("pytype", *args)
 
 
-@nox.session(python=["3.7"])
+@nox.session(python=["3.7", "3.8"])
 def typeguard(session: Session) -> None:
     """Run the test suite with run-time type checking of PEP-484 annotations."""
     args = session.posargs or ["-v2", "--failfast"]

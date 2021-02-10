@@ -10,10 +10,10 @@ env:
 
 jobs:
   include:
-  - name: Python 3.8 tests
+  - name: Python 3.8 tests with run-time type checks
     python: 3.8
     services: docker
-    env: NOXSESSION=tests-3.8
+    env: NOXSESSION=typeguard-3.8
   - name: Python 3.7 tests
     python: 3.7
     services: docker
@@ -21,12 +21,9 @@ jobs:
   - name: Python linting
     python: 3.7
     env: NOXSESSION=lint
-  - name: Python static type checks
-    python: 3.7
-    env: NOXSESSION=pytype
-  - name: Python run-time type checks
-    python: 3.7
-    env: NOXSESSION=typeguard
+# - name: Python static type checks
+#   python: 3.7
+#   env: NOXSESSION=pytype
 
 cache: pip
 
