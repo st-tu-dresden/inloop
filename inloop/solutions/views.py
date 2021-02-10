@@ -328,8 +328,8 @@ def save_checkpoint(request: HttpRequest, slug: str) -> HttpResponse:
         create_checkpoint(files, task, request.user)
     except JSONDecodeError:
         return HttpResponseBadJsonRequest()
-    except ValidationError:
-        return JsonResponse({"success": False})
+    except ValidationError as error:
+        return JsonResponse({"success": False, "reason": error.message})  # noqa: B306
     return JsonResponse({"success": True})
 
 
