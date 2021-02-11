@@ -60,8 +60,8 @@
 <main>
   <div id="editor-left-side">
     <p class="editor-task-hints">
-      <a href="{% url 'tasks:detail' task.slug %}"
-         title="Show only the task without the editor">[view printable version]</a>
+      <a href="{% url 'solutions:list' task.slug %}"
+         title="View a list of your submissions">[my solutions]</a>
     </p>
 {% cache 120 task_description task.slug %}
 {{ task.description|markdown }}
