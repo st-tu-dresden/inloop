@@ -26,7 +26,7 @@ class CategoryViewTest(SimpleAccountsData, TaskData, TestCase):
         self.unpublished_task1.save()
         response = self.client.get(self.get_url(category.slug))
         self.assertContains(response, self.unpublished_task1.title)
-        self.assertContains(response, '<tr class="tasks-unpublished">')
+        self.assertContains(response, '<tr id="task-row-1" class="tasks-unpublished">')
         self.assertNotContains(response, "Nothing to do here")
 
     def test_view_all_published_category(self):
@@ -36,7 +36,7 @@ class CategoryViewTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.get(self.get_url(category.slug))
         self.assertContains(response, self.published_task1.title)
         self.assertNotContains(response, "Nothing to do here")
-        self.assertNotContains(response, '<tr class="tasks-unpublished">')
+        self.assertNotContains(response, '<tr id="task-row-1" class="tasks-unpublished">')
 
     def test_view_category(self):
         response = self.client.get(self.get_url(self.category1.slug))

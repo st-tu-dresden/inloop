@@ -1,4 +1,5 @@
 {% extends 'base_site.html' %}
+{% load static %}
 
 {% block title %}{{ category.name }} tasks{% endblock %}
 
@@ -29,32 +30,11 @@
     <tbody>
 
     {% for task in tasks %}
-    <tr>
+    <tr id="task-row-{{ forloop.counter }}" class="{% if not task.is_published %}tasks-unpublished{% endif %}">
       <td>{{ task.title }} [<a href="{% url 'solutions:editor' task.slug %}">open</a> | <a href="{% url 'solutions:list' task.slug %}">my solutions</a>]</td>
-      <td>{% firstof task.pubdate|date:"d-m-Y H:i" "-" %}</td>
+      <td><time {% if not task.is_published %}class="autoreveal" {% endif %}data-autoreveal-id="task-row-{{ forloop.counter }}" datetime="{{ task.pubdate.isoformat }}" title="{{ task.pubdate }}">{{ task.pubdate|date:"d-m-Y H:i" }}</time></td>
       {% if have_deadlines %}
-      <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
-      {% endif %}
-      {% if show_progress %}
-      <td>
-      {% if task.completed %}
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-        <span class="sr-only">Yes</span>
-      {% else %}
-        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-        <span class="sr-only">No</span>
-      {% endif %}
-      </td>
-      {% endif %}
-    </tr>
-    {% endfor %}
-
-    {% for task in unpublished_tasks %}
-    <tr class="tasks-unpublished">
-      <td>{{ task.title }}</td>
-      <td>{% firstof task.pubdate|date:"d-m-Y H:i" "-" %}</td>
-      {% if have_deadlines %}
-      <td>{% firstof task.deadline|date:"d-m-Y H:i" "-"  %}</td>
+      <td>{% if task.deadline %}<time datetime="{{ task.deadline.isoformat }}">{{ task.deadline|date:"d-m-Y H:i" }}</time>{% else %}-{% endif %}</td>
       {% endif %}
       {% if show_progress %}
       <td>
@@ -76,4 +56,8 @@
   <div class="alert alert-info">You are lucky! Nothing to do here.</div>
 {% endif %}
 
+{% endblock %}
+
+{% block extrabody %}
+<script src="{% static 'js/autoreveal.js' %}" type="module"></script>
 {% endblock %}

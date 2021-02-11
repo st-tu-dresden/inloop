@@ -41,15 +41,8 @@ def index(request: HttpRequest) -> HttpResponse:
 @login_required
 def category(request: HttpRequest, slug: str) -> HttpResponse:
     category = get_object_or_404(Category, slug=slug)
-    tasks = (
-        category.task_set.published()
-        .visible_by(user=request.user)
-        .completed_by_values(request.user, order_by="pubdate")
-    )
-    unpublished_tasks = (
-        category.task_set.unpublished()
-        .visible_by(user=request.user)
-        .completed_by_values(request.user, order_by="pubdate")
+    tasks = category.task_set.visible_by(user=request.user).completed_by_values(
+        request.user, order_by="pubdate"
     )
     have_deadlines = any(task.deadline for task in tasks)
     return TemplateResponse(
@@ -58,7 +51,6 @@ def category(request: HttpRequest, slug: str) -> HttpResponse:
         {
             "category": category,
             "tasks": tasks,
-            "unpublished_tasks": unpublished_tasks,
             "have_deadlines": have_deadlines,
             "show_progress": config.IMMEDIATE_FEEDBACK,
         },

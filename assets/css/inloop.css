@@ -209,8 +209,9 @@ code {
 }
 /* @end */
 
-.tasks-unpublished {
-  color: #d3d3d3;
+.tasks-unpublished a {
+  color: #ccc;
+  pointer-events: none;
 }
 
 /* @begin <pre> styles for console outputs, stack traces, etc. */
