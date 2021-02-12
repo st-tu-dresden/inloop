@@ -8,6 +8,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 
+from constance.test import override_config
+
 from inloop.accounts.forms import User
 from inloop.solutions.models import Solution, SolutionFile
 from inloop.tasks.models import Category, Task
@@ -79,15 +81,26 @@ class SolutionUploadTest(SolutionsData, MessageTestCase):
         self.url = reverse("solutions:upload", kwargs={"slug": self.task.slug})
 
     def test_solution_upload_without_files(self):
-        """Validate that if no files were uploaded, a meaningful message is emitted."""
         response = self.client.post(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertResponseContainsMessage(
             "You haven't uploaded any files.", self.Levels.ERROR, response
         )
 
+    @override_config(ALLOWED_FILENAME_EXTENSIONS=".py, .java")
+    def test_upload_with_invalid_filenames(self):
+        num_solutions = Solution.objects.count()
+        samples = [
+            SimpleUploadedFile("valid.py", b"# test"),
+            SimpleUploadedFile("Valid.java", b"/* test */"),
+            SimpleUploadedFile("invalid.txt", b"test"),
+        ]
+        response = self.client.post(self.url, data={"uploads": samples}, follow=True)
+        self.assertEqual(Solution.objects.count(), num_solutions)
+        self.assertRedirects(response, self.url)
+        self.assertContains(response, "One or more files contain disallowed filename extensions.")
+
     def test_solution_upload_with_multiple_files(self):
-        """Test the solution upload."""
         file_1 = SimpleUploadedFile("Fibonacci1.java", b"class Fibonacci1 {}")
         file_2 = SimpleUploadedFile("Fibonacci2.java", b"class Fibonacci2 {}")
         with patch("inloop.solutions.models.solution_submitted") as mocked_signal:
