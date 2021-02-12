@@ -55,13 +55,14 @@ class SolutionUploadTest(SolutionsData, TestCase):
 
     def setUp(self):
         self.assertTrue(self.client.login(username="bob", password="secret"))
-        self.url = reverse("solutions:upload", kwargs={"slug": self.task.slug})
+        self.url = reverse("solutions:upload", args=[self.task.slug])
+        self.redirect_url = reverse("solutions:editor", args=[self.task.slug])
 
     def test_solution_upload_without_files(self):
         num_solutions = Solution.objects.count()
         response = self.client.post(self.url, follow=True)
         self.assertEqual(Solution.objects.count(), num_solutions)
-        self.assertRedirects(response, self.url)
+        self.assertRedirects(response, self.redirect_url)
         self.assertContains(response, escape("You haven't uploaded any files"))
 
     @override_config(ALLOWED_FILENAME_EXTENSIONS=".py, .java")
@@ -74,7 +75,7 @@ class SolutionUploadTest(SolutionsData, TestCase):
         ]
         response = self.client.post(self.url, data={"uploads": samples}, follow=True)
         self.assertEqual(Solution.objects.count(), num_solutions)
-        self.assertRedirects(response, self.url)
+        self.assertRedirects(response, self.redirect_url)
         self.assertContains(response, "One or more files contain disallowed filename extensions.")
 
     def test_solution_upload_with_multiple_files(self):
@@ -99,7 +100,7 @@ class SolutionUploadTest(SolutionsData, TestCase):
             with self.assertLogs(level="ERROR") as capture_logs:
                 response = self.client.post(self.url, data={"uploads": samples}, follow=True)
         self.assertEqual(Solution.objects.count(), num_solutions)
-        self.assertRedirects(response, self.url)
+        self.assertRedirects(response, self.redirect_url)
         self.assertContains(response, "Concurrent submission")
         self.assertIn("db constraint violation", capture_logs.output[0])
 
