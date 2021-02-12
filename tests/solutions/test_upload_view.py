@@ -87,7 +87,7 @@ class SolutionUploadTest(SolutionsData, TestCase):
             response = self.client.post(self.url, data={"uploads": samples}, follow=True)
         mocked_signal.send.assert_called_once()
         self.assertEqual(Solution.objects.count(), num_solutions + 1)
-        self.assertContains(response, "Your solution has been submitted to the checker.")
+        self.assertContains(response, "Your solution has been submitted.")
         media_files = sorted(file.name for file in Path(TEST_MEDIA_ROOT).glob("**/*.java"))
         self.assertEqual(media_files, ["Fibonacci1.java", "Fibonacci2.java"])
 

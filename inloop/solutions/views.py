@@ -174,7 +174,7 @@ class SolutionUploadView(LoginRequiredMixin, View):
         except ValidationError as error:
             messages.error(request, error.message)  # noqa: B306
             return redirect("solutions:upload", slug=slug)
-        messages.success(request, "Your solution has been submitted to the checker.")
+        messages.success(request, "Your solution has been submitted.")
         return redirect("solutions:list", slug=slug)
 
 
