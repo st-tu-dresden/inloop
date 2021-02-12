@@ -1,9 +1,9 @@
-import os
 import shutil
 from pathlib import Path
-from tempfile import mkdtemp
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
@@ -43,20 +43,27 @@ public class Fibonacci {
 }
 """
 
-TEST_MEDIA_ROOT = mkdtemp()
+# TemporaryDirectory gets automatically cleaned up by Python
+TMP_DIR = TemporaryDirectory(prefix="INLOOP_")
+TMP_PATH = Path(TMP_DIR.name)
 
 
 @tag("slow")
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=Path(TMP_PATH, "SolutionUploadTest"))
 class SolutionUploadTest(SolutionsData, TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.media_root = settings.MEDIA_ROOT
 
     def setUp(self):
         self.assertTrue(self.client.login(username="bob", password="secret"))
         self.url = reverse("solutions:upload", args=[self.task.slug])
         self.redirect_url = reverse("solutions:editor", args=[self.task.slug])
+        self.media_root.mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.media_root)
 
     def test_solution_upload_without_files(self):
         num_solutions = Solution.objects.count()
@@ -89,7 +96,7 @@ class SolutionUploadTest(SolutionsData, TestCase):
         mocked_signal.send.assert_called_once()
         self.assertEqual(Solution.objects.count(), num_solutions + 1)
         self.assertContains(response, "Your solution has been submitted.")
-        media_files = sorted(file.name for file in Path(TEST_MEDIA_ROOT).glob("**/*.java"))
+        media_files = sorted(file.name for file in self.media_root.glob("**/*.java"))
         self.assertEqual(media_files, ["Fibonacci1.java", "Fibonacci2.java"])
 
     def test_integrity_error_is_handled(self):
@@ -104,19 +111,24 @@ class SolutionUploadTest(SolutionsData, TestCase):
         self.assertContains(response, "Concurrent submission")
         self.assertIn("db constraint violation", capture_logs.output[0])
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(TEST_MEDIA_ROOT)
-        super().tearDownClass()
 
-
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=Path(TMP_PATH, "SolutionDetailViewTest"))
 class SolutionDetailViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(TEST_MEDIA_ROOT):
-            os.makedirs(TEST_MEDIA_ROOT)
+        cls.media_root = settings.MEDIA_ROOT
+
+    def setUp(self):
+        self.assertTrue(self.client.login(username="bob", password="secret"))
+        self.url = reverse(
+            "solutions:detail",
+            kwargs={"slug": self.task.slug, "scoped_id": self.solution.scoped_id},
+        )
+        self.media_root.mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.media_root)
 
     @classmethod
     def setUpTestData(cls):
@@ -140,14 +152,6 @@ class SolutionDetailViewTest(TestCase):
         )
         cls.test_output = TestOutput.objects.create(result=cls.test_result, name="", output="")
 
-    def setUp(self):
-        self.assertTrue(self.client.login(username="bob", password="secret"))
-        self.url = reverse(
-            "solutions:detail",
-            kwargs={"slug": self.task.slug, "scoped_id": self.solution.scoped_id},
-        )
-        super().setUp()
-
     def test_displayed_media(self):
         """Validate that static and dynamic media is displayed correctly."""
 
@@ -155,8 +159,3 @@ class SolutionDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Congratulations, your solution passed all tests.")
         self.assertContains(response, "Fibonacci.java")
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(TEST_MEDIA_ROOT)
-        super().tearDownClass()
