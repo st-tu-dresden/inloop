@@ -156,13 +156,6 @@ class SideBySideEditorView(LoginRequiredMixin, View):
 
 
 class SolutionUploadView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, slug: str) -> HttpResponse:
-        return TemplateResponse(
-            request,
-            "solutions/upload_form.html",
-            {"task": get_object_or_404(Task.objects.published(), slug=slug), "active_tab": 2},
-        )
-
     def post(self, request: HttpRequest, slug: str) -> HttpResponse:
         try:
             task = get_visible_task_or_404(request.user, slug)

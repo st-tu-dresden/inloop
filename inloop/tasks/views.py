@@ -9,14 +9,10 @@ from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import ObjectDoesNotExist, Q
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.urls import reverse
-from django.views.generic import View
 
 from constance import config
 
@@ -75,23 +71,3 @@ def serve_attachment(request: HttpRequest, slug: str, path: str) -> HttpResponse
     filesystem_path = join(task.system_name, path)
 
     return sendfile(request, filesystem_path, settings.REPOSITORY_ROOT)
-
-
-class TaskDetailView(LoginRequiredMixin, View):
-    """
-    Show the task description referenced by slug or system_name.
-
-    Requests with a non-slug url are redirected to their slug url equivalent.
-    """
-
-    def get(self, request: HttpRequest, slug_or_name: str) -> HttpResponse:
-        qs = Task.objects.published().visible_by(user=request.user)
-        try:
-            task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
-        except ObjectDoesNotExist:
-            raise Http404
-
-        if slug_or_name != task.slug:
-            return HttpResponseRedirect(reverse("tasks:detail", args=[task.slug]))
-
-        return TemplateResponse(request, "tasks/detail.html", {"task": task, "active_tab": 0})
