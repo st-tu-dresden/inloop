@@ -1,14 +1,16 @@
+import logging
 import re
+import sys
 from datetime import timedelta
 from io import StringIO
 from unittest import mock
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import AnonymousUser, Group, User
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.management import call_command
 from django.db.models import ObjectDoesNotExist
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from constance.test import override_config
@@ -21,6 +23,7 @@ from inloop.accounts.models import (
     user_profile_complete,
 )
 from inloop.accounts.tasks import autoprune_invalid_users
+from inloop.accounts.views import signup
 
 from tests.accounts.mixins import SimpleAccountsData
 
@@ -294,8 +297,8 @@ class SignupWorkflowTest(TestCase):
     FORM_DATA = {
         "username": "bob",
         "email": "bob@example.org",
-        "password1": "secret",
-        "password2": "secret",
+        "password1": "Passw0rd!",
+        "password2": "Passw0rd!",
         "privacy_consent": "true",
     }
 
@@ -312,10 +315,11 @@ class SignupWorkflowTest(TestCase):
         self.assertContains(response, "Please check your mailbox.")
 
         self.assertFalse(
-            self.client.login(username="bob", password="secret"),
+            self.client.login(username="bob", password="Passw0rd!"),
             "Login should fail before activation",
         )
 
+        self.assertEqual(len(mail.outbox), 1)
         subject, body = mail.outbox[0].subject, mail.outbox[0].body
         self.assertEqual(subject, "Activate your account on example.com")
         self.assertIn("Hello bob,", body)
@@ -336,9 +340,43 @@ class SignupWorkflowTest(TestCase):
         )
 
         self.assertTrue(
-            self.client.login(username="bob", password="secret"),
+            self.client.login(username="bob", password="Passw0rd!"),
             "Login should succeed after activation",
         )
+
+    @override_settings(ADMINS=[("Admin", "admin@localhost")])
+    @mock.patch("inloop.accounts.views.SignupView.registration_allowed")
+    def test_post_params_are_hidden_in_admin_error_report(self, method_mock):
+        rf = RequestFactory()
+        request = rf.post("/raise/", data=self.FORM_DATA)
+        request.user = AnonymousUser()
+        # force an unhandled exception in the registration
+        method_mock.side_effect = Exception("Boom!")
+        try:
+            signup(request)
+        except Exception as error:
+            self.assertEqual(str(error), "Boom!")
+            send_log(request, sys.exc_info())
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Exception at /raise/", email.body)
+        self.assertIn("Boom!", email.body)
+        self.assertNotIn("Passw0rd!", email.body)
+        self.assertNotIn("bob@example.org", email.body)
+        self.assertIn("password1", email.body)
+        self.assertIn("password2", email.body)
+        self.assertIn("No GET data", email.body)
+        self.assertNotIn("No POST data", email.body)
+
+
+def send_log(request, exc_info):
+    # based on code in Django: tests/view_tests/views.py
+    logger = logging.getLogger("django")
+    logger.error(
+        "Internal Server Error: %s" % request.path,
+        exc_info=exc_info,
+        extra={"status_code": 500, "request": request},
+    )
 
 
 class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):

@@ -17,6 +17,8 @@ from django.http.request import QueryDict
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView, View
 
 from constance import config
@@ -134,6 +136,7 @@ class SignupView(HmacRegistrationView):
     email_subject_template = "accounts/activation_email_subject.txt"
     disallowed_url = reverse_lazy("accounts:signup_closed")
 
+    @method_decorator(sensitive_post_parameters())
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("home"))
