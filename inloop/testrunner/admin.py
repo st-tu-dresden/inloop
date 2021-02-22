@@ -13,6 +13,9 @@ class TestOutputInline(admin.TabularInline):
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
+    class Media:
+        css = {"all": ["css/admin/testrunner.css"]}
+
     inlines = [TestOutputInline]
     list_display = ["id", "linked_solution", "created_at", "runtime", "return_code", "is_success"]
     list_filter = ["return_code", "created_at"]
@@ -38,6 +41,7 @@ class TestResultAdmin(admin.ModelAdmin):
         url = reverse("admin:solutions_solution_change", args=[solution_id])
         return format_html('<a href="{url}">{solution_id}</a>', url=url, solution_id=solution_id)
 
+    linked_solution.admin_order_field = "solution_id"
     linked_solution.short_description = "Solution id"
 
     def runtime(self, test_result: TestResult) -> str:

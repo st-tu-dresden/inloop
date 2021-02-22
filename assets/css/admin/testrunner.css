@@ -1,0 +1,6 @@
+.field-stdout .readonly,
+.field-stderr .readonly {
+  white-space: pre;
+  font-family: monospace;
+  overflow: auto;
+}
