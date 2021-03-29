@@ -10,7 +10,7 @@ license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-defusedxml = "^0.6.0"
+defusedxml = "^0.7.1"
 Django = "~3.1"
 django-constance = "^2.6.0"
 django-environ = "^0.4.5"
