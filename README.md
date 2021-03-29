@@ -100,11 +100,9 @@ University of Passau and later at the Karlsruhe Institute of Technology:
 
 ## License
 
-INLOOP is released under GPL version 3.
+INLOOP is released under GPL version 3 (see [LICENSE.txt](LICENSE.txt)).
 
-    Copyright (C) 2015-2017 Dominik Muhs and Martin Morgenstern
-    Copyright (C) 2018-2020 Philipp Matthes and Martin Morgenstern
-    Economic rights: Technische Universität Dresden (Germany)
+    Copyright (C) 2015-2021 The INLOOP authors.
 
     INLOOP is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
