@@ -353,7 +353,7 @@ export = ["jinja2 (>=2.7,<2.8)"]
 
 [[package]]
 name = "huey"
-version = "2.3.0"
+version = "2.3.1"
 description = "huey, a little task queue"
 category = "main"
 optional = false
@@ -1002,7 +1002,7 @@ honcho = [
     {file = "honcho-1.0.1.tar.gz", hash = "sha256:c189402ad2e337777283c6a12d0f4f61dc6dd20c254c9a3a4af5087fc66cea6e"},
 ]
 huey = [
-    {file = "huey-2.3.0.tar.gz", hash = "sha256:76978840a875607cd77c283c4ebf3ea5071b2ec06a1ac428d63be0d88f1e7070"},
+    {file = "huey-2.3.1.tar.gz", hash = "sha256:de9b6d0fd59794378fe05813d302be68038044ef3b68274b84ca8d285e20f803"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
