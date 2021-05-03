@@ -136,6 +136,8 @@ MESSAGE_TAGS = {
 
 DATABASES = {"default": env.db()}
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 CACHES = {"default": env.cache()}
 
 # TODO: LOGGING = { ... }
