@@ -78,12 +78,12 @@ class DockerTestRunner:
         """
         if "image" not in config:
             raise ValueError("image is a required config key")
-        config.setdefault("timeout", 30)
-        config.setdefault("memory", "256m")
-        config.setdefault("fssize", "32m")
-        config.setdefault("output_limit", 15000)
-        config.setdefault("filesize_limit", config["output_limit"])
-        self.config = config
+        self.config = dict(config)
+        self.config.setdefault("timeout", 30)
+        self.config.setdefault("memory", "256m")
+        self.config.setdefault("fssize", "32m")
+        self.config.setdefault("output_limit", 15000)
+        self.config.setdefault("filesize_limit", self.config["output_limit"])
 
     def ensure_absolute_dir(self, path: str) -> None:
         """
