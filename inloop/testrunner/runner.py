@@ -131,7 +131,7 @@ class DockerTestRunner:
                 storage_dir, filesize_limit=self.config["filesize_limit"]
             )
         if len(ignored_files) > 0:
-            logger.info(
+            logger.warning(
                 "Ignored %d output file(s) because they were too large.", len(ignored_files)
             )
         return TestOutput(rc, stdout, stderr, duration, files)
