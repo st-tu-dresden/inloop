@@ -10,7 +10,7 @@ from inloop.gitload.repo import Repository
 from inloop.gitload.signals import repository_loaded
 from inloop.tasks.models import Category, FileTemplate, Task
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class InvalidTask(Exception):
@@ -24,7 +24,7 @@ def load_tasks(repository: Repository) -> None:
         try:
             load_task(task_file)
         except InvalidTask as error:
-            LOG.error("%s", error)
+            logger.error("%s", error)
     repository_loaded.send(__name__, repository=repository)
 
 

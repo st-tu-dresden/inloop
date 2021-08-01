@@ -11,7 +11,7 @@ from . import TESTREPO_PATH
 
 class TaskLoadTest(TestCase):
     @patch("inloop.gitload.loader.repository_loaded")
-    @patch("inloop.gitload.loader.LOG")
+    @patch("inloop.gitload.loader.logger")
     def test_load_tasks(self, mocked_logger, mocked_signal):
         load_tasks(Repository(TESTREPO_PATH))
         mocked_signal.send.assert_called_once()

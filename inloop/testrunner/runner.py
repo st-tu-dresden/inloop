@@ -10,7 +10,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Set, Tuple
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def collect_files(path: str, *, filesize_limit: int) -> Tuple[Dict, Set]:
@@ -131,7 +131,9 @@ class DockerTestRunner:
                 storage_dir, filesize_limit=self.config["filesize_limit"]
             )
         if len(ignored_files) > 0:
-            LOG.info(f"Ignored {len(ignored_files)} output file(s) because they were too large.")
+            logger.info(
+                "Ignored %d output file(s) because they were too large.", len(ignored_files)
+            )
         return TestOutput(rc, stdout, stderr, duration, files)
 
     def subpath_check(self, path1: str, path2: str) -> None:
@@ -181,7 +183,7 @@ class DockerTestRunner:
             task_name,
         ]
 
-        LOG.debug("Popen args: %s", args)
+        logger.debug("Popen args: %s", args)
 
         proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -195,16 +197,16 @@ class DockerTestRunner:
             rc = int(signal.SIGKILL)
             # the container must be explicitely removed, because
             # SIGKILL cannot be proxied by the docker client
-            LOG.debug("removing timed out container %s", ctr_id)
+            logger.debug("removing timed out container %s", ctr_id)
             subprocess.call(["docker", "rm", "--force", str(ctr_id)], stdout=subprocess.DEVNULL)
 
         stderr = self.clean_stream(stderr)
         stdout = self.clean_stream(stdout)
 
-        LOG.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
+        logger.debug("container %s: rc=%r stdout=%r stderr=%r", ctr_id, rc, stdout, stderr)
 
         if rc in (125, 126, 127):
             # exit codes set exclusively by the Docker daemon
-            LOG.error("docker failure (rc=%d): %s", rc, stderr)
+            logger.error("docker failure (rc=%d): %s", rc, stderr)
 
         return rc, stdout, stderr
