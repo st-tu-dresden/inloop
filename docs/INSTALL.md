@@ -333,6 +333,18 @@ Name              | Description (default value)
 `WEB_CONCURRENCY` | The number of Gunicorn workers to start (`cpu_count() * 2`)
 `X_ACCEL_LOCATION`| The internal `X-Accel-Redirect` location for nginx, e.g. `/sendfile`, must be set if `PROXY_ENABLED` is `True`
 
+
+Furthermore, you can tweak the logging levels for the `inloop`, `django` (web framework) and `huey`
+(job queue) packages independently with the following environment variables:
+
+Name                     | Default value
+-------------------------|--------------
+`INLOOP_LOGLEVEL`        | `INFO`
+`INLOOP_LOGLEVEL_DJANGO` | `INFO`
+`INLOOP_LOGLEVEL_HUEY`   | `INFO`
+
+Possible values are `DEBUG`, `INFO`, `WARNING`, `ERROR` and `CRITICAL`.
+
 Additionally, the setproctitle library (which is used by Gunicorn) recognizes `SPT_NOENV`. If set,
 it will [not overwrite `/proc/PID/environ`][2].
 
