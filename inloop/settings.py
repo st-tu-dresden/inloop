@@ -140,7 +140,53 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 CACHES = {"default": env.cache()}
 
-# TODO: LOGGING = { ... }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "formatters": {
+        "custom": {
+            "format": "{asctime} {levelname:<7} [{name}@{threadName}] - {message}",
+            "datefmt": "%Y-%m-%d %H:%M:%S%z",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "custom",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "mail_admins"],
+            "level": env("INLOOP_LOGLEVEL_DJANGO", default="INFO"),
+        },
+        "huey": {
+            "handlers": ["console", "mail_admins"],
+            "level": env("INLOOP_LOGLEVEL_HUEY", default="INFO"),
+        },
+        "inloop": {
+            "handlers": ["console", "mail_admins"],
+            "level": env("INLOOP_LOGLEVEL", default="INFO"),
+        },
+    },
+}
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_COOKIE_AGE = 7 * 24 * 3600
