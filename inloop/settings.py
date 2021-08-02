@@ -147,9 +147,6 @@ LOGGING = {
         "require_debug_false": {
             "()": "django.utils.log.RequireDebugFalse",
         },
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
     },
     "formatters": {
         "custom": {
@@ -161,7 +158,6 @@ LOGGING = {
     "handlers": {
         "console": {
             "level": "DEBUG",
-            "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "custom",
         },
