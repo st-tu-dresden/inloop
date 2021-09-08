@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from constance import config
 from django_registration import validators
-from django_registration.forms import RegistrationFormUniqueEmail
+from django_registration.forms import RegistrationForm
 
 from inloop.accounts.models import StudentDetails
 from inloop.common.templatetags.markdown import markdown
@@ -14,9 +14,13 @@ from inloop.common.templatetags.markdown import markdown
 User = get_user_model()
 
 
-class SignupForm(RegistrationFormUniqueEmail):
+class SignupForm(RegistrationForm):
     """
-    A user-friendly sign up form with dynamically configurable help texts and validation.
+    A user-friendly sign-up form with dynamically configurable help texts and validation.
+
+    The sign-up form checks for case-insensitive uniqueness of username and email in the
+    clean_* methods. This way, the corresponding database queries are run after Django's
+    built-in validators have blocked invalid values such as NUL.
     """
 
     # Have to redeclare the entire field from the super class in order
@@ -35,7 +39,9 @@ class SignupForm(RegistrationFormUniqueEmail):
     )
 
     def clean_email(self) -> str:
-        """Perform additional email validation if configured in the admin interface."""
+        """
+        Ensure the email is unique and check against pattern configured in the admin interface.
+        """
         pattern = config.EMAIL_PATTERN
         email = self.cleaned_data["email"]
         if pattern:
@@ -45,12 +51,16 @@ class SignupForm(RegistrationFormUniqueEmail):
             regex = re.compile(pattern, re.VERBOSE)
             if not regex.search(email):
                 raise ValidationError(markdown(config.EMAIL_ERROR_MESSAGE))
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("This email address is already in use.")
         return email
 
     def clean_username(self) -> str:
-        """Ensure no duplicate user names exist, using case-insensitive comparison."""
-        username = self.cleaned_data.get("username")
-        if User.objects.filter(username__iexact=username):
+        """
+        Ensure the username is unique.
+        """
+        username = self.cleaned_data["username"]
+        if User.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError("A user with that username already exists.")
         return username
 
