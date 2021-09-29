@@ -268,6 +268,14 @@ class SignupFormTest(SimpleAccountsData, TestCase):
         self.assertIn("username", form.errors)
         self.assertEqual(form.errors["username"], ["A user with that username already exists."])
 
+    def test_email_with_null_char_is_rejected_early(self):
+        form = SignupForm(data={"email": "foo\x00@bar"})
+        with self.assertNumQueries(0):
+            # the string with \x00 should not reach the DB layer
+            self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
+        self.assertIn("Null characters are not allowed.", form.errors["email"])
+
 
 class SignupViewTests(SimpleAccountsData, TestCase):
     URL = reverse("accounts:signup")
