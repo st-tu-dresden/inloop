@@ -218,6 +218,7 @@ if env.bool("SECURE_COOKIES", default=True):
 
 # necessary to pass security audits:
 CSRF_COOKIE_HTTPONLY = True
+CSRF_FAILURE_VIEW = "inloop.views.csrf_failure"
 
 HUEY = {
     "immediate": False,

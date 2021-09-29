@@ -3,6 +3,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.views import LoginView
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.urls import reverse
+from django.views.csrf import csrf_failure as django_csrf_failure
 from django.views.decorators.cache import never_cache
 
 from inloop.tasks.views import index as task_index
@@ -24,3 +25,7 @@ def logout(request: HttpRequest) -> HttpResponse:
     auth_logout(request)
     messages.success(request, "You have been logged out. We hope to see you soon again!")
     return HttpResponseRedirect(reverse("home"))
+
+
+# custom CSRF failure view that ensures proper no-cache headers
+csrf_failure = never_cache(django_csrf_failure)

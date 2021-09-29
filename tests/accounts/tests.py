@@ -300,6 +300,12 @@ class SignupViewTests(SimpleAccountsData, TestCase):
         for response in [response1, response2]:
             self.assertContains(response, "Sorry, signing up is not allowed at the moment.")
 
+    def test_signup_is_not_cached(self):
+        response = self.client.get(self.URL)
+        self.assertIn("Cache-Control", response)
+        self.assertIn("no-cache", response["Cache-Control"])
+        self.assertIn("max-age=0", response["Cache-Control"])
+
 
 class SignupWorkflowTest(TestCase):
     FORM_DATA = {
