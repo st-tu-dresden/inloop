@@ -243,15 +243,11 @@ Installation
         django-admin loaddata about_pages staff_group
         django-admin set_default_site --system-fqdn --name INLOOP
 
-10. Finally, install the provided [upstart job files](../support/etc/init) or [systemd service
-    units](../support/etc/systemd/system) to their appropriate places. For `systemd` systems:
+10. Finally, install the provided [systemd service units](../support/etc/systemd/system) to
+    their appropriate places and activate them:
 
         sudo cp ~/inloop/support/etc/systemd/system/*.service /etc/systemd/system
         sudo systemctl enable --now gunicorn.service huey-helper.service
-
-    For `upstart` systems:
-
-        sudo cp ~/inloop/support/etc/init/*.conf /etc/init
 
 11. Configure nginx as a reverse proxy by copying and adapting the provided [example nginx
    location](../support/etc/nginx) to `/etc/nginx/conf.d` (or `/etc/nginx/sites-available.d`).
@@ -284,16 +280,13 @@ Got a server error? Look here for hints:
 
 * Check your mailbox, because Django sends detailed error reports via e-mail.
 * Look for error messages in the nginx error log, usually located in `/var/log/nginx/error.log`.
-* For `systemd` users, service logs for gunicorn and huey can be viewed using
+* Service logs for gunicorn and huey can be viewed using
 
        sudo journalctl -u gunicorn.service
 
   and
 
        sudo journalctl -u huey.service
-
-* If you are still stuck with `upstart` instead of `systemd`, the service logs are written to
-   `/var/log/upstart/gunicorn.log` and `/var/log/upstart/huey.log`.
 
 The most common source of errors are wrong file system permissions. Please double check that you
 have changed ownership and access rights as described in the [preparation section](#preparations).
