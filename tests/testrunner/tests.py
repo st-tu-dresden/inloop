@@ -1,7 +1,8 @@
 import signal
 import subprocess
+import sys
 from pathlib import Path
-from unittest import TestCase
+from unittest import TestCase, skipIf
 
 from django.test import tag
 
@@ -61,6 +62,7 @@ class DockerTestRunnerIntegrationTest(TestCase):
         self.assertEqual(result.stderr, "ERR")
         self.assertGreaterEqual(result.duration, 0.0)
 
+    @skipIf(sys.platform == "darwin", reason="Docker Desktop issues")
     def test_kill_on_timeout(self):
         """Test if the container gets killed after the timeout."""
         result = self.runner.check_task("sleep 10", DATA_DIR)
@@ -68,6 +70,7 @@ class DockerTestRunnerIntegrationTest(TestCase):
         self.assertGreaterEqual(result.duration, 0.0)
         self.assertLess(result.duration, 10.0)
 
+    @skipIf(sys.platform == "darwin", reason="Docker Desktop issues")
     def test_output_on_timeout(self):
         """Test if we receive output even if a timeout happens."""
         result = self.runner.check_task("echo -n OUT; echo -n ERR >&2; sleep 10", DATA_DIR)
