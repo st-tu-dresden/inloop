@@ -3,8 +3,8 @@
     "model": "flatpages.flatpage",
     "pk": 1,
     "fields": {
-        "url": "/about/imprint/",
-        "title": "Imprint",
+        "url": "/about/legal-notice/",
+        "title": "Legal Notice",
         "content": "",
         "enable_comments": false,
         "template_name": "",
