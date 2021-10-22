@@ -1,5 +1,5 @@
-nox==2020.8.22
-pip==20.2.4
-poetry==1.1.4
-setuptools==50.3.2
-virtualenv==20.2.1
+nox==2021.10.1
+pip==21.3
+poetry==1.1.11
+setuptools==58.2.0
+virtualenv==20.8.1
