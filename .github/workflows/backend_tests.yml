@@ -22,4 +22,4 @@ jobs:
           ${{ runner.os }}-pip-
     - run: pip install -r tools/ci-requirements.txt
     - run: poetry config experimental.new-installer false
-    - run: nox --sessions lint tests
+    - run: nox --force-color --sessions lint tests
