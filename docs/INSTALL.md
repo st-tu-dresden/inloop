@@ -247,6 +247,7 @@ Installation
     their appropriate places and activate them:
 
         sudo cp ~/inloop/support/etc/systemd/system/*.service /etc/systemd/system
+        sudo systemctl daemon-reload
         sudo systemctl enable --now gunicorn.service huey-helper.service
 
 11. Configure nginx as a reverse proxy by copying and adapting the provided [example nginx
