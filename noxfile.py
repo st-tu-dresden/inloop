@@ -13,6 +13,8 @@ from typing import Any
 import nox
 from nox.sessions import Session
 
+nox.options.stop_on_first_error = True
+
 
 def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> None:
     """Install packages constrained by poetry's lockfile."""
