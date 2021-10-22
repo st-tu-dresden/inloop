@@ -1,7 +1,7 @@
 IMAGE   := inloop-integration-test
 SOURCES := inloop tests
 
-ifndef TRAVIS
+ifndef CI
 override TESTOPTS += --exclude-tag=slow
 endif
 

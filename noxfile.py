@@ -3,8 +3,6 @@ Nox sessions, which each run in an isolated Python environment with
 minimal dependencies. This ensures that we never accidentally depend
 on dev dependencies in production code (thus, we achieve a feature
 similar to Maven's dependency scopes).
-
-The sessions are primarily used in our .travis-ci.yml.
 """
 
 from tempfile import NamedTemporaryFile
@@ -12,6 +10,8 @@ from typing import Any
 
 import nox
 from nox.sessions import Session
+
+nox.options.stop_on_first_error = True
 
 
 def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> None:
@@ -48,7 +48,7 @@ def poetry_install(session: Session) -> None:
     session.run("poetry", "install", "--no-dev", external=True)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def tests(session: Session) -> None:
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ["-v2", "--failfast"]
@@ -59,7 +59,7 @@ def tests(session: Session) -> None:
     session.run("coverage", "report")
 
 
-@nox.session(python=["3.7"])
+@nox.session(python=["3.9"])
 def lint(session: Session) -> None:
     """Check code style with flake8 and isort."""
     locations = "inloop", "tests", "noxfile.py", "manage.py", "runtests.py"
@@ -75,7 +75,7 @@ def lint(session: Session) -> None:
     session.run("flake8", *locations)
 
 
-@nox.session(python=["3.7"])
+@nox.session(python=["3.8"])
 def pytype(session: Session) -> None:
     """Statically check for type errors with pytype."""
     args = session.posargs or ["--config", "pytype.cfg"]
@@ -84,7 +84,7 @@ def pytype(session: Session) -> None:
     session.run("pytype", *args)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def typeguard(session: Session) -> None:
     """Run the test suite with run-time type checking of PEP-484 annotations."""
     args = session.posargs or ["-v2", "--failfast"]

@@ -21,7 +21,7 @@ This is the **preferred way of contributing**. We also use this approach (aka th
 2. Add commits and be sure to follow our [rules for commit messages](#commit-messages).
    Don't mix unrelated changes into one commit.
 3. Open a pull request so we can review the changes and give feedback. Additionally,
-   our Travis CI will check if the test suite succeeds.
+   our CI will check if the test suite succeeds.
 
 New code needs to include [unit tests][django-testing], documentation and must follow our [coding
 conventions](#coding-conventions).
@@ -81,7 +81,7 @@ Steps:
    version before and after the change.
 4. Commit changes with a commit message of the form:
    `Bump django from 1.11.28 to 1.11.29`, i.e., "Bump X from Y to Z".
-5. Push the branch, create a PR and wait for Travis to finish its checks.
+5. Push the branch, create a PR and wait for the CI to finish its checks.
 
 ### Upgrading Django major or minor versions
 

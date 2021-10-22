@@ -8,7 +8,7 @@
        \/__/     \/__/     \/__/   \/__/     \/__/
 
 
-[![Build Status](https://api.travis-ci.com/st-tu-dresden/inloop.svg?branch=main)](https://travis-ci.com/github/st-tu-dresden/inloop)
+[![Backend tests](https://github.com/st-tu-dresden/inloop/actions/workflows/backend_tests.yml/badge.svg)](https://github.com/st-tu-dresden/inloop/actions/workflows/backend_tests.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 INLOOP, the *INteractive Learning center for Object-Oriented Programming*, is a Python web
