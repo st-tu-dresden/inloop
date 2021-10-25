@@ -1,36 +1,21 @@
-IMAGE   := inloop-integration-test
-SOURCES := inloop tests
+help: 	## Show this help.
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "%-10s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-ifndef CI
-override TESTOPTS += --exclude-tag=slow
-endif
-
-# The default TMPDIR on macOS, /var/folders/..., cannot
-# be exported from macOS to Docker, but /tmp can.
-ifeq ($(shell uname -s),Darwin)
-override TESTENV += TMPDIR=/tmp
-endif
-
-init:
+init: 	## Initialize the virtualenv and install packages.
 	poetry install
-	docker build -t $(IMAGE) tests/testrunner
 
-run:
-	poetry run honcho -f Procfile.dev start
-
-loaddb:
+loaddb: ## Create SQLite database from schema and load fixtures.
 	poetry run ./manage.py migrate
 	poetry run ./manage.py loaddata about_pages staff_group
 	poetry run ./manage.py loaddata demo_accounts development_site
 
-test:
-	poetry run ./runtests.py -- $(TESTOPTS)
+run:	## Run the development webserver and the task queue.
+	@poetry run honcho -f Procfile.dev start || true
 
-coverage:
-	poetry run coverage run ./runtests.py -- $(TESTOPTS)
-	poetry run coverage report
+test:	## Run the backend tests via nox.
+	nox -r --session tests
 
-lint:
-	poetry run flake8 $(SOURCES)
+lint:	## Run the Python linters via nox.
+	nox -r --session lint
 
-.PHONY: init loaddb test coverage lint
+.PHONY: help init loaddb test lint

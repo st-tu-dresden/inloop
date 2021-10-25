@@ -39,7 +39,8 @@ INLOOP requires the following software:
 
 Using the command line, a development instance can be set up as follows:
 
-1. If you don't have it already, install [poetry](https://python-poetry.org/docs/#installation).
+1. If you don't have it already, install [poetry](https://python-poetry.org/docs/#installation)
+   and [nox](https://nox.thea.codes/en/stable/tutorial.html).
    If you run into trouble, the known "good" versions of the build tools are listed in
    [tools/ci-requirements.txt](tools/ci-requirements.txt).
 
