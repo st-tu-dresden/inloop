@@ -29,7 +29,7 @@ class CollectorTest(TestCase):
         self.assertEqual(contents["README.md"], "This is a test harness for collect_files().\n")
 
 
-@tag("slow", "docker")
+@tag("slow", "needs-docker")
 class DockerTestRunnerIntegrationTest(TestCase):
     """
     Each of the the following tests uses a *real* docker container, there is

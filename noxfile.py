@@ -5,12 +5,16 @@ on dev dependencies in production code (thus, we achieve a feature
 similar to Maven's dependency scopes).
 """
 
+import os
+import subprocess
 from tempfile import NamedTemporaryFile
 from typing import Any
 
 import nox
 from nox.sessions import Session
 
+nox.needs_version = ">=2021.10.1"
+nox.options.sessions = ["lint", "tests"]
 nox.options.stop_on_first_error = True
 
 
@@ -29,6 +33,13 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
             external=True,
         )
         session.install(f"--constraint={requirements.name}", *args, **kwargs)
+
+
+def is_docker_running() -> bool:
+    """Check if the Docker daemon is running."""
+    args = ["docker", "info"]
+    result = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return result.returncode == 0
 
 
 def build_docker_image(session: Session) -> None:
@@ -52,7 +63,13 @@ def poetry_install(session: Session) -> None:
 def tests(session: Session) -> None:
     """Run the complete test suite without dev dependencies."""
     args = session.posargs or ["-v2", "--failfast"]
-    build_docker_image(session)
+    if is_docker_running():
+        build_docker_image(session)
+    elif "CI" in os.environ:
+        session.error("Docker daemon is not running")
+    else:
+        args.append("--exclude-tag=needs-docker")
+        session.warn("Docker daemon is not running, skipping docker tests")
     poetry_install(session)
     install_with_constraints(session, "coverage[toml]")
     session.run("coverage", "run", "./runtests.py", "--", *args)
