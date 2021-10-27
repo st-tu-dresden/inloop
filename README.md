@@ -30,12 +30,12 @@ application to manage online programming courses, powered by Git, Django and Doc
 
 INLOOP requires the following software:
 
-* Debian 10+ or Ubuntu 20.04+, macOS 10.13+ (for development only)
-* Python 3.7 or 3.8
-* Docker 19.03+ ([Docker setup](docs/docker_setup.md) **!!!**)
+* Debian 11+ or Ubuntu 20.04+, macOS 10.15+ (for development only)
+* Python 3.8 or 3.9
+* Docker 20.10+ ([Docker setup](docs/docker_setup.md) **!!!**)
 * Redis 5.0+
-* Git 2.20+ ([workarounds for older Git versions](docs/git_troubleshouting.md))
-* PostgreSQL 11+
+* Git 2.25+ ([workarounds for older Git versions](docs/git_troubleshouting.md))
+* PostgreSQL 12+
 
 Using the command line, a development instance can be set up as follows:
 
