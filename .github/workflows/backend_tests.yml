@@ -6,20 +6,52 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9']
-    name: Python ${{ matrix.python-version }}
     env:
       VIRTUALENV_NO_DOWNLOAD: "true"
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - name: Checkout sources
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: actions/cache@v2
+    - name: Restore cached pip downloads
+      uses: actions/cache@v2
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - run: pip install -r tools/ci-requirements.txt
-    - run: poetry config experimental.new-installer false
-    - run: nox --force-color --sessions lint tests
+    - name: Setup build tools
+      run: |
+        pip install -r tools/ci-requirements.txt
+        poetry config experimental.new-installer false
+    - name: Run tests
+      run: nox --force-color --session tests-${{ matrix.python-version }}
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9']
+    env:
+      VIRTUALENV_NO_DOWNLOAD: "true"
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Restore cached pip downloads
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Setup build tools
+      run: |
+        pip install -r tools/ci-requirements.txt
+        poetry config experimental.new-installer false
+    - name: Lint
+      run: nox --force-color --session lint
