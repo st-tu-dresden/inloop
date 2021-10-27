@@ -1,4 +1,4 @@
-name: Backend tests
+name: CI
 on: push
 jobs:
   tests:
