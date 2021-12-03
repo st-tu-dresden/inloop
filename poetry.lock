@@ -227,7 +227,7 @@ requests = "*"
 
 [[package]]
 name = "django-redis"
-version = "5.0.0"
+version = "5.1.0"
 description = "Full featured redis cache backend for Django."
 category = "main"
 optional = false
@@ -235,7 +235,10 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 Django = ">=2.2"
-redis = ">=3.0.0"
+redis = ">=3,<4"
+
+[package.extras]
+hiredis = ["redis[hiredis] (>=3,<4)"]
 
 [[package]]
 name = "django-registration"
@@ -993,8 +996,8 @@ django-html-validator = [
     {file = "django-html-validator-0.5.1.tar.gz", hash = "sha256:492754c3240c6572b10e9b94bf5cc5489e96ffefa10854e26ca1edd2757df0c1"},
 ]
 django-redis = [
-    {file = "django-redis-5.0.0.tar.gz", hash = "sha256:048f665bbe27f8ff2edebae6aa9c534ab137f1e8fa7234147ef470df3f3aa9b8"},
-    {file = "django_redis-5.0.0-py3-none-any.whl", hash = "sha256:97739ca9de3f964c51412d1d7d8aecdfd86737bb197fce6e1ff12620c63c97ee"},
+    {file = "django-redis-5.1.0.tar.gz", hash = "sha256:98fb3d31633a1addea1aeb558a647359908bbcf78c0833f99496c5348fe3c1b4"},
+    {file = "django_redis-5.1.0-py3-none-any.whl", hash = "sha256:bf75bce0d6f65c3a6165dd6789506c8d22238f3bfaf7c4ad447e55afbc5b68cb"},
 ]
 django-registration = [
     {file = "django-registration-3.2.tar.gz", hash = "sha256:2ea8c7d89a8760ccde41dfd335aa28ba89073d09aab5a0f5f3d7c8c148fcc518"},
