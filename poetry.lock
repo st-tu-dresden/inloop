@@ -192,7 +192,7 @@ sqlparse = ">=0.2.0"
 
 [[package]]
 name = "django-environ"
-version = "0.7.0"
+version = "0.8.1"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
 category = "main"
 optional = false
@@ -864,7 +864,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "1278ec0d07015144ebf2d73169edeefd6c871b5e098c846ab2b06b22d7706ead"
+content-hash = "bc8ac99daa9a0148fe881840fe9711cb2fe8a9a4409c3f777a62799addabcb39"
 
 [metadata.files]
 appdirs = [
@@ -985,8 +985,8 @@ django-debug-toolbar = [
     {file = "django_debug_toolbar-3.2.1-py3-none-any.whl", hash = "sha256:e759e63e3fe2d3110e0e519639c166816368701eab4a47fed75d7de7018467b9"},
 ]
 django-environ = [
-    {file = "django-environ-0.7.0.tar.gz", hash = "sha256:b99bd3704221f8b717c8517d8146e53fdee509d9e99056be560060003b92213e"},
-    {file = "django_environ-0.7.0-py2.py3-none-any.whl", hash = "sha256:20a5a3570333d3718c0a7ca834290ef850e2b96237ae4ca0a05823b3a0cb3363"},
+    {file = "django-environ-0.8.1.tar.gz", hash = "sha256:6f0bc902b43891656b20486938cba0861dc62892784a44919170719572a534cb"},
+    {file = "django_environ-0.8.1-py2.py3-none-any.whl", hash = "sha256:42593bee519a527602a467c7b682aee1a051c2597f98c45f4f4f44169ecdb6e5"},
 ]
 django-extensions = [
     {file = "django-extensions-3.1.5.tar.gz", hash = "sha256:28e1e1bf49f0e00307ba574d645b0af3564c981a6dfc87209d48cb98f77d0b1a"},
