@@ -1,5 +1,11 @@
 name: CI
-on: push
+
+on:
+  push:
+  schedule:
+  # run checks on main every monday at 05:45
+  - cron: '45 5 * * 1'
+
 jobs:
   tests:
     runs-on: ubuntu-latest
