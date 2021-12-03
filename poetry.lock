@@ -175,7 +175,7 @@ redis = ["redis"]
 
 [[package]]
 name = "django-debug-toolbar"
-version = "3.2.1"
+version = "3.2.2"
 description = "A configurable set of panels that display various debug information about the current request/response."
 category = "dev"
 optional = false
@@ -989,8 +989,8 @@ django-constance = [
     {file = "django_constance-2.8.0-py3-none-any.whl", hash = "sha256:60fec73e397d5f4f7440f611b18d3e7ce5342647f316fedc47b62e1411c849e7"},
 ]
 django-debug-toolbar = [
-    {file = "django-debug-toolbar-3.2.1.tar.gz", hash = "sha256:a5ff2a54f24bf88286f9872836081078f4baa843dc3735ee88524e89f8821e33"},
-    {file = "django_debug_toolbar-3.2.1-py3-none-any.whl", hash = "sha256:e759e63e3fe2d3110e0e519639c166816368701eab4a47fed75d7de7018467b9"},
+    {file = "django-debug-toolbar-3.2.2.tar.gz", hash = "sha256:8c5b13795d4040008ee69ba82dcdd259c49db346cf7d0de6e561a49d191f0860"},
+    {file = "django_debug_toolbar-3.2.2-py3-none-any.whl", hash = "sha256:d7bab7573fab35b0fd029163371b7182f5826c13da69734beb675c761d06a4d3"},
 ]
 django-environ = [
     {file = "django-environ-0.8.1.tar.gz", hash = "sha256:6f0bc902b43891656b20486938cba0861dc62892784a44919170719572a534cb"},
