@@ -353,7 +353,7 @@ tornado = ["tornado (>=0.2)"]
 
 [[package]]
 name = "honcho"
-version = "1.0.1"
+version = "1.1.0"
 description = "Honcho: a Python clone of Foreman. For managing Procfile-based applications."
 category = "dev"
 optional = false
@@ -363,7 +363,7 @@ python-versions = "*"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
 
 [package.extras]
-export = ["jinja2 (>=2.7,<2.8)"]
+export = ["jinja2 (>=2.7,<3)"]
 
 [[package]]
 name = "huey"
@@ -1044,8 +1044,8 @@ gunicorn = [
     {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 honcho = [
-    {file = "honcho-1.0.1-py2.py3-none-any.whl", hash = "sha256:af5806bf13e3b20acdcb9ff8c0beb91eee6fe07393c3448dfad89667e6ac7576"},
-    {file = "honcho-1.0.1.tar.gz", hash = "sha256:c189402ad2e337777283c6a12d0f4f61dc6dd20c254c9a3a4af5087fc66cea6e"},
+    {file = "honcho-1.1.0-py2.py3-none-any.whl", hash = "sha256:a4d6e3a88a7b51b66351ecfc6e9d79d8f4b87351db9ad7e923f5632cc498122f"},
+    {file = "honcho-1.1.0.tar.gz", hash = "sha256:c5eca0bded4bef6697a23aec0422fd4f6508ea3581979a3485fc4b89357eb2a9"},
 ]
 huey = [
     {file = "huey-2.4.2.tar.gz", hash = "sha256:20683288e27e851f786b38465784c5d0e7e2b93b8791cc826898f9555a320cb4"},
