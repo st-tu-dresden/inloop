@@ -254,7 +254,7 @@ Django = ">=2.2,<3.0.0 || >=3.1.0"
 
 [[package]]
 name = "django-widget-tweaks"
-version = "1.4.8"
+version = "1.4.9"
 description = "Tweak the form field rendering in templates, not in python-level form definitions."
 category = "main"
 optional = false
@@ -1004,8 +1004,8 @@ django-registration = [
     {file = "django_registration-3.2-py3-none-any.whl", hash = "sha256:e79fdbfa22bfaf4182efccb6604391391a7de19438d2669c5b9520a7708efbd2"},
 ]
 django-widget-tweaks = [
-    {file = "django-widget-tweaks-1.4.8.tar.gz", hash = "sha256:9f91ca4217199b7671971d3c1f323a2bec71a0c27dec6260b3c006fa541bc489"},
-    {file = "django_widget_tweaks-1.4.8-py2.py3-none-any.whl", hash = "sha256:f80bff4a8a59b278bb277a405a76a8b9a884e4bae7a6c70e78a39c626cd1c836"},
+    {file = "django-widget-tweaks-1.4.9.tar.gz", hash = "sha256:19bcb66a4a9e68493ced04e7124882d753c5be517ed001556f9e35a40147f545"},
+    {file = "django_widget_tweaks-1.4.9-py2.py3-none-any.whl", hash = "sha256:d6c64fbf92cd2df9031f597c1374982233c05a1190d295c39d1c57ce007569c7"},
 ]
 flake8 = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},
