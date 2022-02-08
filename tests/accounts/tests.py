@@ -408,6 +408,22 @@ class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
         response = self.client.get(reverse("accounts:password_reset"))
         self.assertNotEqual(response.status_code, 404)
 
+    def test_activation_link_with_https(self):
+        form_data = {"email": self.bob.email}
+        response = self.client.post(
+            reverse("accounts:password_reset"),
+            data=form_data,
+            follow=True,
+            secure=True,
+        )
+        self.assertContains(
+            response,
+            "We've sent an email to you with further instructions to recover your account.",
+        )
+        subject, body = mail.outbox[0].subject, mail.outbox[0].body
+        self.assertEqual(subject, "Recover your password on example.com")
+        self.assertIn("https://example.com", body)
+
     def test_recovery(self):
         form_data = {"email": self.bob.email}
         response = self.client.post(
@@ -415,7 +431,7 @@ class PasswordRecoverWorkflowTest(SimpleAccountsData, TestCase):
         )
         self.assertContains(
             response,
-            "We've sent an email to you with further " "instructions to recover your account.",
+            "We've sent an email to you with further instructions to recover your account.",
         )
 
         subject, body = mail.outbox[0].subject, mail.outbox[0].body
