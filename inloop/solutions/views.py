@@ -103,12 +103,22 @@ class SideBySideEditorView(LoginRequiredMixin, View):
         """
         Show the side-by-side editor for the task referenced by slug or system_name.
         Requests with a non-slug url are redirected to their slug url equivalent.
+
+        Tasks that are not yet published are treated as non-existent (HTTP 404), with
+        one exception: because client-side autoreveal can be slightly ahead of server
+        time, requests for tasks to be published *very* soon are redirected to the
+        category view with a user-friendly warning message.
         """
-        qs = Task.objects.published().visible_by(user=request.user)
+        qs = Task.objects.published_soon().visible_by(user=request.user)
         try:
             task = qs.filter(Q(slug=slug_or_name) | Q(system_name=slug_or_name)).get()
         except ObjectDoesNotExist:
             raise Http404
+        if not task.is_published:
+            messages.warning(
+                request, "This task has not started yet, please try again in a few seconds."
+            )
+            return redirect("tasks:category", slug=task.category.slug)
         if slug_or_name != task.slug:
             return HttpResponseRedirect(reverse("solutions:editor", args=[task.slug]))
         context = {

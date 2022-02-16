@@ -47,6 +47,10 @@ class TaskQuerySet(models.QuerySet):
     def published(self) -> TaskQuerySet:
         return self.filter(pubdate__lt=timezone.now())
 
+    def published_soon(self) -> TaskQuerySet:
+        now_with_offset = timezone.now() + timedelta(seconds=15)
+        return self.filter(pubdate__lt=now_with_offset)
+
     def visible_by(self, *, user: User) -> TaskQuerySet:
         return self.filter(Q(group__in=user.groups.all()) | Q(group=None))
 

@@ -370,6 +370,16 @@ class EditorTest(SimpleAccountsData, TaskData, TestCase):
         response = self.client.get(reverse("solutions:editor", args=["Task1"]))
         self.assertRedirects(response, reverse("solutions:editor", args=["task-1"]))
 
+    def test_redirect_if_unpublished_but_available_soon(self):
+        self.assertTrue(self.client.login(username="alice", password="secret"))
+        self.unpublished_task1.pubdate = timezone.now() + timedelta(seconds=10)
+        self.unpublished_task1.save()
+        response = self.client.get(
+            reverse("solutions:editor", args=["unpublished-task-1"]), follow=True
+        )
+        self.assertRedirects(response, reverse("tasks:category", args=["category-1"]))
+        self.assertContains(response, "This task has not started yet")
+
     def test_is_never_cached(self):
         self.assertTrue(self.client.login(username="alice", password="secret"))
         response = self.client.get(reverse("solutions:editor", args=["task-1"]))
