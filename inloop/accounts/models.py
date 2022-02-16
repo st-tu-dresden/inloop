@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 from random import choice
 from typing import Any, Iterable, Sequence, Type
@@ -17,6 +18,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from constance import config
+
+logger = logging.getLogger(__name__)
 
 INCOMPLETE_HINT = (
     "Your user profile is incomplete. To ensure we can award bonus points to you, please "
@@ -70,7 +73,7 @@ def auto_assign_to_group(
     try:
         user.groups.add(Group.objects.get(name=group_name))
     except Group.DoesNotExist:
-        pass
+        logger.warning(f"AUTO_ASSIGN_GROUPS is active for a non-existent group: {group_name}")
 
 
 def assign_to_groups(*, users: Iterable[User], groups: Sequence[Group]) -> int:
