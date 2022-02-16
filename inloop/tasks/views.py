@@ -9,8 +9,7 @@ from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
@@ -56,18 +55,18 @@ def category(request: HttpRequest, slug: str) -> HttpResponse:
 @login_required
 def serve_attachment(request: HttpRequest, slug: str, path: str) -> HttpResponse:
     """
-    Serve static files from a task subdirectory.
+    Serve static files from a task subdirectory, but only for published tasks
+    and for tasks the user has permission to view. Otherwise, return status 404.
 
     Access is granted exclusively to whitelisted subdirectories.
     """
     if re.search("^(images|attachments)/", path) is None:
-        raise PermissionDenied
+        raise Http404
 
     if ".." in unquote(path):
-        raise PermissionDenied
+        raise Http404
 
-    # translate the slug into the internal task name
-    task = get_object_or_404(Task, slug=slug)
+    task = get_object_or_404(Task.objects.published().visible_by(user=request.user), slug=slug)
     filesystem_path = join(task.system_name, path)
 
     return sendfile(request, filesystem_path, settings.REPOSITORY_ROOT)
