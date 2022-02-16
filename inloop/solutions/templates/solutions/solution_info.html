@@ -18,6 +18,7 @@
   <li><a href="{% url 'tasks:index' %}">Tasks</a></li>
   <li><a href="{% url 'tasks:category' task.category.slug %}">{{ task.category }}</a></li>
   <li><a href="{% url 'solutions:editor' task.slug %}">{{ task.title }}</a></li>
+  <li><a href="{% url 'solutions:list' task.slug %}">My solutions</a></li>
   <li class="active">Solution
 #{% if impersonate %}{{ solution.id }}{% else %}{{ solution.scoped_id }}{% endif %}
   </li>
