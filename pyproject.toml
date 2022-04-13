@@ -22,7 +22,7 @@ gunicorn = "^20.0.4"
 huey = "^2.3.0"
 Markdown = "^3.3.3"
 psycopg2 = "^2.8.4"
-redis = "^3.4.1"
+redis = "^4.2.2"
 setproctitle = "^1.1.10"
 
 [tool.poetry.dev-dependencies]
