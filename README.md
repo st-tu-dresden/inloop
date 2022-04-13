@@ -103,7 +103,7 @@ University of Passau and later at the Karlsruhe Institute of Technology:
 
 INLOOP is released under GPL version 3 (see [LICENSE.txt](LICENSE.txt)).
 
-    Copyright (C) 2015-2021 The INLOOP authors.
+    Copyright (C) 2015-2022 The INLOOP authors.
 
     INLOOP is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
