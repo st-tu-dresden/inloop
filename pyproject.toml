@@ -9,9 +9,9 @@ authors = [
 license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 defusedxml = "^0.7.1"
-Django = "^3.2"
+Django = "^4.0.3"
 django-constance = "^2.6.0"
 django-environ = "^0.8.1"
 django-extensions = "^3.1.0"
