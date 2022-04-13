@@ -17,7 +17,7 @@ from inloop.tasks.models import Task
 class Command(BaseCommand):
     help = "Generate submissions for demo purposes."
 
-    MAX_USERS = 10 ** 4
+    MAX_USERS = 10**4
     AVG_SOLUTIONS_PER_HOUR = 0.5
 
     def add_arguments(self, parser: CommandParser) -> None:
