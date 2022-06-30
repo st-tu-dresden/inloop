@@ -229,8 +229,8 @@ HUEY = {
 TESTRUNNER_OPTIONS = {
     "image": "inloop-testrunner",
     "timeout": 120,
-    "output_limit": 15000,
-    "filesize_limit": 50000,
+    "output_limit": 30720,
+    "filesize_limit": 81920,
 }
 
 REPOSITORY_ROOT = str(Path(MEDIA_ROOT) / "repository")
