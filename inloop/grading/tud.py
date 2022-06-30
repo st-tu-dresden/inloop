@@ -36,7 +36,7 @@ def guess_name_from_email(email: str) -> Tuple[str, str]:
     Try to guess first and last name from email and return it as a tuple.
     """
     name, domain = email.split("@", 1)
-    if domain != "mailbox.tu-dresden.de":
+    if ("." not in name) or (domain != "mailbox.tu-dresden.de"):
         return "", ""
     first_name, last_name = name.split(".", 1)
     first_name = first_name.replace("_", " ")
