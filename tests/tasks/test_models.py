@@ -19,6 +19,7 @@ class TaskTests(SimpleAccountsData, TaskData, TestCase):
             category=self.category1,
             pubdate=timezone.now(),
         )
+        self.assertEqual(task.sluggable_title, "Some Task III")
         self.assertEqual(task.slug, "some-task-iii")
 
     def test_is_published(self):

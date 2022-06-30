@@ -91,7 +91,7 @@ def create_archive(solution: Solution) -> None:
     if solution.archive:
         return
     stream = BytesIO()
-    stream.name = f"Solution_{solution.scoped_id}_{solution.task.underscored_title}.zip"
+    stream.name = f"solution-{solution.scoped_id}-{solution.task.slug}.zip"
     with ZipFile(stream, mode="w", compression=ZIP_DEFLATED) as zipfile:
         for solution_file in solution.solutionfile_set.all():
             zipfile.write(filename=solution_file.absolute_path, arcname=solution_file.name)
