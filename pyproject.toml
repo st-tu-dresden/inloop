@@ -3,7 +3,7 @@ name = "inloop"
 version = "0.1.0"
 description = "A web application to manage online programming assignments"
 authors = [
-    "Martin Morgenstern <mail@mmorgenstern.net>",
+    "Martin Morgenstern <martin.morgenstern1@tu-dresden.de>",
     "Philipp Matthes <github@philippmatth.es>"
 ]
 license = "GPL-3.0-or-later"
