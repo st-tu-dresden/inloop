@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 INSTALL_CMD="${INSTALL_CMD:-sudo apt-get install}"
-PKGS_BASE="build-essential git python3 python3-dev python3-venv redis-server"
-PKGS_PROD="$PKGS_BASE libpq-dev daemontools"
+PKGS_BASE="build-essential git python3 python3-dev python3-venv redis-server libpq-dev"
+PKGS_PROD="$PKGS_BASE daemontools"
 
 case "$1" in
     --prod)
