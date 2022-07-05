@@ -16,3 +16,5 @@ if ! command -v docker >/dev/null; then
     echo 'from https://www.docker.com/docker-mac.' 2>&1
     exit 1
 fi
+
+echo "Done! Your system appears to be configured correctly."
