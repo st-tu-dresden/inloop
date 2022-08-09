@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>INLOOP is offline</title>
+    <title>INLOOP is temporarily offline</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -37,6 +37,16 @@
         font-size: 0.6rem;
       }
 
+      kbd {
+        border: 1px solid #aaa;
+        font-weight: bold;
+        font-size: 0.75em;
+        border-radius: 3px;
+        padding: 1px 4px;
+        background-color: #eee;
+        box-shadow: 2px 2px 2px #777;
+      }
+
       @media only screen and (min-width: 768px) {
         body > div > img {
           width: 500px;
@@ -56,9 +66,19 @@
         Please try again later.
       </p>
       <p>
+        You can reload the page with <kbd id="ctrl-key">Ctrl</kbd> + <kbd>R</kbd>.
+      </p>
+      <p>
         Artwork by <a href="http://theoatmeal.com">The Oatmeal</a> &mdash;
         <a href="mailto:inf-inloop@groups.tu-dresden.de">Contact us</a>
       </p>
     </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      if (navigator.platform.indexOf("Mac") != -1) {
+        document.getElementById("ctrl-key").innerText = "Cmd";
+      }
+    });
+    </script>
   </body>
 </html>
