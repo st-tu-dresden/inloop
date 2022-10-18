@@ -26,9 +26,7 @@ jobs:
           tools/ci-requirements.txt
           poetry.lock
     - name: Setup build tools
-      run: |
-        pip install -r tools/ci-requirements.txt
-        poetry config experimental.new-installer false
+      run: pip install -r tools/ci-requirements.txt
     - name: Run tests
       run: nox --force-color --session tests-${{ matrix.python-version }}
   lint:
@@ -50,8 +48,6 @@ jobs:
           tools/ci-requirements.txt
           poetry.lock
     - name: Setup build tools
-      run: |
-        pip install -r tools/ci-requirements.txt
-        poetry config experimental.new-installer false
+      run: pip install -r tools/ci-requirements.txt
     - name: Lint
       run: nox --force-color --session lint
