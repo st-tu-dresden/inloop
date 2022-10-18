@@ -190,7 +190,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-constance"
-version = "2.8.0"
+version = "2.9.1"
 description = "Django live settings with pluggable backends, including Redis."
 category = "main"
 optional = false
@@ -1103,8 +1103,8 @@ django = [
     {file = "Django-4.1.2.tar.gz", hash = "sha256:b8d843714810ab88d59344507d4447be8b2cf12a49031363b6eed9f1b9b2280f"},
 ]
 django-constance = [
-    {file = "django-constance-2.8.0.tar.gz", hash = "sha256:0a492454acc78799ce7b9f7a28a00c53427d513f34f8bf6fdc90a46d8864b2af"},
-    {file = "django_constance-2.8.0-py3-none-any.whl", hash = "sha256:60fec73e397d5f4f7440f611b18d3e7ce5342647f316fedc47b62e1411c849e7"},
+    {file = "django-constance-2.9.1.tar.gz", hash = "sha256:4c6a96a5f2cbce1bc3fa41aa20566b6ee26fbd896c9f91f996518a3a0904f6c8"},
+    {file = "django_constance-2.9.1-py3-none-any.whl", hash = "sha256:bf0b392efa18a1f3f464eddb7eb36ac5c02598354a5e31d0d4ce4fc8b535694b"},
 ]
 django-debug-toolbar = [
     {file = "django-debug-toolbar-3.2.4.tar.gz", hash = "sha256:644bbd5c428d3283aa9115722471769cac1bec189edf3a0c855fd8ff870375a9"},
