@@ -16,7 +16,7 @@ class TestResultAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ["css/admin/testrunner.css"]}
 
-    inlines = [TestOutputInline]
+    inlines = (TestOutputInline,)
     list_display = ["id", "linked_solution", "created_at", "runtime", "return_code", "is_success"]
     list_filter = ["return_code", "created_at"]
     search_fields = [

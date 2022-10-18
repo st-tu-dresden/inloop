@@ -22,7 +22,7 @@ class TaskAdmin(PlagiarismAdmin):
     list_filter = ["pubdate", "deadline", "category", "group"]
     search_fields = ["title", "description"]
     prepopulated_fields = {"slug": ("title",)}
-    actions = PlagiarismAdmin.actions + ["jplag_check_tasks"]
+    actions = PlagiarismAdmin.actions + ("jplag_check_tasks",)
     ordering = ["pubdate", "deadline", "title"]
 
     def jplag_check_tasks(self, request: HttpRequest, queryset: TaskQuerySet) -> None:
@@ -42,7 +42,7 @@ class CategoryAdmin(PlagiarismAdmin):
     list_filter = ["display_order"]
     search_fields = ["name", "display_order"]
     prepopulated_fields = {"slug": ("name",)}
-    actions = PlagiarismAdmin.actions + ["jplag_check_category"]
+    actions = PlagiarismAdmin.actions + ("jplag_check_category",)
 
     def jplag_check_category(self, request: HttpRequest, queryset: QuerySet) -> None:
         """

@@ -63,7 +63,7 @@ class SemesterListFilter(admin.SimpleListFilter):
 
 @admin.register(Solution)
 class SolutionAdmin(admin.ModelAdmin):
-    inlines = [SolutionFileInline]
+    inlines = (SolutionFileInline,)
     list_display = ["id", "author", "task", "submission_date", "passed", "site_link"]
     list_filter = ["passed", "task__category", SemesterListFilter, "submission_date", "task"]
     search_fields = [
