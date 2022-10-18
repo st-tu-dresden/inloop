@@ -227,7 +227,7 @@ Installation
    is not the case.
 
         cd ~/inloop
-        poetry install --no-dev
+        poetry install --only main
         django-admin migrate
 
    **Tip**: perform a PostgreSQL backup before migrating with `pg_dump -Fc -f ~/inloop.pgdump`.

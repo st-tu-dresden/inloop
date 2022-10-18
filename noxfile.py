@@ -26,7 +26,8 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
         session.run(
             "poetry",
             "export",
-            "--dev",
+            "--with",
+            "dev",
             "--without-hashes",
             "--format=requirements.txt",
             f"--output={requirements.name}",
@@ -56,7 +57,7 @@ def build_docker_image(session: Session) -> None:
 
 def poetry_install(session: Session) -> None:
     """Install the runtime dependencies with poetry."""
-    session.run("poetry", "install", "--no-dev", external=True)
+    session.run("poetry", "install", "--only", "main", external=True)
 
 
 @nox.session(python=["3.8", "3.9"])
