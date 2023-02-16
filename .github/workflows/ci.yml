@@ -31,5 +31,5 @@ jobs:
           poetry.lock
     - name: Setup build tools
       run: pip install -r tools/ci-requirements.txt
-    - name: Run nox session ${{ matrix.nox-session }}
+    - name: Run nox session '${{ matrix.nox-session }}'
       run: nox --force-color -p ${{ matrix.python-version }} -s ${{ matrix.nox-session }}
