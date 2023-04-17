@@ -21,9 +21,9 @@ django-widget-tweaks = "^1.4.5"
 gunicorn = "^20.0.4"
 huey = "^2.3.0"
 Markdown = "^3.3.3"
-psycopg2 = "^2.8.4"
 redis = "^4.2.2"
 setproctitle = "^1.1.10"
+psycopg = {extras = ["binary"], version = "^3.1.8"}
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.2"
