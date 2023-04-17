@@ -22,7 +22,7 @@ nox.options.stop_on_first_error = True
 
 def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> None:
     """Install packages constrained by poetry's lockfile."""
-    with NamedTemporaryFile() as requirements:
+    with NamedTemporaryFile() as constraints:
         # This approach is by Claudio Jolowicz, see his excellect
         # example at github.com/cjolowicz/hypermodern-python.
         session.run(
@@ -31,11 +31,11 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
             "--with",
             "dev",
             "--without-hashes",
-            "--format=requirements.txt",
-            f"--output={requirements.name}",
+            "--format=constraints.txt",
+            f"--output={constraints.name}",
             external=True,
         )
-        session.install(f"--constraint={requirements.name}", *args, **kwargs)
+        session.install(f"--constraint={constraints.name}", *args, **kwargs)
 
 
 def is_docker_running() -> bool:
