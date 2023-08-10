@@ -1,3 +1,12 @@
+### :warning: Deprecation Notice :warning:
+
+INLOOP has reached its end of life, development has stopped and this repository has been archived.
+
+This project is **no longer supported and maintained** by the Software Technology Group at TU
+Dresden.
+
+The original README has been preserved below.
+
 
         ___       ___       ___     ___       ___       ___
        /\  \     /\__\     /\__\   /\  \     /\  \     /\  \
